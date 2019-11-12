@@ -1,0 +1,16 @@
+//
+//  TorrentDetailFileViewModel.swift
+//  Magnesium
+//
+//  Created by James Hurst on 2019-12-30.
+//  Copyright © 2019 James Hurst. All rights reserved.
+//
+
+import Combine
+import Foundation
+
+protocol TorrentDetailFileViewModel: Hashable {
+    var name: String { get }
+    var detail: AnyPublisher<String, Never> { get }
+    var progress: AnyPublisher<String, Never> { get }
+}
