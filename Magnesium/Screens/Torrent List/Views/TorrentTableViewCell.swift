@@ -59,6 +59,18 @@ final class TorrentTableViewCell: UITableViewCell {
         return label
     }()
 
+    static var estimatedHeight: CGFloat {
+        return 8
+            + UIFont.preferredFont(forTextStyle: .body).lineHeight
+            + 8
+            + 2.5
+            + 8
+            + UIFont.preferredFont(forTextStyle: .subheadline).lineHeight
+            + 2
+            + UIFont.preferredFont(forTextStyle: .subheadline).lineHeight
+            + 8
+    }
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setup()
@@ -98,14 +110,14 @@ final class TorrentTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
 
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressView.topAnchor.constraint(equalToSystemSpacingBelow: nameLabel.bottomAnchor, multiplier: 1),
+            progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
 
             detail1Label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            detail1Label.topAnchor.constraint(equalToSystemSpacingBelow: progressView.bottomAnchor, multiplier: 1),
+            detail1Label.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
             detail2Label.leadingAnchor.constraint(greaterThanOrEqualTo: detail1Label.trailingAnchor, constant: 8),
             detail2Label.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -114,12 +126,12 @@ final class TorrentTableViewCell: UITableViewCell {
 
             detail3Label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             detail3Label.topAnchor.constraint(equalTo: detail1Label.bottomAnchor, constant: 2),
-            detail3Label.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            detail3Label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 
             detail4Label.leadingAnchor.constraint(greaterThanOrEqualTo: detail3Label.trailingAnchor, constant: 8),
             detail4Label.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             detail4Label.topAnchor.constraint(equalTo: detail3Label.topAnchor),
-            detail4Label.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            detail4Label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
         ])
     }
 

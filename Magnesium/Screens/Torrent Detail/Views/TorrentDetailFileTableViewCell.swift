@@ -48,7 +48,6 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        backgroundColor = .systemBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressLabel)
         contentView.addSubview(separatorView)
@@ -63,13 +62,13 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: 4),
-            nameLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: -4),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             progressLabel.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8),
             progressLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            progressLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            progressLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
+            progressLabel.bottomAnchor.constraint(equalTo: nameLabel.bottomAnchor),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

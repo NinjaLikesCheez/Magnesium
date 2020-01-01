@@ -38,7 +38,6 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        backgroundColor = .systemBackground
         contentView.addSubview(trackerLabel)
         contentView.addSubview(separatorView)
     }
@@ -50,8 +49,8 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             trackerLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             trackerLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            trackerLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            trackerLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            trackerLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            trackerLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

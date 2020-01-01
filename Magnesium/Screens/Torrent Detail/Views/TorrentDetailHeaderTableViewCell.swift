@@ -48,19 +48,19 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
     private lazy var pauseButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.tintColor = .white
+        button.tintColor = .systemBlue
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
         button.setImage(UIImage(systemName: "pause.fill", withConfiguration: configuration), for: .normal)
-        button.setBackgroundImage(UIImage(color: .systemBlue), for: .normal)
+        button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         return button
     }()
 
     private lazy var removeButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.tintColor = .white
+        button.tintColor = .systemRed
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
         button.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
-        button.setBackgroundImage(UIImage(color: .systemRed), for: .normal)
+        button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         return button
     }()
 
@@ -79,14 +79,14 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         pauseButton.layer.mask = {
             let mask = CAShapeLayer()
             mask.frame = pauseButton.bounds
-            mask.path = UIBezierPath(roundedRect: pauseButton.bounds, cornerRadius: 7).cgPath
+            mask.path = UIBezierPath(roundedRect: pauseButton.bounds, cornerRadius: 8).cgPath
             return mask
         }()
         removeButton.layoutIfNeeded()
         removeButton.layer.mask = {
             let mask = CAShapeLayer()
             mask.frame = removeButton.bounds
-            mask.path = UIBezierPath(roundedRect: removeButton.bounds, cornerRadius: 7).cgPath
+            mask.path = UIBezierPath(roundedRect: removeButton.bounds, cornerRadius: 8).cgPath
             return mask
         }()
     }
@@ -101,6 +101,11 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
         if previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory {
             setNeedsUpdateConstraints()
+        }
+
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            pauseButton.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+            removeButton.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         }
     }
 
@@ -117,7 +122,6 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        backgroundColor = .systemBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressView)
         contentView.addSubview(detailLabel)
@@ -138,20 +142,20 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
 
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressView.topAnchor.constraint(equalToSystemSpacingBelow: nameLabel.bottomAnchor, multiplier: 1),
+            progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
 
             detailLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             detailLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            detailLabel.topAnchor.constraint(equalToSystemSpacingBelow: progressView.bottomAnchor, multiplier: 1),
+            detailLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             buttonStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             buttonStackView.topAnchor.constraint(equalTo: detailLabel.bottomAnchor, constant: 12),
-            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             buttonHeightConstraint!,
         ])
     }

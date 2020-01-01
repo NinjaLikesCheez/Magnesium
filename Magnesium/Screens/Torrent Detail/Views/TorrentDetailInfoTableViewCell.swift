@@ -52,7 +52,6 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        backgroundColor = .systemBackground
         contentView.addSubview(nameLabel)
         contentView.addSubview(valueLabel)
         contentView.addSubview(separatorView)
@@ -65,13 +64,13 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            nameLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             valueLabel.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8),
             valueLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            valueLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            valueLabel.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            valueLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
+            valueLabel.bottomAnchor.constraint(equalTo: nameLabel.bottomAnchor),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

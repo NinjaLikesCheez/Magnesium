@@ -18,7 +18,7 @@ final class TorrentDetailViewController: UITableViewController {
 
     init(viewModel: TorrentDetailViewModel) {
         self.viewModel = viewModel
-        super.init(style: .grouped)
+        super.init(style: .insetGrouped)
         title = "Info"
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItems = [
@@ -41,10 +41,10 @@ final class TorrentDetailViewController: UITableViewController {
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        tableView.backgroundColor = .systemBackground
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.allowsSelection = false
         tableView.separatorStyle = .none
+        tableView.contentInset.top = 20
         tableView.register(TorrentDetailHeaderTableViewCell.self, forCellReuseIdentifier: "header")
         tableView.register(TorrentDetailInfoTableViewCell.self, forCellReuseIdentifier: "info")
         tableView.register(TorrentDetailTrackerTableViewCell.self, forCellReuseIdentifier: "tracker")
@@ -160,18 +160,12 @@ final class TorrentDetailViewController: UITableViewController {
         let section = dataSource.snapshot().sectionIdentifiers[section]
         guard let title = section.displayString else { return nil }
         let header = TorrentDetailSectionHeaderView()
-        header.configure(withTitle: title)
+        header.configure(title: title)
         return header
     }
 
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        let section = dataSource.snapshot().sectionIdentifiers[section]
-        switch section {
-        case .header:
-            return .leastNormalMagnitude
-        case .info, .trackers, .files:
-            return 20
-        }
+        return .leastNormalMagnitude
     }
 
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

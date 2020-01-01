@@ -34,6 +34,9 @@ final class TorrentListViewController: UITableViewController {
         super.viewDidLoad()
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
+
+        tableView.rowHeight = TorrentTableViewCell.estimatedHeight
+        tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
 
         dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
@@ -86,6 +89,10 @@ final class TorrentListViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.didSelectItem(at: indexPath.row)
+    }
+
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
     }
 }
 
