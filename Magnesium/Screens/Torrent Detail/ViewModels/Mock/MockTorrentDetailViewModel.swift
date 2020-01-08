@@ -159,7 +159,7 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
         var index = 0
         let chunkName = torrent.name.lowercased().replacingOccurrences(of: " ", with: ".")
         while remainingSize > 0 {
-            let chunkSize = 50 * 1024 * 1024
+            let chunkSize: Int64 = 50 * 1024 * 1024
             let suffix = index == 0 ? "rar" : String(format: "r%02d", index - 1)
             let name = "\(chunkName).\(suffix)"
             if remainingSize >= chunkSize {
@@ -167,13 +167,13 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
                 new[name] = CurrentValueSubject(MockTorrentFile(
                     name: name,
                     size: chunkSize,
-                    downloaded: Int.random(in: 0 ... chunkSize)
+                    downloaded: Int64.random(in: 0 ... chunkSize)
                 ))
             } else {
                 new[name] = CurrentValueSubject(MockTorrentFile(
                     name: name,
                     size: remainingSize,
-                    downloaded: Int.random(in: 0 ... remainingSize)
+                    downloaded: Int64.random(in: 0 ... remainingSize)
                 ))
                 remainingSize -= remainingSize
             }

@@ -55,7 +55,7 @@ final class PresentationContext {
         animated: Bool,
         completion: (() -> Void)?
     ) -> PresentationContext? {
-        guard let viewController = self.navigationController ?? self.viewController else { return nil }
+        guard let viewController = navigationController ?? self.viewController else { return nil }
         guard let presentedViewController = navigatable.viewController() else { return nil }
         let newContext = PresentationContext(viewController: presentedViewController)
 

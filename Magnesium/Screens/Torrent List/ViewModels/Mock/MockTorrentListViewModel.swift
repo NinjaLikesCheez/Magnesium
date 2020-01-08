@@ -40,9 +40,9 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
         for i in 1 ..< 26 {
             let name = "\(names[i % names.count]) \(Int(ceil(Double(i) / Double(names.count))))"
             let state = states[i % states.count]
-            let size = Int(1024 * 1024 * 1024 * Double(i) * Double.random(in: 0 ... 1))
-            let downloaded = state != .seeding ? Int(Double(size) * Double.random(in: 0 ... 1)) : size
-            let uploaded = Int(Double(downloaded) * 3 * Double.random(in: 0 ... 1))
+            let size = Int64(1024 * 1024 * 1024 * Double(i) * Double.random(in: 0 ... 1))
+            let downloaded = state != .seeding ? Int64(Double(size) * Double.random(in: 0 ... 1)) : size
+            let uploaded = Int64(Double(downloaded) * 3 * Double.random(in: 0 ... 1))
             let downloadRate = state == .downloading ? Int(1024 * 100 * Double(i) * Double.random(in: 0 ... 1)) : 0
             let uploadRate = state == .seeding ? Int(1024 * 100 * Double(i) * Double.random(in: 0 ... 1)) : 0
             let eta = state == .downloading ? TimeInterval(Double(size - downloaded) / Double(downloadRate)) : 0

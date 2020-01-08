@@ -22,4 +22,8 @@ enum ByteFormatter {
             return String(format: "%.1f TB", Double(byteCount) / Double(unitSize * unitSize * unitSize * unitSize))
         }
     }
+
+    static func string(fromByteCount byteCount: Int64) -> String {
+        return string(fromByteCount: Int(byteCount))
+    }
 }

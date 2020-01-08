@@ -1,0 +1,118 @@
+//
+//  DelugeTorrentListViewModel.swift
+//  Magnesium
+//
+//  Created by James Hurst on 2020-01-07.
+//  Copyright © 2020 James Hurst. All rights reserved.
+//
+
+import Combine
+import Foundation
+
+final class DelugeTorrentListViewModel: TorrentListViewModel {
+    private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
+    private typealias TorrentMap = [String: TorrentSubject]
+
+    private let client: DelugeClient
+    private let navigator: Navigator
+    private var observers = [AnyCancellable]()
+    private var torrentMapSubject: CurrentValueSubject<TorrentMap, Never>
+    private var torrentMapObserver: AnyCancellable?
+    private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
+    private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
+
+    var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
+        return Publishers.CombineLatest(torrentSubjects, sortOption)
+            .map { args -> [TorrentSubject] in
+                let (subjects, sortOption) = args
+                return DelugeTorrentListViewModel.sort(subjects, using: sortOption)
+            }
+            .map { torrents -> [AnyTorrentListItemViewModel] in
+                torrents.map { DelugeTorrentListItemViewModel(torrentSubject: $0).eraseToAny() }
+            }
+            .ui()
+            .eraseToAnyPublisher()
+    }
+
+    private static func sort(
+        _ torrents: [TorrentSubject],
+        using sortOption: SortOption
+    ) -> [TorrentSubject] {
+        let compare: (DelugeTorrent, DelugeTorrent) -> ComparisonResult
+        switch sortOption.property {
+        case .name:
+            compare = { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) }
+        case .dateAdded:
+            compare = { $0.dateAdded.compare($1.dateAdded) }
+        case .downloadSpeed:
+            compare = {
+                $0.downloadRate == $1.downloadRate
+                    ? .orderedSame
+                    : $0.downloadRate < $1.downloadRate ? .orderedAscending : .orderedDescending
+            }
+        case .uploadSpeed:
+            compare = {
+                $0.uploadRate == $1.uploadRate
+                    ? .orderedSame
+                    : $0.uploadRate < $1.uploadRate ? .orderedAscending : .orderedDescending
+            }
+        }
+
+        return torrents.sorted { (subject1, subject2) -> Bool in
+            let obj1 = subject1.value
+            let obj2 = subject2.value
+            switch compare(obj1, obj2) {
+            case .orderedAscending:
+                return sortOption.direction == .ascending
+            case .orderedDescending:
+                return sortOption.direction == .descending
+            case .orderedSame:
+                if obj1.name != obj2.name {
+                    return obj1.name < obj2.name
+                }
+
+                return obj1.hash < obj2.hash
+            }
+        }
+    }
+
+    init(client: DelugeClient, navigator: Navigator) {
+        self.client = client
+        self.navigator = navigator
+        torrentSubjects = CurrentValueSubject([])
+        torrentMapSubject = CurrentValueSubject([:])
+        torrentMapObserver = torrentMapSubject.sink { [weak self] in
+            self?.torrentSubjects.send($0.values.sorted { $0.value.name < $1.value.name })
+        }
+        refresh()
+            .sink(receiveCompletion: { _ in }, receiveValue: {})
+            .store(in: &observers)
+    }
+
+    func refresh() -> AnyPublisher<Void, Error> {
+        return client.torrents()
+            .map { torrents -> TorrentMap in
+                torrents.reduce(into: TorrentMap()) { map, torrent in
+                    map[torrent.hash] = CurrentValueSubject(torrent)
+                }
+            }
+            .handleEvents(receiveOutput: { new in
+                self.torrentMapSubject.send(
+                    self.torrentMapSubject.value
+                        .filter { new[$0.key] != nil }
+                        .merging(new) { current, new in
+                            current.send(new.value)
+                            return current
+                        }
+                )
+            })
+            .map { _ in () }
+            .mapError { $0 as Error }
+            .ui()
+            .eraseToAnyPublisher()
+    }
+
+    func didSelectItem(at index: Int) {
+        // TODO:
+    }
+}

@@ -19,11 +19,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let splitViewController = SplitViewController()
         let masterNavigationController = UINavigationController()
         masterNavigationController.navigationBar.prefersLargeTitles = true
-        let viewModel = MockTorrentListViewModel(
-            navigator: DefaultNavigator(
-                presentationContext: PresentationContext(viewController: masterNavigationController)
-            )
+//        let viewModel = MockTorrentListViewModel(
+//            navigator: DefaultNavigator(
+//                presentationContext: PresentationContext(viewController: masterNavigationController)
+//            )
+//        )
+        let navigator = DefaultNavigator(
+            presentationContext: PresentationContext(viewController: masterNavigationController)
         )
+        let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
+        // swiftlint:disable:next force_try
+        let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
+            as! [String: String] // swiftlint:disable:this force_cast
+        let client = DelugeClient(
+            baseURL: URL(string: credentials["url"]!)!,
+            password: credentials["password"]!
+        )
+        let viewModel = DelugeTorrentListViewModel(client: client, navigator: navigator)
         let torrentListViewController = TorrentListViewController(viewModel: viewModel)
         masterNavigationController.viewControllers = [torrentListViewController]
         let detailViewController = UIViewController()

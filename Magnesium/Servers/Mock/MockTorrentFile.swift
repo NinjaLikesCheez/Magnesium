@@ -10,8 +10,8 @@ import Foundation
 
 struct MockTorrentFile: Hashable {
     var name: String
-    var size: Int
-    var downloaded: Int
+    var size: Int64
+    var downloaded: Int64
 
     var progress: Float {
         return size != 0 ? Float(downloaded) / Float(size) : 0
