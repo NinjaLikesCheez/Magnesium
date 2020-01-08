@@ -1,35 +1,27 @@
 //
-//  MockTorrentDetailViewModel.swift
+//  DelugeTorrentDetailViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2019-12-19.
-//  Copyright © 2019 James Hurst. All rights reserved.
+//  Created by James Hurst on 2020-01-07.
+//  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import Combine
 import UIKit
 
-final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigurable {
-    private typealias FileSubject = CurrentValueSubject<MockTorrentFile, Never>
-    private typealias FileMap = [String: FileSubject]
-
-    private let torrentSubject: CurrentValueSubject<MockTorrent, Never>
-    private let fileMapSubject = CurrentValueSubject<FileMap, Never>([:])
-    private let refresher: MockTorrentServerRefreshable
-    private var torrentObserver: AnyCancellable?
+final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigurable {
+    private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
 
     let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
     var navigator: Navigator?
 
-    init(torrentSubject: CurrentValueSubject<MockTorrent, Never>, refresher: MockTorrentServerRefreshable) {
+    init(torrentSubject: CurrentValueSubject<DelugeTorrent, Never>) {
         self.torrentSubject = torrentSubject
-        self.refresher = refresher
         sections = torrentSubject
-            .combineLatest(fileMapSubject)
-            .map { torrent, fileMap in
+            .map { torrent in
                 var sections = [(TorrentDetailSection, [TorrentDetailItem])]()
                 sections.append((.header, [
-                    .header(MockTorrentDetailHeaderViewModel(torrentSubject: torrentSubject).eraseToAny()),
+                    .header(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject).eraseToAny()),
                 ]))
                 sections.append((.info, [
                     .info(TorrentDetailInfoViewModel(
@@ -103,66 +95,14 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
                     sections.append((.trackers, torrent.trackers.map { .tracker($0) }))
                 }
 
-                if !fileMap.isEmpty {
-                    let files = fileMap.values
-                        .sorted { $0.value.name.compare($1.value.name, options: [.numeric]) != .orderedDescending }
-                        .map {
-                            TorrentDetailItem.file(MockTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
-                        }
-                    sections.append((.files, files))
-                }
-
                 return sections
             }
             .ui()
             .eraseToAnyPublisher()
-
-        torrentObserver = torrentSubject.sink { [weak self] torrent in
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-                self?.refreshFiles(for: torrent)
-            }
-        }
     }
 
     func refresh() -> AnyPublisher<Void, Error> {
-        return refresher.refresh()
-    }
-
-    private func refreshFiles(for torrent: MockTorrent) {
-        var new = FileMap()
-
-        var remainingSize = torrent.size
-        var index = 0
-        let chunkName = torrent.name.lowercased().replacingOccurrences(of: " ", with: ".")
-        while remainingSize > 0 {
-            let chunkSize: Int64 = 50 * 1024 * 1024
-            let suffix = index == 0 ? "rar" : String(format: "r%02d", index - 1)
-            let name = "\(chunkName).\(suffix)"
-            if remainingSize >= chunkSize {
-                remainingSize -= chunkSize
-                new[name] = CurrentValueSubject(MockTorrentFile(
-                    name: name,
-                    size: chunkSize,
-                    downloaded: Int64.random(in: 0 ... chunkSize)
-                ))
-            } else {
-                new[name] = CurrentValueSubject(MockTorrentFile(
-                    name: name,
-                    size: remainingSize,
-                    downloaded: Int64.random(in: 0 ... remainingSize)
-                ))
-                remainingSize -= remainingSize
-            }
-            index += 1
-        }
-
-        fileMapSubject.send(
-            fileMapSubject.value
-                .filter { new[$0.key] != nil }
-                .merging(new) { current, new in
-                    current.send(new.value)
-                    return current
-                }
-        )
+        // TODO:
+        Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 }

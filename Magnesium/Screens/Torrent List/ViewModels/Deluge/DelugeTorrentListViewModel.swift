@@ -22,14 +22,10 @@ final class DelugeTorrentListViewModel: TorrentListViewModel {
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
-        return Publishers.CombineLatest(torrentSubjects, sortOption)
-            .map { args -> [TorrentSubject] in
-                let (subjects, sortOption) = args
-                return DelugeTorrentListViewModel.sort(subjects, using: sortOption)
-            }
-            .map { torrents -> [AnyTorrentListItemViewModel] in
-                torrents.map { DelugeTorrentListItemViewModel(torrentSubject: $0).eraseToAny() }
-            }
+        return torrentSubjects
+            .combineLatest(sortOption)
+            .map { DelugeTorrentListViewModel.sort($0, using: $1) }
+            .map { $0.map { DelugeTorrentListItemViewModel(torrentSubject: $0).eraseToAny() } }
             .ui()
             .eraseToAnyPublisher()
     }
@@ -113,6 +109,10 @@ final class DelugeTorrentListViewModel: TorrentListViewModel {
     }
 
     func didSelectItem(at index: Int) {
-        // TODO:
+        let subject = torrentSubjects.value[index]
+        let screen = Screens.Torrents.detail(
+            viewModel: DelugeTorrentDetailViewModel(torrentSubject: subject)
+        )
+        navigator.showDetail(NavigationControllerScreen(screen))
     }
 }
