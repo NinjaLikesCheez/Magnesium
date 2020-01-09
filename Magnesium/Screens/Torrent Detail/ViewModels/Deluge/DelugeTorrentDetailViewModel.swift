@@ -9,19 +9,19 @@
 import Combine
 import UIKit
 
-final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigurable {
+final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
     private typealias FileSubject = CurrentValueSubject<DelugeTorrentFile, Never>
     private typealias FileMap = [String: FileSubject]
 
+    private let client: DelugeClient
+    private let navigator: Navigator
+    private let refresher: DelugeRefreshable
     private let torrentSubject: TorrentSubject
     private let fileMap = CurrentValueSubject<FileMap?, Never>(nil)
-    private let client: DelugeClient
-    private let refresher: DelugeRefreshable
     private var observers = [AnyCancellable]()
 
     let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
-    var navigator: Navigator?
 
     private static func createSections(
         torrentSubject: TorrentSubject,
@@ -124,10 +124,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfi
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
         client: DelugeClient,
+        navigator: Navigator,
         refresher: DelugeRefreshable
     ) {
         self.torrentSubject = torrentSubject
         self.client = client
+        self.navigator = navigator
         self.refresher = refresher
 
         sections = torrentSubject
@@ -177,25 +179,25 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfi
     }
 
     func pause() {
-        self.client.pause(hash: self.torrentSubject.value.hash)
+        client.pause(hash: torrentSubject.value.hash)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &self.observers)
+            .store(in: &observers)
     }
 
     func resume() {
-        self.client.resume(hash: self.torrentSubject.value.hash)
+        client.resume(hash: torrentSubject.value.hash)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &self.observers)
+            .store(in: &observers)
     }
 
     func remove() {
-        let hash = self.torrentSubject.value.hash
+        let hash = torrentSubject.value.hash
         var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
         alert.actions.append(AlertActionModel(title: "Keep Data", style: .default) {
             self.client.remove(hash: hash, removeData: false)
                 .ui()
                 .sink(receiveCompletion: { _ in
-                    self.navigator?.popToRoot(animated: true)
+                    self.dismiss()
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
@@ -203,11 +205,16 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfi
             self.client.remove(hash: hash, removeData: true)
                 .ui()
                 .sink(receiveCompletion: { _ in
-                    self.navigator?.popToRoot(animated: true)
+                    self.dismiss()
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         }))
         alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
-        navigator?.present(AlertScreen(alert), animated: true)
+        navigator.present(AlertScreen(alert), animated: true)
+    }
+
+    private func dismiss() {
+        navigator.popToRoot(animated: true)
+        navigator.showDetail(Screens.Torrents.emptyDetail)
     }
 }

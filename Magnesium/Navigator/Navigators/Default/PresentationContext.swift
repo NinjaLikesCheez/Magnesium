@@ -11,10 +11,6 @@ import UIKit
 final class PresentationContext {
     private weak var viewController: UIViewController?
 
-    var isValid: Bool {
-        return viewController != nil
-    }
-
     private var navigationController: UINavigationController? {
         if let navigationController = viewController as? UINavigationController {
             return navigationController
@@ -38,17 +34,16 @@ final class PresentationContext {
         }
     }
 
-    init(viewController: UIViewController) {
-        self.viewController = viewController.navigationController ?? viewController
+    var isValid: Bool {
+        return viewController != nil
+    }
+
+    init(viewController: UIViewController?) {
+        self.viewController = viewController?.navigationController ?? viewController
     }
 
     func push(_ navigatable: Navigatable, navigator: Navigator, animated: Bool) {
         guard let pushedViewController = navigatable.viewController() else { return }
-
-        if var navigatorConfigurable = navigatable as? NavigatorConfigurable {
-            navigatorConfigurable.navigator = navigator
-        }
-
         navigationController?.pushViewController(pushedViewController, animated: animated)
     }
 
@@ -69,11 +64,6 @@ final class PresentationContext {
         guard let viewController = navigationController ?? self.viewController else { return nil }
         guard let presentedViewController = navigatable.viewController() else { return nil }
         let newContext = PresentationContext(viewController: presentedViewController)
-
-        if var navigatorConfigurable = navigatable as? NavigatorConfigurable {
-            navigatorConfigurable.navigator = DefaultNavigator(presentationContext: newContext)
-        }
-
         presentedViewController.modalPresentationStyle = style.modalPresentationStyle
 
         if case let .popover(source) = style {
@@ -96,13 +86,6 @@ final class PresentationContext {
 
     func showDetail(_ navigatable: Navigatable) {
         guard let detailViewController = navigatable.viewController() else { return }
-
-        if var navigatorConfigurable = navigatable as? NavigatorConfigurable {
-            navigatorConfigurable.navigator = DefaultNavigator(
-                presentationContext: PresentationContext(viewController: detailViewController)
-            )
-        }
-
         splitViewController?.showDetailViewController(detailViewController, sender: nil)
     }
 }

@@ -115,9 +115,13 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
-        let screen = Screens.Torrents.detail(
-            viewModel: DelugeTorrentDetailViewModel(torrentSubject: subject, client: client, refresher: self)
-        )
-        navigator.showDetail(NavigationControllerScreen(screen))
+        navigator.showDetail(NavigationControllerScreen { navigator in
+            Screens.Torrents.detail(viewModel: DelugeTorrentDetailViewModel(
+                torrentSubject: subject,
+                client: self.client,
+                navigator: navigator,
+                refresher: self
+            ))
+        })
     }
 }

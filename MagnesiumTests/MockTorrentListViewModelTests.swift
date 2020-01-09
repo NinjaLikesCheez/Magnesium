@@ -31,8 +31,9 @@ final class MockTorrentListViewModelTests: XCTestCase {
                 return
             }
 
-            guard case Screens.Torrents.detail = navigationScreen.root else {
-                XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: navigationScreen.root))")
+            guard case Screens.Torrents.detail = navigationScreen.builder(MockNavigator())! else {
+                let screen = navigationScreen.builder(MockNavigator())!
+                XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: screen))")
                 return
             }
         }

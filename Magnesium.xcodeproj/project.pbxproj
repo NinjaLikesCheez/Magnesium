@@ -36,7 +36,6 @@
 		E9464ADF237E321A00735BE8 /* MockTorrentListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9464ADE237E321A00735BE8 /* MockTorrentListItemViewModel.swift */; };
 		E94ACA54237B35E60082B1A6 /* TorrentListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E94ACA53237B35E60082B1A6 /* TorrentListItemViewModel.swift */; };
 		E959FA9E23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E959FA9D23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift */; };
-		E95D3E9423AD64090098AB6C /* NavigatorConfigurable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D3E9323AD64090098AB6C /* NavigatorConfigurable.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
@@ -75,7 +74,6 @@
 		E9CC161423AD5CF000EA1B4C /* MockTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CC161323AD5CF000EA1B4C /* MockTorrentListViewModelTests.swift */; };
 		E9CC161623AD5DB300EA1B4C /* MockNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CC161523AD5DB300EA1B4C /* MockNavigator.swift */; };
 		E9CE4C3423B453BE001D1C63 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */; };
-		E9D3354B23AD7E9800DD97BE /* TestDefaultNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D3354A23AD7E9800DD97BE /* TestDefaultNavigator.swift */; };
 		E9E9F0F423807044007C6D2D /* TorrentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */; };
 		E9E9F0F7238075AE007C6D2D /* MockTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F6238075AE007C6D2D /* MockTorrent.swift */; };
 /* End PBXBuildFile section */
@@ -120,7 +118,6 @@
 		E9464ADE237E321A00735BE8 /* MockTorrentListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTorrentListItemViewModel.swift; sourceTree = "<group>"; };
 		E94ACA53237B35E60082B1A6 /* TorrentListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListItemViewModel.swift; sourceTree = "<group>"; };
 		E959FA9D23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailHeaderTableViewCell.swift; sourceTree = "<group>"; };
-		E95D3E9323AD64090098AB6C /* NavigatorConfigurable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigatorConfigurable.swift; sourceTree = "<group>"; };
 		E96B0061237A43740091FA71 /* Magnesium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B0064237A43740091FA71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E96B0066237A43740091FA71 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -163,7 +160,6 @@
 		E9CC161323AD5CF000EA1B4C /* MockTorrentListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTorrentListViewModelTests.swift; sourceTree = "<group>"; };
 		E9CC161523AD5DB300EA1B4C /* MockNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockNavigator.swift; sourceTree = "<group>"; };
 		E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatters.swift; sourceTree = "<group>"; };
-		E9D3354A23AD7E9800DD97BE /* TestDefaultNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDefaultNavigator.swift; sourceTree = "<group>"; };
 		E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewModel.swift; sourceTree = "<group>"; };
 		E9E9F0F6238075AE007C6D2D /* MockTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTorrent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -346,7 +342,6 @@
 			isa = PBXGroup;
 			children = (
 				E928EFFC23AC3323006BD6BD /* DefaultNavigator.swift */,
-				E95D3E9323AD64090098AB6C /* NavigatorConfigurable.swift */,
 				E9938B1423AC3675004616DC /* PresentationContext.swift */,
 			);
 			path = Default;
@@ -518,7 +513,6 @@
 				E9CC160D23AD5CD400EA1B4C /* Info.plist */,
 				E9CC161523AD5DB300EA1B4C /* MockNavigator.swift */,
 				E9CC161323AD5CF000EA1B4C /* MockTorrentListViewModelTests.swift */,
-				E9D3354A23AD7E9800DD97BE /* TestDefaultNavigator.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -648,7 +642,6 @@
 			files = (
 				E928EFF923AC3196006BD6BD /* MockTorrentDetailViewModel.swift in Sources */,
 				E976FA44237E3647006B9DA9 /* ByteFormatter.swift in Sources */,
-				E95D3E9423AD64090098AB6C /* NavigatorConfigurable.swift in Sources */,
 				E97D971B23C6C67E005FD8F3 /* AlertViewModel.swift in Sources */,
 				E9C8259023C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift in Sources */,
 				E97D971623C6B286005FD8F3 /* DelugeTorrentFileViewModel.swift in Sources */,
@@ -720,7 +713,6 @@
 			files = (
 				E9CC161423AD5CF000EA1B4C /* MockTorrentListViewModelTests.swift in Sources */,
 				E9CC161623AD5DB300EA1B4C /* MockNavigator.swift in Sources */,
-				E9D3354B23AD7E9800DD97BE /* TestDefaultNavigator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

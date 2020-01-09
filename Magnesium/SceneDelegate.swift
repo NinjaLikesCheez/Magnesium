@@ -16,17 +16,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        let splitViewController = SplitViewController()
-        let masterNavigationController = UINavigationController()
-        masterNavigationController.navigationBar.prefersLargeTitles = true
-//        let viewModel = MockTorrentListViewModel(
-//            navigator: DefaultNavigator(
-//                presentationContext: PresentationContext(viewController: masterNavigationController)
-//            )
-//        )
-        let navigator = DefaultNavigator(
-            presentationContext: PresentationContext(viewController: masterNavigationController)
-        )
         let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
         // swiftlint:disable:next force_try
         let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
@@ -35,14 +24,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             baseURL: URL(string: credentials["url"]!)!,
             password: credentials["password"]!
         )
-        let viewModel = DelugeTorrentListViewModel(client: client, navigator: navigator)
-        let torrentListViewController = TorrentListViewController(viewModel: viewModel)
-        masterNavigationController.viewControllers = [torrentListViewController]
-        let detailViewController = UIViewController()
-        detailViewController.view.backgroundColor = .systemBackground
+
+        let splitViewController = SplitViewController()
         splitViewController.viewControllers = [
-            masterNavigationController,
-            UINavigationController(rootViewController: detailViewController),
+            NavigationControllerScreen { navigator in
+//                Screens.Torrents.list(viewModel: MockTorrentListViewModel(navigator: navigator))
+                Screens.Torrents.list(viewModel: DelugeTorrentListViewModel(client: client, navigator: navigator))
+            }.viewController()!,
+            Screens.Torrents.emptyDetail.viewController()!,
         ]
 
         if let windowScene = scene as? UIWindowScene {

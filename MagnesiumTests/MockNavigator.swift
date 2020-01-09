@@ -19,7 +19,7 @@ final class MockNavigator: Navigator {
     private(set) var presentationStack: [MockPresentationContext]
 
     init(
-        splitNavigator: SplitNavigator,
+        splitNavigator: SplitNavigator? = nil,
         presentationStack: [MockPresentationContext] = []
     ) {
         self.splitNavigator = splitNavigator
@@ -32,6 +32,11 @@ final class MockNavigator: Navigator {
 
     func pop(animated: Bool) {
         presentationStack.last?.screens.removeLast()
+    }
+
+    func popToRoot(animated: Bool) {
+        guard let first = presentationStack.first else { return }
+        presentationStack = [first]
     }
 
     func present(_ navigatable: Navigatable, style: PresentationStyle, animated: Bool, completion: (() -> Void)? = nil) {

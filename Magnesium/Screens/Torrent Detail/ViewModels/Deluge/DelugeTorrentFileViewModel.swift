@@ -10,6 +10,7 @@ import Combine
 import UIKit
 
 struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
+    private var path: String
     let name: String
     let size: AnyPublisher<String, Never>
     let progress: AnyPublisher<String, Never>
@@ -20,6 +21,7 @@ struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
 
     init(fileSubject: CurrentValueSubject<DelugeTorrentFile, Never>) {
         let file = fileSubject.value
+        path = file.path
         name = file.name
         size = fileSubject
             .map { ByteFormatter.string(fromByteCount: $0.size) }

@@ -9,28 +9,10 @@
 import UIKit
 
 extension Screens {
-    enum Torrents: Navigatable, NavigatorConfigurable {
+    enum Torrents: Navigatable {
         case list(viewModel: TorrentListViewModel)
-        case detail(viewModel: TorrentDetailViewModel & NavigatorConfigurable)
-
-        var navigator: Navigator? {
-            get {
-                switch self {
-                case .list:
-                    return nil
-                case let .detail(viewModel: viewModel):
-                    return viewModel.navigator
-                }
-            }
-            set {
-                switch self {
-                case var .detail(viewModel: viewModel):
-                    viewModel.navigator = newValue
-                case .list:
-                    break
-                }
-            }
-        }
+        case detail(viewModel: TorrentDetailViewModel)
+        case emptyDetail
 
         func viewController() -> UIViewController? {
             switch self {
@@ -38,6 +20,10 @@ extension Screens {
                 return TorrentListViewController(viewModel: viewModel)
             case let .detail(viewModel: viewModel):
                 return TorrentDetailViewController(viewModel: viewModel)
+            case .emptyDetail:
+                let viewController = UIViewController()
+                viewController.view.backgroundColor = .systemBackground
+                return UINavigationController(rootViewController: viewController)
             }
         }
     }

@@ -9,19 +9,21 @@
 import Combine
 import UIKit
 
-final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigurable {
+final class MockTorrentDetailViewModel: TorrentDetailViewModel {
     private typealias FileSubject = CurrentValueSubject<MockTorrentFile, Never>
     private typealias FileMap = [String: FileSubject]
 
     private let torrentSubject: CurrentValueSubject<MockTorrent, Never>
-    private let fileMap = CurrentValueSubject<FileMap, Never>([:])
     private let refresher: MockTorrentServerRefreshable
+    private let fileMap = CurrentValueSubject<FileMap, Never>([:])
     private var torrentObserver: AnyCancellable?
 
     let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
-    var navigator: Navigator?
 
-    init(torrentSubject: CurrentValueSubject<MockTorrent, Never>, refresher: MockTorrentServerRefreshable) {
+    init(
+        torrentSubject: CurrentValueSubject<MockTorrent, Never>,
+        refresher: MockTorrentServerRefreshable
+    ) {
         self.torrentSubject = torrentSubject
         self.refresher = refresher
         sections = torrentSubject
