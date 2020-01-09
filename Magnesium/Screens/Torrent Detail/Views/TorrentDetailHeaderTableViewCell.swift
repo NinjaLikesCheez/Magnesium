@@ -30,7 +30,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         return progressView
     }()
 
-    private lazy var detailLabel: UILabel = {
+    private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -124,18 +124,18 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressView)
-        contentView.addSubview(detailLabel)
+        contentView.addSubview(statusLabel)
         buttonStackView.addArrangedSubview(pauseButton)
         buttonStackView.addArrangedSubview(removeButton)
         contentView.addSubview(buttonStackView)
     }
 
     private func setupLayoutConstraints() {
-        for view in [nameLabel, progressView, detailLabel, buttonStackView] {
+        for view in [nameLabel, progressView, statusLabel, buttonStackView] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
-        detailLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        statusLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
         buttonHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 0)
 
@@ -148,13 +148,13 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
 
-            detailLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            detailLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            detailLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
+            statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
             buttonStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             buttonStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            buttonStackView.topAnchor.constraint(equalTo: detailLabel.bottomAnchor, constant: 12),
+            buttonStackView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
             buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             buttonHeightConstraint!,
         ])
@@ -176,9 +176,9 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        viewModel.detail
+        viewModel.status
             .map { text -> String? in text }
-            .assign(to: \.text, on: detailLabel)
+            .assign(to: \.text, on: statusLabel)
             .store(in: &observers)
         // swiftlint:enable array_init
     }

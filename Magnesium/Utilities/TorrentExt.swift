@@ -27,7 +27,7 @@ extension TorrentExt {
         return size != 0 ? Float(downloaded) / Float(size) : 0
     }
 
-    var speedDisplayString: String {
+    var speedString: String {
         if state == .downloading {
             return """
             ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
@@ -40,7 +40,7 @@ extension TorrentExt {
         }
     }
 
-    var progressDisplayString: String {
+    var progressString: String {
         return """
         \(ByteFormatter.string(fromByteCount: downloaded)) / \
         \(ByteFormatter.string(fromByteCount: size)) \
@@ -48,7 +48,7 @@ extension TorrentExt {
         """
     }
 
-    var etaOrRatioString: String {
+    var ratioOrETAString: String {
         if state == .downloading {
             return eta > 0
                 ? DateFormatters.etaFormatter.string(from: eta) ?? ""

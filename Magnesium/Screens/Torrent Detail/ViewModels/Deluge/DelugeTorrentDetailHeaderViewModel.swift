@@ -14,7 +14,7 @@ struct DelugeTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
     let name: AnyPublisher<String, Never>
     let progress: AnyPublisher<Float, Never>
     let progressColor: AnyPublisher<UIColor, Never>
-    let detail: AnyPublisher<String, Never>
+    let status: AnyPublisher<String, Never>
 
     static func == (lhs: DelugeTorrentDetailHeaderViewModel, rhs: DelugeTorrentDetailHeaderViewModel) -> Bool {
         return lhs.hash == rhs.hash
@@ -36,7 +36,7 @@ struct DelugeTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
-        detail = torrentSubject
+        status = torrentSubject
             .map { torrent in
                 "\(torrent.state.displayString) (\(Int(torrent.progress * 100))%)"
             }

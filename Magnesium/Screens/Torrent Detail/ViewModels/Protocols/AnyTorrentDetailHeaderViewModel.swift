@@ -22,7 +22,7 @@ private class _AnyTorrentDetailHeaderViewModelBoxBase: TorrentDetailHeaderViewMo
     var name: AnyPublisher<String, Never> { _abstract() }
     var progress: AnyPublisher<Float, Never> { _abstract() }
     var progressColor: AnyPublisher<UIColor, Never> { _abstract() }
-    var detail: AnyPublisher<String, Never> { _abstract() }
+    var status: AnyPublisher<String, Never> { _abstract() }
 
     static func == (
         lhs: _AnyTorrentDetailHeaderViewModelBoxBase,
@@ -44,7 +44,7 @@ private final class _AnyTorrentDetailHeaderViewModelBox<
     override var name: AnyPublisher<String, Never> { _base.name }
     override var progress: AnyPublisher<Float, Never> { _base.progress }
     override var progressColor: AnyPublisher<UIColor, Never> { _base.progressColor }
-    override var detail: AnyPublisher<String, Never> { _base.detail }
+    override var status: AnyPublisher<String, Never> { _base.status }
 
     init(_ base: Base) {
         _base = base
@@ -67,7 +67,7 @@ struct AnyTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
     var name: AnyPublisher<String, Never> { box.name }
     var progress: AnyPublisher<Float, Never> { box.progress }
     var progressColor: AnyPublisher<UIColor, Never> { box.progressColor }
-    var detail: AnyPublisher<String, Never> { box.detail }
+    var status: AnyPublisher<String, Never> { box.status }
 
     init<VM: TorrentDetailHeaderViewModel>(_ viewModel: VM) {
         box = _AnyTorrentDetailHeaderViewModelBox(viewModel)

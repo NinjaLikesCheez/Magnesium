@@ -13,10 +13,10 @@ struct DelugeTorrentListItemViewModel: TorrentListItemViewModel {
     let name: AnyPublisher<String, Never>
     let progress: AnyPublisher<Float, Never>
     let progressColor: AnyPublisher<UIColor, Never>
-    let detail1: AnyPublisher<String, Never>
-    let detail2: AnyPublisher<String, Never>
-    let detail3: AnyPublisher<String, Never>
-    let detail4: AnyPublisher<String, Never>
+    let state: AnyPublisher<String, Never>
+    let speed: AnyPublisher<String, Never>
+    let progressString: AnyPublisher<String, Never>
+    let ratioOrETA: AnyPublisher<String, Never>
 
     static func == (lhs: DelugeTorrentListItemViewModel, rhs: DelugeTorrentListItemViewModel) -> Bool {
         return lhs.hash == rhs.hash
@@ -38,21 +38,21 @@ struct DelugeTorrentListItemViewModel: TorrentListItemViewModel {
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
-        detail1 = torrentSubject
+        state = torrentSubject
             .map(\.state)
             .map { $0.displayString }
             .ui()
             .eraseToAnyPublisher()
-        detail2 = torrentSubject
-            .map(\.speedDisplayString)
+        speed = torrentSubject
+            .map(\.speedString)
             .ui()
             .eraseToAnyPublisher()
-        detail3 = torrentSubject
-            .map(\.progressDisplayString)
+        progressString = torrentSubject
+            .map(\.progressString)
             .ui()
             .eraseToAnyPublisher()
-        detail4 = torrentSubject
-            .map(\.etaOrRatioString)
+        ratioOrETA = torrentSubject
+            .map(\.ratioOrETAString)
             .ui()
             .eraseToAnyPublisher()
     }

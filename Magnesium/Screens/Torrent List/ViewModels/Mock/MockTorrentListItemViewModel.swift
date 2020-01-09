@@ -14,10 +14,10 @@ struct MockTorrentListItemViewModel: TorrentListItemViewModel {
     let name: AnyPublisher<String, Never>
     let progress: AnyPublisher<Float, Never>
     let progressColor: AnyPublisher<UIColor, Never>
-    let detail1: AnyPublisher<String, Never>
-    let detail2: AnyPublisher<String, Never>
-    let detail3: AnyPublisher<String, Never>
-    let detail4: AnyPublisher<String, Never>
+    let state: AnyPublisher<String, Never>
+    let speed: AnyPublisher<String, Never>
+    let progressString: AnyPublisher<String, Never>
+    let ratioOrETA: AnyPublisher<String, Never>
 
     static func == (lhs: MockTorrentListItemViewModel, rhs: MockTorrentListItemViewModel) -> Bool {
         return lhs.id == rhs.id
@@ -39,29 +39,21 @@ struct MockTorrentListItemViewModel: TorrentListItemViewModel {
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
-        detail1 = torrentSubject
+        state = torrentSubject
             .map(\.state)
             .map { $0.displayString }
             .ui()
             .eraseToAnyPublisher()
-        detail2 = torrentSubject
-            .map(\.speedDisplayString)
+        speed = torrentSubject
+            .map(\.speedString)
             .ui()
             .eraseToAnyPublisher()
-        detail3 = torrentSubject
-            .map(\.progressDisplayString)
+        progressString = torrentSubject
+            .map(\.progressString)
             .ui()
             .eraseToAnyPublisher()
-        detail4 = torrentSubject
-            .map { torrent in
-                if torrent.state == .downloading {
-                    return torrent.eta > 0
-                        ? DateFormatters.etaFormatter.string(from: torrent.eta) ?? ""
-                        : "∞"
-                } else {
-                    return "Ratio: \(!torrent.ratio.isNaN ? String(format: "%.1f", torrent.ratio) : "∞")"
-                }
-            }
+        ratioOrETA = torrentSubject
+            .map(\.ratioOrETAString)
             .ui()
             .eraseToAnyPublisher()
     }

@@ -13,5 +13,5 @@ protocol TorrentDetailHeaderViewModel: Hashable {
     var name: AnyPublisher<String, Never> { get }
     var progress: AnyPublisher<Float, Never> { get }
     var progressColor: AnyPublisher<UIColor, Never> { get }
-    var detail: AnyPublisher<String, Never> { get }
+    var status: AnyPublisher<String, Never> { get }
 }

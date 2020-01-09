@@ -13,8 +13,8 @@ protocol TorrentListItemViewModel: Hashable {
     var name: AnyPublisher<String, Never> { get }
     var progress: AnyPublisher<Float, Never> { get }
     var progressColor: AnyPublisher<UIColor, Never> { get }
-    var detail1: AnyPublisher<String, Never> { get }
-    var detail2: AnyPublisher<String, Never> { get }
-    var detail3: AnyPublisher<String, Never> { get }
-    var detail4: AnyPublisher<String, Never> { get }
+    var state: AnyPublisher<String, Never> { get }
+    var speed: AnyPublisher<String, Never> { get }
+    var progressString: AnyPublisher<String, Never> { get }
+    var ratioOrETA: AnyPublisher<String, Never> { get }
 }

@@ -14,7 +14,7 @@ struct MockTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
     let name: AnyPublisher<String, Never>
     let progress: AnyPublisher<Float, Never>
     let progressColor: AnyPublisher<UIColor, Never>
-    let detail: AnyPublisher<String, Never>
+    let status: AnyPublisher<String, Never>
 
     static func == (lhs: MockTorrentDetailHeaderViewModel, rhs: MockTorrentDetailHeaderViewModel) -> Bool {
         return lhs.id == rhs.id
@@ -36,7 +36,7 @@ struct MockTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
-        detail = torrentSubject
+        status = torrentSubject
             .map { torrent in
                 "\(torrent.state.displayString) (\(Int(torrent.progress * 100))%)"
             }

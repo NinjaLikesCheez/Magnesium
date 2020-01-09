@@ -27,7 +27,7 @@ final class TorrentTableViewCell: UITableViewCell {
         return progressView
     }()
 
-    private lazy var detail1Label: UILabel = {
+    private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -35,7 +35,7 @@ final class TorrentTableViewCell: UITableViewCell {
         return label
     }()
 
-    private lazy var detail2Label: UILabel = {
+    private lazy var speedLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -43,7 +43,7 @@ final class TorrentTableViewCell: UITableViewCell {
         return label
     }()
 
-    private lazy var detail3Label: UILabel = {
+    private lazy var progressLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -51,7 +51,7 @@ final class TorrentTableViewCell: UITableViewCell {
         return label
     }()
 
-    private lazy var detail4Label: UILabel = {
+    private lazy var ratioOrETALabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
@@ -93,19 +93,19 @@ final class TorrentTableViewCell: UITableViewCell {
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressView)
-        contentView.addSubview(detail1Label)
-        contentView.addSubview(detail2Label)
-        contentView.addSubview(detail3Label)
-        contentView.addSubview(detail4Label)
+        contentView.addSubview(stateLabel)
+        contentView.addSubview(speedLabel)
+        contentView.addSubview(progressLabel)
+        contentView.addSubview(ratioOrETALabel)
     }
 
     private func setupLayoutConstraints() {
-        for view in [nameLabel, progressView, detail1Label, detail2Label, detail3Label, detail4Label] {
+        for view in [nameLabel, progressView, stateLabel, speedLabel, progressLabel, ratioOrETALabel] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
-        detail1Label.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
-        detail3Label.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        stateLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        progressLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
@@ -116,22 +116,22 @@ final class TorrentTableViewCell: UITableViewCell {
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
 
-            detail1Label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            detail1Label.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
+            stateLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            stateLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
-            detail2Label.leadingAnchor.constraint(greaterThanOrEqualTo: detail1Label.trailingAnchor, constant: 8),
-            detail2Label.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            detail2Label.topAnchor.constraint(equalTo: detail1Label.topAnchor),
-            detail2Label.bottomAnchor.constraint(equalTo: detail1Label.bottomAnchor),
+            speedLabel.leadingAnchor.constraint(greaterThanOrEqualTo: stateLabel.trailingAnchor, constant: 8),
+            speedLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            speedLabel.topAnchor.constraint(equalTo: stateLabel.topAnchor),
+            speedLabel.bottomAnchor.constraint(equalTo: stateLabel.bottomAnchor),
 
-            detail3Label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            detail3Label.topAnchor.constraint(equalTo: detail1Label.bottomAnchor, constant: 2),
-            detail3Label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            progressLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            progressLabel.topAnchor.constraint(equalTo: stateLabel.bottomAnchor, constant: 2),
+            progressLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 
-            detail4Label.leadingAnchor.constraint(greaterThanOrEqualTo: detail3Label.trailingAnchor, constant: 8),
-            detail4Label.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            detail4Label.topAnchor.constraint(equalTo: detail3Label.topAnchor),
-            detail4Label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            ratioOrETALabel.leadingAnchor.constraint(greaterThanOrEqualTo: progressLabel.trailingAnchor, constant: 8),
+            ratioOrETALabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            ratioOrETALabel.topAnchor.constraint(equalTo: progressLabel.topAnchor),
+            ratioOrETALabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
         ])
     }
 
@@ -151,24 +151,24 @@ final class TorrentTableViewCell: UITableViewCell {
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        viewModel.detail1
+        viewModel.state
             .map { text -> String? in text }
-            .assign(to: \.text, on: detail1Label)
+            .assign(to: \.text, on: stateLabel)
             .store(in: &observers)
 
-        viewModel.detail2
+        viewModel.speed
             .map { text -> String? in text }
-            .assign(to: \.text, on: detail2Label)
+            .assign(to: \.text, on: speedLabel)
             .store(in: &observers)
 
-        viewModel.detail3
+        viewModel.progressString
             .map { text -> String? in text }
-            .assign(to: \.text, on: detail3Label)
+            .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
 
-        viewModel.detail4
+        viewModel.ratioOrETA
             .map { text -> String? in text }
-            .assign(to: \.text, on: detail4Label)
+            .assign(to: \.text, on: ratioOrETALabel)
             .store(in: &observers)
         // swiftlint:enable array_init
     }

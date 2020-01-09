@@ -22,10 +22,10 @@ private class _AnyTorrentListItemViewModelBoxBase: TorrentListItemViewModel {
     var name: AnyPublisher<String, Never> { _abstract() }
     var progress: AnyPublisher<Float, Never> { _abstract() }
     var progressColor: AnyPublisher<UIColor, Never> { _abstract() }
-    var detail1: AnyPublisher<String, Never> { _abstract() }
-    var detail2: AnyPublisher<String, Never> { _abstract() }
-    var detail3: AnyPublisher<String, Never> { _abstract() }
-    var detail4: AnyPublisher<String, Never> { _abstract() }
+    var state: AnyPublisher<String, Never> { _abstract() }
+    var speed: AnyPublisher<String, Never> { _abstract() }
+    var progressString: AnyPublisher<String, Never> { _abstract() }
+    var ratioOrETA: AnyPublisher<String, Never> { _abstract() }
 
     static func == (lhs: _AnyTorrentListItemViewModelBoxBase, rhs: _AnyTorrentListItemViewModelBoxBase) -> Bool {
         return lhs.isEqual(to: rhs)
@@ -44,10 +44,10 @@ private final class _AnyTorrentListItemViewModelBox<
     override var name: AnyPublisher<String, Never> { _base.name }
     override var progress: AnyPublisher<Float, Never> { _base.progress }
     override var progressColor: AnyPublisher<UIColor, Never> { _base.progressColor }
-    override var detail1: AnyPublisher<String, Never> { _base.detail1 }
-    override var detail2: AnyPublisher<String, Never> { _base.detail2 }
-    override var detail3: AnyPublisher<String, Never> { _base.detail3 }
-    override var detail4: AnyPublisher<String, Never> { _base.detail4 }
+    override var state: AnyPublisher<String, Never> { _base.state }
+    override var speed: AnyPublisher<String, Never> { _base.speed }
+    override var progressString: AnyPublisher<String, Never> { _base.progressString }
+    override var ratioOrETA: AnyPublisher<String, Never> { _base.ratioOrETA }
 
     init(_ base: Base) {
         _base = base
@@ -70,10 +70,10 @@ struct AnyTorrentListItemViewModel: TorrentListItemViewModel {
     var name: AnyPublisher<String, Never> { box.name }
     var progress: AnyPublisher<Float, Never> { box.progress }
     var progressColor: AnyPublisher<UIColor, Never> { box.progressColor }
-    var detail1: AnyPublisher<String, Never> { box.detail1 }
-    var detail2: AnyPublisher<String, Never> { box.detail2 }
-    var detail3: AnyPublisher<String, Never> { box.detail3 }
-    var detail4: AnyPublisher<String, Never> { box.detail4 }
+    var state: AnyPublisher<String, Never> { box.state }
+    var speed: AnyPublisher<String, Never> { box.speed }
+    var progressString: AnyPublisher<String, Never> { box.progressString }
+    var ratioOrETA: AnyPublisher<String, Never> { box.ratioOrETA }
 
     init<VM: TorrentListItemViewModel>(_ viewModel: VM) {
         box = _AnyTorrentListItemViewModelBox(viewModel)
