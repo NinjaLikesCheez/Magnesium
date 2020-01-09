@@ -16,7 +16,7 @@ struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
     let progress: AnyPublisher<String, Never>
 
     static func == (lhs: DelugeTorrentDetailFileViewModel, rhs: DelugeTorrentDetailFileViewModel) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.path == rhs.path
     }
 
     init(fileSubject: CurrentValueSubject<DelugeTorrentFile, Never>) {

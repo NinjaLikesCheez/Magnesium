@@ -229,4 +229,14 @@ final class DelugeClient {
     func remove(hash: String, removeData: Bool) -> AnyPublisher<Never, Error> {
         return remove(hashes: [hash], removeData: removeData)
     }
+
+    func recheck(hashes: [String]) -> AnyPublisher<Never, Error> {
+        return request(method: "core.force_recheck", params: hashes)
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func recheck(hash: String) -> AnyPublisher<Never, Error> {
+        return recheck(hashes: [hash])
+    }
 }

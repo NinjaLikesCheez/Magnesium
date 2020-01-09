@@ -178,21 +178,24 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .eraseToAnyPublisher()
     }
 
-    func pause() {
+    func didSelectMoreOptions(from source: PopoverSource) {}
+
+    func didSelectPause() {
         client.pause(hash: torrentSubject.value.hash)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    func resume() {
+    func didSelectResume() {
         client.resume(hash: torrentSubject.value.hash)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    func remove() {
+    func didSelectRemove(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
         var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
+        alert.popoverSource = source
         alert.actions.append(AlertActionModel(title: "Keep Data", style: .default) {
             self.client.remove(hash: hash, removeData: false)
                 .ui()

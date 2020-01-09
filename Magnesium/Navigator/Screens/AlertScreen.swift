@@ -22,6 +22,16 @@ struct AlertScreen: Navigatable {
             preferredStyle: model.style.alertControllerStyle
         )
 
+        switch model.popoverSource {
+        case let .view(view, rect: rect):
+            alertController.popoverPresentationController?.sourceView = view
+            alertController.popoverPresentationController?.sourceRect = rect
+        case let .barButton(barButton):
+            alertController.popoverPresentationController?.barButtonItem = barButton
+        case .none:
+            break
+        }
+
         for action in model.actions {
             alertController.addAction(UIAlertAction(
                 title: action.title,

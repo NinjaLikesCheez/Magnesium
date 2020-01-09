@@ -12,7 +12,8 @@ import UIKit
 protocol TorrentDetailViewModel {
     var sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never> { get }
     func refresh() -> AnyPublisher<Never, Error>
-    func pause()
-    func resume()
-    func remove()
+    func didSelectMoreOptions(from source: PopoverSource)
+    func didSelectPause()
+    func didSelectResume()
+    func didSelectRemove(from source: PopoverSource)
 }

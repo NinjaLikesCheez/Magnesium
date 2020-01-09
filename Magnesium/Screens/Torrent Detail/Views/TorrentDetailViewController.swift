@@ -176,14 +176,14 @@ final class TorrentDetailViewController: UITableViewController {
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.pause()
+        viewModel.didSelectPause()
     }
 
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.resume()
+        viewModel.didSelectResume()
     }
 
-    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.remove()
+    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
+        viewModel.didSelectRemove(from: .view(sender, rect: sender.bounds))
     }
 }

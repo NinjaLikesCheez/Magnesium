@@ -13,7 +13,7 @@ import UIKit
 protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell)
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell)
-    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell)
+    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView)
 }
 
 final class TorrentDetailHeaderTableViewCell: UITableViewCell {
@@ -66,7 +66,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
         button.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
         button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
-        button.addTarget(self, action: #selector(removeButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(removeButtonTapped(_:)), for: .touchUpInside)
         return button
     }()
 
@@ -215,8 +215,8 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     @objc
-    private func removeButtonTapped() {
-        delegate?.headerDidSelectRemove(self)
+    private func removeButtonTapped(_ sender: UIButton) {
+        delegate?.headerDidSelectRemove(self, sender: sender)
     }
 }
 

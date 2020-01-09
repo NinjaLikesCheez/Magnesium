@@ -130,11 +130,13 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel {
         return refresher.refresh()
     }
 
-    func pause() {}
+    func didSelectMoreOptions(from source: PopoverSource) {}
 
-    func resume() {}
+    func didSelectPause() {}
 
-    func remove() {}
+    func didSelectResume() {}
+
+    func didSelectRemove(from source: PopoverSource) {}
 
     private func refreshFiles(for torrent: MockTorrent) {
         var new = FileMap()

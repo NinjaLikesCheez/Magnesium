@@ -17,12 +17,12 @@ struct AlertModel {
     var title: String?
     var message: String?
     var style: Style
-    var actions: [AlertActionModel]
+    var actions = [AlertActionModel]()
+    var popoverSource: PopoverSource?
 
     init(title: String?, message: String?, style: Style) {
         self.title = title
         self.message = message
         self.style = style
-        actions = []
     }
 }
