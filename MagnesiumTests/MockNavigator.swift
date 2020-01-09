@@ -19,7 +19,7 @@ final class MockNavigator: Navigator {
     private(set) var presentationStack: [MockPresentationContext]
 
     init(
-        splitNavigator: SplitNavigator? = nil,
+        splitNavigator: SplitNavigator,
         presentationStack: [MockPresentationContext] = []
     ) {
         self.splitNavigator = splitNavigator
