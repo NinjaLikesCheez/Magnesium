@@ -55,29 +55,3 @@ struct SortOption: Equatable {
         return SortOption(property: property, direction: newDirection)
     }
 }
-
-extension SortOption.Property {
-    var displayString: String {
-        switch self {
-        case .name:
-            return "Name"
-        case .dateAdded:
-            return "Date Added"
-        case .downloadSpeed:
-            return "Download Speed"
-        case .uploadSpeed:
-            return "Upload Speed"
-        }
-    }
-}
-
-extension SortOption.Direction {
-    var displayString: String {
-        switch self {
-        case .ascending:
-            return "Ascending"
-        case .descending:
-            return "Descending"
-        }
-    }
-}

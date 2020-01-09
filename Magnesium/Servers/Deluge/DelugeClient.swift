@@ -15,9 +15,10 @@ final class DelugeClient {
         case decoding(Swift.Error)
         case request(URLError)
         case unauthenticated
-        case badResponseBody
+        case unexpectedResponse
         case serverError(message: String?)
         case ensureWebInterfaceConnectivity
+        case noLabelPlugin
     }
 
     private lazy var session: URLSession = {
@@ -81,7 +82,7 @@ final class DelugeClient {
 
     private func parse(data: Data, response: URLResponse) throws -> [String: Any] {
         guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            throw Error.badResponseBody
+            throw Error.unexpectedResponse
         }
 
         if let error = dict["error"] as? [String: Any] {
@@ -95,22 +96,20 @@ final class DelugeClient {
         return dict
     }
 
-    func authenticate() -> AnyPublisher<Void, Error> {
+    func authenticate() -> AnyPublisher<Never, Error> {
         return request(method: "auth.login", params: [password], authenticateIfNeeded: false)
-            .flatMap { response -> AnyPublisher<Void, Error> in
+            .flatMap { response -> AnyPublisher<Never, Error> in
                 let authenticated = response["result"] as? Bool ?? false
                 guard authenticated else {
                     return Fail(error: Error.unauthenticated).eraseToAnyPublisher()
                 }
 
-                return Just(())
-                    .setFailureType(to: Error.self)
-                    .eraseToAnyPublisher()
+                return Empty(completeImmediately: true).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
 
-    func torrents() -> AnyPublisher<[DelugeTorrent], Error> {
+    func getTorrents() -> AnyPublisher<[DelugeTorrent], Error> {
         let keys = [
             "name",
             "state",
@@ -141,6 +140,62 @@ final class DelugeClient {
                 return Just(torrents.compactMap { DelugeTorrent(hash: $0.key, dictionary: $0.value) })
                     .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+
+    func getLabels() -> AnyPublisher<[String], Error> {
+        return request(method: "label.get_labels", params: [])
+            .flatMap { (value) -> AnyPublisher<[String], Error> in
+                guard let result = value["result"] as? [String] else {
+                    return Fail(error: Error.unexpectedResponse).eraseToAnyPublisher()
+                }
+
+                return Just(result).setFailureType(to: Error.self).eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+
+    private func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[DelugeTorrentFile], Error> {
+        guard let results = response["result"] as? [String: Any],
+            let contents = results["contents"] as? [String: [String: Any]]
+        else {
+            return .failure(.unexpectedResponse)
+        }
+
+        func parseDirectory(_ contents: [String: [String: Any]]) -> [DelugeTorrentFile] {
+            var files = [DelugeTorrentFile]()
+            for (name, node) in contents {
+                guard let type = node["type"] as? String else {
+                    continue
+                }
+
+                switch type {
+                case "dir":
+                    guard let child = node["contents"] as? [String: [String: Any]] else { break }
+                    files.append(contentsOf: parseDirectory(child))
+                case "file":
+                    guard let file = DelugeTorrentFile(name: name, dictionary: node) else { break }
+                    files.append(file)
+                default:
+                    break
+                }
+            }
+            return files
+        }
+
+        return .success(parseDirectory(contents))
+    }
+
+    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], Error> {
+        return request(method: "web.get_torrent_files", params: [hash])
+            .flatMap { response -> AnyPublisher<[DelugeTorrentFile], Error> in
+                switch self.parseTorrentFileResponse(response) {
+                case let .success(files):
+                    return Just(files).setFailureType(to: Error.self).eraseToAnyPublisher()
+                case let .failure(error):
+                    return Fail(error: error).eraseToAnyPublisher()
+                }
             }
             .eraseToAnyPublisher()
     }

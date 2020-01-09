@@ -77,17 +77,18 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
             self?.torrentSubjects.send($0.values.sorted { $0.value.id < $1.value.id })
         }
         refresh()
-            .sink(receiveCompletion: { _ in }, receiveValue: {})
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    func refresh() -> AnyPublisher<Void, Error> {
-        return Future { [weak self] completion in
+    func refresh() -> AnyPublisher<Never, Error> {
+        return Future<Void, Error> { [weak self] completion in
             DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
                 self?._refresh()
                 completion(.success(()))
             }
         }
+        .ignoreOutput()
         .ui()
         .eraseToAnyPublisher()
     }

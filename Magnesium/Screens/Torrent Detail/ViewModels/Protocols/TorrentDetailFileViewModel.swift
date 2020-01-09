@@ -11,6 +11,6 @@ import Foundation
 
 protocol TorrentDetailFileViewModel: Hashable {
     var name: String { get }
-    var detail: AnyPublisher<String, Never> { get }
+    var size: AnyPublisher<String, Never> { get }
     var progress: AnyPublisher<String, Never> { get }
 }

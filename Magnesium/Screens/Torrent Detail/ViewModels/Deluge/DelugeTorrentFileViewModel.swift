@@ -1,24 +1,24 @@
 //
-//  MockTorrentDetailFileViewModel.swift
+//  DelugeTorrentFileViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2019-12-30.
-//  Copyright © 2019 James Hurst. All rights reserved.
+//  Created by James Hurst on 2020-01-08.
+//  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import Combine
 import UIKit
 
-struct MockTorrentDetailFileViewModel: TorrentDetailFileViewModel {
+struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
     let name: String
     let size: AnyPublisher<String, Never>
     let progress: AnyPublisher<String, Never>
 
-    static func == (lhs: MockTorrentDetailFileViewModel, rhs: MockTorrentDetailFileViewModel) -> Bool {
+    static func == (lhs: DelugeTorrentDetailFileViewModel, rhs: DelugeTorrentDetailFileViewModel) -> Bool {
         return lhs.name == rhs.name
     }
 
-    init(fileSubject: CurrentValueSubject<MockTorrentFile, Never>) {
+    init(fileSubject: CurrentValueSubject<DelugeTorrentFile, Never>) {
         let file = fileSubject.value
         name = file.name
         size = fileSubject

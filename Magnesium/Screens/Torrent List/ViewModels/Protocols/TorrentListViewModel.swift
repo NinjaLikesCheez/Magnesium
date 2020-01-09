@@ -11,6 +11,6 @@ import Combine
 protocol TorrentListViewModel {
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> { get }
 
-    func refresh() -> AnyPublisher<Void, Error>
+    func refresh() -> AnyPublisher<Never, Error>
     func didSelectItem(at index: Int)
 }

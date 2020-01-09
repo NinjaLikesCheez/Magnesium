@@ -12,10 +12,8 @@ import Combine
     struct NoopMockTorrentServerRefresher: MockTorrentServerRefreshable {
         let torrentsUpdated: AnyPublisher<[MockTorrent], Never> = Empty().eraseToAnyPublisher()
 
-        func refresh() -> AnyPublisher<Void, Error> {
-            return Future { completion in
-                completion(.success(()))
-            }.eraseToAnyPublisher()
+        func refresh() -> AnyPublisher<Never, Error> {
+            return Empty(completeImmediately: true).eraseToAnyPublisher()
         }
     }
 #endif

@@ -14,7 +14,7 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
     private typealias FileMap = [String: FileSubject]
 
     private let torrentSubject: CurrentValueSubject<MockTorrent, Never>
-    private let fileMapSubject = CurrentValueSubject<FileMap, Never>([:])
+    private let fileMap = CurrentValueSubject<FileMap, Never>([:])
     private let refresher: MockTorrentServerRefreshable
     private var torrentObserver: AnyCancellable?
 
@@ -25,7 +25,7 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
         self.torrentSubject = torrentSubject
         self.refresher = refresher
         sections = torrentSubject
-            .combineLatest(fileMapSubject)
+            .combineLatest(fileMap)
             .map { torrent, fileMap in
                 var sections = [(TorrentDetailSection, [TorrentDetailItem])]()
                 sections.append((.header, [
@@ -124,7 +124,7 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
         }
     }
 
-    func refresh() -> AnyPublisher<Void, Error> {
+    func refresh() -> AnyPublisher<Never, Error> {
         return refresher.refresh()
     }
 
@@ -156,8 +156,8 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
             index += 1
         }
 
-        fileMapSubject.send(
-            fileMapSubject.value
+        fileMap.send(
+            fileMap.value
                 .filter { new[$0.key] != nil }
                 .merging(new) { current, new in
                     current.send(new.value)

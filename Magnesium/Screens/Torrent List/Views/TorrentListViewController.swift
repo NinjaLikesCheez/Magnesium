@@ -82,7 +82,7 @@ final class TorrentListViewController: UITableViewController {
             }
 
             sender?.endRefreshing()
-        }, receiveValue: {})
+        }, receiveValue: { _ in })
     }
 
     // MARK: UITableViewDelegate

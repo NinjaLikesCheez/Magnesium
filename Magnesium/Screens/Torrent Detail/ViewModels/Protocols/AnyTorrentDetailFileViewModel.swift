@@ -20,7 +20,7 @@ private func _abstract(
 private class _AnyTorrentDetailFileViewModelBoxBase: TorrentDetailFileViewModel {
     var base: Any { _abstract() }
     var name: String { _abstract() }
-    var detail: AnyPublisher<String, Never> { _abstract() }
+    var size: AnyPublisher<String, Never> { _abstract() }
     var progress: AnyPublisher<String, Never> { _abstract() }
 
     static func == (
@@ -41,7 +41,7 @@ private final class _AnyTorrentDetailFileViewModelBox<
 
     override var base: Any { _base }
     override var name: String { _base.name }
-    override var detail: AnyPublisher<String, Never> { _base.detail }
+    override var size: AnyPublisher<String, Never> { _base.size }
     override var progress: AnyPublisher<String, Never> { _base.progress }
 
     init(_ base: Base) {
@@ -63,7 +63,7 @@ struct AnyTorrentDetailFileViewModel: TorrentDetailFileViewModel {
 
     var base: Any { box.base }
     var name: String { box.name }
-    var detail: AnyPublisher<String, Never> { box.detail }
+    var size: AnyPublisher<String, Never> { box.size }
     var progress: AnyPublisher<String, Never> { box.progress }
 
     init<VM: TorrentDetailFileViewModel>(_ viewModel: VM) {

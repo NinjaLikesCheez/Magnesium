@@ -147,7 +147,7 @@ final class TorrentDetailViewController: UITableViewController {
             }
 
             self?.refreshControl?.endRefreshing()
-        }, receiveValue: {})
+        }, receiveValue: { _ in })
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

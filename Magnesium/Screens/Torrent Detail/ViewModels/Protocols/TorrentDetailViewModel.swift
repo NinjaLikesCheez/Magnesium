@@ -11,5 +11,5 @@ import UIKit
 
 protocol TorrentDetailViewModel {
     var sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never> { get }
-    func refresh() -> AnyPublisher<Void, Error>
+    func refresh() -> AnyPublisher<Never, Error>
 }

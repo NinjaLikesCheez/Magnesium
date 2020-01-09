@@ -10,5 +10,5 @@ import Combine
 
 protocol MockTorrentServerRefreshable {
     var torrentsUpdated: AnyPublisher<[MockTorrent], Never> { get }
-    func refresh() -> AnyPublisher<Void, Error>
+    func refresh() -> AnyPublisher<Never, Error>
 }

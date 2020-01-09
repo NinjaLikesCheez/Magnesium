@@ -16,7 +16,16 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.numberOfLines = 0
+        return label
+    }()
+
+    private lazy var sizeLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.textColor = .secondaryLabel
         return label
     }()
 
@@ -24,6 +33,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.textColor = .secondaryLabel
         return label
     }()
 
@@ -50,25 +60,32 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressLabel)
+        contentView.addSubview(sizeLabel)
         contentView.addSubview(separatorView)
     }
 
     private func setupLayoutConstraints() {
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         progressLabel.translatesAutoresizingMaskIntoConstraints = false
+        sizeLabel.translatesAutoresizingMaskIntoConstraints = false
         separatorView.translatesAutoresizingMaskIntoConstraints = false
 
         progressLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        progressLabel.setContentHuggingPriority(.defaultHigh + 1, for: .horizontal)
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            nameLabel.trailingAnchor.constraint(equalTo: progressLabel.leadingAnchor, constant: -8),
 
-            progressLabel.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8),
             progressLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
             progressLabel.bottomAnchor.constraint(equalTo: nameLabel.bottomAnchor),
+
+            sizeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2),
+            sizeLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            sizeLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+            sizeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -82,6 +99,11 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         separatorView.isHidden = isLastRow
 
         // swiftlint:disable array_init
+        viewModel.size
+            .map { text -> String? in text }
+            .assign(to: \.text, on: sizeLabel)
+            .store(in: &observers)
+
         viewModel.progress
             .map { text -> String? in text }
             .assign(to: \.text, on: progressLabel)

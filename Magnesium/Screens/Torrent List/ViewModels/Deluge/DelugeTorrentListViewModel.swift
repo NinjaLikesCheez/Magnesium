@@ -9,17 +9,18 @@
 import Combine
 import Foundation
 
-final class DelugeTorrentListViewModel: TorrentListViewModel {
+final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
     private let navigator: Navigator
     private var observers = [AnyCancellable]()
-    private var torrentMapSubject: CurrentValueSubject<TorrentMap, Never>
+    private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
+    private var labels = CurrentValueSubject<[String], Never>([])
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
@@ -76,25 +77,29 @@ final class DelugeTorrentListViewModel: TorrentListViewModel {
         self.client = client
         self.navigator = navigator
         torrentSubjects = CurrentValueSubject([])
-        torrentMapSubject = CurrentValueSubject([:])
-        torrentMapObserver = torrentMapSubject.sink { [weak self] in
+        torrentMap = CurrentValueSubject([:])
+        torrentMapObserver = torrentMap.sink { [weak self] in
             self?.torrentSubjects.send($0.values.sorted { $0.value.name < $1.value.name })
         }
         refresh()
-            .sink(receiveCompletion: { _ in }, receiveValue: {})
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    func refresh() -> AnyPublisher<Void, Error> {
-        return client.torrents()
+    func refresh() -> AnyPublisher<Never, Error> {
+        return client.getLabels()
+            .handleEvents(receiveOutput: { labels in
+                self.labels.send(labels)
+            })
+            .flatMap { _ in self.client.getTorrents() }
             .map { torrents -> TorrentMap in
                 torrents.reduce(into: TorrentMap()) { map, torrent in
                     map[torrent.hash] = CurrentValueSubject(torrent)
                 }
             }
             .handleEvents(receiveOutput: { new in
-                self.torrentMapSubject.send(
-                    self.torrentMapSubject.value
+                self.torrentMap.send(
+                    self.torrentMap.value
                         .filter { new[$0.key] != nil }
                         .merging(new) { current, new in
                             current.send(new.value)
@@ -102,8 +107,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel {
                         }
                 )
             })
-            .map { _ in () }
             .mapError { $0 as Error }
+            .ignoreOutput()
             .ui()
             .eraseToAnyPublisher()
     }
@@ -111,7 +116,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel {
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
         let screen = Screens.Torrents.detail(
-            viewModel: DelugeTorrentDetailViewModel(torrentSubject: subject)
+            viewModel: DelugeTorrentDetailViewModel(torrentSubject: subject, client: client, refresher: self)
         )
         navigator.showDetail(NavigationControllerScreen(screen))
     }
