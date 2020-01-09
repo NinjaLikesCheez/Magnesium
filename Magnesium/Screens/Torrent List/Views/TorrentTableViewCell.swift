@@ -16,7 +16,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.numberOfLines = 2
         return label
     }()
