@@ -128,6 +128,12 @@ final class MockTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfigu
         return refresher.refresh()
     }
 
+    func pause() {}
+
+    func resume() {}
+
+    func remove() {}
+
     private func refreshFiles(for torrent: MockTorrent) {
         var new = FileMap()
 

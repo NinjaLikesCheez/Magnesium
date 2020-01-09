@@ -23,6 +23,13 @@ final class PresentationContext {
         }
     }
 
+    private var topNavigationController: UINavigationController? {
+        guard let navigationController = navigationController else { return nil }
+        var current = navigationController
+        while let parent = current.navigationController { current = parent }
+        return current
+    }
+
     private var splitViewController: UISplitViewController? {
         if let splitViewController = viewController as? UISplitViewController {
             return splitViewController
@@ -46,7 +53,11 @@ final class PresentationContext {
     }
 
     func pop(animated: Bool) {
-        navigationController?.popViewController(animated: animated)
+        topNavigationController?.popViewController(animated: animated)
+    }
+
+    func popToRoot(animated: Bool) {
+        topNavigationController?.popToRootViewController(animated: animated)
     }
 
     func present(

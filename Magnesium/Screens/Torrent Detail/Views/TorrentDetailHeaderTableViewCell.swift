@@ -10,6 +10,12 @@ import Combine
 import SwiftUI
 import UIKit
 
+protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
+    func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell)
+    func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell)
+    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell)
+}
+
 final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private var observers = [AnyCancellable]()
     private var buttonHeightConstraint: NSLayoutConstraint?
@@ -49,9 +55,8 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private lazy var pauseButton: UIButton = {
         let button = UIButton(type: .custom)
         button.tintColor = .systemBlue
-        let configuration = UIImage.SymbolConfiguration(textStyle: .body)
-        button.setImage(UIImage(systemName: "pause.fill", withConfiguration: configuration), for: .normal)
         button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+        button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
         return button
     }()
 
@@ -61,8 +66,21 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
         button.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
         button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+        button.addTarget(self, action: #selector(removeButtonTapped), for: .touchUpInside)
         return button
     }()
+
+    private var isActive = true {
+        didSet {
+            let configuration = UIImage.SymbolConfiguration(textStyle: .body)
+            pauseButton.setImage(UIImage(
+                systemName: isActive ? "pause.fill" : "play.fill",
+                withConfiguration: configuration
+            ), for: .normal)
+        }
+    }
+
+    weak var delegate: TorrentDetailHeaderTableViewCellDelegate?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -167,6 +185,10 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
+        viewModel.isActive
+            .assign(to: \.isActive, on: self)
+            .store(in: &observers)
+
         viewModel.progress
             .assign(to: \.progress, on: progressView)
             .store(in: &observers)
@@ -181,6 +203,20 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .assign(to: \.text, on: statusLabel)
             .store(in: &observers)
         // swiftlint:enable array_init
+    }
+
+    @objc
+    private func pauseButtonTapped() {
+        if isActive {
+            delegate?.headerDidSelectPause(self)
+        } else {
+            delegate?.headerDidSelectResume(self)
+        }
+    }
+
+    @objc
+    private func removeButtonTapped() {
+        delegate?.headerDidSelectRemove(self)
     }
 }
 

@@ -34,6 +34,10 @@ final class DefaultNavigator: Navigator {
         currentContext?.pop(animated: animated)
     }
 
+    func popToRoot(animated: Bool) {
+        currentContext?.popToRoot(animated: animated)
+    }
+
     func present(_ navigatable: Navigatable, style: PresentationStyle, animated: Bool, completion: (() -> Void)?) {
         guard let newContext = currentContext?.present(
             navigatable,

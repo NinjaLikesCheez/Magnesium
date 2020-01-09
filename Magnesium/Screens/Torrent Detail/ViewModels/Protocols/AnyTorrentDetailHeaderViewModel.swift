@@ -20,6 +20,7 @@ private func _abstract(
 private class _AnyTorrentDetailHeaderViewModelBoxBase: TorrentDetailHeaderViewModel {
     var base: Any { _abstract() }
     var name: AnyPublisher<String, Never> { _abstract() }
+    var isActive: AnyPublisher<Bool, Never> { _abstract() }
     var progress: AnyPublisher<Float, Never> { _abstract() }
     var progressColor: AnyPublisher<UIColor, Never> { _abstract() }
     var status: AnyPublisher<String, Never> { _abstract() }
@@ -42,6 +43,7 @@ private final class _AnyTorrentDetailHeaderViewModelBox<
 
     override var base: Any { _base }
     override var name: AnyPublisher<String, Never> { _base.name }
+    override var isActive: AnyPublisher<Bool, Never> { _base.isActive }
     override var progress: AnyPublisher<Float, Never> { _base.progress }
     override var progressColor: AnyPublisher<UIColor, Never> { _base.progressColor }
     override var status: AnyPublisher<String, Never> { _base.status }
@@ -65,6 +67,7 @@ struct AnyTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
 
     var base: Any { box.base }
     var name: AnyPublisher<String, Never> { box.name }
+    var isActive: AnyPublisher<Bool, Never> { box.isActive }
     var progress: AnyPublisher<Float, Never> { box.progress }
     var progressColor: AnyPublisher<UIColor, Never> { box.progressColor }
     var status: AnyPublisher<String, Never> { box.status }

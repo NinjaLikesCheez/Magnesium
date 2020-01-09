@@ -12,6 +12,7 @@ import UIKit
 struct MockTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
     let id: Int
     let name: AnyPublisher<String, Never>
+    let isActive: AnyPublisher<Bool, Never>
     let progress: AnyPublisher<Float, Never>
     let progressColor: AnyPublisher<UIColor, Never>
     let status: AnyPublisher<String, Never>
@@ -25,6 +26,10 @@ struct MockTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
         id = torrent.id
         name = torrentSubject
             .map(\.name)
+            .ui()
+            .eraseToAnyPublisher()
+        isActive = torrentSubject
+            .map(\.isActive)
             .ui()
             .eraseToAnyPublisher()
         progress = torrentSubject

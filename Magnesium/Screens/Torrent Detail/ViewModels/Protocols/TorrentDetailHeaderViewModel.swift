@@ -11,6 +11,7 @@ import UIKit
 
 protocol TorrentDetailHeaderViewModel: Hashable {
     var name: AnyPublisher<String, Never> { get }
+    var isActive: AnyPublisher<Bool, Never> { get }
     var progress: AnyPublisher<Float, Never> { get }
     var progressColor: AnyPublisher<UIColor, Never> { get }
     var status: AnyPublisher<String, Never> { get }

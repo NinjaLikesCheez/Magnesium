@@ -23,6 +23,10 @@ extension TorrentExt {
         return Double(uploaded) / Double(downloaded)
     }
 
+    var isActive: Bool {
+        return state == .downloading || state == .seeding
+    }
+
     var progress: Float {
         return size != 0 ? Float(downloaded) / Float(size) : 0
     }

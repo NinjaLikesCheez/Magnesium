@@ -56,7 +56,7 @@ final class TorrentDetailViewController: UITableViewController {
         }()
         tableView.tableFooterView = UIView()
 
-        dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
+        dataSource = UITableViewDiffableDataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
             switch item {
             case let .header(viewModel):
                 guard let cell = tableView.dequeueReusableCell(
@@ -66,6 +66,7 @@ final class TorrentDetailViewController: UITableViewController {
                     return nil
                 }
 
+                cell.delegate = self
                 cell.configure(with: viewModel)
                 return cell
             case let .info(viewModel):
@@ -170,5 +171,19 @@ final class TorrentDetailViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
+    }
+}
+
+extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
+    func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell) {
+        viewModel.pause()
+    }
+
+    func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell) {
+        viewModel.resume()
+    }
+
+    func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell) {
+        viewModel.remove()
     }
 }

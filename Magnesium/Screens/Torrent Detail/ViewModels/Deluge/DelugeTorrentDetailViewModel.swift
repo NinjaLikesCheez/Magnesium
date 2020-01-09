@@ -175,4 +175,39 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel, NavigatorConfi
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
+
+    func pause() {
+        self.client.pause(hash: self.torrentSubject.value.hash)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &self.observers)
+    }
+
+    func resume() {
+        self.client.resume(hash: self.torrentSubject.value.hash)
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &self.observers)
+    }
+
+    func remove() {
+        let hash = self.torrentSubject.value.hash
+        var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
+        alert.actions.append(AlertActionModel(title: "Keep Data", style: .default) {
+            self.client.remove(hash: hash, removeData: false)
+                .ui()
+                .sink(receiveCompletion: { _ in
+                    self.navigator?.popToRoot(animated: true)
+                }, receiveValue: { _ in })
+                .store(in: &self.observers)
+        })
+        alert.actions.append(AlertActionModel(title: "Remove Data", style: .destructive, handler: {
+            self.client.remove(hash: hash, removeData: true)
+                .ui()
+                .sink(receiveCompletion: { _ in
+                    self.navigator?.popToRoot(animated: true)
+                }, receiveValue: { _ in })
+                .store(in: &self.observers)
+        }))
+        alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
+        navigator?.present(AlertScreen(alert), animated: true)
+    }
 }

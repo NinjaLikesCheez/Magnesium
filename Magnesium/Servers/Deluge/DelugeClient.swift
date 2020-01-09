@@ -199,4 +199,34 @@ final class DelugeClient {
             }
             .eraseToAnyPublisher()
     }
+
+    func pause(hashes: [String]) -> AnyPublisher<Never, Error> {
+        return request(method: "core.pause_torrent", params: hashes)
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func pause(hash: String) -> AnyPublisher<Never, Error> {
+        return pause(hashes: [hash])
+    }
+
+    func resume(hashes: [String]) -> AnyPublisher<Never, Error> {
+        return request(method: "core.resume_torrent", params: hashes)
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func resume(hash: String) -> AnyPublisher<Never, Error> {
+        return resume(hashes: [hash])
+    }
+
+    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, Error> {
+        return request(method: "core.remove_torrents", params: [hashes, removeData])
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func remove(hash: String, removeData: Bool) -> AnyPublisher<Never, Error> {
+        return remove(hashes: [hash], removeData: removeData)
+    }
 }
