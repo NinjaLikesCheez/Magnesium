@@ -9,20 +9,16 @@
 import UIKit
 
 final class NavigationControllerScreen: Navigatable {
-    let builder: (Navigator) -> Navigatable?
+    let root: Navigatable
 
-    init(_ builder: @escaping ((Navigator) -> Navigatable?)) {
-        self.builder = builder
+    init(_ root: Navigatable) {
+        self.root = root
     }
 
     func viewController() -> UIViewController? {
-        let navigationController = UINavigationController()
+        guard let viewController = root.viewController() else { return nil }
+        let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.navigationBar.prefersLargeTitles = true
-        let navigator = DefaultNavigator(
-            presentationContext: PresentationContext(viewController: navigationController)
-        )
-        guard let viewController = builder(navigator)?.viewController() else { return nil }
-        navigationController.viewControllers = [viewController]
         return navigationController
     }
 }

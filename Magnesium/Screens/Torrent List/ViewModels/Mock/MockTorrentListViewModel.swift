@@ -108,10 +108,7 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
 
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
-        navigator.showDetail(NavigationControllerScreen { _ in
-            Screens.Torrents.detail(
-                viewModel: MockTorrentDetailViewModel(torrentSubject: subject, refresher: self)
-            )
-        })
+        let viewModel = MockTorrentDetailViewModel(torrentSubject: subject, refresher: self)
+        navigator.showDetail(NavigationControllerScreen(Screens.Torrents.detail(viewModel: viewModel)))
     }
 }

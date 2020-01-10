@@ -26,11 +26,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
 
         let splitViewController = SplitViewController()
+        let viewModel = DelugeTorrentListViewModel(client: client)
+        let screen = NavigationControllerScreen(Screens.Torrents.list(viewModel: viewModel))
+        let navigationController = screen.viewController()!
+        viewModel.navigator = DefaultNavigator(viewController: navigationController)
         splitViewController.viewControllers = [
-            NavigationControllerScreen { navigator in
-//                Screens.Torrents.list(viewModel: MockTorrentListViewModel(navigator: navigator))
-                Screens.Torrents.list(viewModel: DelugeTorrentListViewModel(client: client, navigator: navigator))
-            }.viewController()!,
+            navigationController,
             Screens.Torrents.emptyDetail.viewController()!,
         ]
 

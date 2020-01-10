@@ -11,8 +11,8 @@ import XCTest
 
 final class MockTorrentListViewModelTests: XCTestCase {
     func testSelectionNavigatesToDetail() {
-        let splitNavigator = SplitNavigator()
-        let viewModel = MockTorrentListViewModel(navigator: splitNavigator.master)
+        let navigator = MockNavigator()
+        let viewModel = MockTorrentListViewModel(navigator: navigator)
 
         let expectation = self.expectation(description: "Navigation")
         let observer = viewModel.torrentsUpdated.sink { _ in
@@ -22,22 +22,46 @@ final class MockTorrentListViewModelTests: XCTestCase {
 
             viewModel.didSelectItem(at: 0)
 
-            XCTAssertEqual(splitNavigator.detail.presentationStack.count, 1)
-            XCTAssertEqual(splitNavigator.detail.presentationStack[0].screens.count, 1)
+            XCTAssertNotNil(navigator.detail)
 
-            let firstScreen = splitNavigator.detail.presentationStack[0].screens[0]
-            guard let navigationScreen = firstScreen as? NavigationControllerScreen else {
-                XCTFail("Expected NavigationControllerScreen, instead got \(type(of: firstScreen))")
+            let detail = navigator.detail
+            guard let navigationScreen = detail as? NavigationControllerScreen else {
+                XCTFail("Expected NavigationControllerScreen, instead got \(type(of: detail))")
                 return
             }
 
-            guard case Screens.Torrents.detail = navigationScreen.builder(splitNavigator.detail)! else {
-                let screen = navigationScreen.builder(splitNavigator.detail)!
-                XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: screen))")
+            guard case Screens.Torrents.detail = navigationScreen.root else {
+                XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: navigationScreen.root))")
                 return
             }
         }
 
         waitForExpectations(timeout: 1)
+    }
+}
+
+private final class MockNavigator: Navigator {
+    var detail: Navigatable?
+
+    func push(_ navigatable: Navigatable, animated: Bool) {}
+    func pop(animated: Bool) {}
+    func popToRoot(animated: Bool) {}
+
+    func present(
+        _ navigatable: Navigatable,
+        style: PresentationStyle,
+        animated: Bool,
+        completion: (() -> Void)?
+    ) -> Navigator? {
+        return nil
+    }
+
+    func dismiss(animated: Bool, completion: (() -> Void)?) {
+        completion?()
+    }
+
+    func showDetail(_ navigatable: Navigatable) -> Navigator? {
+        detail = navigatable
+        return nil
     }
 }

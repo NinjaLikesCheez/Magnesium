@@ -15,12 +15,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private typealias FileMap = [String: FileSubject]
 
     private let client: DelugeClient
-    private let navigator: Navigator
     private let refresher: DelugeRefreshable
     private let torrentSubject: TorrentSubject
     private let fileMap = CurrentValueSubject<FileMap?, Never>(nil)
     private var observers = [AnyCancellable]()
 
+    var navigator: Navigator?
     let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
 
     private static func createSections(
@@ -124,12 +124,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
         client: DelugeClient,
-        navigator: Navigator,
         refresher: DelugeRefreshable
     ) {
         self.torrentSubject = torrentSubject
         self.client = client
-        self.navigator = navigator
         self.refresher = refresher
 
         sections = torrentSubject
@@ -213,11 +211,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .store(in: &self.observers)
         }))
         alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
-        navigator.present(AlertScreen(alert), animated: true)
+        navigator?.present(AlertScreen(alert), animated: true)
     }
 
     private func dismiss() {
-        navigator.popToRoot(animated: true)
-        navigator.showDetail(Screens.Torrents.emptyDetail)
+        navigator?.popToRoot(animated: true)
+        navigator?.showDetail(Screens.Torrents.emptyDetail)
     }
 }

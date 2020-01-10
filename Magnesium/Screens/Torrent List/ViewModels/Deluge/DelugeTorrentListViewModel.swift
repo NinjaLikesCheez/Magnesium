@@ -14,7 +14,6 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
-    private let navigator: Navigator
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -22,6 +21,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var labels = CurrentValueSubject<[String], Never>([])
 
+    var navigator: Navigator?
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
             .combineLatest(sortOption)
@@ -73,9 +73,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         }
     }
 
-    init(client: DelugeClient, navigator: Navigator) {
+    init(client: DelugeClient) {
         self.client = client
-        self.navigator = navigator
         torrentSubjects = CurrentValueSubject([])
         torrentMap = CurrentValueSubject([:])
         torrentMapObserver = torrentMap.sink { [weak self] in
@@ -115,13 +114,12 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
-        navigator.showDetail(NavigationControllerScreen { navigator in
-            Screens.Torrents.detail(viewModel: DelugeTorrentDetailViewModel(
-                torrentSubject: subject,
-                client: self.client,
-                navigator: navigator,
-                refresher: self
-            ))
-        })
+        let viewModel = DelugeTorrentDetailViewModel(
+            torrentSubject: subject,
+            client: client,
+            refresher: self
+        )
+        let screen = NavigationControllerScreen(Screens.Torrents.detail(viewModel: viewModel))
+        viewModel.navigator = navigator?.showDetail(screen)
     }
 }

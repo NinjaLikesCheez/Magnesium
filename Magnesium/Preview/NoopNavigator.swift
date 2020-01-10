@@ -13,8 +13,17 @@ import Foundation
         func push(_ navigatable: Navigatable, animated: Bool) {}
         func pop(animated: Bool) {}
         func popToRoot(animated: Bool) {}
-        func present(_ navigatable: Navigatable, style: PresentationStyle, animated: Bool, completion: (() -> Void)?) {}
+
+        func present(
+            _ navigatable: Navigatable,
+            style: PresentationStyle,
+            animated: Bool,
+            completion: (() -> Void)?
+        ) -> Navigator? {
+            return nil
+        }
+
         func dismiss(animated: Bool, completion: (() -> Void)?) {}
-        func showDetail(_ navigatable: Navigatable) {}
+        func showDetail(_ navigatable: Navigatable) -> Navigator? { return nil }
     }
 #endif
