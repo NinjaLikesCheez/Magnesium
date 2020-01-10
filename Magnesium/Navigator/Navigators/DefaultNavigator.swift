@@ -63,10 +63,7 @@ final class DefaultNavigator: Navigator {
         navigationController?.popViewController(animated: animated)
     }
 
-    func popToRoot(animated: Bool) {
-        navigationController?.popToRootViewController(animated: animated)
-    }
-
+    @discardableResult
     func present(
         _ navigatable: Navigatable,
         style: PresentationStyle,
@@ -84,9 +81,18 @@ final class DefaultNavigator: Navigator {
         presentationStack.items.removeLast()
     }
 
+    @discardableResult
     func showDetail(_ navigatable: Navigatable) -> Navigator? {
         guard let viewController = navigatable.viewController() else { return nil }
         self.viewController?.showDetailViewController(viewController, sender: nil)
         return DefaultNavigator(viewController: viewController)
+    }
+
+    func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool) {
+        if let navigationController = self.navigationController?.navigationController {
+            navigationController.popViewController(animated: animated)
+        } else {
+            showDetail(navigatable)
+        }
     }
 }

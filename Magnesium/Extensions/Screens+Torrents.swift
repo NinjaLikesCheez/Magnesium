@@ -22,7 +22,7 @@ extension Screens {
                 return TorrentDetailViewController(viewModel: viewModel)
             case .emptyDetail:
                 let viewController = UIViewController()
-                viewController.view.backgroundColor = .systemBackground
+                viewController.view.backgroundColor = .systemGroupedBackground
                 return UINavigationController(rootViewController: viewController)
             }
         }

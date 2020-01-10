@@ -176,7 +176,18 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .eraseToAnyPublisher()
     }
 
-    func didSelectMoreOptions(from source: PopoverSource) {}
+    func didSelectMoreOptions(from source: PopoverSource) {
+        let hash = torrentSubject.value.hash
+        var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
+        alert.popoverSource = source
+        alert.actions.append(AlertActionModel(title: "Force Recheck", style: .default) {
+            self.client.recheck(hash: hash)
+                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                .store(in: &self.observers)
+        })
+        alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
+        navigator?.present(AlertScreen(alert), animated: true)
+    }
 
     func didSelectPause() {
         client.pause(hash: torrentSubject.value.hash)
@@ -215,7 +226,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     private func dismiss() {
-        navigator?.popToRoot(animated: true)
-        navigator?.showDetail(Screens.Torrents.emptyDetail)
+        navigator?.dismissDetailOrReplace(with: Screens.Torrents.emptyDetail, animated: true)
     }
 }

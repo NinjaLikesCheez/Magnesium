@@ -25,8 +25,8 @@ final class TorrentDetailViewController: UITableViewController {
             UIBarButtonItem(
                 image: UIImage(systemName: "ellipsis.circle"),
                 style: .plain,
-                target: nil,
-                action: nil
+                target: self,
+                action: #selector(moreButtonTapped(_:))
             ),
         ]
     }
@@ -149,6 +149,11 @@ final class TorrentDetailViewController: UITableViewController {
 
             self?.refreshControl?.endRefreshing()
         }, receiveValue: { _ in })
+    }
+
+    @objc
+    private func moreButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.didSelectMoreOptions(from: .barButton(sender))
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

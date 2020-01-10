@@ -12,7 +12,6 @@ import Foundation
     struct NoopNavigator: Navigator {
         func push(_ navigatable: Navigatable, animated: Bool) {}
         func pop(animated: Bool) {}
-        func popToRoot(animated: Bool) {}
 
         func present(
             _ navigatable: Navigatable,
@@ -25,5 +24,6 @@ import Foundation
 
         func dismiss(animated: Bool, completion: (() -> Void)?) {}
         func showDetail(_ navigatable: Navigatable) -> Navigator? { return nil }
+        func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool) {}
     }
 #endif

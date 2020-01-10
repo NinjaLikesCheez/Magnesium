@@ -11,7 +11,6 @@ import Foundation
 protocol Navigator {
     func push(_ navigatable: Navigatable, animated: Bool)
     func pop(animated: Bool)
-    func popToRoot(animated: Bool)
     @discardableResult
     func present(
         _ navigatable: Navigatable,
@@ -22,6 +21,7 @@ protocol Navigator {
     func dismiss(animated: Bool, completion: (() -> Void)?)
     @discardableResult
     func showDetail(_ navigatable: Navigatable) -> Navigator?
+    func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool)
 }
 
 extension Navigator {
