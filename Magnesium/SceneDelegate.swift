@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // swiftlint:disable:next force_try
         let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
             as! [String: String] // swiftlint:disable:this force_cast
-        let client = DelugeClient(
+        let client = DefaultDelugeClient(
             baseURL: URL(string: credentials["url"]!)!,
             password: credentials["password"]!
         )
