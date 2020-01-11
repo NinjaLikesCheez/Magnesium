@@ -10,7 +10,7 @@
 import XCTest
 
 class DefaultServerManagerTests: XCTestCase {
-    private let serverManager = DefaultServerManager.shared
+    private let serverManager = DefaultServerManager()
 
     override func setUp() {
         serverManager.reset()
@@ -24,24 +24,23 @@ class DefaultServerManagerTests: XCTestCase {
         let server = Server(name: "Server 1", data: Data())
         serverManager.addOrUpdate(server: server)
         XCTAssertEqual(serverManager.getServers().count, 1)
-        serverManager.clearCache()
-        XCTAssertEqual(serverManager.getServers().count, 1)
+        XCTAssertEqual(serverManager.getServers()[0].id, server.id)
+        let newServerManager = DefaultServerManager()
+        XCTAssertEqual(newServerManager.getServers().count, 1)
+        XCTAssertEqual(newServerManager.getServers()[0].id, server.id)
     }
 
-    func testSameServerGetsReturned() {
+    func testServerUpdated() {
         let server = Server(name: "Server 1", data: Data())
-        serverManager.addOrUpdate(server: server)
-
-        let managedServer = serverManager.getServers()[0]
-        XCTAssertTrue(server == managedServer)
 
         let expectation = self.expectation(description: "Value received")
-        let observer = server.name.dropFirst().sink { _ in
+        let observer = serverManager.serverUpdated.sink { updated in
+            XCTAssertEqual(updated.id, server.id)
             expectation.fulfill()
         }
         _ = observer
 
-        managedServer.name.value = "New Name"
+        serverManager.addOrUpdate(server: server)
 
         wait(for: [expectation], timeout: 1)
     }
@@ -52,7 +51,7 @@ class DefaultServerManagerTests: XCTestCase {
         XCTAssertEqual(serverManager.getServers().count, 1)
         serverManager.reset()
         XCTAssertEqual(serverManager.getServers().count, 0)
-        serverManager.clearCache()
-        XCTAssertEqual(serverManager.getServers().count, 0)
+        let newServerManager = DefaultServerManager()
+        XCTAssertEqual(newServerManager.getServers().count, 0)
     }
 }

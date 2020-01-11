@@ -1,5 +1,5 @@
 //
-//  Screens+Torrents.swift
+//  Screens.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2019-12-19.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension Screens {
+enum Screens {
     enum Torrents: Navigatable {
         case list(viewModel: TorrentListViewModel)
         case detail(viewModel: TorrentDetailViewModel)
