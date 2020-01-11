@@ -12,6 +12,7 @@ import XCTest
 class DefaultPreferenceManagerTests: XCTestCase {
     private let preferenceManager = DefaultPreferenceManager()
     private let key = PreferenceKey<String>("_test")
+    private let keyWithDefault = PreferenceKey<String>("_testDefault")
 
     override func setUp() {
         preferenceManager.removeValue(for: key)
@@ -21,53 +22,65 @@ class DefaultPreferenceManagerTests: XCTestCase {
         preferenceManager.removeValue(for: key)
     }
 
-    func testPersistance() {
-        preferenceManager.set("Value", for: key)
-        XCTAssertEqual(preferenceManager.value(for: key), "Value")
-        let newPreferenceManager = DefaultPreferenceManager()
-        XCTAssertEqual(newPreferenceManager.value(for: key), "Value")
+    func testRegisterDefaults() throws {
+        try preferenceManager.registerDefault("Value", for: keyWithDefault)
+        XCTAssertEqual(try preferenceManager.value(for: keyWithDefault), "Value")
     }
 
-    func testValueUpdated() {
+    func testRegisterDefaultsCodable() throws {
+        let keyWithDefault = PreferenceKey<DummyCodable>(self.keyWithDefault.value)
+        try preferenceManager.registerDefault(DummyCodable(name: "Codable"), for: keyWithDefault)
+        XCTAssertEqual(try preferenceManager.value(for: keyWithDefault)?.name, "Codable")
+    }
+
+    func testPersistance() throws {
+        try preferenceManager.set("Value", for: key)
+        XCTAssertEqual(try preferenceManager.value(for: key), "Value")
+        let newPreferenceManager = DefaultPreferenceManager()
+        XCTAssertEqual(try newPreferenceManager.value(for: key), "Value")
+    }
+
+    func testValueUpdated() throws {
         let key = PreferenceKey<String>("_test")
 
         let expectation = self.expectation(description: "Value received")
         let observer = preferenceManager.valueUpdated.sink { args in
             let (anyKey, value) = args
             XCTAssertEqual(anyKey.value, key.value)
-            XCTAssertEqual(value as! String, "Value")
+            XCTAssertEqual(value as? String, "Value")
             expectation.fulfill()
         }
         _ = observer
 
-        preferenceManager.set("Value", for: key)
+        try preferenceManager.set("Value", for: key)
         
         wait(for: [expectation], timeout: 1)
     }
 
-    func testContainsValue() {
+    func testContainsValue() throws {
         let key = PreferenceKey<String>("_test")
         XCTAssertFalse(preferenceManager.containsValue(for: key))
-        preferenceManager.set("Value", for: key)
-        XCTAssertEqual(preferenceManager.value(for: key), "Value")
+        try preferenceManager.set("Value", for: key)
+        XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         XCTAssertTrue(preferenceManager.containsValue(for: key))
     }
 
-    func testRemoveValue() {
+    func testRemoveValue() throws {
         let key = PreferenceKey<String>("_test")
-        preferenceManager.set("Value", for: key)
-        XCTAssertEqual(preferenceManager.value(for: key), "Value")
+        try preferenceManager.set("Value", for: key)
+        XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         preferenceManager.removeValue(for: key)
-        XCTAssertEqual(preferenceManager.value(for: key), nil)
+        XCTAssertEqual(try preferenceManager.value(for: key), nil)
     }
 
-    func testCodable() {
-        struct MockCodable: Codable {
-            let name: String
-        }
-
-        let key = PreferenceKey<MockCodable>(self.key.value)
-        preferenceManager.set(MockCodable(name: "Codable"), for: key)
-        XCTAssertEqual(preferenceManager.value(for: key)?.name, "Codable")
+    func testCodable() throws {
+        let key = PreferenceKey<DummyCodable>(self.key.value)
+        try preferenceManager.set(DummyCodable(name: "Codable"), for: key)
+        XCTAssertEqual(try preferenceManager.value(for: key)?.name, "Codable")
     }
 }
+
+private struct DummyCodable: Codable {
+    let name: String
+}
+

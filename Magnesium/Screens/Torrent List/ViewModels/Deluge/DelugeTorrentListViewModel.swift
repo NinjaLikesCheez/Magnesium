@@ -14,12 +14,14 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
+    private let preferences: PreferenceManager
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var labels = CurrentValueSubject<[String], Never>([])
+    private var updateTimer: Timer?
 
     var navigator: Navigator?
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
@@ -73,16 +75,50 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         }
     }
 
-    init(client: DelugeClient) {
+    init(client: DelugeClient, preferences: PreferenceManager) {
         self.client = client
+        self.preferences = preferences
         torrentSubjects = CurrentValueSubject([])
         torrentMap = CurrentValueSubject([:])
         torrentMapObserver = torrentMap.sink { [weak self] in
             self?.torrentSubjects.send($0.values.sorted { $0.value.name < $1.value.name })
         }
+
         refresh()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
+
+        preferences.valueUpdated
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] args in
+                let (anyKey, anyValue) = args
+                guard anyKey.value == PreferenceKeys.autoRefreshInterval.value,
+                    let value = anyValue as? TimeInterval?
+                else {
+                    return
+                }
+                self?.configureUpdateTimer(interval: value)
+            })
+            .store(in: &observers)
+
+        configureUpdateTimer(interval: try? preferences.value(for: PreferenceKeys.autoRefreshInterval))
+    }
+
+    private func configureUpdateTimer(interval: TimeInterval?) {
+        guard let interval = interval, interval > 0 else {
+            updateTimer?.invalidate()
+            updateTimer = nil
+            return
+        }
+
+        updateTimer?.invalidate()
+        let timer = Timer(timeInterval: interval, repeats: true, block: { [weak self] timer in
+            guard let strongSelf = self, timer.isValid else { return }
+            strongSelf.refresh()
+                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                .store(in: &strongSelf.observers)
+        })
+        RunLoop.current.add(timer, forMode: .common)
+        self.updateTimer = timer
     }
 
     func refresh() -> AnyPublisher<Never, Error> {

@@ -16,6 +16,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
+        let preferences = DefaultPreferenceManager()
+        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
+
         let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
         // swiftlint:disable:next force_try
         let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
@@ -26,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
 
         let splitViewController = SplitViewController()
-        let viewModel = DelugeTorrentListViewModel(client: client)
+        let viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
         let screen = NavigationControllerScreen(Screens.Torrents.list(viewModel: viewModel))
         let navigationController = screen.viewController()!
         viewModel.navigator = DefaultNavigator(viewController: navigationController)

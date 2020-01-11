@@ -12,7 +12,7 @@ import Foundation
 struct PreferenceKey<T: Codable> {
     let value: String
 
-    public init(_ value: String) {
+    init(_ value: String) {
         self.value = value
     }
 }
@@ -20,25 +20,26 @@ struct PreferenceKey<T: Codable> {
 struct AnyPreferenceKey {
     let value: String
 
-    public init(_ value: String) {
+    fileprivate init(_ value: String) {
         self.value = value
     }
 }
 
 protocol PreferenceManager {
-    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any), Never> { get }
+    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> { get }
 
-    func value<T>(for key: PreferenceKey<T>) -> T?
-    func set<T>(_ value: T, for key: PreferenceKey<T>)
+    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws
+    func value<T>(for key: PreferenceKey<T>) throws -> T?
+    func set<T>(_ value: T, for key: PreferenceKey<T>) throws
     func containsValue<T>(for key: PreferenceKey<T>) -> Bool
     func removeValue<T>(for key: PreferenceKey<T>)
 }
 
 final class DefaultPreferenceManager: PreferenceManager {
     private let userDefaults: UserDefaults
-    private let valueUpdatedSubject = PassthroughSubject<(AnyPreferenceKey, Any), Never>()
+    private let valueUpdatedSubject = PassthroughSubject<(AnyPreferenceKey, Any?), Never>()
 
-    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any), Never> {
+    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
         return valueUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -46,7 +47,7 @@ final class DefaultPreferenceManager: PreferenceManager {
         self.userDefaults = userDefaults
     }
 
-    private func isNativeType<T>(_ type: T.Type) -> Bool {
+    private func isNativeType(_ type: Any.Type) -> Bool {
         switch type {
         case is String.Type, is Bool.Type, is Int.Type, is Float.Type, is Double.Type, is Date.Type:
             return true
@@ -55,23 +56,29 @@ final class DefaultPreferenceManager: PreferenceManager {
         }
     }
 
-    func value<T>(for key: PreferenceKey<T>) -> T? {
+    private func encode<T>(_ value: T) throws -> Any where T: Codable {
+        guard !isNativeType(T.self) else {
+            return value
+        }
+
+        return try PropertyListEncoder().encode(value)
+    }
+
+    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {
+        userDefaults.register(defaults: [key.value: try encode(value)])
+    }
+
+    func value<T>(for key: PreferenceKey<T>) throws -> T? {
         if isNativeType(T.self) {
             return userDefaults.value(forKey: key.value) as? T
         } else {
             guard let data = userDefaults.data(forKey: key.value) else { return nil }
-            return try? PropertyListDecoder().decode(T.self, from: data)
+            return try PropertyListDecoder().decode(T.self, from: data)
         }
     }
 
-    func set<T>(_ value: T, for key: PreferenceKey<T>) {
-        if isNativeType(T.self) {
-            userDefaults.setValue(value, forKey: key.value)
-        } else {
-            guard let data = try? PropertyListEncoder().encode(value) else { return }
-            userDefaults.set(data, forKey: key.value)
-        }
-
+    func set<T>(_ value: T, for key: PreferenceKey<T>) throws {
+        userDefaults.set(try encode(value), forKey: key.value)
         valueUpdatedSubject.send((AnyPreferenceKey(key.value), value))
     }
 
@@ -81,5 +88,6 @@ final class DefaultPreferenceManager: PreferenceManager {
 
     func removeValue<T>(for key: PreferenceKey<T>) {
         userDefaults.removeObject(forKey: key.value)
+        valueUpdatedSubject.send((AnyPreferenceKey(key.value), nil))
     }
 }

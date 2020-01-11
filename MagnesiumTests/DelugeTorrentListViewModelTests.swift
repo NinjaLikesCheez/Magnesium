@@ -13,7 +13,7 @@ import XCTest
 final class DelugeTorrentListViewModelTests: XCTestCase {
     func testSelectionNavigatesToDetail() {
         let navigator = MockNavigator()
-        let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient())
+        let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient(), preferences: MockPreferenceManager())
         viewModel.navigator = navigator
         viewModel.didSelectItem(at: 0)
 
@@ -92,6 +92,18 @@ private final class MockDelugeClient: DelugeClient {
         XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
+}
+
+private final class MockPreferenceManager: PreferenceManager {
+    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
+        return Empty().eraseToAnyPublisher()
+    }
+
+    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {}
+    func value<T>(for key: PreferenceKey<T>) -> T? { return nil }
+    func set<T>(_ value: T, for key: PreferenceKey<T>) {}
+    func containsValue<T>(for key: PreferenceKey<T>) -> Bool { return false }
+    func removeValue<T>(for key: PreferenceKey<T>) {}
 }
 
 private final class MockNavigator: Navigator {
