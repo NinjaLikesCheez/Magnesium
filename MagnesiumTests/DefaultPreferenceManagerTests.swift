@@ -53,7 +53,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
         _ = observer
 
         try preferenceManager.set("Value", for: key)
-        
+
         wait(for: [expectation], timeout: 1)
     }
 
@@ -83,4 +83,3 @@ class DefaultPreferenceManagerTests: XCTestCase {
 private struct DummyCodable: Codable {
     let name: String
 }
-

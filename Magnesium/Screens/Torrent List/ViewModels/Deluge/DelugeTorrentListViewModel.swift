@@ -117,9 +117,10 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             target: self,
             selector: #selector(updateTimerFired(_:)),
             userInfo: nil,
-            repeats: true)
+            repeats: true
+        )
         RunLoop.main.add(timer, forMode: .common)
-        self.updateTimer = timer
+        updateTimer = timer
     }
 
     @objc
