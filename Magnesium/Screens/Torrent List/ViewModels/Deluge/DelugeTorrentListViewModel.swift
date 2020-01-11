@@ -111,14 +111,23 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         }
 
         updateTimer?.invalidate()
-        let timer = Timer(timeInterval: interval, repeats: true, block: { [weak self] timer in
-            guard let strongSelf = self, timer.isValid else { return }
-            strongSelf.refresh()
-                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                .store(in: &strongSelf.observers)
-        })
-        RunLoop.current.add(timer, forMode: .common)
+        let timer = Timer(
+            fireAt: Date().advanced(by: interval),
+            interval: interval,
+            target: self,
+            selector: #selector(updateTimerFired(_:)),
+            userInfo: nil,
+            repeats: true)
+        RunLoop.main.add(timer, forMode: .common)
         self.updateTimer = timer
+    }
+
+    @objc
+    private func updateTimerFired(_ timer: Timer) {
+        guard timer.isValid else { return }
+        refresh()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
     }
 
     func refresh() -> AnyPublisher<Never, Error> {

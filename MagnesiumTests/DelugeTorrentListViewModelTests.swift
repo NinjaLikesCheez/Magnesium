@@ -12,7 +12,7 @@ import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
     func testSelectionNavigatesToDetail() {
-        let navigator = MockNavigator()
+        let navigator = MockDetailNavigator()
         let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient(), preferences: MockPreferenceManager())
         viewModel.navigator = navigator
         viewModel.didSelectItem(at: 0)
@@ -30,15 +30,43 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             return
         }
     }
+
+    func testAutoUpdate() {
+        let client = MockDelugeClient()
+        let viewModel = DelugeTorrentListViewModel(client: client, preferences: MockPreferenceManager())
+        _ = viewModel
+        client.resetRequests()
+
+        let expectation = self.expectation(description: "Update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, labels: 1))
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 2)
+    }
 }
 
 private final class MockDelugeClient: DelugeClient {
+    struct Requests: Equatable {
+        var torrents = 0
+        var labels = 0
+    }
+
+    private(set) var requests = Requests()
+
+    func resetRequests() {
+        requests = Requests()
+    }
+
     func authenticate() -> AnyPublisher<Never, DelugeClientError> {
         XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
     func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeClientError> {
+        requests.torrents += 1
+
         let torrents = [
             DelugeTorrent(
                 hash: "",
@@ -66,6 +94,7 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     func getLabels() -> AnyPublisher<[String], DelugeClientError> {
+        requests.labels += 1
         return Just([]).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
     }
 
@@ -100,13 +129,21 @@ private final class MockPreferenceManager: PreferenceManager {
     }
 
     func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {}
-    func value<T>(for key: PreferenceKey<T>) -> T? { return nil }
+
+    func value<T>(for key: PreferenceKey<T>) -> T? {
+        if key.value == PreferenceKeys.autoRefreshInterval.value {
+            return TimeInterval(1) as? T
+        }
+
+        return nil
+    }
+
     func set<T>(_ value: T, for key: PreferenceKey<T>) {}
     func containsValue<T>(for key: PreferenceKey<T>) -> Bool { return false }
     func removeValue<T>(for key: PreferenceKey<T>) {}
 }
 
-private final class MockNavigator: Navigator {
+private final class MockDetailNavigator: Navigator {
     var detail: Navigatable?
 
     func push(_ navigatable: Navigatable, animated: Bool) {
