@@ -25,6 +25,6 @@ import Navigator
 
         func dismiss(animated: Bool, completion: (() -> Void)?) {}
         func showDetail(_ navigatable: Navigatable) -> Navigator? { return nil }
-        func popDetail(animated: Bool) -> Bool { return false }
+        func popNestedDetail(animated: Bool) -> Bool { return false }
     }
 #endif

@@ -61,5 +61,5 @@ trailing_comma:
   mandatory_comma: true
 
 implicit_return:
-  include:
-    - closures
+  included:
+    - closure

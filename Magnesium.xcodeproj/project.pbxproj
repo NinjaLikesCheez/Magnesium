@@ -245,6 +245,7 @@
 			children = (
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
+				E9635A5323CADBD100239239 /* Navigator */,
 				E96B0062237A43740091FA71 /* Products */,
 				E9635A5423CADC5300239239 /* Frameworks */,
 			);
@@ -262,7 +263,6 @@
 		E96B0063237A43740091FA71 /* Magnesium */ = {
 			isa = PBXGroup;
 			children = (
-				E9635A5323CADBD100239239 /* Navigator */,
 				E96B0064237A43740091FA71 /* AppDelegate.swift */,
 				E96B0066237A43740091FA71 /* SceneDelegate.swift */,
 				E9B78DE523AD426A004DC0C9 /* Servers */,
