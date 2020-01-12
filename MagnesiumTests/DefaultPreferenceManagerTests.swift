@@ -33,7 +33,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
         XCTAssertEqual(try preferenceManager.value(for: keyWithDefault)?.name, "Codable")
     }
 
-    func testPersistance() throws {
+    func testValueIsPersisted() throws {
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         let newPreferenceManager = DefaultPreferenceManager()
@@ -41,12 +41,10 @@ class DefaultPreferenceManagerTests: XCTestCase {
     }
 
     func testValueUpdated() throws {
-        let key = PreferenceKey<String>("_test")
-
         let expectation = self.expectation(description: "Value received")
         let observer = preferenceManager.valueUpdated.sink { args in
             let (anyKey, value) = args
-            XCTAssertEqual(anyKey.value, key.value)
+            XCTAssertEqual(anyKey.value, self.key.value)
             XCTAssertEqual(value as? String, "Value")
             expectation.fulfill()
         }
@@ -57,8 +55,59 @@ class DefaultPreferenceManagerTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
+    func testValueUpdatedPublisher() throws {
+        let expectation = self.expectation(description: "Value received")
+        let observer = preferenceManager.valueUpdatedPublisher(for: key)
+            .sink { value in
+                XCTAssertEqual(value, "Value")
+                expectation.fulfill()
+            }
+        _ = observer
+
+        try preferenceManager.set("Value", for: key)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testValueUpdatedPublisherWithRemove() throws {
+        let expectation = self.expectation(description: "Value received")
+        let observer = preferenceManager.valueUpdatedPublisher(for: key)
+            .sink { value in
+                XCTAssertEqual(value, nil)
+                expectation.fulfill()
+            }
+        _ = observer
+
+        preferenceManager.removeValue(for: key)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testValuePublisher() throws {
+        try preferenceManager.set("Initial", for: key)
+
+        let firstExpectation = self.expectation(description: "First value received")
+        let secondExpectation = self.expectation(description: "First value received")
+        var index = -1
+        let observer = preferenceManager.valuePublisher(for: key)
+            .sink { value in
+                index += 1
+                if index == 0 {
+                    XCTAssertEqual(value, "Initial")
+                    firstExpectation.fulfill()
+                } else if index == 1 {
+                    XCTAssertEqual(value, "Value")
+                    secondExpectation.fulfill()
+                }
+            }
+        _ = observer
+
+        try preferenceManager.set("Value", for: key)
+
+        wait(for: [firstExpectation, secondExpectation], timeout: 1)
+    }
+
     func testContainsValue() throws {
-        let key = PreferenceKey<String>("_test")
         XCTAssertFalse(preferenceManager.containsValue(for: key))
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
@@ -66,7 +115,6 @@ class DefaultPreferenceManagerTests: XCTestCase {
     }
 
     func testRemoveValue() throws {
-        let key = PreferenceKey<String>("_test")
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         preferenceManager.removeValue(for: key)

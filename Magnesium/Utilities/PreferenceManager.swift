@@ -38,11 +38,14 @@ protocol PreferenceManager {
 extension PreferenceManager {
     func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
         return valueUpdated
-            .compactMap { args in
-                let (updatedKey, updatedValue) = args
-                guard updatedKey.value == key.value else { return nil }
-                return updatedValue as? T
-            }
+            .filter { $0.0.value == key.value }
+            .map { $0.1 as? T }
+            .eraseToAnyPublisher()
+    }
+
+    func valuePublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
+        return valueUpdatedPublisher(for: key)
+            .prepend(try? value(for: key))
             .eraseToAnyPublisher()
     }
 }

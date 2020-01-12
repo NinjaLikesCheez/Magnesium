@@ -30,7 +30,15 @@ class DefaultPreferenceManagerServerTests: XCTestCase {
         XCTAssertEqual(newServerManager.getServers()[0].id, server.id)
     }
 
-    func testServerUpdated() {
+    func testServerIsNotDuplicated() {
+        let server = Server(name: "Server 1", data: Data())
+        preferenceManager.addOrUpdate(server: server)
+        XCTAssertEqual(preferenceManager.getServers().count, 1)
+        preferenceManager.addOrUpdate(server: server)
+        XCTAssertEqual(preferenceManager.getServers().count, 1)
+    }
+
+    func testServerUpdatedPublisher() {
         let server = Server(name: "Server 1", data: Data())
 
         let expectation = self.expectation(description: "Value received")
