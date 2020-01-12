@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Navigator
 
 #if DEBUG
     struct NoopNavigator: Navigator {
@@ -24,6 +25,6 @@ import Foundation
 
         func dismiss(animated: Bool, completion: (() -> Void)?) {}
         func showDetail(_ navigatable: Navigatable) -> Navigator? { return nil }
-        func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool) {}
+        func popDetail(animated: Bool) -> Bool { return false }
     }
 #endif

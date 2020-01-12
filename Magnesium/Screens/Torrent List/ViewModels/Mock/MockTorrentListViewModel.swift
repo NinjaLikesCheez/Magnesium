@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import Navigator
 
 final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<MockTorrent, Never>

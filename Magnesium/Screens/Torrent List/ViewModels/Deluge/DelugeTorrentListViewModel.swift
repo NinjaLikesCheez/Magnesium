@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import Navigator
 
 final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>

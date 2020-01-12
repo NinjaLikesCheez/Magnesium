@@ -8,6 +8,7 @@
 
 import Combine
 @testable import Magnesium
+import Navigator
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
@@ -173,7 +174,8 @@ private final class MockDetailNavigator: Navigator {
         return nil
     }
 
-    func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool) {
+    func popDetail(animated: Bool) -> Bool {
         XCTFail()
+        return false
     }
 }

@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Navigator
 import UIKit
 
 final class MockTorrentDetailViewModel: TorrentDetailViewModel {

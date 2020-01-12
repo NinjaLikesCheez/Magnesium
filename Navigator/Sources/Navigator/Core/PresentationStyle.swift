@@ -1,6 +1,6 @@
 //
 //  PresentationStyle.swift
-//  Magnesium
+//  Navigator
 //
 //  Created by James Hurst on 2019-12-19.
 //  Copyright © 2019 James Hurst. All rights reserved.
@@ -8,7 +8,8 @@
 
 import Foundation
 
-enum PresentationStyle {
+/// Styles that can be used for presentations.
+public enum PresentationStyle {
     case automatic
     case fullScreen
     case pageSheet

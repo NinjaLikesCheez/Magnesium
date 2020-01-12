@@ -6,6 +6,7 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
+import Navigator
 import UIKit
 
 enum Screens {

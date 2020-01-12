@@ -8,14 +8,17 @@
 
 import UIKit
 
-struct AlertScreen: Navigatable {
+/// A screen that creates a UIAlertController from an AlertModel.
+public struct AlertScreen: Navigatable {
     private let model: AlertModel
 
-    init(_ model: AlertModel) {
+    /// Creates a new alert screen with the given model.
+    /// - Parameter model: The model to use for the created alert.
+    public init(_ model: AlertModel) {
         self.model = model
     }
 
-    func viewController() -> UIViewController? {
+    public func viewController() -> UIViewController? {
         let alertController = UIAlertController(
             title: model.title,
             message: model.message,

@@ -6,9 +6,10 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
+import Navigator
 import UIKit
 
-final class NavigationControllerScreen: Navigatable {
+struct NavigationControllerScreen: Navigatable {
     let root: Navigatable
 
     init(_ root: Navigatable) {

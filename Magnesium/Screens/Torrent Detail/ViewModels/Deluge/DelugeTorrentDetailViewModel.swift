@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Navigator
 import UIKit
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
@@ -226,6 +227,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     private func dismiss() {
-        navigator?.dismissDetailOrReplace(with: Screens.Torrents.emptyDetail, animated: true)
+        guard let navigator = navigator else { return }
+        let dismissed = navigator.popDetail(animated: true)
+        if !dismissed {
+            navigator.showDetail(Screens.Torrents.emptyDetail)
+        }
     }
 }

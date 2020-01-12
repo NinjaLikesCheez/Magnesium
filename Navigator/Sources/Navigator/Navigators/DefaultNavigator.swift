@@ -1,6 +1,6 @@
 //
 //  DefaultNavigator.swift
-//  Magnesium
+//  Navigator
 //
 //  Created by James Hurst on 2019-12-19.
 //  Copyright © 2019 James Hurst. All rights reserved.
@@ -8,7 +8,12 @@
 
 import UIKit
 
-final class DefaultNavigator: Navigator {
+/**
+A Navigator operating on a view controller.
+
+ The view controller used to create the navigator can be either a regular view controller or a navigaiton controller. If a regular view controller is used then the view controller's `navigationController` property will be used for navigation operations such as push and pop.
+*/
+final public class DefaultNavigator: Navigator {
     private class PresentationStack {
         var items: [PresentationContext]
 
@@ -43,7 +48,9 @@ final class DefaultNavigator: Navigator {
         return navigationController
     }
 
-    convenience init(viewController: UIViewController) {
+    /// Creates a new navigator with the given view controller.
+    /// - Parameter viewController: The view controller to use for navigation. This may be either a regular view controller or a navigation controller.
+    public convenience init(viewController: UIViewController) {
         self.init(viewController: viewController, presentationStack: nil)
     }
 
@@ -54,17 +61,17 @@ final class DefaultNavigator: Navigator {
         )
     }
 
-    func push(_ navigatable: Navigatable, animated: Bool) {
+    public func push(_ navigatable: Navigatable, animated: Bool) {
         guard let viewController = navigatable.viewController() else { return }
         navigationController?.pushViewController(viewController, animated: animated)
     }
 
-    func pop(animated: Bool) {
+    public func pop(animated: Bool) {
         navigationController?.popViewController(animated: animated)
     }
 
     @discardableResult
-    func present(
+    public func present(
         _ navigatable: Navigatable,
         style: PresentationStyle,
         animated: Bool,
@@ -76,23 +83,24 @@ final class DefaultNavigator: Navigator {
         return DefaultNavigator(viewController: viewController, presentationStack: presentationStack)
     }
 
-    func dismiss(animated: Bool, completion: (() -> Void)?) {
+    public func dismiss(animated: Bool, completion: (() -> Void)?) {
         presentationContext?.viewController?.dismiss(animated: animated, completion: completion)
         presentationStack.items.removeLast()
     }
 
     @discardableResult
-    func showDetail(_ navigatable: Navigatable) -> Navigator? {
+    public func showDetail(_ navigatable: Navigatable) -> Navigator? {
         guard let viewController = navigatable.viewController() else { return nil }
         self.viewController?.showDetailViewController(viewController, sender: nil)
         return DefaultNavigator(viewController: viewController)
     }
 
-    func dismissDetailOrReplace(with navigatable: Navigatable, animated: Bool) {
+    public func popDetail(animated: Bool) -> Bool {
         if let navigationController = self.navigationController?.navigationController {
             navigationController.popViewController(animated: animated)
-        } else {
-            showDetail(navigatable)
+            return true
         }
+
+        return false
     }
 }
