@@ -35,6 +35,18 @@ protocol PreferenceManager {
     func removeValue<T>(for key: PreferenceKey<T>)
 }
 
+extension PreferenceManager {
+    func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
+        return valueUpdated
+            .compactMap { args in
+                let (updatedKey, updatedValue) = args
+                guard updatedKey.value == key.value else { return nil }
+                return updatedValue as? T
+            }
+            .eraseToAnyPublisher()
+    }
+}
+
 final class DefaultPreferenceManager: PreferenceManager {
     private let userDefaults: UserDefaults
     private let valueUpdatedSubject = PassthroughSubject<(AnyPreferenceKey, Any?), Never>()
