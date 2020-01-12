@@ -16,6 +16,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
+        let isRunningTests = NSClassFromString("XCTestCase") != nil
+        guard !isRunningTests else {
+            if let windowScene = scene as? UIWindowScene {
+                let window = UIWindow(windowScene: windowScene)
+                window.rootViewController = UIViewController()
+                self.window = window
+                window.makeKeyAndVisible()
+            }
+            return
+        }
+
         let preferences = DefaultPreferenceManager()
         _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
 
