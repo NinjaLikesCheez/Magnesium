@@ -11,7 +11,9 @@ import UIKit
 /**
  A Navigator operating on a view controller.
 
- The view controller used to create the navigator can be either a regular view controller or a navigaiton controller. If a regular view controller is used then the view controller's `navigationController` property will be used for navigation operations such as push and pop.
+ The view controller used to create the navigator can be either a regular view controller or a navigaiton controller.
+ If a regular view controller is used then the view controller's `navigationController` property will be used for
+ navigation operations such as push and pop.
  */
 public final class DefaultNavigator: Navigator {
     internal class PresentationStack {
@@ -49,7 +51,8 @@ public final class DefaultNavigator: Navigator {
     }
 
     /// Creates a new navigator with the given view controller.
-    /// - Parameter viewController: The view controller to use for navigation. This may be either a regular view controller or a navigation controller.
+    /// - Parameter viewController: The view controller to use for navigation. This may be either a regular view
+    /// controller or a navigation controller.
     public convenience init(viewController: UIViewController) {
         self.init(viewController: viewController, presentationStack: nil)
     }
