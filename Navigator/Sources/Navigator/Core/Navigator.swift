@@ -16,10 +16,10 @@ import Foundation
 
  A "presentation stack" refers to presented and dismissed navigatables.
 
- Navigation operations such as push and pop will occur in the navigation stack for the current navigator.
+ Navigation operations such as push and pop will occur in the navigation stack for the navigator.
 
- Presentation operations such as present and dismiss will be performed on the presentation stack known to the current
- navigator. Presentation stacks are shared between the current navigator and the new navigators it creates.
+ Presentation operations such as present and dismiss will be performed on the presentation stack known to the navigator.
+ Presentation stacks are shared between a navigator and any new navigators it creates.
 
  When displaying a navigatable in a way that will create a new navigation stack, such as present or showDetail,
  a new navigator is returned. This new navigator should be used by the newly displayed navigatable for its navigation.
@@ -42,7 +42,9 @@ public protocol Navigator {
     ///   - animated: If the presentation should be animated.
     ///   - completion: A handler to run when the presentation is completed.
     /// - Returns: A new navigator for the displayed navigatable to use.
-    /// The new navigator will share the same presentation stack as this navigator.
+    /// The new navigator will share the same presentation stack as this navigator. If this method returns nil then the
+    /// navigatable was not able to be presented either due to the navigatable's `viewController()` method returning nil
+    /// or the presentation stack being empty or deallocated.
     @discardableResult
     func present(
         _ navigatable: Navigatable,
@@ -51,25 +53,28 @@ public protocol Navigator {
         completion: (() -> Void)?
     ) -> Navigator?
 
-    /// Dismisses the current navigatable in the presentation stack.
+    /// Dismisses the current navigatable in the presentation stack. If the presentation stack contains only one
+    /// navigatable then this method will do nothing.
     /// - Parameters:
     ///   - animated: If the dismiss should be animated.
     ///   - completion: A handler to run when the dismiss is completed.
     func dismiss(animated: Bool, completion: (() -> Void)?)
 
-    /// Displays a navigatable as the detail in a split environment.
+    /// Displays a navigatable as the detail view in the nearest ancestor which is a split view.
     /// - Parameter navigatable: The navigatable to display.
     /// - Returns: A new navigator for the displayed navigatable to use.
-    /// The new navigator will share the same presentation stack as this navigator.
+    /// The new navigator will share the same presentation stack as this navigator. If this method returns nil then the
+    /// navigatable was not able to be presented due to the navigatable's `viewController()` method returning nil.
     @discardableResult
     func showDetail(_ navigatable: Navigatable) -> Navigator?
 
-    /// Pops the detail navigation stack if displayed as a single navigation stack.
+    /// Pops the detail navigaiton stack if nested within the master navigation stack.
     /// - Parameters:
     ///   - animated: If the pop should be animated.
     /// - Returns: Returns true if the detail navigation stack was popped. If false this may indicate that the
-    /// split environment is displayed as two separate panes.
-    func popDetail(animated: Bool) -> Bool
+    /// split view is not displayed as a nested navigation stack.
+    @discardableResult
+    func popNestedDetail(animated: Bool) -> Bool
 }
 
 public extension Navigator {
