@@ -88,13 +88,11 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
 
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.autoRefreshInterval)
+        preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
                 self?.configureUpdateTimer(interval: value)
             })
             .store(in: &observers)
-
-        configureUpdateTimer(interval: try? preferences.value(for: PreferenceKeys.autoRefreshInterval))
     }
 
     private func configureUpdateTimer(interval: TimeInterval?) {
