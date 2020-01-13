@@ -6,7 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-
 enum ByteFormatter {
     private static let unitSize = 1024
 

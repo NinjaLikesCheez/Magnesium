@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import Preferences
 
 struct Server: Codable, Equatable {
     fileprivate(set) var id = UUID()
@@ -19,7 +20,7 @@ private enum Keys {
     static let servers = PreferenceKey<[Server]>("servers")
 }
 
-extension PreferenceManager {
+extension Preferences {
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server, Never> {
         return valueUpdatedPublisher(for: Keys.servers)
             .compactMap { servers -> Server? in

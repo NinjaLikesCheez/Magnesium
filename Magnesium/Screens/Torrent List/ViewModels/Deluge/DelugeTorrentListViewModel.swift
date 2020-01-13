@@ -9,13 +9,14 @@
 import Combine
 import Foundation
 import Navigator
+import Preferences
 
 final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
-    private let preferences: PreferenceManager
+    private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -76,7 +77,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         }
     }
 
-    init(client: DelugeClient, preferences: PreferenceManager) {
+    init(client: DelugeClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
         torrentSubjects = CurrentValueSubject([])

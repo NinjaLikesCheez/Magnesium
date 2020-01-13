@@ -1,16 +1,8 @@
-//
-//  DefaultPreferenceManagerTests.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-01-11.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
-@testable import Magnesium
+@testable import Preferences
 import XCTest
 
-class DefaultPreferenceManagerTests: XCTestCase {
-    private let preferenceManager = DefaultPreferenceManager()
+class UserDefaultPreferencesTests: XCTestCase {
+    private let preferenceManager = UserDefaultsPreferences()
     private let key = PreferenceKey<String>("_test")
     private let keyWithDefault = PreferenceKey<String>("_testDefault")
 
@@ -38,7 +30,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
     func testValueIsPersisted() throws {
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
-        let newPreferenceManager = DefaultPreferenceManager()
+        let newPreferenceManager = UserDefaultsPreferences()
         XCTAssertEqual(try newPreferenceManager.value(for: key), "Value")
     }
 
@@ -54,7 +46,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
 
         try preferenceManager.set("Value", for: key)
 
-        wait(for: [expectation], timeout: 1)
+        waitForExpectations(timeout: 1)
     }
 
     func testValueUpdatedPublisher() throws {
@@ -68,7 +60,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
 
         try preferenceManager.set("Value", for: key)
 
-        wait(for: [expectation], timeout: 1)
+        waitForExpectations(timeout: 1)
     }
 
     func testValueUpdatedPublisherWithRemove() throws {
@@ -82,7 +74,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
 
         preferenceManager.removeValue(for: key)
 
-        wait(for: [expectation], timeout: 1)
+        waitForExpectations(timeout: 1)
     }
 
     func testValuePublisher() throws {
@@ -106,7 +98,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
 
         try preferenceManager.set("Value", for: key)
 
-        wait(for: [firstExpectation, secondExpectation], timeout: 1)
+        waitForExpectations(timeout: 1)
     }
 
     func testContainsValue() throws {

@@ -3,24 +3,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "Navigator",
+    name: "Preferences",
     platforms: [
         .iOS(.v13),
     ],
     products: [
         .library(
-            name: "Navigator",
-            targets: ["Navigator"]
+            name: "Preferences",
+            targets: ["Preferences"]
         ),
     ],
     targets: [
         .target(
-            name: "Navigator",
+            name: "Preferences",
             dependencies: []
         ),
         .testTarget(
-            name: "NavigatorTests",
-            dependencies: ["Navigator"]
+            name: "PreferencesTests",
+            dependencies: ["Preferences"]
         ),
     ]
 )

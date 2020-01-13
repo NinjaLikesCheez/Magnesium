@@ -9,12 +9,13 @@
 import Combine
 @testable import Magnesium
 import Navigator
+import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
     func testSelectionNavigatesToDetail() {
         let navigator = MockDetailNavigator()
-        let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient(), preferences: MockPreferenceManager())
+        let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient(), preferences: MockPreferences())
         viewModel.navigator = navigator
         viewModel.didSelectItem(at: 0)
 
@@ -34,7 +35,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func testAutoUpdate() {
         let client = MockDelugeClient()
-        let viewModel = DelugeTorrentListViewModel(client: client, preferences: MockPreferenceManager())
+        let viewModel = DelugeTorrentListViewModel(client: client, preferences: MockPreferences())
         _ = viewModel
         client.resetRequests()
 
@@ -124,7 +125,7 @@ private final class MockDelugeClient: DelugeClient {
     }
 }
 
-private final class MockPreferenceManager: PreferenceManager {
+private final class MockPreferences: Preferences {
     var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
         return Empty().eraseToAnyPublisher()
     }

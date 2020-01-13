@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Preferences
 
 enum PreferenceKeys {
     static let autoRefreshInterval = PreferenceKey<TimeInterval>("autoRefreshInterval")

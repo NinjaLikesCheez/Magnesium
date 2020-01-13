@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Foundation
 import Navigator
 
 final class MockTorrentDetailViewModel: TorrentDetailViewModel {
