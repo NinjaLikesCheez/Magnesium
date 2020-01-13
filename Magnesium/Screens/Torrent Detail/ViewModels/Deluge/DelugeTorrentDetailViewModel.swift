@@ -7,7 +7,9 @@
 //
 
 import Combine
+import Foundation
 import Navigator
+import Preferences
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
@@ -19,9 +21,43 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private let torrentSubject: TorrentSubject
     private let fileMap = CurrentValueSubject<FileMap?, Never>(nil)
     private var observers = [AnyCancellable]()
+    private var autoUpdateTimer: Timer?
 
     var navigator: Navigator?
     let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
+
+    init(
+        torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
+        client: DelugeClient,
+        preferences: Preferences,
+        refresher: DelugeRefreshable
+    ) {
+        self.torrentSubject = torrentSubject
+        self.client = client
+        self.refresher = refresher
+
+        sections = torrentSubject
+            .combineLatest(fileMap)
+            .map { torrent, fileMap in
+                DelugeTorrentDetailViewModel.createSections(
+                    torrentSubject: torrentSubject,
+                    torrent: torrent,
+                    fileMap: fileMap
+                )
+            }
+            .ui()
+            .eraseToAnyPublisher()
+
+        refreshFiles()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
+
+        preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
+                self?.configureAutoUpdateTimer(interval: value)
+            })
+            .store(in: &observers)
+    }
 
     private static func createSections(
         torrentSubject: TorrentSubject,
@@ -121,28 +157,30 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         return sections
     }
 
-    init(
-        torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
-        client: DelugeClient,
-        refresher: DelugeRefreshable
-    ) {
-        self.torrentSubject = torrentSubject
-        self.client = client
-        self.refresher = refresher
+    private func configureAutoUpdateTimer(interval: TimeInterval?) {
+        guard let interval = interval, interval > 0 else {
+            autoUpdateTimer?.invalidate()
+            autoUpdateTimer = nil
+            return
+        }
 
-        sections = torrentSubject
-            .combineLatest(fileMap)
-            .map { torrent, fileMap in
-                DelugeTorrentDetailViewModel.createSections(
-                    torrentSubject: torrentSubject,
-                    torrent: torrent,
-                    fileMap: fileMap
-                )
-            }
-            .ui()
-            .eraseToAnyPublisher()
+        autoUpdateTimer?.invalidate()
+        let timer = Timer(
+            fireAt: Date().advanced(by: interval),
+            interval: interval,
+            target: self,
+            selector: #selector(updateTimerFired(_:)),
+            userInfo: nil,
+            repeats: true
+        )
+        RunLoop.main.add(timer, forMode: .common)
+        autoUpdateTimer = timer
+    }
 
-        refreshFiles()
+    @objc
+    private func updateTimerFired(_ timer: Timer) {
+        guard timer.isValid else { return }
+        refresh()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }

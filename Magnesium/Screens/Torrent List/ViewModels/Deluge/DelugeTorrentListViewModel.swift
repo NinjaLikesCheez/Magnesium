@@ -23,7 +23,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var labels = CurrentValueSubject<[String], Never>([])
-    private var updateTimer: Timer?
+    private var autoUpdateTimer: Timer?
 
     var navigator: Navigator?
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
@@ -92,19 +92,19 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
         preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureUpdateTimer(interval: value)
+                self?.configureAutoUpdateTimer(interval: value)
             })
             .store(in: &observers)
     }
 
-    private func configureUpdateTimer(interval: TimeInterval?) {
+    private func configureAutoUpdateTimer(interval: TimeInterval?) {
         guard let interval = interval, interval > 0 else {
-            updateTimer?.invalidate()
-            updateTimer = nil
+            autoUpdateTimer?.invalidate()
+            autoUpdateTimer = nil
             return
         }
 
-        updateTimer?.invalidate()
+        autoUpdateTimer?.invalidate()
         let timer = Timer(
             fireAt: Date().advanced(by: interval),
             interval: interval,
@@ -114,7 +114,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             repeats: true
         )
         RunLoop.main.add(timer, forMode: .common)
-        updateTimer = timer
+        autoUpdateTimer = timer
     }
 
     @objc
@@ -157,6 +157,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         let viewModel = DelugeTorrentDetailViewModel(
             torrentSubject: subject,
             client: client,
+            preferences: preferences,
             refresher: self
         )
         let screen = NavigationControllerScreen(Screens.Torrents.detail(viewModel: viewModel))
