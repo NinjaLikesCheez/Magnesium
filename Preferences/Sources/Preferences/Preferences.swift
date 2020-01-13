@@ -45,7 +45,7 @@ public extension Preferences {
 
     /// Returns a publisher that emits the current preference value and new values when the preference is
     /// changed.
-    /// - Parameter key: The preference key to observe. 
+    /// - Parameter key: The preference key to observe.
     func valuePublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
         return valueUpdatedPublisher(for: key)
             .prepend(try? value(for: key))
