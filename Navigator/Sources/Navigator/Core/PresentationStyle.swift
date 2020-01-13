@@ -6,8 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 /// Styles that can be used for presentations.
 public enum PresentationStyle {
     case automatic

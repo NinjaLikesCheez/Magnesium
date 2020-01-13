@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 /// A model describing an alert.
 public struct AlertModel {
     /// The style of an alert.

@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Foundation
 
 protocol TorrentDetailFileViewModel: Hashable {
     var name: String { get }

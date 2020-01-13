@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 struct SortOption: Equatable {
     enum Property: String, CaseIterable {
         case name

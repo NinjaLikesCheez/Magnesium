@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Foundation
 
 struct TorrentDetailInfoViewModel: Hashable {
     let name: String

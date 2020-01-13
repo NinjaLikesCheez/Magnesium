@@ -6,8 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 struct MockTorrentFile: Hashable {
     var name: String
     var size: Int64

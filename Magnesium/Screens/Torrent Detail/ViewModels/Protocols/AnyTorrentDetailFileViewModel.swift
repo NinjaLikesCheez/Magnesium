@@ -7,7 +7,6 @@
 //
 
 import Combine
-import UIKit
 
 @inline(never)
 private func _abstract(

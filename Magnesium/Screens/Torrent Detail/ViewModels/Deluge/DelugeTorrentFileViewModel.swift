@@ -7,7 +7,6 @@
 //
 
 import Combine
-import UIKit
 
 struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
     private var path: String

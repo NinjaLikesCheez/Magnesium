@@ -8,7 +8,6 @@
 
 import Combine
 import Navigator
-import UIKit
 
 protocol TorrentDetailViewModel {
     var sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never> { get }

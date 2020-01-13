@@ -7,7 +7,6 @@
 //
 
 import Combine
-import UIKit
 
 struct MockTorrentDetailFileViewModel: TorrentDetailFileViewModel {
     let name: String

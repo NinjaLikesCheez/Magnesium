@@ -6,9 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Combine
-import Foundation
-
 enum TorrentDetailItem: Hashable {
     case header(AnyTorrentDetailHeaderViewModel)
     case info(TorrentDetailInfoViewModel)

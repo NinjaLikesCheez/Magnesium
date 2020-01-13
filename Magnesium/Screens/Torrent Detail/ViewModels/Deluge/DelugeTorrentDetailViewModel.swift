@@ -8,7 +8,6 @@
 
 import Combine
 import Navigator
-import UIKit
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>

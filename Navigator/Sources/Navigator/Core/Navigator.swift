@@ -6,8 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 /**
  A Navigator is used to display navigatable elements.
 

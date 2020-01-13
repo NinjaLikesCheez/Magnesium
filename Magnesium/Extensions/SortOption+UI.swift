@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 extension SortOption.Property {
     var displayString: String {
         switch self {

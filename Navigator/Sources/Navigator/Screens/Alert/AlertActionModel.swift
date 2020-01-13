@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 /// A model describing an alert action.
 public struct AlertActionModel {
     /// The style of an alert action.

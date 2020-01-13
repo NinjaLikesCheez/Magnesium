@@ -6,7 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Foundation
 import Navigator
 
 #if DEBUG

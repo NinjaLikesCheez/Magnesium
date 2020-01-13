@@ -6,8 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 enum TorrentState: Equatable, CaseIterable {
     case downloading
     case seeding
