@@ -148,7 +148,7 @@ private final class MockDetailNavigator: Navigator {
     var detail: Navigatable?
 
     func push(_ navigatable: Navigatable, animated: Bool) {
-        fatalError()
+        XCTFail()
     }
 
     func pop(animated: Bool) {
@@ -174,7 +174,7 @@ private final class MockDetailNavigator: Navigator {
         return nil
     }
 
-    func popDetail(animated: Bool) -> Bool {
+    func popNestedDetail(animated: Bool) -> Bool {
         XCTFail()
         return false
     }

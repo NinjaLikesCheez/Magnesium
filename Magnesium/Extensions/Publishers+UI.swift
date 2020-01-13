@@ -11,14 +11,14 @@
 import Combine
 import Foundation
 
-extension Publisher {
-    public func ui() -> Publishers.UI<Self> {
+public extension Publisher {
+    func ui() -> Publishers.UI<Self> {
         return .init(upstream: self)
     }
 }
 
-extension Publishers {
-    public struct UI<Upstream: Publisher>: Publisher {
+public extension Publishers {
+    struct UI<Upstream: Publisher>: Publisher {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
 

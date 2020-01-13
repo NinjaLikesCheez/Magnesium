@@ -13,10 +13,12 @@ class DefaultPreferenceManagerServerTests: XCTestCase {
     private let preferenceManager = DefaultPreferenceManager()
 
     override func setUp() {
+        super.setUp()
         preferenceManager.removeServers()
     }
 
     override func tearDown() {
+        super.tearDown()
         preferenceManager.removeServers()
     }
 

@@ -175,7 +175,7 @@ final class DefaultDelugeClient: DelugeClient {
 
     func getLabels() -> AnyPublisher<[String], DelugeClientError> {
         return request(method: "label.get_labels", params: [])
-            .flatMap { (value) -> AnyPublisher<[String], DelugeClientError> in
+            .flatMap { value -> AnyPublisher<[String], DelugeClientError> in
                 guard let result = value["result"] as? [String] else {
                     return Fail(error: DelugeClientError.unexpectedResponse).eraseToAnyPublisher()
                 }

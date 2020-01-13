@@ -15,10 +15,12 @@ class DefaultPreferenceManagerTests: XCTestCase {
     private let keyWithDefault = PreferenceKey<String>("_testDefault")
 
     override func setUp() {
+        super.setUp()
         preferenceManager.removeValue(for: key)
     }
 
     override func tearDown() {
+        super.tearDown()
         preferenceManager.removeValue(for: key)
     }
 
@@ -73,7 +75,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         let observer = preferenceManager.valueUpdatedPublisher(for: key)
             .sink { value in
-                XCTAssertEqual(value, nil)
+                XCTAssertNil(value)
                 expectation.fulfill()
             }
         _ = observer
@@ -118,7 +120,7 @@ class DefaultPreferenceManagerTests: XCTestCase {
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         preferenceManager.removeValue(for: key)
-        XCTAssertEqual(try preferenceManager.value(for: key), nil)
+        XCTAssertNil(try preferenceManager.value(for: key))
     }
 
     func testCodable() throws {

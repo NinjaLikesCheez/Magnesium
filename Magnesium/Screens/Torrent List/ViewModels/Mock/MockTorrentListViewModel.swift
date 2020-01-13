@@ -38,19 +38,19 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
         let states = [TorrentState.seeding, .downloading, .paused, .queued, .error, .downloading, .seeding, .checking]
         var torrents = [MockTorrent]()
 
-        for i in 1 ..< 26 {
-            let name = "\(names[i % names.count]) \(Int(ceil(Double(i) / Double(names.count))))"
-            let state = states[i % states.count]
-            let size = Int64(1024 * 1024 * 1024 * Double(i) * Double.random(in: 0 ... 1))
+        for index in 1 ..< 26 {
+            let name = "\(names[index % names.count]) \(Int(ceil(Double(index) / Double(names.count))))"
+            let state = states[index % states.count]
+            let size = Int64(1024 * 1024 * 1024 * Double(index) * Double.random(in: 0 ... 1))
             let downloaded = state != .seeding ? Int64(Double(size) * Double.random(in: 0 ... 1)) : size
             let uploaded = Int64(Double(downloaded) * 3 * Double.random(in: 0 ... 1))
-            let downloadRate = state == .downloading ? Int(1024 * 100 * Double(i) * Double.random(in: 0 ... 1)) : 0
-            let uploadRate = state == .seeding ? Int(1024 * 100 * Double(i) * Double.random(in: 0 ... 1)) : 0
+            let downloadRate = state == .downloading ? Int(1024 * 100 * Double(index) * Double.random(in: 0 ... 1)) : 0
+            let uploadRate = state == .seeding ? Int(1024 * 100 * Double(index) * Double.random(in: 0 ... 1)) : 0
             let eta = state == .downloading ? TimeInterval(Double(size - downloaded) / Double(downloadRate)) : 0
             let trackers = ["https://tracker.example.com/\(UUID().uuidString)", "https://tracker2.example.com"]
 
             torrents.append(MockTorrent(
-                id: i,
+                id: index,
                 name: name,
                 state: state,
                 size: size,

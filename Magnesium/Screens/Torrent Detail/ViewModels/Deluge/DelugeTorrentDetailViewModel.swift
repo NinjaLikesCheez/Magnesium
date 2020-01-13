@@ -228,7 +228,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func dismiss() {
         guard let navigator = navigator else { return }
-        let dismissed = navigator.popDetail(animated: true)
+        let dismissed = navigator.popNestedDetail(animated: true)
         if !dismissed {
             navigator.showDetail(Screens.Torrents.emptyDetail)
         }

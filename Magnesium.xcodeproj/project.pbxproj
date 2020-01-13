@@ -31,7 +31,6 @@
 		E95BB40223CA3A3D002F0520 /* PreferenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95BB40123CA3A3D002F0520 /* PreferenceManager.swift */; };
 		E95BB40423CA404C002F0520 /* PreferenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95BB40323CA404C002F0520 /* PreferenceKeys.swift */; };
 		E95BB40723CA40C7002F0520 /* DefaultPreferenceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95BB40623CA40C7002F0520 /* DefaultPreferenceManagerTests.swift */; };
-		E9635A5623CADC5300239239 /* Navigator in Frameworks */ = {isa = PBXBuildFile; productRef = E9635A5523CADC5300239239 /* Navigator */; };
 		E9635A5823CAE91D00239239 /* NavigationControllerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9635A5723CAE91D00239239 /* NavigationControllerScreen.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
@@ -69,6 +68,7 @@
 		E9C8259023C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258F23C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift */; };
 		E9CC161423AD5CF000EA1B4C /* DelugeTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CC161323AD5CF000EA1B4C /* DelugeTorrentListViewModelTests.swift */; };
 		E9CE4C3423B453BE001D1C63 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */; };
+		E9D128FC23CBCF0A0014436C /* Navigator in Frameworks */ = {isa = PBXBuildFile; productRef = E9D128FB23CBCF0A0014436C /* Navigator */; };
 		E9E9F0F423807044007C6D2D /* TorrentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */; };
 		E9E9F0F7238075AE007C6D2D /* MockTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F6238075AE007C6D2D /* MockTorrent.swift */; };
 /* End PBXBuildFile section */
@@ -159,7 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9635A5623CADC5300239239 /* Navigator in Frameworks */,
+				E9D128FC23CBCF0A0014436C /* Navigator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,7 +497,7 @@
 			);
 			name = Magnesium;
 			packageProductDependencies = (
-				E9635A5523CADC5300239239 /* Navigator */,
+				E9D128FB23CBCF0A0014436C /* Navigator */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -922,7 +922,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E9635A5523CADC5300239239 /* Navigator */ = {
+		E9D128FB23CBCF0A0014436C /* Navigator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Navigator;
 		};

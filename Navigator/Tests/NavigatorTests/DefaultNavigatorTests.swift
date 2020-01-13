@@ -15,6 +15,7 @@ class DefaultNavigatorTests: XCTestCase {
     private var navigator: DefaultNavigator!
 
     override func setUp() {
+        super.setUp()
         navigationController = UINavigationController(rootViewController: UIViewController())
         window.rootViewController = navigationController
         window.makeKeyAndVisible()

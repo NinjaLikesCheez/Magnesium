@@ -58,7 +58,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             }
         }
 
-        return torrents.sorted { (subject1, subject2) -> Bool in
+        return torrents.sorted { subject1, subject2 -> Bool in
             let obj1 = subject1.value
             let obj2 = subject2.value
             switch compare(obj1, obj2) {
