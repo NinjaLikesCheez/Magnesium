@@ -88,8 +88,8 @@ class DefaultPreferenceManagerTests: XCTestCase {
     func testValuePublisher() throws {
         try preferenceManager.set("Initial", for: key)
 
-        let firstExpectation = self.expectation(description: "First value received")
-        let secondExpectation = self.expectation(description: "First value received")
+        let firstExpectation = expectation(description: "First value received")
+        let secondExpectation = expectation(description: "First value received")
         var index = -1
         let observer = preferenceManager.valuePublisher(for: key)
             .sink { value in
