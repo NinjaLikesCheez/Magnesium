@@ -1,3 +1,3 @@
 # Navigator
 
-A description of this package.
+A navigation component to be used in an MVVM application.
