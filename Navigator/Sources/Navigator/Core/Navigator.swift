@@ -1,11 +1,3 @@
-//
-//  Navigator.swift
-//  Navigator
-//
-//  Created by James Hurst on 2019-12-19.
-//  Copyright © 2019 James Hurst. All rights reserved.
-//
-
 /**
  A Navigator is used to display navigatable elements.
 

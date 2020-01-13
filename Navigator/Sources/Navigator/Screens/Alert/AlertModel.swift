@@ -1,11 +1,3 @@
-//
-//  AlertModel.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-08.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 /// A model describing an alert.
 public struct AlertModel {
     /// The style of an alert.

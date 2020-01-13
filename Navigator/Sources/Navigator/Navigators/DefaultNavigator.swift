@@ -1,11 +1,3 @@
-//
-//  DefaultNavigator.swift
-//  Navigator
-//
-//  Created by James Hurst on 2019-12-19.
-//  Copyright © 2019 James Hurst. All rights reserved.
-//
-
 import UIKit
 
 /**
@@ -16,7 +8,7 @@ import UIKit
  navigation operations such as push and pop.
  */
 public final class DefaultNavigator: Navigator {
-    internal class PresentationStack {
+    class PresentationStack {
         var items: [PresentationContext]
 
         init(_ context: PresentationContext) {
@@ -24,12 +16,12 @@ public final class DefaultNavigator: Navigator {
         }
     }
 
-    internal struct PresentationContext {
+    struct PresentationContext {
         weak var viewController: UIViewController?
     }
 
     private weak var viewController: UIViewController?
-    internal private(set) var presentationStack: PresentationStack
+    private(set) var presentationStack: PresentationStack
 
     private var presentationContext: PresentationContext? {
         guard let last = presentationStack.items.last else { return nil }

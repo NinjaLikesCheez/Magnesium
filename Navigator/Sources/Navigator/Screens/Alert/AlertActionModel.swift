@@ -1,11 +1,3 @@
-//
-//  AlertActionModel.swift
-//  Navigator
-//
-//  Created by James Hurst on 2020-01-08.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 /// A model describing an alert action.
 public struct AlertActionModel {
     /// The style of an alert action.
