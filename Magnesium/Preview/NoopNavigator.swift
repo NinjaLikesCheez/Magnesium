@@ -23,6 +23,7 @@ import Navigator
         }
 
         func dismiss(animated: Bool, completion: (() -> Void)?) {}
+        func showMaster(_ navigatable: Navigatable) -> Navigator? { return nil }
         func showDetail(_ navigatable: Navigatable) -> Navigator? { return nil }
         func popNestedDetail(animated: Bool) -> Bool { return false }
     }

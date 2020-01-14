@@ -13,6 +13,7 @@ import XCTest
 
 class ServerPreferencesTests: XCTestCase {
     private let preferences = UserDefaultsPreferences()
+    private let server = Server(name: "Server 1", type: .deluge, data: Data())
 
     override func setUp() {
         super.setUp()
@@ -25,7 +26,6 @@ class ServerPreferencesTests: XCTestCase {
     }
 
     func testPersistance() {
-        let server = Server(name: "Server 1", data: Data())
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         XCTAssertEqual(preferences.getServers()[0].id, server.id)
@@ -35,7 +35,6 @@ class ServerPreferencesTests: XCTestCase {
     }
 
     func testServerIsNotDuplicated() {
-        let server = Server(name: "Server 1", data: Data())
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         preferences.addOrUpdate(server: server)
@@ -43,12 +42,10 @@ class ServerPreferencesTests: XCTestCase {
     }
 
     func testServerUpdatedPublisher() {
-        let server = Server(name: "Server 1", data: Data())
-
         let expectation = self.expectation(description: "Value received")
         let observer = preferences.serverUpdatedPublisher(for: server)
             .sink { updated in
-                XCTAssertEqual(updated.id, server.id)
+                XCTAssertEqual(updated.id, self.server.id)
                 expectation.fulfill()
             }
         _ = observer
@@ -59,7 +56,6 @@ class ServerPreferencesTests: XCTestCase {
     }
 
     func testRemoveServers() {
-        let server = Server(name: "Server 1", data: Data())
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         preferences.removeServers()

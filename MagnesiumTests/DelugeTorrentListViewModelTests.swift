@@ -27,7 +27,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             return
         }
 
-        guard case Screens.Torrents.detail = navigationScreen.root else {
+        guard case Screens.torrentDetail = navigationScreen.root else {
             XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: navigationScreen.root))")
             return
         }
@@ -168,6 +168,11 @@ private final class MockDetailNavigator: Navigator {
 
     func dismiss(animated: Bool, completion: (() -> Void)?) {
         XCTFail()
+    }
+
+    func showMaster(_ navigatable: Navigatable) -> Navigator? {
+        XCTFail()
+        return nil
     }
 
     func showDetail(_ navigatable: Navigatable) -> Navigator? {

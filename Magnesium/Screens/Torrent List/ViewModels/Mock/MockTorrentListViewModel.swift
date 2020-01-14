@@ -18,7 +18,8 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
     private var torrentMapObserver: AnyCancellable?
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var observers = [AnyCancellable]()
-    let navigator: Navigator?
+
+    var navigator: Navigator?
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
@@ -103,6 +104,10 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
                     return current
                 }
         )
+    }
+
+    func didSelectSettings() {
+        // noop
     }
 
     func didSelectItem(at index: Int) {

@@ -13,16 +13,23 @@ import Preferences
 struct Server: Codable, Equatable {
     fileprivate(set) var id = UUID()
     var name: String
+    var type: ServerType
     var data: Data
+
+    init(name: String, type: ServerType, data: Data) {
+        self.name = name
+        self.type = type
+        self.data = data
+    }
 }
 
-private enum Keys {
-    static let servers = PreferenceKey<[Server]>("servers")
+enum ServerType: String, Codable {
+    case deluge
 }
 
 extension Preferences {
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server, Never> {
-        return valueUpdatedPublisher(for: Keys.servers)
+        return valueUpdatedPublisher(for: PreferenceKeys.servers)
             .compactMap { servers -> Server? in
                 servers?.first(where: { $0.id == server.id })
             }
@@ -30,7 +37,7 @@ extension Preferences {
     }
 
     func getServers() -> [Server] {
-        return (try? value(for: Keys.servers)) ?? []
+        return (try? value(for: PreferenceKeys.servers)) ?? []
     }
 
     func addOrUpdate(server: Server) {
@@ -42,10 +49,10 @@ extension Preferences {
             servers.append(server)
         }
 
-        _ = try? set(servers, for: Keys.servers)
+        _ = try? set(servers, for: PreferenceKeys.servers)
     }
 
     func removeServers() {
-        removeValue(for: Keys.servers)
+        removeValue(for: PreferenceKeys.servers)
     }
 }

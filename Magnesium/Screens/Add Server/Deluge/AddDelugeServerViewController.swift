@@ -141,7 +141,7 @@ final class AddDelugeServerViewController: UITableViewController {
         }
 
         static var previews: some View {
-            let viewModel = MockAddDelugeServerViewModel()
+            let viewModel = DefaultAddDelugeServerViewModel(preferences: NoopPreferences())
 
             return Group {
                 Container(viewModel: viewModel)

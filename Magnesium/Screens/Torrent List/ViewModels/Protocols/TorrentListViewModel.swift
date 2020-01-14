@@ -8,9 +8,10 @@
 
 import Combine
 import Navigator
+import Preferences
 
-protocol TorrentListViewModel {
-    var navigator: Navigator? { get }
+protocol TorrentListViewModel: AnyObject {
+    var navigator: Navigator? { get set }
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> { get }
 
     func refresh() -> AnyPublisher<Never, Error>
@@ -18,8 +19,16 @@ protocol TorrentListViewModel {
     func didSelectItem(at index: Int)
 }
 
-extension TorrentListViewModel {
+protocol TorrentListViewModelExt: TorrentListViewModel {
+    var preferences: Preferences { get }
+}
+
+extension TorrentListViewModelExt {
     func didSelectSettings() {
-        navigator?.present(NavigationControllerScreen(Screens.settings), animated: true)
+        let viewModel = DefaultAddDelugeServerViewModel(preferences: preferences)
+        let screen = NavigationControllerScreen(Screens.addDelugeServer(viewModel: viewModel))
+        viewModel.navigator = navigator?.present(screen, animated: true)
+        // TODO: show settings
+//        navigator?.present(NavigationControllerScreen(Screens.settings), animated: true)
     }
 }

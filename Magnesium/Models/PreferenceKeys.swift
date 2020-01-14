@@ -11,4 +11,5 @@ import Preferences
 
 enum PreferenceKeys {
     static let autoRefreshInterval = PreferenceKey<TimeInterval>("autoRefreshInterval")
+    static let servers = PreferenceKey<[Server]>("servers")
 }

@@ -8,31 +8,7 @@ import UIKit
  navigation operations such as push and pop.
  */
 public final class DefaultNavigator: Navigator {
-    class PresentationStack {
-        var items: [PresentationContext]
-
-        init(_ context: PresentationContext) {
-            items = [context]
-        }
-    }
-
-    struct PresentationContext {
-        weak var viewController: UIViewController?
-    }
-
     private weak var viewController: UIViewController?
-    private(set) var presentationStack: PresentationStack
-
-    private var presentationContext: PresentationContext? {
-        guard let last = presentationStack.items.last else { return nil }
-
-        guard last.viewController != nil else {
-            presentationStack.items.removeLast()
-            return self.presentationContext
-        }
-
-        return last
-    }
 
     private var navigationController: UINavigationController? {
         guard let navigationController = viewController as? UINavigationController else {
@@ -42,18 +18,12 @@ public final class DefaultNavigator: Navigator {
         return navigationController
     }
 
-    /// Creates a new navigator with the given view controller.
+    /// Creates a new `DefaultNavigator` with the given view controller.
     /// - Parameter viewController: The view controller to use for navigation. This may be either a regular view
-    /// controller or a navigation controller.
-    public convenience init(viewController: UIViewController) {
-        self.init(viewController: viewController, presentationStack: nil)
-    }
-
-    private init(viewController: UIViewController, presentationStack: PresentationStack?) {
+    /// controller or a navigation controller. If a regular view controller is used then the view controller's
+    /// `navigationController` property will be used for navigation operations such as push and pop.
+    public init(viewController: UIViewController) {
         self.viewController = viewController
-        self.presentationStack = presentationStack ?? PresentationStack(
-            PresentationContext(viewController: viewController)
-        )
     }
 
     public func push(_ navigatable: Navigatable, animated: Bool) {
@@ -72,38 +42,32 @@ public final class DefaultNavigator: Navigator {
         animated: Bool,
         completion: (() -> Void)?
     ) -> Navigator? {
-        guard let viewController = navigatable.viewController(),
-            let presentingViewController = presentationContext?.viewController
-        else {
-            return nil
-        }
-
-        presentingViewController.present(viewController, animated: animated, completion: completion)
-        presentationStack.items.append(PresentationContext(viewController: viewController))
-        return DefaultNavigator(viewController: viewController, presentationStack: presentationStack)
+        guard let presentedViewController = navigatable.viewController() else { return nil }
+        viewController?.present(presentedViewController, animated: animated, completion: completion)
+        return DefaultNavigator(viewController: presentedViewController)
     }
 
     public func dismiss(animated: Bool, completion: (() -> Void)?) {
-        guard presentationStack.items.count > 1,
-            let presentedViewController = presentationContext?.viewController
-        else {
-            return
-        }
+        viewController?.dismiss(animated: animated, completion: completion)
+    }
 
-        presentedViewController.dismiss(animated: animated, completion: completion)
-        presentationStack.items.removeLast()
+    @discardableResult
+    public func showMaster(_ navigatable: Navigatable) -> Navigator? {
+        guard let masterViewController = navigatable.viewController() else { return nil }
+        viewController?.show(masterViewController, sender: nil)
+        return DefaultNavigator(viewController: masterViewController)
     }
 
     @discardableResult
     public func showDetail(_ navigatable: Navigatable) -> Navigator? {
-        guard let viewController = navigatable.viewController() else { return nil }
-        self.viewController?.showDetailViewController(viewController, sender: nil)
-        return DefaultNavigator(viewController: viewController)
+        guard let detailViewController = navigatable.viewController() else { return nil }
+        viewController?.showDetailViewController(detailViewController, sender: nil)
+        return DefaultNavigator(viewController: detailViewController)
     }
 
     @discardableResult
     public func popNestedDetail(animated: Bool) -> Bool {
-        if let navigationController = self.navigationController?.navigationController {
+        if let navigationController = navigationController?.navigationController {
             navigationController.popViewController(animated: animated)
             return true
         }

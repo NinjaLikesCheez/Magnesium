@@ -11,12 +11,11 @@ import Foundation
 import Navigator
 import Preferences
 
-final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
+final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewModelExt, DelugeRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
-    private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -25,7 +24,9 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private var labels = CurrentValueSubject<[String], Never>([])
     private var autoUpdateTimer: Timer?
 
+    let preferences: Preferences
     var navigator: Navigator?
+
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
             .combineLatest(sortOption)
@@ -155,13 +156,6 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .mapError { $0 as Error }
             .ui()
             .eraseToAnyPublisher()
-    }
-
-    func didSelectSettings() {
-        navigator?.present(
-            NavigationControllerScreen(Screens.addDelugeServer(viewModel: MockAddDelugeServerViewModel())),
-            animated: true
-        )
     }
 
     func didSelectItem(at index: Int) {

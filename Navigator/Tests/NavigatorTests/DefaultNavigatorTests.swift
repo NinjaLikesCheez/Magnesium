@@ -41,19 +41,11 @@ class DefaultNavigatorTests: XCTestCase {
 
     func testDismiss() {
         let viewController = DismissTestViewController()
-        navigator.present(viewController, animated: false)
-        navigator.dismiss(animated: false)
+        let childNavigator = navigator.present(viewController, animated: false)
+        childNavigator?.dismiss(animated: false)
         // The implementation of UIViewController.dismiss won't work in tests since the presented view controller's
         // `isBeingPresented` property gets stuck as true.
         XCTAssertTrue(viewController.wasDismissCalled)
-    }
-
-    func testRootViewControllerNotDismissed() {
-        let viewController = DismissTestViewController()
-        navigator = DefaultNavigator(viewController: viewController)
-        navigator.dismiss(animated: false)
-        XCTAssertEqual(navigator.presentationStack.items.count, 1)
-        XCTAssertFalse(viewController.wasDismissCalled)
     }
 
     func testCompactShowDetail() {
