@@ -85,8 +85,7 @@ final class DefaultDelugeClient: DelugeClient {
 
         return session.dataTaskPublisher(for: request)
             .mapError { DelugeClientError.request($0) }
-            .flatMap { args -> AnyPublisher<[String: Any], DelugeClientError> in
-                let (data, response) = args
+            .flatMap { data, response -> AnyPublisher<[String: Any], DelugeClientError> in
                 do {
                     return try Just(self.parse(data: data, response: response))
                         .setFailureType(to: DelugeClientError.self)

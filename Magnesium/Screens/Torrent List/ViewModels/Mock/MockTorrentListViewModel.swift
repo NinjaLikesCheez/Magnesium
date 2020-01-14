@@ -14,11 +14,11 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
     private typealias TorrentSubject = CurrentValueSubject<MockTorrent, Never>
     private typealias TorrentMap = [Int: TorrentSubject]
 
-    private let navigator: Navigator
     private var torrentMapSubject: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var observers = [AnyCancellable]()
+    let navigator: Navigator?
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
@@ -77,9 +77,7 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
         torrentMapObserver = torrentMapSubject.sink { [weak self] in
             self?.torrentSubjects.send($0.values.sorted { $0.value.id < $1.value.id })
         }
-        refresh()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+        _refresh()
     }
 
     func refresh() -> AnyPublisher<Never, Error> {
@@ -110,6 +108,6 @@ final class MockTorrentListViewModel: TorrentListViewModel, MockTorrentServerRef
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
         let viewModel = MockTorrentDetailViewModel(torrentSubject: subject, refresher: self)
-        navigator.showDetail(NavigationControllerScreen(Screens.Torrents.detail(viewModel: viewModel)))
+        navigator?.showDetail(NavigationControllerScreen(Screens.torrentDetail(viewModel: viewModel)))
     }
 }

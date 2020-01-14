@@ -152,6 +152,13 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .eraseToAnyPublisher()
     }
 
+    func didSelectSettings() {
+        navigator?.present(
+            NavigationControllerScreen(Screens.addDelugeServer(viewModel: MockAddDelugeServerViewModel())),
+            animated: true
+        )
+    }
+
     func didSelectItem(at index: Int) {
         let subject = torrentSubjects.value[index]
         let viewModel = DelugeTorrentDetailViewModel(
@@ -160,7 +167,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             preferences: preferences,
             refresher: self
         )
-        let screen = NavigationControllerScreen(Screens.Torrents.detail(viewModel: viewModel))
+        let screen = NavigationControllerScreen(Screens.torrentDetail(viewModel: viewModel))
         viewModel.navigator = navigator?.showDetail(screen)
     }
 }

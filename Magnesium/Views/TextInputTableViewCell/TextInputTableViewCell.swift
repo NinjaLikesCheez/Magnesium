@@ -13,6 +13,7 @@ import UIKit
 final class TextInputTableViewCell: UITableViewCell {
     private var observers = [AnyCancellable]()
     private var valueSubject: CurrentValueSubject<String?, Never>?
+    private var proceedToNextInputSubject = PassthroughSubject<Void, Never>()
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -26,8 +27,13 @@ final class TextInputTableViewCell: UITableViewCell {
         textField.adjustsFontForContentSizeCategory = true
         textField.font = UIFont.preferredFont(forTextStyle: .body)
         textField.addTarget(self, action: #selector(textFieldTextChanged(_:)), for: .editingChanged)
+        textField.delegate = self
         return textField
     }()
+
+    var proceedToNextInput: AnyPublisher<Void, Never> {
+        return proceedToNextInputSubject.eraseToAnyPublisher()
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -49,6 +55,7 @@ final class TextInputTableViewCell: UITableViewCell {
     }
 
     private func setup() {
+        selectionStyle = .none
         setupViews()
         setupLayoutConstraints()
     }
@@ -65,28 +72,51 @@ final class TextInputTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
 
             textField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             textField.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
-            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
         ])
     }
 
-    func configure<VM: TextInputTableViewCellViewModel>(with viewModel: VM) {
+    func configure(with viewModel: TextInputTableViewCellViewModel) {
         nameLabel.text = viewModel.name
         textField.placeholder = viewModel.placeholder
+        textField.isSecureTextEntry = viewModel.isSecure
+        textField.keyboardType = viewModel.keyboardType
+        textField.returnKeyType = viewModel.returnKeyType
+        textField.textContentType = viewModel.textContentType
+        textField.autocapitalizationType = viewModel.autocapitalizationType
         viewModel.value
             .filter { [weak textField] in textField?.text != $0 }
             .assign(to: \.text, on: textField)
             .store(in: &observers)
         valueSubject = viewModel.value
+        viewModel.isEnabled
+            .assign(to: \.isEnabled, on: textField)
+            .store(in: &observers)
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        if selected {
+            textField.becomeFirstResponder()
+        }
     }
 
     @objc
     private func textFieldTextChanged(_ textField: UITextField) {
         valueSubject?.send(textField.text)
+    }
+}
+
+extension TextInputTableViewCell: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        proceedToNextInputSubject.send(())
+        return false
     }
 }
 
@@ -119,11 +149,21 @@ final class TextInputTableViewCell: UITableViewCell {
             let emptyViewModel = DefaultTextInputTableViewCellViewModel(
                 name: "server",
                 placeholder: "https://example.com",
-                value: CurrentValueSubject(nil))
+                value: CurrentValueSubject(nil),
+                isSecure: false
+            )
             let textViewModel = DefaultTextInputTableViewCellViewModel(
                 name: "server",
                 placeholder: "https://example.com",
-                value: CurrentValueSubject("https://example.com"))
+                value: CurrentValueSubject("https://example.com"),
+                isSecure: false
+            )
+            let secureViewModel = DefaultTextInputTableViewCellViewModel(
+                name: "password",
+                placeholder: "password",
+                value: CurrentValueSubject("password"),
+                isSecure: true
+            )
             return Group {
                 Container(viewModel: emptyViewModel)
                     .previewDisplayName("Light - No Text")
@@ -131,12 +171,19 @@ final class TextInputTableViewCell: UITableViewCell {
                 Container(viewModel: textViewModel)
                     .previewDisplayName("Light - Text")
                     .previewLayout(.sizeThatFits)
+                Container(viewModel: secureViewModel)
+                    .previewDisplayName("Light - Secure")
+                    .previewLayout(.sizeThatFits)
                 Container(viewModel: emptyViewModel)
                     .previewDisplayName("Dark - No Text")
                     .previewLayout(.sizeThatFits)
                     .environment(\.colorScheme, .dark)
                 Container(viewModel: textViewModel)
                     .previewDisplayName("Dark - Text")
+                    .previewLayout(.sizeThatFits)
+                    .environment(\.colorScheme, .dark)
+                Container(viewModel: secureViewModel)
+                    .previewDisplayName("Dark - Secure")
                     .previewLayout(.sizeThatFits)
                     .environment(\.colorScheme, .dark)
             }

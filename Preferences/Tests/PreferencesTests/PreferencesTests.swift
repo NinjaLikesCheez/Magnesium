@@ -36,8 +36,7 @@ class UserDefaultPreferencesTests: XCTestCase {
 
     func testValueUpdated() throws {
         let expectation = self.expectation(description: "Value received")
-        let observer = preferenceManager.valueUpdated.sink { args in
-            let (anyKey, value) = args
+        let observer = preferenceManager.valueUpdated.sink { anyKey, value in
             XCTAssertEqual(anyKey.value, self.key.value)
             XCTAssertEqual(value as? String, "Value")
             expectation.fulfill()

@@ -9,23 +9,30 @@
 import Navigator
 import UIKit
 
-enum Screens {
-    enum Torrents: Navigatable {
-        case list(viewModel: TorrentListViewModel)
-        case detail(viewModel: TorrentDetailViewModel)
-        case emptyDetail
+enum Screens: Navigatable {
+    case torrentList(viewModel: TorrentListViewModel)
+    case torrentDetail(viewModel: TorrentDetailViewModel)
+    case torrentDetailEmpty
+    case settings
+    case addDelugeServer(viewModel: AddDelugeServerViewModel)
 
-        func viewController() -> UIViewController? {
-            switch self {
-            case let .list(viewModel: viewModel):
-                return TorrentListViewController(viewModel: viewModel)
-            case let .detail(viewModel: viewModel):
-                return TorrentDetailViewController(viewModel: viewModel)
-            case .emptyDetail:
-                let viewController = UIViewController()
-                viewController.view.backgroundColor = .systemGroupedBackground
-                return UINavigationController(rootViewController: viewController)
-            }
+    func viewController() -> UIViewController? {
+        switch self {
+        case let .torrentList(viewModel: viewModel):
+            return TorrentListViewController(viewModel: viewModel)
+        case let .torrentDetail(viewModel: viewModel):
+            return TorrentDetailViewController(viewModel: viewModel)
+        case .torrentDetailEmpty:
+            let viewController = UIViewController()
+            viewController.view.backgroundColor = .systemGroupedBackground
+            return UINavigationController(rootViewController: viewController)
+        case .settings:
+            let viewController = UIViewController()
+            viewController.title = "Settings"
+            viewController.view.backgroundColor = .systemBackground
+            return viewController
+        case let .addDelugeServer(viewModel: viewModel):
+            return AddDelugeServerViewController(viewModel: viewModel)
         }
     }
 }

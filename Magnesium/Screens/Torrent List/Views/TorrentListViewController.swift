@@ -19,11 +19,18 @@ final class TorrentListViewController: UITableViewController {
     private var observers = [AnyCancellable]()
     private var refreshObserver: AnyCancellable?
     private var dataSource: UITableViewDiffableDataSource<Section, AnyTorrentListItemViewModel>!
+    fileprivate var applySnapshotInBackground = true
 
     init(viewModel: TorrentListViewModel) {
         self.viewModel = viewModel
         super.init(style: .plain)
         title = "Torrents"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "gear"),
+            style: .plain,
+            target: self,
+            action: #selector(settingsButtonTapped(_:))
+        )
     }
 
     required init?(coder: NSCoder) {
@@ -32,6 +39,7 @@ final class TorrentListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
@@ -65,9 +73,18 @@ final class TorrentListViewController: UITableViewController {
         snapshot.appendSections([.main])
         snapshot.appendItems(items, toSection: .main)
 
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.dataSource.apply(snapshot, animatingDifferences: true)
+        if applySnapshotInBackground {
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.dataSource.apply(snapshot, animatingDifferences: true)
+            }
+        } else {
+            dataSource.apply(snapshot, animatingDifferences: true)
         }
+    }
+
+    @objc
+    private func settingsButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.didSelectSettings()
     }
 
     @objc
@@ -108,7 +125,9 @@ final class TorrentListViewController: UITableViewController {
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
             ) -> TorrentListViewController {
-                return TorrentListViewController(viewModel: viewModel)
+                let viewController = TorrentListViewController(viewModel: viewModel)
+                viewController.applySnapshotInBackground = false
+                return viewController
             }
 
             func updateUIViewController(
