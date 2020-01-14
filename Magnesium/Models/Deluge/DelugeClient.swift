@@ -229,13 +229,13 @@ final class DefaultDelugeClient: DelugeClient {
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        return request(method: "core.pause_torrent", params: hashes)
+        return request(method: "core.pause_torrent", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
 
     func resume(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        return request(method: "core.resume_torrent", params: hashes)
+        return request(method: "core.resume_torrent", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
@@ -247,7 +247,7 @@ final class DefaultDelugeClient: DelugeClient {
     }
 
     func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        return request(method: "core.force_recheck", params: hashes)
+        return request(method: "core.force_recheck", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }

@@ -30,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         let preferences = UserDefaultsPreferences()
-        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
+        _ = try? preferences.registerDefault(2, for: PreferenceKeys.autoRefreshInterval)
 
         let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
         // swiftlint:disable:next force_try
