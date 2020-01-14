@@ -32,17 +32,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let preferences = UserDefaultsPreferences()
         _ = try? preferences.registerDefault(2, for: PreferenceKeys.autoRefreshInterval)
 
-        let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
-        // swiftlint:disable:next force_try
-        let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
-            as! [String: String] // swiftlint:disable:this force_cast
-        let client = DefaultDelugeClient(
-            baseURL: URL(string: credentials["url"]!)!,
-            password: credentials["password"]!
-        )
+//        let credentialsURL = Bundle(for: type(of: self)).url(forResource: "deluge-credentials", withExtension: nil)!
+//        // swiftlint:disable:next force_try
+//        let credentials = try! JSONSerialization.jsonObject(with: Data(contentsOf: credentialsURL), options: [])
+//            as! [String: String] // swiftlint:disable:this force_cast
+//        let client = DefaultDelugeClient(
+//            baseURL: URL(string: credentials["url"]!)!,
+//            password: credentials["password"]!
+//        )
+//        let viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
+
+        let client = TransmissionClient(baseURL: URL(string: "http://localhost:9091")!, authentication: nil)
+        let viewModel = TransmissionTorrentListViewModel(client: client, preferences: preferences)
 
         let splitViewController = SplitViewController()
-        let viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
         let screen = NavigationControllerScreen(Screens.torrentList(viewModel: viewModel))
         let navigationController = screen.viewController()!
         viewModel.navigator = DefaultNavigator(viewController: navigationController)

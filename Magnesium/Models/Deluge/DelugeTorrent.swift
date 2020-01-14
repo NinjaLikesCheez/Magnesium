@@ -8,24 +8,24 @@
 
 import Foundation
 
-struct DelugeTorrent: Equatable {
+struct DelugeTorrent {
     let hash: String
-    var name: String
-    var state: TorrentState
-    var dateAdded: Date
-    var downloadRate: Int
-    var uploadRate: Int
-    var eta: TimeInterval
-    var progress: Float
-    var downloaded: Int64
-    var uploaded: Int64
-    var size: Int64
-    var seeds: Int
-    var totalSeeds: Int
-    var peers: Int
-    var totalPeers: Int
-    var trackers: [String]
-    var label: String
+    let name: String
+    let state: TorrentState
+    let dateAdded: Date
+    let downloadRate: Int
+    let uploadRate: Int
+    let eta: TimeInterval
+    let progress: Float
+    let downloaded: Int64
+    let uploaded: Int64
+    let size: Int64
+    let seeds: Int
+    let totalSeeds: Int
+    let peers: Int
+    let totalPeers: Int
+    let trackers: [String]
+    let label: String
 }
 
 extension DelugeTorrent {
