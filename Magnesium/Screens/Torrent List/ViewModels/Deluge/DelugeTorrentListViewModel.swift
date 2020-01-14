@@ -125,12 +125,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .store(in: &observers)
     }
 
-    func refresh() -> AnyPublisher<Never, Error> {
-        return client.getLabels()
-            .handleEvents(receiveOutput: { labels in
-                self.labels.send(labels)
-            })
-            .flatMap { _ in self.client.getTorrents() }
+    func refreshTorrents() -> AnyPublisher<Never, DelugeClientError> {
+        return client.getTorrents()
             .map { torrents -> TorrentMap in
                 torrents.reduce(into: TorrentMap()) { map, torrent in
                     map[torrent.hash] = CurrentValueSubject(torrent)
@@ -146,8 +142,17 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
                         }
                 )
             })
-            .mapError { $0 as Error }
             .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    func refresh() -> AnyPublisher<Never, Error> {
+        return client.getLabels()
+            .handleEvents(receiveOutput: { labels in
+                self.labels.send(labels)
+            })
+            .flatMap { _ in self.refreshTorrents() }
+            .mapError { $0 as Error }
             .ui()
             .eraseToAnyPublisher()
     }

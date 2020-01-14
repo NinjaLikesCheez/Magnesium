@@ -9,5 +9,5 @@
 import Combine
 
 protocol DelugeRefreshable {
-    func refresh() -> AnyPublisher<Never, Error>
+    func refreshTorrents() -> AnyPublisher<Never, DelugeClientError>
 }
