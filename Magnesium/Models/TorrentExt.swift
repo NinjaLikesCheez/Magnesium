@@ -13,6 +13,7 @@ protocol TorrentExt {
     var downloadRate: Int { get }
     var uploadRate: Int { get }
     var eta: TimeInterval { get }
+    var progress: Float { get }
     var size: Int64 { get }
     var downloaded: Int64 { get }
     var uploaded: Int64 { get }
@@ -25,10 +26,6 @@ extension TorrentExt {
 
     var isActive: Bool {
         return state == .downloading || state == .seeding
-    }
-
-    var progress: Float {
-        return size != 0 ? Float(downloaded) / Float(size) : 0
     }
 
     var speedString: String {

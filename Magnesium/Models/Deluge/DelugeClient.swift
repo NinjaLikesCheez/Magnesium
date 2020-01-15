@@ -54,8 +54,8 @@ final class DefaultDelugeClient: DelugeClient {
         URLSession.shared
     }()
 
-    let baseURL: URL
-    let password: String
+    var baseURL: URL
+    var password: String
 
     init(baseURL: URL, password: String) {
         self.baseURL = baseURL
@@ -86,16 +86,17 @@ final class DefaultDelugeClient: DelugeClient {
         return session.dataTaskPublisher(for: request)
             .mapError { DelugeClientError.request($0) }
             .flatMap { data, response -> AnyPublisher<[String: Any], DelugeClientError> in
-                do {
-                    return try Just(self.parse(data: data, response: response))
+                switch self.parse(data: data, response: response) {
+                case let .success(response):
+                    return Just(response)
                         .setFailureType(to: DelugeClientError.self)
                         .eraseToAnyPublisher()
-                } catch {
-                    return Fail(error: DelugeClientError.decoding(error)).eraseToAnyPublisher()
+                case let .failure(error):
+                    return Fail(error: error).eraseToAnyPublisher()
                 }
             }
             .catch { error -> AnyPublisher<[String: Any], DelugeClientError> in
-                guard authenticateIfNeeded else {
+                guard case .unauthenticated = error, authenticateIfNeeded else {
                     return Fail(error: error).eraseToAnyPublisher()
                 }
 
@@ -108,20 +109,28 @@ final class DefaultDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    private func parse(data: Data, response: URLResponse) throws -> [String: Any] {
-        guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            throw DelugeClientError.unexpectedResponse
+    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], DelugeClientError> {
+        let dict: [String: Any]
+
+        do {
+            guard let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                return .failure(.unexpectedResponse)
+            }
+
+            dict = object
+        } catch {
+            return .failure(.decoding(error))
         }
 
         if let error = dict["error"] as? [String: Any] {
             if let code = error["code"] as? Int, code == 1 {
-                throw DelugeClientError.unauthenticated
+                return .failure(.unauthenticated)
             }
 
-            throw DelugeClientError.serverError(message: error["message"] as? String)
+            return .failure(.serverError(message: error["message"] as? String))
         }
 
-        return dict
+        return .success(dict)
     }
 
     func authenticate() -> AnyPublisher<Never, DelugeClientError> {
@@ -129,7 +138,7 @@ final class DefaultDelugeClient: DelugeClient {
             .flatMap { response -> AnyPublisher<Never, DelugeClientError> in
                 let authenticated = response["result"] as? Bool ?? false
                 guard authenticated else {
-                    return Fail(error: DelugeClientError.unauthenticated).eraseToAnyPublisher()
+                    return Fail(error: .unauthenticated).eraseToAnyPublisher()
                 }
 
                 return Empty(completeImmediately: true).eraseToAnyPublisher()
@@ -162,7 +171,7 @@ final class DefaultDelugeClient: DelugeClient {
                 guard let results = response["result"] as? [String: Any],
                     let torrents = results["torrents"] as? [String: [String: Any]]
                 else {
-                    return Fail(error: DelugeClientError.ensureWebInterfaceConnectivity).eraseToAnyPublisher()
+                    return Fail(error: .ensureWebInterfaceConnectivity).eraseToAnyPublisher()
                 }
 
                 return Just(torrents.compactMap { DelugeTorrent(hash: $0.key, dictionary: $0.value) })
@@ -176,7 +185,7 @@ final class DefaultDelugeClient: DelugeClient {
         return request(method: "label.get_labels", params: [])
             .flatMap { value -> AnyPublisher<[String], DelugeClientError> in
                 guard let result = value["result"] as? [String] else {
-                    return Fail(error: DelugeClientError.unexpectedResponse).eraseToAnyPublisher()
+                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
                 return Just(result).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()

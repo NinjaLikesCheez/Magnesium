@@ -23,6 +23,10 @@ struct MockTorrent {
     var peers: Int
     var totalPeers: Int
     var trackers: [String]
+
+    var progress: Float {
+        return size != 0 ? Float(downloaded) / Float(size) : 0
+    }
 }
 
 extension MockTorrent: TorrentExt {}
