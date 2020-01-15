@@ -1,5 +1,5 @@
 //
-//  AddDelugeServerViewModel.swift
+//  DelugeSettingsViewModel.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-13.
@@ -8,7 +8,7 @@
 
 import Combine
 
-protocol AddDelugeServerViewModel {
+protocol DelugeSettingsViewModel {
     var title: String { get }
     var saveButtonTitle: String { get }
     var isLoading: AnyPublisher<Bool, Never> { get }

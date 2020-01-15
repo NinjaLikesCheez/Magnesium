@@ -1,5 +1,5 @@
 //
-//  DefaultAddDelugeServerViewModel.swift
+//  DefaultDelugeSettingsViewModel.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-14.
@@ -11,12 +11,12 @@ import Foundation
 import Navigator
 import Preferences
 
-final class DefaultAddDelugeServerViewModel: AddDelugeServerViewModel {
+final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
+    private let navigator: Navigator
     private let preferences: Preferences
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
     private var observers = [AnyCancellable]()
-    var navigator: Navigator?
 
     var title: String {
         return "Add Server"
@@ -76,7 +76,8 @@ final class DefaultAddDelugeServerViewModel: AddDelugeServerViewModel {
         return _passwordViewModel
     }
 
-    init(preferences: Preferences) {
+    init(navigator: Navigator, preferences: Preferences) {
+        self.navigator = navigator
         self.preferences = preferences
         nameViewModel.value
             .combineLatest(serverViewModel.value, passwordViewModel.value)
@@ -128,7 +129,7 @@ final class DefaultAddDelugeServerViewModel: AddDelugeServerViewModel {
                             type: .deluge,
                             data: try JSONEncoder().encode(settings)
                         ))
-                        self?.navigator?.dismiss(animated: true)
+                        self?.navigator.popToRoot(animated: true)
                     } catch {
                         self?.displayError(error, title: "Unable to Add Server")
                     }
@@ -155,7 +156,7 @@ final class DefaultAddDelugeServerViewModel: AddDelugeServerViewModel {
             style: .alert
         )
         alert.actions.append(AlertActionModel(title: "OK", style: .default, handler: nil))
-        navigator?.present(AlertScreen(alert), animated: true)
+        navigator.present(AlertScreen(alert), animated: true)
     }
 
     private func displayError(_ error: Error, title: String) {
@@ -165,6 +166,6 @@ final class DefaultAddDelugeServerViewModel: AddDelugeServerViewModel {
             style: .alert
         )
         alert.actions.append(AlertActionModel(title: "OK", style: .default, handler: nil))
-        navigator?.present(AlertScreen(alert), animated: true)
+        navigator.present(AlertScreen(alert), animated: true)
     }
 }

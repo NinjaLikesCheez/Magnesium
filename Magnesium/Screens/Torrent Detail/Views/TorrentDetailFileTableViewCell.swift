@@ -114,22 +114,22 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
 #if DEBUG
     struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
-        private struct Container<VM: TorrentDetailFileViewModel>: UIViewRepresentable {
-            let viewModel: VM
+        private struct Container: UIViewRepresentable {
+            let viewModel: AnyTorrentDetailFileViewModel
 
-            init(viewModel: VM) {
+            init(viewModel: AnyTorrentDetailFileViewModel) {
                 self.viewModel = viewModel
             }
 
             func makeUIView(
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TorrentDetailFileTableViewCell> {
                 return PreviewViewContainer(TorrentDetailFileTableViewCell(style: .default, reuseIdentifier: nil))
             }
 
             func updateUIView(
                 _ uiView: PreviewViewContainer<TorrentDetailFileTableViewCell>,
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -142,7 +142,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
                 name: "file.rar",
                 size: 50 * 1024 * 1024,
                 downloaded: 25 * 1024 * 1024
-            )))
+            ))).eraseToAny()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

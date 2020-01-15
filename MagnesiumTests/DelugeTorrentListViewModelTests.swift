@@ -156,6 +156,10 @@ private final class MockDetailNavigator: Navigator {
         XCTFail()
     }
 
+    func popToRoot(animated: Bool) {
+        XCTFail()
+    }
+
     func present(
         _ navigatable: Navigatable,
         style: PresentationStyle,

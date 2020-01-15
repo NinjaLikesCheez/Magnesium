@@ -13,8 +13,8 @@ enum Screens: Navigatable {
     case torrentList(viewModel: TorrentListViewModel)
     case torrentDetail(viewModel: TorrentDetailViewModel)
     case torrentDetailEmpty
-    case settings
-    case addDelugeServer(viewModel: AddDelugeServerViewModel)
+    case settings(viewModel: SettingsViewModel)
+    case delugeSettings(viewModel: DelugeSettingsViewModel)
 
     func viewController() -> UIViewController? {
         switch self {
@@ -26,13 +26,10 @@ enum Screens: Navigatable {
             let viewController = UIViewController()
             viewController.view.backgroundColor = .systemGroupedBackground
             return UINavigationController(rootViewController: viewController)
-        case .settings:
-            let viewController = UIViewController()
-            viewController.title = "Settings"
-            viewController.view.backgroundColor = .systemBackground
-            return viewController
-        case let .addDelugeServer(viewModel: viewModel):
-            return AddDelugeServerViewController(viewModel: viewModel)
+        case let .settings(viewModel):
+            return SettingsViewController(viewModel: viewModel)
+        case let .delugeSettings(viewModel: viewModel):
+            return DelugeSettingsViewController(viewModel: viewModel)
         }
     }
 }

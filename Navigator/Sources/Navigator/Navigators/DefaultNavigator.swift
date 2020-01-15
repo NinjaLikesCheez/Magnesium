@@ -35,6 +35,10 @@ public final class DefaultNavigator: Navigator {
         navigationController?.popViewController(animated: animated)
     }
 
+    public func popToRoot(animated: Bool) {
+        navigationController?.popToRootViewController(animated: animated)
+    }
+
     @discardableResult
     public func present(
         _ navigatable: Navigatable,

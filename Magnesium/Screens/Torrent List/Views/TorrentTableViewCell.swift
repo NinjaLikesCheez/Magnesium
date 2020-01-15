@@ -176,22 +176,22 @@ final class TorrentTableViewCell: UITableViewCell {
 
 #if DEBUG
     struct TorrentTableViewCell_Previews: PreviewProvider {
-        private struct Container<VM: TorrentListItemViewModel>: UIViewRepresentable {
-            let viewModel: VM
+        private struct Container: UIViewRepresentable {
+            let viewModel: AnyTorrentListItemViewModel
 
-            init(viewModel: VM) {
+            init(viewModel: AnyTorrentListItemViewModel) {
                 self.viewModel = viewModel
             }
 
             func makeUIView(
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TorrentTableViewCell> {
                 return PreviewViewContainer(TorrentTableViewCell(style: .default, reuseIdentifier: nil))
             }
 
             func updateUIView(
                 _ uiView: PreviewViewContainer<TorrentTableViewCell>,
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -215,7 +215,7 @@ final class TorrentTableViewCell: UITableViewCell {
                 peers: 0,
                 totalPeers: 0,
                 trackers: []
-            )))
+            ))).eraseToAny()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

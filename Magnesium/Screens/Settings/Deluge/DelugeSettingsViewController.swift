@@ -1,5 +1,5 @@
 //
-//  AddDelugeServerViewController.swift
+//  DelugeSettingsViewController.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-12.
@@ -10,14 +10,14 @@ import Combine
 import SwiftUI
 import UIKit
 
-final class AddDelugeServerViewController: UITableViewController {
+final class DelugeSettingsViewController: UITableViewController {
     private enum Row: Int, CaseIterable {
         case name
         case server
         case password
     }
 
-    private let viewModel: AddDelugeServerViewModel
+    private let viewModel: DelugeSettingsViewModel
     private let nameCell = TextInputTableViewCell()
     private let serverCell = TextInputTableViewCell()
     private let passwordCell = TextInputTableViewCell()
@@ -38,9 +38,10 @@ final class AddDelugeServerViewController: UITableViewController {
         return UIBarButtonItem(customView: activityView)
     }()
 
-    init(viewModel: AddDelugeServerViewModel) {
+    init(viewModel: DelugeSettingsViewModel) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
+        isModalInPresentation = true
         navigationItem.title = viewModel.title
         navigationItem.largeTitleDisplayMode = .never
         nameCell.configure(with: viewModel.nameViewModel)
@@ -112,37 +113,36 @@ final class AddDelugeServerViewController: UITableViewController {
 
     private func isLoadingChanged(_ isLoading: Bool) {
         view.endEditing(true)
-        navigationItem.leftBarButtonItem?.isEnabled = !isLoading
+        navigationItem.hidesBackButton = isLoading
         navigationItem.rightBarButtonItem = isLoading ? loadingBarButtonItem : saveBarButtonItem
         tableView.isUserInteractionEnabled = !isLoading
     }
 }
 
 #if DEBUG
-    struct AddDelugeServerViewController_Previews: PreviewProvider {
-        private struct Container<VM: AddDelugeServerViewModel>: UIViewControllerRepresentable {
-            private let viewModel: VM
+    struct DelugeSettingsViewController_Previews: PreviewProvider {
+        private struct Container: UIViewControllerRepresentable {
+            private let viewModel: DelugeSettingsViewModel
 
-            init(viewModel: VM) {
+            init(viewModel: DelugeSettingsViewModel) {
                 self.viewModel = viewModel
             }
 
             func makeUIViewController(
-                context: UIViewControllerRepresentableContext<Container<VM>>
+                context: UIViewControllerRepresentableContext<Container>
             ) -> UINavigationController {
-                let viewController = AddDelugeServerViewController(viewModel: viewModel)
+                let viewController = DelugeSettingsViewController(viewModel: viewModel)
                 return UINavigationController(rootViewController: viewController)
             }
 
             func updateUIViewController(
                 _ uiViewController: UINavigationController,
-                context: UIViewControllerRepresentableContext<Container<VM>>
+                context: UIViewControllerRepresentableContext<Container>
             ) {}
         }
 
         static var previews: some View {
-            let viewModel = DefaultAddDelugeServerViewModel(preferences: NoopPreferences())
-
+            let viewModel = DefaultDelugeSettingsViewModel(navigator: NoopNavigator(), preferences: NoopPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

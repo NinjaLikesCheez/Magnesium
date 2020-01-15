@@ -25,10 +25,8 @@ protocol TorrentListViewModelExt: TorrentListViewModel {
 
 extension TorrentListViewModelExt {
     func didSelectSettings() {
-        let viewModel = DefaultAddDelugeServerViewModel(preferences: preferences)
-        let screen = NavigationControllerScreen(Screens.addDelugeServer(viewModel: viewModel))
+        let viewModel = DefaultSettingsViewModel(preferences: preferences)
+        let screen = NavigationControllerScreen(Screens.settings(viewModel: viewModel))
         viewModel.navigator = navigator?.present(screen, animated: true)
-        // TODO: show settings
-//        navigator?.present(NavigationControllerScreen(Screens.settings), animated: true)
     }
 }

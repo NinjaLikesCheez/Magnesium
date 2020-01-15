@@ -156,6 +156,8 @@ final class TorrentDetailViewController: UITableViewController {
         viewModel.didSelectMoreOptions(from: .barButton(sender))
     }
 
+    // MARK: UITableViewDelegate
+
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         let section = dataSource.snapshot().sectionIdentifiers[section]
         guard section.displayString != nil else { return .leastNormalMagnitude }

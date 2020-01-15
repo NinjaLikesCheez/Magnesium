@@ -122,22 +122,22 @@ extension TextInputTableViewCell: UITextFieldDelegate {
 
 #if DEBUG
     struct TextInputTableViewCell_Previews: PreviewProvider {
-        private struct Container<VM: TextInputTableViewCellViewModel>: UIViewRepresentable {
-            let viewModel: VM
+        private struct Container: UIViewRepresentable {
+            let viewModel: TextInputTableViewCellViewModel
 
-            init(viewModel: VM) {
+            init(viewModel: TextInputTableViewCellViewModel) {
                 self.viewModel = viewModel
             }
 
             func makeUIView(
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TextInputTableViewCell> {
                 return PreviewViewContainer(TextInputTableViewCell(style: .default, reuseIdentifier: nil))
             }
 
             func updateUIView(
                 _ uiView: PreviewViewContainer<TextInputTableViewCell>,
-                context: UIViewRepresentableContext<Container<VM>>
+                context: UIViewRepresentableContext<Container>
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)

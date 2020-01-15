@@ -52,6 +52,12 @@ extension Preferences {
         _ = try? set(servers, for: PreferenceKeys.servers)
     }
 
+    func remove(server: Server) {
+        var servers = getServers()
+        servers.removeAll { $0.id == server.id }
+        _ = try? set(servers, for: PreferenceKeys.servers)
+    }
+
     func removeServers() {
         removeValue(for: PreferenceKeys.servers)
     }

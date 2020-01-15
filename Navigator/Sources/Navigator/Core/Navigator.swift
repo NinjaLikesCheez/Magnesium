@@ -22,6 +22,10 @@ public protocol Navigator {
     /// - Parameter animated: If the pop should be animated.
     func pop(animated: Bool)
 
+    /// Pops to the root of the navigation stack.
+    /// - Parameter animated: If the pop should be animated.
+    func popToRoot(animated: Bool)
+
     /// Presents a navigatable.
     /// - Parameters:
     ///   - navigatable: The navigatable to present.
