@@ -71,7 +71,6 @@
 		E9C8258423C5787E003B1D72 /* TorrentExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258323C5787E003B1D72 /* TorrentExt.swift */; };
 		E9C8258623C579E9003B1D72 /* DelugeTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258523C579E9003B1D72 /* DelugeTorrentListViewModel.swift */; };
 		E9C8258823C57E47003B1D72 /* SortOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258723C57E47003B1D72 /* SortOption.swift */; };
-		E9C8258A23C58467003B1D72 /* deluge-credentials in Resources */ = {isa = PBXBuildFile; fileRef = E9C8258923C58467003B1D72 /* deluge-credentials */; };
 		E9C8258E23C58509003B1D72 /* DelugeTorrentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258D23C58509003B1D72 /* DelugeTorrentDetailViewModel.swift */; };
 		E9C8259023C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258F23C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift */; };
 		E9CC161423AD5CF000EA1B4C /* DelugeTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CC161323AD5CF000EA1B4C /* DelugeTorrentListViewModelTests.swift */; };
@@ -163,7 +162,6 @@
 		E9C8258323C5787E003B1D72 /* TorrentExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentExt.swift; sourceTree = "<group>"; };
 		E9C8258523C579E9003B1D72 /* DelugeTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentListViewModel.swift; sourceTree = "<group>"; };
 		E9C8258723C57E47003B1D72 /* SortOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortOption.swift; sourceTree = "<group>"; };
-		E9C8258923C58467003B1D72 /* deluge-credentials */ = {isa = PBXFileReference; lastKnownFileType = text; name = "deluge-credentials"; path = "../../deluge-credentials"; sourceTree = "<group>"; };
 		E9C8258D23C58509003B1D72 /* DelugeTorrentDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentDetailViewModel.swift; sourceTree = "<group>"; };
 		E9C8258F23C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentDetailHeaderViewModel.swift; sourceTree = "<group>"; };
 		E9CC160923AD5CD400EA1B4C /* MagnesiumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MagnesiumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -380,7 +378,6 @@
 			isa = PBXGroup;
 			children = (
 				E96B006A237A43760091FA71 /* Assets.xcassets */,
-				E9C8258923C58467003B1D72 /* deluge-credentials */,
 				E96B0072237A43760091FA71 /* Info.plist */,
 			);
 			path = Resources;
@@ -626,7 +623,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9C8258A23C58467003B1D72 /* deluge-credentials in Resources */,
 				E96B0071237A43760091FA71 /* LaunchScreen.storyboard in Resources */,
 				E96B006B237A43760091FA71 /* Assets.xcassets in Resources */,
 			);
