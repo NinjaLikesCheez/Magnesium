@@ -6,7 +6,7 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-enum TorrentDetailItem: Hashable {
+enum TorrentDetailItem: Equatable, Hashable {
     case header(AnyTorrentDetailHeaderViewModel)
     case info(TorrentDetailInfoViewModel)
     case tracker(String)

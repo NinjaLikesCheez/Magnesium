@@ -115,11 +115,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: AnyTorrentDetailFileViewModel
-
-            init(viewModel: AnyTorrentDetailFileViewModel) {
-                self.viewModel = viewModel
-            }
+            var viewModel: AnyTorrentDetailFileViewModel
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -137,12 +133,23 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             }
         }
 
+        private struct ViewModel: TorrentDetailFileViewModel, Hashable {
+            let id = UUID()
+            var name: String = "file.rar"
+            var size: AnyPublisher<String, Never> = Just("50.0 MB").eraseToAnyPublisher()
+            var progress: AnyPublisher<String, Never> = Just("100%").eraseToAnyPublisher()
+
+            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
+                return lhs.id == rhs.id
+            }
+
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(id)
+            }
+        }
+
         static var previews: some View {
-            let viewModel = MockTorrentDetailFileViewModel(fileSubject: CurrentValueSubject(MockTorrentFile(
-                name: "file.rar",
-                size: 50 * 1024 * 1024,
-                downloaded: 25 * 1024 * 1024
-            ))).eraseToAny()
+            let viewModel = ViewModel().eraseToAny()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

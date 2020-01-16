@@ -6,14 +6,19 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-enum TorrentDetailSection {
+struct TorrentDetailSection: Equatable {
+    let type: TorrentDetailSectionType
+    let items: [TorrentDetailItem]
+}
+
+enum TorrentDetailSectionType: Equatable {
     case header
     case info
     case trackers
     case files
 }
 
-extension TorrentDetailSection {
+extension TorrentDetailSectionType {
     var displayString: String? {
         switch self {
         case .header:

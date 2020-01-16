@@ -32,6 +32,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewMod
             .combineLatest(sortOption)
             .map { DelugeTorrentListViewModel.sort($0, using: $1) }
             .map { $0.map { DelugeTorrentListItemViewModel(torrentSubject: $0).eraseToAny() } }
+            .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
     }

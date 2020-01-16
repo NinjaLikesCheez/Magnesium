@@ -245,23 +245,26 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             }
         }
 
+        private struct ViewModel: TorrentDetailHeaderViewModel, Hashable {
+            let id = UUID()
+            var name: AnyPublisher<String, Never> = Just("Torrent").eraseToAnyPublisher()
+            var isActive: AnyPublisher<Bool, Never> = Just(true).eraseToAnyPublisher()
+            var progress: AnyPublisher<Float, Never> = Just(1).eraseToAnyPublisher()
+            var progressColor: AnyPublisher<UIColor, Never> = Just(TorrentState.seeding.displayColor)
+                .eraseToAnyPublisher()
+            var status: AnyPublisher<String, Never> = Just("Seeding (100%)").eraseToAnyPublisher()
+
+            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
+                return lhs.id == rhs.id
+            }
+
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(id)
+            }
+        }
+
         static var previews: some View {
-            let viewModel = MockTorrentDetailHeaderViewModel(torrentSubject: CurrentValueSubject(MockTorrent(
-                id: 0,
-                name: "Torrent",
-                state: .seeding,
-                size: 1024,
-                downloaded: 1024,
-                uploaded: 4098,
-                downloadRate: 0,
-                uploadRate: 0,
-                eta: 0,
-                seeds: 0,
-                totalSeeds: 0,
-                peers: 0,
-                totalPeers: 0,
-                trackers: []
-            ))).eraseToAny()
+            let viewModel = ViewModel().eraseToAny()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

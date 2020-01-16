@@ -25,7 +25,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private var autoUpdateTimer: Timer?
 
     var navigator: Navigator?
-    let sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never>
+    let sections: AnyPublisher<[TorrentDetailSection], Never>
 
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
@@ -46,6 +46,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                     fileMap: fileMap
                 )
             }
+            .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
 
@@ -64,12 +65,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         torrentSubject: TorrentSubject,
         torrent: DelugeTorrent,
         fileMap: FileMap?
-    ) -> [(TorrentDetailSection, [TorrentDetailItem])] {
-        var sections = [(TorrentDetailSection, [TorrentDetailItem])]()
-        sections.append((.header, [
+    ) -> [TorrentDetailSection] {
+        var sections = [TorrentDetailSection]()
+        sections.append(.init(type: .header, items: [
             .header(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject).eraseToAny()),
         ]))
-        sections.append((.info, [
+        sections.append(.init(type: .info, items: [
             .info(TorrentDetailInfoViewModel(
                 name: "Size",
                 value: torrentSubject
@@ -138,7 +139,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         ]))
 
         if !torrent.trackers.isEmpty {
-            sections.append((.trackers, torrent.trackers.map { .tracker($0) }))
+            sections.append(.init(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
         }
 
         if let fileMap = fileMap {
@@ -147,12 +148,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                     $0.value.path.compare(
                         $1.value.path,
                         options: [.numeric, .caseInsensitive]
-                    ) == .orderedDescending
+                    ) == .orderedAscending
                 }
                 .map {
                     TorrentDetailItem.file(DelugeTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
                 }
-            sections.append((.files, items))
+            sections.append(.init(type: .files, items: items))
         }
 
         return sections

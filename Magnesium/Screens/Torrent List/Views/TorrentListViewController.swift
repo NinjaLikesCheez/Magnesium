@@ -137,7 +137,7 @@ final class TorrentListViewController: UITableViewController {
         }
 
         static var previews: some View {
-            let viewModel = MockTorrentListViewModel(navigator: NoopNavigator())
+            let viewModel = EmptyTorrentListViewModel(preferences: NoopPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

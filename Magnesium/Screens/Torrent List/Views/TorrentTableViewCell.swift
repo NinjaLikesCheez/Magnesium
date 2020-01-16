@@ -199,23 +199,28 @@ final class TorrentTableViewCell: UITableViewCell {
             }
         }
 
+        private struct ViewModel: TorrentListItemViewModel, Hashable {
+            let id = UUID()
+            var name: AnyPublisher<String, Never> = Just("Torrent").eraseToAnyPublisher()
+            var progress: AnyPublisher<Float, Never> = Just(1).eraseToAnyPublisher()
+            var progressColor: AnyPublisher<UIColor, Never> = Just(TorrentState.seeding.displayColor)
+                .eraseToAnyPublisher()
+            var state: AnyPublisher<String, Never> = Just("Seeding").eraseToAnyPublisher()
+            var speed: AnyPublisher<String, Never> = Just("↑ 0.0 KB/s").eraseToAnyPublisher()
+            var progressString: AnyPublisher<String, Never> = Just("1.0 GB / 1.0 GB").eraseToAnyPublisher()
+            var ratioOrETA: AnyPublisher<String, Never> = Just("Ratio: 1.0").eraseToAnyPublisher()
+
+            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
+                return lhs.id == rhs.id
+            }
+
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(id)
+            }
+        }
+
         static var previews: some View {
-            let viewModel = MockTorrentListItemViewModel(torrentSubject: CurrentValueSubject(MockTorrent(
-                id: 0,
-                name: "Torrent",
-                state: .seeding,
-                size: 1024,
-                downloaded: 1024,
-                uploaded: 4098,
-                downloadRate: 0,
-                uploadRate: 0,
-                eta: 0,
-                seeds: 0,
-                totalSeeds: 0,
-                peers: 0,
-                totalPeers: 0,
-                trackers: []
-            ))).eraseToAny()
+            let viewModel = ViewModel().eraseToAny()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

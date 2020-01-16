@@ -13,7 +13,7 @@ final class TorrentDetailViewController: UITableViewController {
     private let viewModel: TorrentDetailViewModel
     private var observers = [AnyCancellable]()
     private var refreshObserver: AnyCancellable?
-    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection, TorrentDetailItem>!
+    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
 
     init(viewModel: TorrentDetailViewModel) {
@@ -114,21 +114,21 @@ final class TorrentDetailViewController: UITableViewController {
         tableView.dataSource = dataSource
 
         viewModel.sections
-            .sink { [weak self] items in
-                self?.update(with: items)
+            .sink { [weak self] sections in
+                self?.update(with: sections)
             }
             .store(in: &observers)
     }
 
-    private func update(with sections: [(TorrentDetailSection, [TorrentDetailItem])]) {
+    private func update(with sections: [TorrentDetailSection]) {
         let animate = !isFirstSnapshot
         isFirstSnapshot = false
 
-        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection, TorrentDetailItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSectionType, TorrentDetailItem>()
 
-        for (section, items) in sections {
-            snapshot.appendSections([section])
-            snapshot.appendItems(items, toSection: section)
+        for section in sections {
+            snapshot.appendSections([section.type])
+            snapshot.appendItems(section.items, toSection: section.type)
         }
 
         DispatchQueue.global(qos: .userInteractive).async {

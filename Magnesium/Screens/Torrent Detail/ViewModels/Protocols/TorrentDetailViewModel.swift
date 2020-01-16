@@ -10,7 +10,7 @@ import Combine
 import Navigator
 
 protocol TorrentDetailViewModel {
-    var sections: AnyPublisher<[(TorrentDetailSection, [TorrentDetailItem])], Never> { get }
+    var sections: AnyPublisher<[TorrentDetailSection], Never> { get }
     func refresh() -> AnyPublisher<Never, Error>
     func didSelectMoreOptions(from source: PopoverSource)
     func didSelectPause()
