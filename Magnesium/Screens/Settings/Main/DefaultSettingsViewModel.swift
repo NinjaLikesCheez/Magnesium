@@ -56,9 +56,8 @@ final class DefaultSettingsViewModel: SettingsViewModel {
     }
 
     func didSelectAddServer() {
-        // TODO: actually display server selection
         guard let navigator = navigator else { return }
-        let viewModel = DefaultDelugeSettingsViewModel(navigator: navigator, preferences: preferences)
-        navigator.push(Screens.delugeSettings(viewModel: viewModel), animated: true)
+        let viewModel = DefaultAddServerViewModel(navigator: navigator, preferences: preferences)
+        navigator.push(Screens.addServer(viewModel: viewModel), animated: true)
     }
 }

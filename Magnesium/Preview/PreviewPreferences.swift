@@ -1,5 +1,5 @@
 //
-//  NoopPreferences.swift
+//  PreviewPreferences.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-14.
@@ -10,7 +10,7 @@ import Combine
 import Preferences
 
 #if DEBUG
-    struct NoopPreferences: Preferences {
+    struct PreviewPreferences: Preferences {
         var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
             return Empty().eraseToAnyPublisher()
         }

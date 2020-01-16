@@ -122,10 +122,6 @@ extension TextInputTableViewCell: UITextFieldDelegate {
         private struct Container: UIViewRepresentable {
             let viewModel: TextInputTableViewCellViewModel
 
-            init(viewModel: TextInputTableViewCellViewModel) {
-                self.viewModel = viewModel
-            }
-
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TextInputTableViewCell> {

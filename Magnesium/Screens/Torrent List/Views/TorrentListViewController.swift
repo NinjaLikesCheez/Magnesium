@@ -15,7 +15,7 @@ final class TorrentListViewController: UITableViewController {
         case main
     }
 
-    private var viewModel: TorrentListViewModel
+    private let viewModel: TorrentListViewModel
     private var observers = [AnyCancellable]()
     private var refreshObserver: AnyCancellable?
     private var dataSource: UITableViewDiffableDataSource<Section, AnyTorrentListItemViewModel>!
@@ -116,11 +116,7 @@ final class TorrentListViewController: UITableViewController {
 #if DEBUG
     struct TorrentListViewController_Previews: PreviewProvider {
         private struct Container: UIViewControllerRepresentable {
-            private let viewModel: TorrentListViewModel
-
-            init(viewModel: TorrentListViewModel) {
-                self.viewModel = viewModel
-            }
+            let viewModel: TorrentListViewModel
 
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
@@ -137,7 +133,7 @@ final class TorrentListViewController: UITableViewController {
         }
 
         static var previews: some View {
-            let viewModel = EmptyTorrentListViewModel(preferences: NoopPreferences())
+            let viewModel = EmptyTorrentListViewModel(preferences: PreviewPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

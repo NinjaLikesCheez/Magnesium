@@ -179,10 +179,6 @@ final class TorrentTableViewCell: UITableViewCell {
         private struct Container: UIViewRepresentable {
             let viewModel: AnyTorrentListItemViewModel
 
-            init(viewModel: AnyTorrentListItemViewModel) {
-                self.viewModel = viewModel
-            }
-
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TorrentTableViewCell> {

@@ -21,11 +21,33 @@ struct SortOption: Equatable {
                 return .descending
             }
         }
+
+        var displayString: String {
+            switch self {
+            case .name:
+                return "Name"
+            case .dateAdded:
+                return "Date Added"
+            case .downloadSpeed:
+                return "Download Speed"
+            case .uploadSpeed:
+                return "Upload Speed"
+            }
+        }
     }
 
     enum Direction: String {
         case ascending
         case descending
+
+        var displayString: String {
+            switch self {
+            case .ascending:
+                return "Ascending"
+            case .descending:
+                return "Descending"
+            }
+        }
     }
 
     var property: Property

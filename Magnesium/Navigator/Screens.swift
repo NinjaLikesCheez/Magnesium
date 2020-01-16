@@ -14,6 +14,7 @@ enum Screens: Navigatable {
     case torrentDetail(viewModel: TorrentDetailViewModel)
     case torrentDetailEmpty
     case settings(viewModel: SettingsViewModel)
+    case addServer(viewModel: AddServerViewModel)
     case delugeSettings(viewModel: DelugeSettingsViewModel)
 
     func viewController() -> UIViewController? {
@@ -28,6 +29,8 @@ enum Screens: Navigatable {
             return UINavigationController(rootViewController: viewController)
         case let .settings(viewModel):
             return SettingsViewController(viewModel: viewModel)
+        case let .addServer(viewModel: viewModel):
+            return AddServerViewController(viewModel: viewModel)
         case let .delugeSettings(viewModel: viewModel):
             return DelugeSettingsViewController(viewModel: viewModel)
         }

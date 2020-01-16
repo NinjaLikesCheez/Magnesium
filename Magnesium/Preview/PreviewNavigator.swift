@@ -1,5 +1,5 @@
 //
-//  NoopNavigator.swift
+//  PreviewNavigator.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2019-12-19.
@@ -9,7 +9,7 @@
 import Navigator
 
 #if DEBUG
-    struct NoopNavigator: Navigator {
+    struct PreviewNavigator: Navigator {
         func push(_ navigatable: Navigatable, animated: Bool) {}
         func pop(animated: Bool) {}
         func popToRoot(animated: Bool) {}

@@ -64,6 +64,7 @@ final class DelugeSettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
     }
@@ -145,11 +146,7 @@ final class DelugeSettingsViewController: UITableViewController {
 #if DEBUG
     struct DelugeSettingsViewController_Previews: PreviewProvider {
         private struct Container: UIViewControllerRepresentable {
-            private let viewModel: DelugeSettingsViewModel
-
-            init(viewModel: DelugeSettingsViewModel) {
-                self.viewModel = viewModel
-            }
+            let viewModel: DelugeSettingsViewModel
 
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
@@ -167,8 +164,8 @@ final class DelugeSettingsViewController: UITableViewController {
         static var previews: some View {
             let server = Server(name: "Deluge", type: .deluge, data: Data())
             let viewModel = DefaultDelugeSettingsViewModel(
-                navigator: NoopNavigator(),
-                preferences: NoopPreferences(),
+                navigator: PreviewNavigator(),
+                preferences: PreviewPreferences(),
                 server: server
             )
             return Group {

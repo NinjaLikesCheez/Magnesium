@@ -50,16 +50,17 @@ final class SettingsViewController: UITableViewController {
         super.viewDidLoad()
 
         tableView.cellLayoutMarginsFollowReadableWidth = true
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
 
-        dataSource = DataSource(tableView: tableView) { _, _, item in
+        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
             switch item {
             case let .server(id: _, name: name):
-                let cell = UITableViewCell(style: .default, reuseIdentifier: "text")
+                let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
                 cell.textLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case .addServer:
-                let cell = UITableViewCell(style: .default, reuseIdentifier: "text")
+                let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
                 cell.textLabel?.text = "Add Server"
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -111,17 +112,11 @@ final class SettingsViewController: UITableViewController {
         private struct Container: UIViewControllerRepresentable {
             let viewModel: SettingsViewModel
 
-            init(viewModel: SettingsViewModel) {
-                self.viewModel = viewModel
-            }
-
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
             ) -> UINavigationController {
                 let viewController = SettingsViewController(viewModel: viewModel)
-                let navigationController = UINavigationController(rootViewController: viewController)
-                navigationController.navigationBar.prefersLargeTitles = true
-                return navigationController
+                return UINavigationController(rootViewController: viewController)
             }
 
             func updateUIViewController(
@@ -131,7 +126,7 @@ final class SettingsViewController: UITableViewController {
         }
 
         static var previews: some View {
-            let viewModel = DefaultSettingsViewModel(preferences: NoopPreferences())
+            let viewModel = DefaultSettingsViewModel(preferences: PreviewPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

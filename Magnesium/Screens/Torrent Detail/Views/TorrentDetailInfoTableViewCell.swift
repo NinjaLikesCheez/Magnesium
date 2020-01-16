@@ -95,10 +95,6 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
         private struct Container: UIViewRepresentable {
             let viewModel: TorrentDetailInfoViewModel
 
-            init(viewModel: TorrentDetailInfoViewModel) {
-                self.viewModel = viewModel
-            }
-
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
             ) -> PreviewViewContainer<TorrentDetailInfoTableViewCell> {

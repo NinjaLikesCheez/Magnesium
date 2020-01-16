@@ -115,7 +115,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            var viewModel: AnyTorrentDetailFileViewModel
+            let viewModel: AnyTorrentDetailFileViewModel
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>

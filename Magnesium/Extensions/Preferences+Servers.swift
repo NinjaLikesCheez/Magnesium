@@ -25,6 +25,13 @@ struct Server: Codable, Equatable {
 
 enum ServerType: String, Codable {
     case deluge
+
+    var displayString: String {
+        switch self {
+        case .deluge:
+            return "Deluge"
+        }
+    }
 }
 
 extension Preferences {
