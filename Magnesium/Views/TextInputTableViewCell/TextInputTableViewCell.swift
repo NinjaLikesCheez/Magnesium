@@ -13,7 +13,6 @@ import UIKit
 final class TextInputTableViewCell: UITableViewCell {
     private var observers = [AnyCancellable]()
     private var valueSubject: CurrentValueSubject<String?, Never>?
-    private var proceedToNextInputSubject = PassthroughSubject<Void, Never>()
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -31,9 +30,7 @@ final class TextInputTableViewCell: UITableViewCell {
         return textField
     }()
 
-    var proceedToNextInput: AnyPublisher<Void, Never> {
-        return proceedToNextInputSubject.eraseToAnyPublisher()
-    }
+    var proceedToNextInput: (() -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -115,7 +112,7 @@ final class TextInputTableViewCell: UITableViewCell {
 
 extension TextInputTableViewCell: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        proceedToNextInputSubject.send(())
+        proceedToNextInput?()
         return false
     }
 }

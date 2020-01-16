@@ -73,7 +73,7 @@ final class TransmissionClient {
             .flatMap { data, response -> AnyPublisher<[String: Any], TransmissionClientError> in
                 if let response = response as? HTTPURLResponse {
                     switch response.statusCode {
-                    case 200..<300:
+                    case 200 ..< 300:
                         break
                     case 409:
                         guard handleSessionID,

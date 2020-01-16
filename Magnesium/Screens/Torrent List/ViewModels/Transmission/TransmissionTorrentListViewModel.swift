@@ -11,12 +11,11 @@ import Foundation
 import Navigator
 import Preferences
 
-final class TransmissionTorrentListViewModel: TorrentListViewModel {
+final class TransmissionTorrentListViewModel: TorrentListViewModel, TorrentListViewModelExt {
     private typealias TorrentSubject = CurrentValueSubject<TransmissionTorrent, Never>
     private typealias TorrentMap = [Int: TorrentSubject]
 
     private let client: TransmissionClient
-    private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -24,6 +23,7 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var autoUpdateTimer: Timer?
 
+    let preferences: Preferences
     var navigator: Navigator?
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects

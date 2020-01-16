@@ -39,8 +39,20 @@ final class DefaultSettingsViewModel: SettingsViewModel {
     }
 
     func didSelectServer(at index: Int) {
-        // TODO: display server settings
-        preferences.remove(server: serversSubject.value[index])
+        guard let navigator = navigator else {
+            return
+        }
+
+        let server = serversSubject.value[index]
+        switch server.type {
+        case .deluge:
+            let viewModel = DefaultDelugeSettingsViewModel(
+                navigator: navigator,
+                preferences: preferences,
+                server: server
+            )
+            navigator.push(Screens.delugeSettings(viewModel: viewModel), animated: true)
+        }
     }
 
     func didSelectAddServer() {

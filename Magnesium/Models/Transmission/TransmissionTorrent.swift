@@ -70,14 +70,14 @@ extension TransmissionTorrent {
             let uploaded = dictionary["uploadedEver"] as? Int64,
             let size = dictionary["totalSize"] as? Int64,
             let trackers = (dictionary["trackerStats"] as? [[String: Any]])?
-                .compactMap({ TransmissionTracker(dictionary: $0) })
+            .compactMap({ TransmissionTracker(dictionary: $0) })
         else {
             return nil
         }
 
         self.id = id
         self.name = name
-        self.state = status.state
+        state = status.state
         dateAdded = Date(timeIntervalSince1970: addedDate)
         self.downloadRate = downloadRate
         self.uploadRate = uploadRate

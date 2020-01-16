@@ -19,6 +19,7 @@ final class SettingsViewController: UITableViewController {
             }
         }
     }
+
     private enum Section: Hashable {
         case servers
     }
@@ -36,11 +37,13 @@ final class SettingsViewController: UITableViewController {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         title = "Settings"
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             title: "Done",
             style: .done,
             target: self,
-            action: #selector(closeButtonTapped(_:)))
+            action: #selector(closeButtonTapped(_:))
+        )
     }
 
     override func viewDidLoad() {
@@ -51,13 +54,11 @@ final class SettingsViewController: UITableViewController {
         dataSource = DataSource(tableView: tableView) { _, _, item in
             switch item {
             case let .server(id: _, name: name):
-                // TODO: custom cell
                 let cell = UITableViewCell(style: .default, reuseIdentifier: "text")
                 cell.textLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case .addServer:
-                // TODO: custom cell
                 let cell = UITableViewCell(style: .default, reuseIdentifier: "text")
                 cell.textLabel?.text = "Add Server"
                 cell.accessoryType = .disclosureIndicator
@@ -83,7 +84,7 @@ final class SettingsViewController: UITableViewController {
         snapshot.appendSections([Section.servers])
         snapshot.appendItems(servers?.map { Row.server(id: $0.0, name: $0.1) } ?? [], toSection: .servers)
         snapshot.appendItems([Row.addServer], toSection: .servers)
-        dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
 
     @objc
@@ -92,6 +93,7 @@ final class SettingsViewController: UITableViewController {
     }
 
     // MARK: UITableViewDelegate
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch dataSource.itemIdentifier(for: indexPath) {
         case .server:

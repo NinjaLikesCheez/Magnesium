@@ -11,10 +11,10 @@ import Combine
 protocol DelugeSettingsViewModel {
     var title: String { get }
     var saveButtonTitle: String { get }
+    var canDelete: Bool { get }
     var isLoading: AnyPublisher<Bool, Never> { get }
     var isSaveButtonEnabled: AnyPublisher<Bool, Never> { get }
-    var nameViewModel: TextInputTableViewCellViewModel { get }
-    var serverViewModel: TextInputTableViewCellViewModel { get }
-    var passwordViewModel: TextInputTableViewCellViewModel { get }
+    var inputs: [TextInputTableViewCellViewModel] { get }
     func didSelectSave()
+    func didSelectDelete()
 }

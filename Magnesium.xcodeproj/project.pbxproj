@@ -45,6 +45,8 @@
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
 		E96B0071237A43760091FA71 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E96B006F237A43760091FA71 /* LaunchScreen.storyboard */; };
 		E96B007F237A473E0091FA71 /* TorrentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B007E237A473E0091FA71 /* TorrentState.swift */; };
+		E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */; };
+		E97233F923CFF92900038D30 /* DefaultTextInputTableViewCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F823CFF92900038D30 /* DefaultTextInputTableViewCellViewModel.swift */; };
 		E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */; };
 		E976FA44237E3647006B9DA9 /* ByteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E976FA43237E3647006B9DA9 /* ByteFormatter.swift */; };
 		E97B543123B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */; };
@@ -141,6 +143,8 @@
 		E96B0070237A43760091FA71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E96B0072237A43760091FA71 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E96B007E237A473E0091FA71 /* TorrentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentState.swift; sourceTree = "<group>"; };
+		E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
+		E97233F823CFF92900038D30 /* DefaultTextInputTableViewCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTextInputTableViewCellViewModel.swift; sourceTree = "<group>"; };
 		E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailTrackerTableViewCell.swift; sourceTree = "<group>"; };
 		E976FA43237E3647006B9DA9 /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
 		E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSectionHeaderView.swift; sourceTree = "<group>"; };
@@ -382,6 +386,7 @@
 			isa = PBXGroup;
 			children = (
 				E9C39ADE23CC278E00BB3556 /* TextInputTableViewCell */,
+				E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */,
 				E97B543523B581B7006FFCC9 /* SplitViewController.swift */,
 			);
 			path = Views;
@@ -521,6 +526,7 @@
 		E9C39ADE23CC278E00BB3556 /* TextInputTableViewCell */ = {
 			isa = PBXGroup;
 			children = (
+				E97233F823CFF92900038D30 /* DefaultTextInputTableViewCellViewModel.swift */,
 				E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */,
 				E9C39ADF23CC27A800BB3556 /* TextInputTableViewCellViewModel.swift */,
 			);
@@ -746,6 +752,7 @@
 				E9B40EA223B4057C009E30AE /* TorrentDetailInfoTableViewCell.swift in Sources */,
 				E97B543623B581B7006FFCC9 /* SplitViewController.swift in Sources */,
 				E93F5D6D23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift in Sources */,
+				E97233F923CFF92900038D30 /* DefaultTextInputTableViewCellViewModel.swift in Sources */,
 				E9A6510523AB176000EA8264 /* AnyTorrentListItemViewModel.swift in Sources */,
 				E9635A5823CAE91D00239239 /* NavigationControllerScreen.swift in Sources */,
 				E9460D1D237BB3B100A08E68 /* TorrentListViewModel.swift in Sources */,
@@ -766,6 +773,7 @@
 				E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */,
 				E90DC4FA23CEC6A100FB53E6 /* DefaultSettingsViewModel.swift in Sources */,
 				E99DD0A723AD440700ECB630 /* NoopMockTorrentServerRefresher.swift in Sources */,
+				E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */,
 				E9F24E1223CE55180089E45F /* NoopPreferences.swift in Sources */,
 				E90366E223AAC45600C6AB46 /* NSLayoutConstraint+Priority.swift in Sources */,
 			);
