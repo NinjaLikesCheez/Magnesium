@@ -35,6 +35,6 @@ final class EmptyTorrentListViewModel: TorrentListViewModel {
     }
 
     private func serversChanged() {
-        coordinator?.showListForSelectedServer()
+        coordinator?.showDefaultServer()
     }
 }

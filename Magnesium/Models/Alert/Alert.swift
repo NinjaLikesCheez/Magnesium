@@ -22,8 +22,6 @@ public struct Alert {
     public var style: Style
     /// The alert's actions.
     public var actions = [AlertAction]()
-    /// The source to display the alert from in a popover presentation.
-    public var popoverSource: PopoverSource?
 
     /// Creates a new alert with the given properties.
     /// - Parameters:

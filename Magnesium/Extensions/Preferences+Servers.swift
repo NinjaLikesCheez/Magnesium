@@ -35,15 +35,6 @@ enum ServerType: String, Codable {
 }
 
 extension Preferences {
-    var selectedServerPublisher: AnyPublisher<Server?, Never> {
-        return valuePublisher(for: PreferenceKeys.servers)
-            .combineLatest(valuePublisher(for: PreferenceKeys.selectedServerID))
-            .map { servers, selectedServerID -> Server? in
-                return servers?.first { $0.id == selectedServerID } ?? servers?.first
-            }
-            .eraseToAnyPublisher()
-    }
-
     private func updateSelectedServerID() {
         guard let server = getSelectedServer() else {
             removeValue(for: PreferenceKeys.selectedServerID)
@@ -58,6 +49,7 @@ extension Preferences {
             .compactMap { servers -> Server? in
                 servers?.first(where: { $0.id == server.id })
             }
+            .removeDuplicates()
             .eraseToAnyPublisher()
     }
 

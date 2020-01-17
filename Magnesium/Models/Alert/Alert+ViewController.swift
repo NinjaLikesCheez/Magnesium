@@ -16,16 +16,6 @@ extension Alert {
             preferredStyle: style.alertControllerStyle
         )
 
-        switch popoverSource {
-        case let .view(view, rect: rect):
-            alertController.popoverPresentationController?.sourceView = view
-            alertController.popoverPresentationController?.sourceRect = rect
-        case let .barButton(barButton):
-            alertController.popoverPresentationController?.barButtonItem = barButton
-        case .none:
-            break
-        }
-
         for action in actions {
             alertController.addAction(UIAlertAction(
                 title: action.title,

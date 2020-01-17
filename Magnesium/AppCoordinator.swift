@@ -12,6 +12,7 @@ import UIKit
 
 final class AppCoordinator: Coordinator {
     private let window: UIWindow
+    private lazy var session: Session = DefaultSession(preferences: preferences)
 
     private var preferences: Preferences = {
         let preferences = UserDefaultsPreferences()
@@ -32,6 +33,7 @@ final class AppCoordinator: Coordinator {
         window.rootViewController = splitViewController
         let coordinator = DefaultTorrentListCoordinator(
             splitViewController: splitViewController,
+            session: session,
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)

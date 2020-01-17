@@ -133,7 +133,7 @@ final class TorrentListViewController: UITableViewController {
         }
 
         private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
-            func showListForSelectedServer() {}
+            func showDefaultServer() {}
             func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
             func showSettings() {}
         }

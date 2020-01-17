@@ -102,7 +102,8 @@ final class SettingsViewController: UITableViewController {
         switch dataSource.itemIdentifier(for: indexPath) {
         case .changeServer:
             tableView.deselectRow(at: indexPath, animated: false)
-            viewModel.didSelectChangeServer()
+            guard let cell = tableView.cellForRow(at: indexPath) else { return }
+            viewModel.didSelectChangeServer(from: .view(cell, rect: cell.bounds))
         case .server:
             viewModel.didSelectServer(at: indexPath.row)
         case .addServer:
@@ -142,7 +143,7 @@ final class SettingsViewController: UITableViewController {
                 ]),
             ]).eraseToAnyPublisher()
 
-            func didSelectChangeServer() {}
+            func didSelectChangeServer(from source: PopoverSource) {}
             func didSelectServer(at index: Int) {}
             func didSelectAddServer() {}
         }

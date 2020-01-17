@@ -34,19 +34,21 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
 
     func start() {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
-        let navigatonController = UINavigationController(rootViewController: viewController)
-        navigationController = navigatonController
-        splitViewController.showDetailViewController(navigatonController, sender: nil)
+        let navigationController = UINavigationController(rootViewController: viewController)
+        self.navigationController = navigationController
+        splitViewController.showDetailViewController(navigationController, sender: nil)
     }
 
     func complete() {
-        if let navigatonController = navigationController?.navigationController {
-            navigatonController.popViewController(animated: true)
+        if let navigationController = navigationController?.navigationController {
+            navigationController.popViewController(animated: true)
         } else {
             let viewController = UIViewController()
             viewController.view.backgroundColor = .systemGroupedBackground
-            let navigatonController = UINavigationController(rootViewController: viewController)
-            splitViewController.showDetailViewController(navigatonController, sender: nil)
+            let navigationController = UINavigationController(rootViewController: viewController)
+            splitViewController.showDetailViewController(navigationController, sender: nil)
         }
+
+        didCompleteSubject.send(completion: .finished)
     }
 }

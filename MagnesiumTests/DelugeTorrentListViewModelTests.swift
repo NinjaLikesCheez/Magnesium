@@ -51,7 +51,7 @@ private final class MockCoordinator: TorrentListCoordinator {
     var childCoordinatorObservers: [AnyCancellable] = []
 
     func start() {}
-    func showListForSelectedServer() {}
+    func showDefaultServer() {}
     func showSettings() {}
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
         wasShowTorrentDetailCalled = true

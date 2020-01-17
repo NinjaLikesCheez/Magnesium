@@ -13,7 +13,17 @@ protocol PresentationCoordinator: Coordinator {
 }
 
 extension PresentationCoordinator {
-    func showAlert(_ alert: Alert) {
-        presentationViewController.present(alert.createAlertController(), animated: true, completion: nil)
+    func showAlert(_ alert: Alert, from source: PopoverSource? = nil) {
+        let alertController = alert.createAlertController()
+        switch source {
+        case let .view(view, rect: rect):
+            alertController.popoverPresentationController?.sourceView = view
+            alertController.popoverPresentationController?.sourceRect = rect
+        case let .barButton(barButtonItem):
+            alertController.popoverPresentationController?.barButtonItem = barButtonItem
+        case .none:
+            break
+        }
+        presentationViewController.present(alertController, animated: true, completion: nil)
     }
 }

@@ -11,16 +11,18 @@ import Preferences
 import UIKit
 
 protocol TorrentListCoordinator: Coordinator {
-    func showListForSelectedServer()
+    func showDefaultServer()
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel)
     func showSettings()
 }
 
 final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     private let splitViewController: UISplitViewController
+    private let session: Session
     private let preferences: Preferences
     private let didCompleteSubject = PassthroughSubject<Never, Never>()
     private var masterNavigationController: UINavigationController?
+    private var detailCoordinator: Coordinator?
     private var observers = [AnyCancellable]()
     var childCoordinators = [Coordinator]()
     var childCoordinatorObservers = [AnyCancellable]()
@@ -29,45 +31,50 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         return didCompleteSubject.eraseToAnyPublisher()
     }
 
-    init(splitViewController: UISplitViewController, preferences: Preferences) {
+    init(splitViewController: UISplitViewController, session: Session, preferences: Preferences) {
         self.splitViewController = splitViewController
+        self.session = session
         self.preferences = preferences
     }
 
     func start() {
         observers = []
-        preferences.selectedServerPublisher
+        masterNavigationController = UINavigationController()
+        masterNavigationController?.navigationBar.prefersLargeTitles = true
+        session.serverPublisher
             .sink { [weak self] in self?.start(with: $0) }
             .store(in: &observers)
     }
 
     private func start(with server: Server?) {
+        guard let masterNavigationController = masterNavigationController else { return }
+    
         let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
             ?? EmptyTorrentListViewModel(coordinator: self, preferences: preferences)
         let viewController = TorrentListViewController(viewModel: viewModel)
-
-        let navigationController = UINavigationController()
-        navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.setViewControllers([viewController], animated: true)
+        masterNavigationController.setViewControllers([viewController], animated: true)
 
         let detailViewController = UIViewController()
         detailViewController.view.backgroundColor = .systemGroupedBackground
         let detailNavigationController = UINavigationController(rootViewController: detailViewController)
-
-        splitViewController.viewControllers = [navigationController, detailNavigationController]
-        masterNavigationController = navigationController
+        splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
     }
 
-    func showListForSelectedServer() {
-        start()
+    func showDefaultServer() {
+        session.updateServerWithDefault()
     }
 
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
+        if let detailCoordinator = detailCoordinator {
+            removeChildCoordinator(childCoordinator: detailCoordinator)
+        }
+
         var viewModel = viewModel
         let coordinator = DefaultTorrentDetailCoordinator(
             viewModel: viewModel,
             splitViewController: splitViewController
         )
+        detailCoordinator = coordinator
         addChildCoordinator(childCoordinator: coordinator)
         viewModel.coordinator = coordinator
         coordinator.start()
@@ -76,11 +83,13 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     func showSettings() {
         let navigationController = UINavigationController()
         let coordinator = DefaultSettingsCoordinator(
-            navigatonController: navigationController,
+            navigationController: navigationController,
+            session: session,
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)
         coordinator.start()
+        navigationController.modalPresentationStyle = .formSheet
         splitViewController.present(navigationController, animated: true, completion: nil)
     }
 }

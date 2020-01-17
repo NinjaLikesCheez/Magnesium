@@ -220,7 +220,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     func didSelectMoreOptions(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.popoverSource = source
         alert.actions.append(AlertAction(title: "Force Recheck", style: .default) {
             self.client.recheck(hash: hash)
                 .collect()
@@ -233,7 +232,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .store(in: &self.observers)
         })
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
-        coordinator?.showAlert(alert)
+        coordinator?.showAlert(alert, from: source)
     }
 
     func didSelectPause() {
@@ -263,7 +262,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     func didSelectRemove(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.popoverSource = source
         alert.actions.append(AlertAction(title: "Keep Data", style: .default) {
             self.client.remove(hash: hash, removeData: false)
                 .collect()
@@ -293,7 +291,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .store(in: &self.observers)
         }))
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
-        coordinator?.showAlert(alert)
+        coordinator?.showAlert(alert, from: source)
     }
 
     private func dismiss() {
