@@ -1,5 +1,13 @@
+//
+//  Alert.swift
+//  Magnesium
+//
+//  Created by James Hurst on 2020-01-16.
+//  Copyright © 2020 James Hurst. All rights reserved.
+//
+
 /// A model describing an alert.
-public struct AlertModel {
+public struct Alert {
     /// The style of an alert.
     public enum Style {
         case actionSheet
@@ -13,7 +21,7 @@ public struct AlertModel {
     /// The alert's style.
     public var style: Style
     /// The alert's actions.
-    public var actions = [AlertActionModel]()
+    public var actions = [AlertAction]()
     /// The source to display the alert from in a popover presentation.
     public var popoverSource: PopoverSource?
 

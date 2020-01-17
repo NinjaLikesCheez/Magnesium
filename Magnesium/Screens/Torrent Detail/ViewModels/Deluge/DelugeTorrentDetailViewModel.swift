@@ -8,7 +8,6 @@
 
 import Combine
 import Foundation
-import Navigator
 import Preferences
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
@@ -24,8 +23,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
 
-    var navigator: Navigator?
     let sections: AnyPublisher<[TorrentDetailSection], Never>
+    weak var coordinator: TorrentDetailCoordinator?
 
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
@@ -220,9 +219,9 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectMoreOptions(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
-        var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.popoverSource = source
-        alert.actions.append(AlertActionModel(title: "Force Recheck", style: .default) {
+        alert.actions.append(AlertAction(title: "Force Recheck", style: .default) {
             self.client.recheck(hash: hash)
                 .collect()
                 .delay(
@@ -233,8 +232,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
-        alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
-        navigator?.present(AlertScreen(alert), animated: true)
+        alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
+        coordinator?.showAlert(alert)
     }
 
     func didSelectPause() {
@@ -263,9 +262,9 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectRemove(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
-        var alert = AlertModel(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.popoverSource = source
-        alert.actions.append(AlertActionModel(title: "Keep Data", style: .default) {
+        alert.actions.append(AlertAction(title: "Keep Data", style: .default) {
             self.client.remove(hash: hash, removeData: false)
                 .collect()
                 .delay(
@@ -279,7 +278,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
-        alert.actions.append(AlertActionModel(title: "Remove Data", style: .destructive, handler: {
+        alert.actions.append(AlertAction(title: "Remove Data", style: .destructive, handler: {
             self.client.remove(hash: hash, removeData: true)
                 .collect()
                 .delay(
@@ -293,15 +292,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         }))
-        alert.actions.append(AlertActionModel(title: "Cancel", style: .cancel, handler: nil))
-        navigator?.present(AlertScreen(alert), animated: true)
+        alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
+        coordinator?.showAlert(alert)
     }
 
     private func dismiss() {
-        guard let navigator = navigator else { return }
-        let dismissed = navigator.popNestedDetail(animated: true)
-        if !dismissed {
-            navigator.showDetail(Screens.torrentDetailEmpty)
-        }
+        coordinator?.complete()
     }
 }

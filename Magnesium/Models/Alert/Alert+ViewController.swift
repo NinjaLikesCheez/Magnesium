@@ -1,23 +1,22 @@
+//
+//  Alert+ViewController.swift
+//  Magnesium
+//
+//  Created by James Hurst on 2020-01-16.
+//  Copyright © 2020 James Hurst. All rights reserved.
+//
+
 import UIKit
 
-/// A screen that creates a UIAlertController from an AlertModel.
-public struct AlertScreen: Navigatable {
-    private let model: AlertModel
-
-    /// Creates a new alert screen with the given model.
-    /// - Parameter model: The model to use for the created alert.
-    public init(_ model: AlertModel) {
-        self.model = model
-    }
-
-    public func viewController() -> UIViewController? {
+extension Alert {
+    func createAlertController() -> UIAlertController {
         let alertController = UIAlertController(
-            title: model.title,
-            message: model.message,
-            preferredStyle: model.style.alertControllerStyle
+            title: title,
+            message: message,
+            preferredStyle: style.alertControllerStyle
         )
 
-        switch model.popoverSource {
+        switch popoverSource {
         case let .view(view, rect: rect):
             alertController.popoverPresentationController?.sourceView = view
             alertController.popoverPresentationController?.sourceRect = rect
@@ -27,7 +26,7 @@ public struct AlertScreen: Navigatable {
             break
         }
 
-        for action in model.actions {
+        for action in actions {
             alertController.addAction(UIAlertAction(
                 title: action.title,
                 style: action.style.alertActionStyle,
@@ -39,7 +38,7 @@ public struct AlertScreen: Navigatable {
     }
 }
 
-private extension AlertModel.Style {
+private extension Alert.Style {
     var alertControllerStyle: UIAlertController.Style {
         switch self {
         case .actionSheet:
@@ -50,7 +49,7 @@ private extension AlertModel.Style {
     }
 }
 
-private extension AlertActionModel.Style {
+private extension AlertAction.Style {
     var alertActionStyle: UIAlertAction.Style {
         switch self {
         case .default:

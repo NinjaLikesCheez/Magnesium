@@ -10,7 +10,7 @@ import Foundation
 import Preferences
 
 extension Server {
-    func listViewModel(preferences: Preferences) -> TorrentListViewModel? {
+    func listViewModel(coordinator: TorrentListCoordinator, preferences: Preferences) -> TorrentListViewModel? {
         switch type {
         case .deluge:
             guard let settings = try? JSONDecoder().decode(DelugeServerSettings.self, from: data) else {
@@ -20,7 +20,7 @@ extension Server {
                 baseURL: settings.url,
                 password: settings.password
             )
-            return DelugeTorrentListViewModel(client: client, preferences: preferences)
+            return DelugeTorrentListViewModel(coordinator: coordinator, client: client, preferences: preferences)
         }
     }
 }

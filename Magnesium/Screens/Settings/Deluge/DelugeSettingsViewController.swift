@@ -164,7 +164,7 @@ final class DelugeSettingsViewController: UITableViewController {
         static var previews: some View {
             let server = Server(name: "Deluge", type: .deluge, data: Data())
             let viewModel = DefaultDelugeSettingsViewModel(
-                navigator: PreviewNavigator(),
+                coordinator: PreviewAddServerCoordinator(),
                 preferences: PreviewPreferences(),
                 server: server
             )

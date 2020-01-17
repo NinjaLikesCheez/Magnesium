@@ -7,11 +7,10 @@
 //
 
 import Combine
-import Navigator
 import Preferences
 
 protocol TorrentListViewModel: AnyObject {
-    var navigator: Navigator? { get set }
+    var coordinator: TorrentListCoordinator? { get }
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> { get }
 
     func refresh() -> AnyPublisher<Never, Error>
@@ -19,14 +18,8 @@ protocol TorrentListViewModel: AnyObject {
     func didSelectItem(at index: Int)
 }
 
-protocol TorrentListViewModelExt: TorrentListViewModel {
-    var preferences: Preferences { get }
-}
-
-extension TorrentListViewModelExt {
+extension TorrentListViewModel {
     func didSelectSettings() {
-        let viewModel = DefaultSettingsViewModel(preferences: preferences)
-        let screen = NavigationControllerScreen(Screens.settings(viewModel: viewModel))
-        viewModel.navigator = navigator?.present(screen, animated: true)
+        coordinator?.showSettings()
     }
 }

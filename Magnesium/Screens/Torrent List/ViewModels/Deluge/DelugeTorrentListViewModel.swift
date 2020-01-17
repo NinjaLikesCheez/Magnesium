@@ -8,14 +8,14 @@
 
 import Combine
 import Foundation
-import Navigator
 import Preferences
 
-final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewModelExt, DelugeRefreshable {
+final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
     private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
     private typealias TorrentMap = [String: TorrentSubject]
 
     private let client: DelugeClient
+    private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -24,8 +24,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewMod
     private var labels = CurrentValueSubject<[String], Never>([])
     private var autoUpdateTimer: Timer?
 
-    let preferences: Preferences
-    var navigator: Navigator?
+    weak var coordinator: TorrentListCoordinator?
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
@@ -79,7 +78,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewMod
         }
     }
 
-    init(client: DelugeClient, preferences: Preferences) {
+    init(coordinator: TorrentListCoordinator, client: DelugeClient, preferences: Preferences) {
+        self.coordinator = coordinator
         self.client = client
         self.preferences = preferences
         torrentSubjects = CurrentValueSubject([])
@@ -167,7 +167,6 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, TorrentListViewMod
             preferences: preferences,
             refresher: self
         )
-        let screen = NavigationControllerScreen(Screens.torrentDetail(viewModel: viewModel))
-        viewModel.navigator = navigator?.showDetail(screen)
+        coordinator?.showTorrentDetail(viewModel)
     }
 }

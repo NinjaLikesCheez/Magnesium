@@ -63,7 +63,7 @@ final class AddServerViewController: UITableViewController {
         }
 
         static var previews: some View {
-            let viewModel = DefaultAddServerViewModel(navigator: PreviewNavigator(), preferences: PreviewPreferences())
+            let viewModel = DefaultAddServerViewModel(coordinator: PreviewAddServerCoordinator())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

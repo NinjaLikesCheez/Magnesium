@@ -125,8 +125,17 @@ final class SettingsViewController: UITableViewController {
             ) {}
         }
 
+        private final class Coordinator: PreviewCoordinator, SettingsCoordinator {
+            func complete() {}
+            func showServerSettings(_ server: Server) {}
+            func showAddServer() {}
+        }
+
         static var previews: some View {
-            let viewModel = DefaultSettingsViewModel(preferences: PreviewPreferences())
+            let viewModel = DefaultSettingsViewModel(
+                coordinator: Coordinator(),
+                preferences: PreviewPreferences()
+            )
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

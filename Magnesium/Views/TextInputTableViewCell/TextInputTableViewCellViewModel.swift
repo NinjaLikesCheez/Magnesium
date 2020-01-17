@@ -20,3 +20,15 @@ protocol TextInputTableViewCellViewModel {
     var textContentType: UITextContentType? { get }
     var autocapitalizationType: UITextAutocapitalizationType { get }
 }
+
+struct DefaultTextInputTableViewCellViewModel: TextInputTableViewCellViewModel {
+    var name: String
+    var placeholder: String
+    var value: CurrentValueSubject<String?, Never>
+    var isEnabled: AnyPublisher<Bool, Never> = Just(true).eraseToAnyPublisher()
+    var isSecure: Bool = false
+    var keyboardType: UIKeyboardType = .default
+    var returnKeyType: UIReturnKeyType = .default
+    var textContentType: UITextContentType?
+    var autocapitalizationType: UITextAutocapitalizationType = .sentences
+}

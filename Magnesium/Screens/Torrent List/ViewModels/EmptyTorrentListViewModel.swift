@@ -7,15 +7,15 @@
 //
 
 import Combine
-import Navigator
 import Preferences
 
-final class EmptyTorrentListViewModel: TorrentListViewModel, TorrentListViewModelExt {
+final class EmptyTorrentListViewModel: TorrentListViewModel {
+    private let preferences: Preferences
     private var observers = [AnyCancellable]()
-    let preferences: Preferences
-    var navigator: Navigator?
+    weak var coordinator: TorrentListCoordinator?
 
-    init(preferences: Preferences) {
+    init(coordinator: TorrentListCoordinator, preferences: Preferences) {
+        self.coordinator = coordinator
         self.preferences = preferences
         preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
             .sink { [weak self] _ in self?.serversChanged() }
@@ -27,7 +27,6 @@ final class EmptyTorrentListViewModel: TorrentListViewModel, TorrentListViewMode
     }
 
     func refresh() -> AnyPublisher<Never, Error> {
-        // noop
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
@@ -36,6 +35,6 @@ final class EmptyTorrentListViewModel: TorrentListViewModel, TorrentListViewMode
     }
 
     private func serversChanged() {
-        navigator?.showFirstServer(preferences: preferences)
+        coordinator?.showListForSelectedServer()
     }
 }

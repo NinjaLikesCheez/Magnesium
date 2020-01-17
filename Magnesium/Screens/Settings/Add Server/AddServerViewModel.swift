@@ -10,3 +10,23 @@ protocol AddServerViewModel {
     var types: [String] { get }
     func didSelectType(at index: Int)
 }
+
+final class DefaultAddServerViewModel: AddServerViewModel {
+    private weak var coordinator: AddServerCoordinator?
+
+    private var serverTypes: [ServerType] = [
+        .deluge,
+    ]
+
+    var types: [String] {
+        return serverTypes.map { $0.displayString }
+    }
+
+    init(coordinator: AddServerCoordinator) {
+        self.coordinator = coordinator
+    }
+
+    func didSelectType(at index: Int) {
+        coordinator?.showServerSettings(for: serverTypes[index])
+    }
+}

@@ -7,7 +7,6 @@
 //
 
 @testable import Magnesium
-import Navigator
 import Preferences
 import XCTest
 

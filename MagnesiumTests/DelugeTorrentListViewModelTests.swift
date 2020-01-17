@@ -8,34 +8,29 @@
 
 import Combine
 @testable import Magnesium
-import Navigator
 import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
     func testSelectionNavigatesToDetail() {
-        let navigator = MockDetailNavigator()
-        let viewModel = DelugeTorrentListViewModel(client: MockDelugeClient(), preferences: MockPreferences())
-        viewModel.navigator = navigator
+        let coordinator = MockCoordinator()
+        let viewModel = DelugeTorrentListViewModel(
+            coordinator: coordinator,
+            client: MockDelugeClient(),
+            preferences: MockPreferences()
+        )
         viewModel.didSelectItem(at: 0)
-
-        XCTAssertNotNil(navigator.detail)
-
-        let detail = navigator.detail
-        guard let navigationScreen = detail as? NavigationControllerScreen else {
-            XCTFail("Expected NavigationControllerScreen, instead got \(type(of: detail))")
-            return
-        }
-
-        guard case Screens.torrentDetail = navigationScreen.root else {
-            XCTFail("Expected Screens.Torrents.detail, instead got \(type(of: navigationScreen.root))")
-            return
-        }
+        XCTAssertTrue(coordinator.wasShowTorrentDetailCalled)
     }
 
     func testAutoUpdate() {
+        let coordinator = MockCoordinator()
         let client = MockDelugeClient()
-        let viewModel = DelugeTorrentListViewModel(client: client, preferences: MockPreferences())
+        let viewModel = DelugeTorrentListViewModel(
+            coordinator: coordinator,
+            client: client,
+            preferences: MockPreferences()
+        )
         _ = viewModel
         client.resetRequests()
 
@@ -46,6 +41,20 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 2)
+    }
+}
+
+private final class MockCoordinator: TorrentListCoordinator {
+    let didComplete: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    private(set) var wasShowTorrentDetailCalled = false
+    var childCoordinators: [Coordinator] = []
+    var childCoordinatorObservers: [AnyCancellable] = []
+
+    func start() {}
+    func showListForSelectedServer() {}
+    func showSettings() {}
+    func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
+        wasShowTorrentDetailCalled = true
     }
 }
 
@@ -143,49 +152,4 @@ private final class MockPreferences: Preferences {
     func set<T>(_ value: T, for key: PreferenceKey<T>) {}
     func containsValue<T>(for key: PreferenceKey<T>) -> Bool { return false }
     func removeValue<T>(for key: PreferenceKey<T>) {}
-}
-
-private final class MockDetailNavigator: Navigator {
-    var detail: Navigatable?
-
-    func push(_ navigatable: Navigatable, animated: Bool) {
-        XCTFail()
-    }
-
-    func pop(animated: Bool) {
-        XCTFail()
-    }
-
-    func popToRoot(animated: Bool) {
-        XCTFail()
-    }
-
-    func present(
-        _ navigatable: Navigatable,
-        style: PresentationStyle,
-        animated: Bool,
-        completion: (() -> Void)?
-    ) -> Navigator? {
-        XCTFail()
-        return nil
-    }
-
-    func dismiss(animated: Bool, completion: (() -> Void)?) {
-        XCTFail()
-    }
-
-    func showMaster(_ navigatable: Navigatable) -> Navigator? {
-        XCTFail()
-        return nil
-    }
-
-    func showDetail(_ navigatable: Navigatable) -> Navigator? {
-        detail = navigatable
-        return nil
-    }
-
-    func popNestedDetail(animated: Bool) -> Bool {
-        XCTFail()
-        return false
-    }
 }

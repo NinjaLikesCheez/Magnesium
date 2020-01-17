@@ -132,8 +132,14 @@ final class TorrentListViewController: UITableViewController {
             ) {}
         }
 
+        private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
+            func showListForSelectedServer() {}
+            func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
+            func showSettings() {}
+        }
+
         static var previews: some View {
-            let viewModel = EmptyTorrentListViewModel(preferences: PreviewPreferences())
+            let viewModel = EmptyTorrentListViewModel(coordinator: Coordinator(), preferences: PreviewPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

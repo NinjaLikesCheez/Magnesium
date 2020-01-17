@@ -8,14 +8,14 @@
 
 import Combine
 import Foundation
-import Navigator
 import Preferences
 
-final class TransmissionTorrentListViewModel: TorrentListViewModel, TorrentListViewModelExt {
+final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private typealias TorrentSubject = CurrentValueSubject<TransmissionTorrent, Never>
     private typealias TorrentMap = [Int: TorrentSubject]
 
     private let client: TransmissionClient
+    private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var torrentMap: CurrentValueSubject<TorrentMap, Never>
     private var torrentMapObserver: AnyCancellable?
@@ -23,8 +23,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel, TorrentListV
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var autoUpdateTimer: Timer?
 
-    let preferences: Preferences
-    var navigator: Navigator?
+    weak var coordinator: TorrentListCoordinator?
+
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
             .combineLatest(sortOption)
@@ -76,7 +76,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel, TorrentListV
         }
     }
 
-    init(client: TransmissionClient, preferences: Preferences) {
+    init(coordinator: TorrentListCoordinator, client: TransmissionClient, preferences: Preferences) {
+        self.coordinator = coordinator
         self.client = client
         self.preferences = preferences
         torrentSubjects = CurrentValueSubject([])

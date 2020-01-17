@@ -6,11 +6,11 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Navigator
 import Preferences
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    private var coordinator: AppCoordinator!
     var window: UIWindow?
 
     func scene(
@@ -29,28 +29,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
 
-        let preferences = UserDefaultsPreferences()
-        _ = try? preferences.registerDefault(2, for: PreferenceKeys.autoRefreshInterval)
-
-        let viewModel = preferences.getServers()
-            .compactMap { $0.listViewModel(preferences: preferences) }
-            .last
-            ?? EmptyTorrentListViewModel(preferences: preferences)
-
-        let splitViewController = SplitViewController()
-        let screen = NavigationControllerScreen(Screens.torrentList(viewModel: viewModel))
-        let navigationController = screen.viewController()!
-        viewModel.navigator = DefaultNavigator(viewController: navigationController)
-        splitViewController.viewControllers = [
-            navigationController,
-            Screens.torrentDetailEmpty.viewController()!,
-        ]
-
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = splitViewController
             self.window = window
-            window.makeKeyAndVisible()
+            coordinator = AppCoordinator(window: window)
+            coordinator.start()
         }
     }
 }
