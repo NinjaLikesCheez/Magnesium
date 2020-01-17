@@ -10,11 +10,14 @@ import Combine
 import UIKit
 
 #if DEBUG
+    class PreviewPresentable: Presentable {
+        let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    }
+
     class PreviewCoordinator: Coordinator, PresentationCoordinator {
-        let didComplete: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
         let presentationViewController = UIViewController()
         var childCoordinators: [Coordinator] = []
         var childCoordinatorObservers: [AnyCancellable] = []
-        func start() {}
+        func start() -> Presentable { return PreviewPresentable() }
     }
 #endif

@@ -17,13 +17,8 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
     private let navigationController: UINavigationController
     private let presenter: UIViewController
     private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Never, Never>()
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
-
-    var didComplete: AnyPublisher<Never, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
-    }
 
     var presentationViewController: UIViewController {
         return navigationController
@@ -41,7 +36,7 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
         self.preferences = preferences
     }
 
-    func start() {
+    func start() -> Presentable {
         switch server.type {
         case .deluge:
             let viewModel = DefaultDelugeSettingsViewModel(
@@ -51,12 +46,12 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
             )
             let viewController = DelugeSettingsViewController(viewModel: viewModel)
             navigationController.pushViewController(viewController, animated: true)
+            return viewController
         }
     }
 
     func complete() {
         navigationController.popToViewController(presenter, animated: true)
-        didCompleteSubject.send(completion: .finished)
     }
 
     func showServerSettings(for type: ServerType) {

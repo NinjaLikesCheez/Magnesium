@@ -18,13 +18,8 @@ final class DefaultAddServerCoordinator: AddServerCoordinator {
     private let navigationController: UINavigationController
     private let presenter: UIViewController
     private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Never, Never>()
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
-
-    var didComplete: AnyPublisher<Never, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
-    }
 
     var presentationViewController: UIViewController {
         return navigationController
@@ -36,15 +31,15 @@ final class DefaultAddServerCoordinator: AddServerCoordinator {
         self.preferences = preferences
     }
 
-    func start() {
+    func start() -> Presentable {
         let viewModel = DefaultAddServerViewModel(coordinator: self)
         let viewController = AddServerViewController(viewModel: viewModel)
         navigationController.pushViewController(viewController, animated: true)
+        return viewController
     }
 
     func complete() {
         navigationController.popToViewController(presenter, animated: true)
-        didCompleteSubject.send(completion: .finished)
     }
 
     func showServerSettings(for type: ServerType) {

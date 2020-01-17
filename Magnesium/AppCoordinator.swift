@@ -11,6 +11,10 @@ import Preferences
 import UIKit
 
 final class AppCoordinator: Coordinator {
+    private class AppPresentable: Presentable {
+        let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    }
+
     private let window: UIWindow
     private lazy var session: Session = DefaultSession(preferences: preferences)
 
@@ -20,7 +24,6 @@ final class AppCoordinator: Coordinator {
         return preferences
     }()
 
-    let didComplete: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
 
@@ -28,7 +31,7 @@ final class AppCoordinator: Coordinator {
         self.window = window
     }
 
-    func start() {
+    func start() -> Presentable {
         let splitViewController = SplitViewController()
         window.rootViewController = splitViewController
         let coordinator = DefaultTorrentListCoordinator(
@@ -37,7 +40,8 @@ final class AppCoordinator: Coordinator {
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)
-        coordinator.start()
+        startChildCoordinator(childCoordinator: coordinator)
         window.makeKeyAndVisible()
+        return AppPresentable()
     }
 }

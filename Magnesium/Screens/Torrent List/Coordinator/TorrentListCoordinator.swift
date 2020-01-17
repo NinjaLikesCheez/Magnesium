@@ -20,16 +20,10 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     private let splitViewController: UISplitViewController
     private let session: Session
     private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Never, Never>()
     private var masterNavigationController: UINavigationController?
-    private var detailCoordinator: Coordinator?
     private var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
-    var childCoordinatorObservers = [AnyCancellable]()
-
-    var didComplete: AnyPublisher<Never, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
-    }
+    var childCoordinators: [Coordinator] = []
+    var childCoordinatorObservers: [AnyCancellable] = []
 
     init(splitViewController: UISplitViewController, session: Session, preferences: Preferences) {
         self.splitViewController = splitViewController
@@ -37,18 +31,20 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         self.preferences = preferences
     }
 
-    func start() {
+    func start() -> Presentable {
         observers = []
-        masterNavigationController = UINavigationController()
-        masterNavigationController?.navigationBar.prefersLargeTitles = true
+        let masterNavigationController = PresentableNavigationController()
+        masterNavigationController.navigationBar.prefersLargeTitles = true
+        self.masterNavigationController = masterNavigationController
         session.serverPublisher
             .sink { [weak self] in self?.start(with: $0) }
             .store(in: &observers)
+        return masterNavigationController
     }
 
     private func start(with server: Server?) {
         guard let masterNavigationController = masterNavigationController else { return }
-    
+
         let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
             ?? EmptyTorrentListViewModel(coordinator: self, preferences: preferences)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -65,19 +61,14 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     }
 
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
-        if let detailCoordinator = detailCoordinator {
-            removeChildCoordinator(childCoordinator: detailCoordinator)
-        }
-
         var viewModel = viewModel
         let coordinator = DefaultTorrentDetailCoordinator(
             viewModel: viewModel,
             splitViewController: splitViewController
         )
-        detailCoordinator = coordinator
-        addChildCoordinator(childCoordinator: coordinator)
         viewModel.coordinator = coordinator
-        coordinator.start()
+        addChildCoordinator(childCoordinator: coordinator)
+        startChildCoordinator(childCoordinator: coordinator)
     }
 
     func showSettings() {
@@ -88,7 +79,7 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)
-        coordinator.start()
+        startChildCoordinator(childCoordinator: coordinator)
         navigationController.modalPresentationStyle = .formSheet
         splitViewController.present(navigationController, animated: true, completion: nil)
     }

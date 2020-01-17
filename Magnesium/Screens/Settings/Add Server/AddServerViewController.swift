@@ -9,7 +9,7 @@
 import SwiftUI
 import UIKit
 
-final class AddServerViewController: UITableViewController {
+final class AddServerViewController: PresentableTableViewController {
     private let viewModel: AddServerViewModel
 
     init(viewModel: AddServerViewModel) {

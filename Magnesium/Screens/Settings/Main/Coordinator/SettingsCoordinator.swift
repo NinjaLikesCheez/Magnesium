@@ -19,13 +19,8 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
     private let navigationController: UINavigationController
     private let session: Session
     private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Never, Never>()
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
-
-    var didComplete: AnyPublisher<Never, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
-    }
 
     var presentationViewController: UIViewController {
         return navigationController
@@ -37,15 +32,15 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
         self.preferences = preferences
     }
 
-    func start() {
+    func start() -> Presentable {
         let viewModel = DefaultSettingsViewModel(coordinator: self, session: session, preferences: preferences)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: true)
+        return viewController
     }
 
     func complete() {
         navigationController.dismiss(animated: true, completion: nil)
-        didCompleteSubject.send(completion: .finished)
     }
 
     func showServerSettings(_ server: Server) {
@@ -57,7 +52,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)
-        coordinator.start()
+        startChildCoordinator(childCoordinator: coordinator)
     }
 
     func showAddServer() {
@@ -68,6 +63,6 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
             preferences: preferences
         )
         addChildCoordinator(childCoordinator: coordinator)
-        coordinator.start()
+        startChildCoordinator(childCoordinator: coordinator)
     }
 }

@@ -11,8 +11,7 @@ import Combine
 protocol Coordinator: AnyObject {
     var childCoordinators: [Coordinator] { get set }
     var childCoordinatorObservers: [AnyCancellable] { get set }
-    var didComplete: AnyPublisher<Never, Never> { get }
-    func start()
+    func start() -> Presentable
     func complete()
 }
 
@@ -21,8 +20,13 @@ extension Coordinator {
 
     func addChildCoordinator(childCoordinator: Coordinator) {
         childCoordinators.append(childCoordinator)
-        childCoordinator.didComplete
-            .sink(receiveCompletion: { [weak self] _ in
+    }
+
+    func startChildCoordinator(childCoordinator: Coordinator) {
+        childCoordinator.start()
+            .didDismiss
+            .sink(receiveCompletion: { [weak self, weak childCoordinator] _ in
+                guard let childCoordinator = childCoordinator else { return }
                 self?.removeChildCoordinator(childCoordinator: childCoordinator)
             }, receiveValue: { _ in })
             .store(in: &childCoordinatorObservers)

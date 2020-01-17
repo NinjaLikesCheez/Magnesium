@@ -107,14 +107,9 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         }
 
         autoUpdateTimer?.invalidate()
-        let timer = Timer(
-            fireAt: Date().advanced(by: interval),
-            interval: interval,
-            target: self,
-            selector: #selector(updateTimerFired(_:)),
-            userInfo: nil,
-            repeats: true
-        )
+        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
+            self?.updateTimerFired($0)
+        }
         RunLoop.main.add(timer, forMode: .common)
         autoUpdateTimer = timer
     }

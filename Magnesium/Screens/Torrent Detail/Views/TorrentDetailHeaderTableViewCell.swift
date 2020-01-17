@@ -186,7 +186,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &observers)
 
         viewModel.isActive
-            .assign(to: \.isActive, on: self)
+            .sink(receiveValue: { [weak self] in self?.isActive = $0 })
             .store(in: &observers)
 
         viewModel.progress

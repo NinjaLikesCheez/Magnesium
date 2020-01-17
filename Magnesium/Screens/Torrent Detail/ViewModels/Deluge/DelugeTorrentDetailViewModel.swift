@@ -166,14 +166,9 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         }
 
         autoUpdateTimer?.invalidate()
-        let timer = Timer(
-            fireAt: Date().advanced(by: interval),
-            interval: interval,
-            target: self,
-            selector: #selector(updateTimerFired(_:)),
-            userInfo: nil,
-            repeats: true
-        )
+        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
+            self?.updateTimerFired($0)
+        }
         RunLoop.main.add(timer, forMode: .common)
         autoUpdateTimer = timer
     }
@@ -271,8 +266,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 )
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
-                .sink(receiveCompletion: { _ in
-                    self.dismiss()
+                .sink(receiveCompletion: { [weak self] _ in
+                    self?.coordinator?.complete()
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
@@ -285,16 +280,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 )
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
-                .sink(receiveCompletion: { _ in
-                    self.dismiss()
+                .sink(receiveCompletion: { [weak self] _ in
+                    self?.coordinator?.complete()
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         }))
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
         coordinator?.showAlert(alert, from: source)
-    }
-
-    private func dismiss() {
-        coordinator?.complete()
     }
 }

@@ -14,14 +14,9 @@ protocol TorrentDetailCoordinator: PresentationCoordinator {}
 final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
     private let viewModel: TorrentDetailViewModel
     private let splitViewController: UISplitViewController
-    private let didCompleteSubject = PassthroughSubject<Never, Never>()
     private var navigationController: UINavigationController?
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
-
-    var didComplete: AnyPublisher<Never, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
-    }
 
     var presentationViewController: UIViewController {
         return navigationController ?? splitViewController
@@ -32,11 +27,12 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
         self.splitViewController = splitViewController
     }
 
-    func start() {
+    func start() -> Presentable {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
-        let navigationController = UINavigationController(rootViewController: viewController)
+        let navigationController = PresentableNavigationController(rootViewController: viewController)
         self.navigationController = navigationController
         splitViewController.showDetailViewController(navigationController, sender: nil)
+        return navigationController
     }
 
     func complete() {
@@ -48,7 +44,5 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
             let navigationController = UINavigationController(rootViewController: viewController)
             splitViewController.showDetailViewController(navigationController, sender: nil)
         }
-
-        didCompleteSubject.send(completion: .finished)
     }
 }

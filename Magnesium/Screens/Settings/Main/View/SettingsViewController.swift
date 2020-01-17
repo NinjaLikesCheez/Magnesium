@@ -10,7 +10,7 @@ import Combine
 import SwiftUI
 import UIKit
 
-final class SettingsViewController: UITableViewController {
+final class SettingsViewController: PresentableTableViewController {
     private class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {

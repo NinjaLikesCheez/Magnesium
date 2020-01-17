@@ -33,7 +33,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let window = UIWindow(windowScene: windowScene)
             self.window = window
             coordinator = AppCoordinator(window: window)
-            coordinator.start()
+            _ = coordinator.start()
         }
     }
 }

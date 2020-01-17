@@ -10,7 +10,7 @@ import Combine
 import SwiftUI
 import UIKit
 
-final class DelugeSettingsViewController: UITableViewController {
+final class DelugeSettingsViewController: PresentableTableViewController {
     private enum Section: Int {
         case settings
         case delete
