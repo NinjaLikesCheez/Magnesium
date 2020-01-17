@@ -76,7 +76,7 @@ final class DefaultSettingsViewModel: SettingsViewModel {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         for server in servers {
             alert.actions.append(AlertAction(title: server.name, style: .default, handler: { [weak self] in
-                self?.session.server = server
+                self?.session.setServer(server)
             }))
         }
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))

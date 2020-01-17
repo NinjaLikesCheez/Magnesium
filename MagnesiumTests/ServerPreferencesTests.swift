@@ -28,7 +28,7 @@ class ServerPreferencesTests: XCTestCase {
     func testAddServer() {
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
-        XCTAssertEqual(preferences.getServers()[0].id, server.id)
+        XCTAssertEqual(preferences.getServers()[0], server)
     }
 
     func testRemoveServer() {
@@ -56,7 +56,7 @@ class ServerPreferencesTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         let observer = preferences.serverUpdatedPublisher(for: server)
             .sink { updated in
-                XCTAssertEqual(updated?.id, self.server.id)
+                XCTAssertEqual(updated, self.server)
                 expectation.fulfill()
             }
         _ = observer
@@ -65,7 +65,7 @@ class ServerPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testServerUpdatedPublisherEmitsValueWithUpdatedServer() {
+    func testServerUpdatedPublisherEmitsUpdatedServer() {
         preferences.addOrUpdate(server: server)
 
         let expectation = self.expectation(description: "Value received")

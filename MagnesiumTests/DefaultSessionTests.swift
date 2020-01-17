@@ -12,9 +12,10 @@ import Preferences
 import XCTest
 
 class DefaultSessionTests: XCTestCase {
-    let session: Session = DefaultSession(preferences: MockPreferences())
+    private let preferences: Preferences = MockPreferences()
+    lazy var session: Session = DefaultSession(preferences: preferences)
 
-    func testServerSubjectHasInitialValue() {
+    func testServerPublisherHasInitialValue() {
         let expectation = self.expectation(description: "Value received")
         let observer = session.serverPublisher
             .sink { _ in
@@ -24,20 +25,103 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func testServerSubjectEmitsValueOnChange() {
+    func testServerPublisherEmitsOnAddFirstServer() {
         let server = Server(name: "Server", type: .deluge, data: Data())
 
         let expectation = self.expectation(description: "Value received")
         let observer = session.serverPublisher
             .dropFirst()
             .sink { new in
-                XCTAssertEqual(server.id, new?.id)
+                XCTAssertEqual(new, server)
                 expectation.fulfill()
             }
         _ = observer
 
-        session.server = server
+        preferences.addOrUpdate(server: server)
+        XCTAssertEqual(session.server, server)
+        waitForExpectations(timeout: 1)
+    }
 
+    func testServerPublisherEmitsOnUpdateServer() {
+        var server = Server(name: "Server", type: .deluge, data: Data())
+        preferences.addOrUpdate(server: server)
+
+        let expectation = self.expectation(description: "Value received")
+        let observer = session.serverPublisher
+            .dropFirst()
+            .sink { new in
+                XCTAssertEqual(new?.id, server.id)
+                XCTAssertEqual(new?.name, "New Name")
+                expectation.fulfill()
+            }
+        _ = observer
+
+        server.name = "New Name"
+        preferences.addOrUpdate(server: server)
+        XCTAssertEqual(session.server, server)
+        waitForExpectations(timeout: 1)
+    }
+
+    func testServerPublisherEmitsNextServerOnDelete() {
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        preferences.addOrUpdate(server: firstServer)
+        preferences.addOrUpdate(server: secondServer)
+
+        let expectation = self.expectation(description: "Value received")
+        let observer = session.serverPublisher
+            .dropFirst()
+            .sink { new in
+                XCTAssertEqual(new, secondServer)
+                expectation.fulfill()
+            }
+        _ = observer
+
+        XCTAssertEqual(session.server, firstServer)
+        preferences.remove(server: firstServer)
+        XCTAssertEqual(session.server, secondServer)
+        waitForExpectations(timeout: 1)
+    }
+
+    func testServerPublisherDoesNotEmitOnPreferenceChange() throws {
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        preferences.addOrUpdate(server: firstServer)
+        preferences.addOrUpdate(server: secondServer)
+
+        let expectation = self.expectation(description: "Value received")
+        expectation.isInverted = true
+        let observer = session.serverPublisher
+            .dropFirst()
+            .sink { _ in
+                expectation.fulfill()
+            }
+        _ = observer
+
+        XCTAssertEqual(session.server, firstServer)
+        try preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
+        XCTAssertEqual(session.server, firstServer)
+        waitForExpectations(timeout: 1)
+    }
+
+    func testServerPublisherEmitsOnServerChange() throws {
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        preferences.addOrUpdate(server: firstServer)
+        preferences.addOrUpdate(server: secondServer)
+
+        let expectation = self.expectation(description: "Value received")
+        let observer = session.serverPublisher
+            .dropFirst()
+            .sink { new in
+                XCTAssertEqual(new, secondServer)
+                expectation.fulfill()
+            }
+        _ = observer
+
+        XCTAssertEqual(session.server, firstServer)
+        session.setServer(secondServer)
+        XCTAssertEqual(session.server, secondServer)
         waitForExpectations(timeout: 1)
     }
 }
