@@ -22,14 +22,14 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private var torrentSubjects: CurrentValueSubject<[TorrentSubject], Never>
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var autoUpdateTimer: Timer?
-
-    weak var coordinator: TorrentListCoordinator?
+    private(set) weak var coordinator: TorrentListCoordinator?
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects
             .combineLatest(sortOption)
             .map { TransmissionTorrentListViewModel.sort($0, using: $1) }
             .map { $0.map { TransmissionTorrentListItemViewModel(torrentSubject: $0).eraseToAny() } }
+            .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
     }
@@ -105,14 +105,9 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
         }
 
         autoUpdateTimer?.invalidate()
-        let timer = Timer(
-            fireAt: Date().advanced(by: interval),
-            interval: interval,
-            target: self,
-            selector: #selector(updateTimerFired(_:)),
-            userInfo: nil,
-            repeats: true
-        )
+        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
+            self?.updateTimerFired($0)
+        }
         RunLoop.main.add(timer, forMode: .common)
         autoUpdateTimer = timer
     }

@@ -16,6 +16,7 @@ final class DefaultAddServerViewModel: AddServerViewModel {
 
     private var serverTypes: [ServerType] = [
         .deluge,
+        .transmission,
     ]
 
     var types: [String] {

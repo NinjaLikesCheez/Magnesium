@@ -12,12 +12,19 @@ import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
+    private let preferences: Preferences = MockPreferences()
+
+    override func setUp() {
+        super.setUp()
+        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
+    }
+
     func testSelectionNavigatesToDetail() {
         let coordinator = MockCoordinator()
         let viewModel = DelugeTorrentListViewModel(
             coordinator: coordinator,
             client: MockDelugeClient(),
-            preferences: MockPreferences()
+            preferences: preferences
         )
         viewModel.didSelectItem(at: 0)
         XCTAssertTrue(coordinator.wasShowTorrentDetailCalled)
@@ -29,7 +36,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         let viewModel = DelugeTorrentListViewModel(
             coordinator: coordinator,
             client: client,
-            preferences: MockPreferences()
+            preferences: preferences
         )
         _ = viewModel
         client.resetRequests()
@@ -45,13 +52,15 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 }
 
 private final class MockCoordinator: TorrentListCoordinator {
-    let didComplete: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    private final class MockPresentable: Presentable {
+        let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    }
+
     private(set) var wasShowTorrentDetailCalled = false
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
 
-    func start() {}
-    func showDefaultServer() {}
+    func start() -> Presentable { return MockPresentable() }
     func showSettings() {}
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
         wasShowTorrentDetailCalled = true
@@ -132,24 +141,4 @@ private final class MockDelugeClient: DelugeClient {
         XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
-}
-
-private final class MockPreferences: Preferences {
-    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
-        return Empty().eraseToAnyPublisher()
-    }
-
-    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {}
-
-    func value<T>(for key: PreferenceKey<T>) -> T? {
-        if key.value == PreferenceKeys.autoRefreshInterval.value {
-            return TimeInterval(1) as? T
-        }
-
-        return nil
-    }
-
-    func set<T>(_ value: T, for key: PreferenceKey<T>) {}
-    func containsValue<T>(for key: PreferenceKey<T>) -> Bool { return false }
-    func removeValue<T>(for key: PreferenceKey<T>) {}
 }

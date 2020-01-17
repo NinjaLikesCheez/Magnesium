@@ -29,8 +29,7 @@ final class DefaultSettingsViewModel: SettingsViewModel {
     private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
-
-    weak var coordinator: SettingsCoordinator?
+    private(set) weak var coordinator: SettingsCoordinator?
 
     var sections: AnyPublisher<[SettingsSection], Never> {
         return sectionsSubject

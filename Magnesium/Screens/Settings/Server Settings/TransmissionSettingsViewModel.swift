@@ -1,8 +1,8 @@
 //
-//  DelugeSettingsViewModel.swift
+//  TransmissionSettingsViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2020-01-14.
+//  Created by James Hurst on 2020-01-17.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
@@ -10,18 +10,7 @@ import Combine
 import Foundation
 import Preferences
 
-protocol DelugeSettingsViewModel {
-    var title: String { get }
-    var saveButtonTitle: String { get }
-    var canDelete: Bool { get }
-    var isLoading: AnyPublisher<Bool, Never> { get }
-    var isSaveButtonEnabled: AnyPublisher<Bool, Never> { get }
-    var inputs: [TextInputTableViewCellViewModel] { get }
-    func didSelectSave()
-    func didSelectDelete()
-}
-
-final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
+final class TransmissionSettingsViewModel: ServerSettingsViewModel {
     private weak var coordinator: ServerSettingsCoordinator?
     private let preferences: Preferences
     private let server: Server?
@@ -29,9 +18,9 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
     private var observers = [AnyCancellable]()
 
-    private lazy var settings: DelugeServerSettings? = {
+    private lazy var settings: TransmissionServerSettings? = {
         return (server?.data).flatMap { data in
-            try? JSONDecoder().decode(DelugeServerSettings.self, from: data)
+            try? JSONDecoder().decode(TransmissionServerSettings.self, from: data)
         }
     }()
 
@@ -46,7 +35,7 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
     private lazy var nameViewModel: DefaultTextInputTableViewCellViewModel = {
         return DefaultTextInputTableViewCellViewModel(
             name: "name",
-            placeholder: "Deluge",
+            placeholder: "Transmission",
             value: nameValue,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
             returnKeyType: .next
@@ -73,8 +62,28 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
         )
     }()
 
+    private lazy var usernameValue: CurrentValueSubject<String?, Never> = {
+        return CurrentValueSubject(settings?.authentication?.username)
+    }()
+
+    private lazy var usernameEnabled: CurrentValueSubject<Bool, Never> = {
+        return CurrentValueSubject(true)
+    }()
+
+    private lazy var usernameViewModel: DefaultTextInputTableViewCellViewModel = {
+        return DefaultTextInputTableViewCellViewModel(
+            name: "username",
+            placeholder: "user (optional)",
+            value: usernameValue,
+            isEnabled: usernameEnabled.eraseToAnyPublisher(),
+            isSecure: true,
+            returnKeyType: .next,
+            autocapitalizationType: .none
+        )
+    }()
+
     private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.password)
+        return CurrentValueSubject(settings?.authentication?.password)
     }()
 
     private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
@@ -84,7 +93,7 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
     private lazy var passwordViewModel: DefaultTextInputTableViewCellViewModel = {
         return DefaultTextInputTableViewCellViewModel(
             name: "password",
-            placeholder: "password",
+            placeholder: "password (optional)",
             value: passwordValue,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
             isSecure: true,
@@ -117,7 +126,7 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
     }
 
     var inputs: [TextInputTableViewCellViewModel] {
-        return [nameViewModel, serverViewModel, passwordViewModel]
+        return [nameViewModel, serverViewModel, usernameViewModel, passwordViewModel]
     }
 
     init(coordinator: ServerSettingsCoordinator, preferences: Preferences, server: Server? = nil) {
@@ -125,19 +134,17 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
         self.preferences = preferences
         self.server = server
         nameValue
-            .combineLatest(serverValue, passwordValue)
-            .map { name, server, password in
+            .combineLatest(serverValue)
+            .map { name, server in
                 guard
                     let name = name,
                     let server = server,
-                    let serverURL = URL(string: server),
-                    let password = password
+                    let serverURL = URL(string: server)
                 else {
                     return false
                 }
                 return !name.isEmpty
                     && ["http", "https"].contains(serverURL.scheme) && serverURL.host != nil
-                    && !password.isEmpty
             }
             .removeDuplicates()
             .assign(to: \.value, on: isSaveButtonEnabledSubject)
@@ -154,21 +161,30 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
     func didSelectSave() {
         guard isSaveButtonEnabledSubject.value,
             let name = nameValue.value,
-            let url = serverValue.value.flatMap({ URL(string: $0) }),
-            let password = passwordValue.value
+            let url = serverValue.value.flatMap({ URL(string: $0) })
         else {
             return
         }
 
+        var authentication: TransmissionClient.Authentication?
+        if let username = usernameValue.value, let password = passwordValue.value {
+            authentication = TransmissionClient.Authentication(username: username, password: password)
+        }
+
         isLoadingSubject.send(true)
-        let client = DefaultDelugeClient(baseURL: url, password: password)
-        client.authenticate()
+        let client = TransmissionClient(baseURL: url, authentication: authentication)
+        client.getTorrents()
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:
                     do {
-                        let settings = DelugeServerSettings(url: url, password: password)
+                        let settings = TransmissionServerSettings(
+                            url: url,
+                            authentication: authentication.map {
+                                TransmissionServerSettings.Authentication(username: $0.username, password: $0.password)
+                            }
+                        )
                         try self?.saveServer(name: name, settings: settings)
                     } catch {
                         self?.displayError(error, title: "Unable to Add Server")
@@ -181,19 +197,19 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
             .store(in: &observers)
     }
 
-    private func saveServer(name: String, settings: DelugeServerSettings) throws {
+    private func saveServer(name: String, settings: TransmissionServerSettings) throws {
         let data = try JSONEncoder().encode(settings)
         if var server = server {
             server.name = name
             server.data = data
             preferences.addOrUpdate(server: server)
         } else {
-            preferences.addOrUpdate(server: Server(name: name, type: .deluge, data: data))
+            preferences.addOrUpdate(server: Server(name: name, type: .transmission, data: data))
         }
         coordinator?.complete()
     }
 
-    func didSelectDelete() {
+    func didSelectDelete(from source: PopoverSource) {
         var alert = Alert(title: nil, message: "Are you sure you want to delete this server?", style: .actionSheet)
         alert.actions.append(AlertAction(title: "Delete Server", style: .destructive, handler: { [weak self] in
             guard let server = self?.server else { return }
@@ -201,10 +217,10 @@ final class DefaultDelugeSettingsViewModel: DelugeSettingsViewModel {
             self?.coordinator?.complete()
         }))
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
-        coordinator?.showAlert(alert)
+        coordinator?.showAlert(alert, from: source)
     }
 
-    private func displayError(_ error: DelugeClientError) {
+    private func displayError(_ error: TransmissionClientError) {
         let message: String
         switch error {
         case .unauthenticated:

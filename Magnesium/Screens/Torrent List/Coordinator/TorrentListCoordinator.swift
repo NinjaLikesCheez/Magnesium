@@ -11,7 +11,6 @@ import Preferences
 import UIKit
 
 protocol TorrentListCoordinator: Coordinator {
-    func showDefaultServer()
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel)
     func showSettings()
 }
@@ -46,18 +45,14 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         guard let masterNavigationController = masterNavigationController else { return }
 
         let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
-            ?? EmptyTorrentListViewModel(coordinator: self, preferences: preferences)
+            ?? EmptyTorrentListViewModel(coordinator: self)
         let viewController = TorrentListViewController(viewModel: viewModel)
-        masterNavigationController.setViewControllers([viewController], animated: true)
+        masterNavigationController.setViewControllers([viewController], animated: false)
 
         let detailViewController = UIViewController()
         detailViewController.view.backgroundColor = .systemGroupedBackground
         let detailNavigationController = UINavigationController(rootViewController: detailViewController)
         splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
-    }
-
-    func showDefaultServer() {
-        session.updateServerWithDefault()
     }
 
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {

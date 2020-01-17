@@ -59,6 +59,7 @@ final class TorrentListViewController: UITableViewController {
             return cell
         }
 
+        dataSource.defaultRowAnimation = .fade
         tableView.dataSource = dataSource
 
         viewModel.items
@@ -133,13 +134,12 @@ final class TorrentListViewController: UITableViewController {
         }
 
         private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
-            func showDefaultServer() {}
             func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
             func showSettings() {}
         }
 
         static var previews: some View {
-            let viewModel = EmptyTorrentListViewModel(coordinator: Coordinator(), preferences: PreviewPreferences())
+            let viewModel = EmptyTorrentListViewModel(coordinator: Coordinator())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

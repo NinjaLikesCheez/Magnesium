@@ -23,8 +23,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private var sortOption = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
     private var labels = CurrentValueSubject<[String], Never>([])
     private var autoUpdateTimer: Timer?
-
-    weak var coordinator: TorrentListCoordinator?
+    private(set) weak var coordinator: TorrentListCoordinator?
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
         return torrentSubjects

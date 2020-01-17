@@ -21,6 +21,17 @@ extension Server {
                 password: settings.password
             )
             return DelugeTorrentListViewModel(coordinator: coordinator, client: client, preferences: preferences)
+        case .transmission:
+            guard let settings = try? JSONDecoder().decode(TransmissionServerSettings.self, from: data) else {
+                return nil
+            }
+            let client = TransmissionClient(
+                baseURL: settings.url,
+                authentication: settings.authentication.map {
+                    TransmissionClient.Authentication(username: $0.username, password: $0.password)
+                }
+            )
+            return TransmissionTorrentListViewModel(coordinator: coordinator, client: client, preferences: preferences)
         }
     }
 }

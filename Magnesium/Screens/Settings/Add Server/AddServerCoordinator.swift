@@ -43,11 +43,15 @@ final class DefaultAddServerCoordinator: AddServerCoordinator {
     }
 
     func showServerSettings(for type: ServerType) {
+        let viewModel: ServerSettingsViewModel
         switch type {
         case .deluge:
-            let viewModel = DefaultDelugeSettingsViewModel(coordinator: self, preferences: preferences)
-            let viewController = DelugeSettingsViewController(viewModel: viewModel)
-            navigationController.pushViewController(viewController, animated: true)
+            viewModel = DelugeSettingsViewModel(coordinator: self, preferences: preferences)
+        case .transmission:
+            viewModel = TransmissionSettingsViewModel(coordinator: self, preferences: preferences)
         }
+
+        let viewController = ServerSettingsViewController(viewModel: viewModel)
+        navigationController.pushViewController(viewController, animated: true)
     }
 }

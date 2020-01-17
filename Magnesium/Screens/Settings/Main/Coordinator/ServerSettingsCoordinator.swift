@@ -37,29 +37,20 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
     }
 
     func start() -> Presentable {
+        let viewModel: ServerSettingsViewModel
         switch server.type {
         case .deluge:
-            let viewModel = DefaultDelugeSettingsViewModel(
-                coordinator: self,
-                preferences: preferences,
-                server: server
-            )
-            let viewController = DelugeSettingsViewController(viewModel: viewModel)
-            navigationController.pushViewController(viewController, animated: true)
-            return viewController
+            viewModel = DelugeSettingsViewModel(coordinator: self, preferences: preferences, server: server)
+        case .transmission:
+            viewModel = TransmissionSettingsViewModel(coordinator: self, preferences: preferences, server: server)
         }
+
+        let viewController = ServerSettingsViewController(viewModel: viewModel)
+        navigationController.pushViewController(viewController, animated: true)
+        return viewController
     }
 
     func complete() {
         navigationController.popToViewController(presenter, animated: true)
-    }
-
-    func showServerSettings(for type: ServerType) {
-        switch type {
-        case .deluge:
-            let viewModel = DefaultDelugeSettingsViewModel(coordinator: self, preferences: preferences)
-            let viewController = DelugeSettingsViewController(viewModel: viewModel)
-            navigationController.pushViewController(viewController, animated: true)
-        }
     }
 }

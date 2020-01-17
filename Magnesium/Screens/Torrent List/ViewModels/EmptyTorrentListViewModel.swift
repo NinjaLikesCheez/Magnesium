@@ -10,16 +10,10 @@ import Combine
 import Preferences
 
 final class EmptyTorrentListViewModel: TorrentListViewModel {
-    private let preferences: Preferences
-    private var observers = [AnyCancellable]()
-    weak var coordinator: TorrentListCoordinator?
+    var coordinator: TorrentListCoordinator?
 
-    init(coordinator: TorrentListCoordinator, preferences: Preferences) {
+    init(coordinator: TorrentListCoordinator) {
         self.coordinator = coordinator
-        self.preferences = preferences
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
-            .sink { [weak self] _ in self?.serversChanged() }
-            .store(in: &observers)
     }
 
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
@@ -32,9 +26,5 @@ final class EmptyTorrentListViewModel: TorrentListViewModel {
 
     func didSelectItem(at index: Int) {
         // noop
-    }
-
-    private func serversChanged() {
-        coordinator?.showDefaultServer()
     }
 }

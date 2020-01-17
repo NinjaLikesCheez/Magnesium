@@ -11,7 +11,9 @@ import Foundation
 import Preferences
 
 struct Server: Codable, Equatable {
-    fileprivate(set) var id = UUID()
+    // swiftlint:disable:next type_name
+    typealias ID = String
+    fileprivate(set) var id: ID = UUID().uuidString
     var name: String
     var type: ServerType
     var data: Data
@@ -25,11 +27,14 @@ struct Server: Codable, Equatable {
 
 enum ServerType: String, Codable {
     case deluge
+    case transmission
 
     var displayString: String {
         switch self {
         case .deluge:
             return "Deluge"
+        case .transmission:
+            return "Transmission"
         }
     }
 }
@@ -44,12 +49,14 @@ extension Preferences {
         _ = try? set(server.id, for: PreferenceKeys.selectedServerID)
     }
 
-    func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server, Never> {
+    func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
         return valueUpdatedPublisher(for: PreferenceKeys.servers)
-            .compactMap { servers -> Server? in
-                servers?.first(where: { $0.id == server.id })
+            .map { servers -> Server? in
+                servers?.first { $0.id == server.id }
             }
+            .prepend(getServers().first { $0.id == server.id })
             .removeDuplicates()
+            .dropFirst()
             .eraseToAnyPublisher()
     }
 

@@ -37,7 +37,7 @@ final class TransmissionClient {
     }()
 
     var baseURL: URL
-    var authentication: Authentication?
+    var authentication: Authentication? // TODO: actually use this
 
     init(baseURL: URL, authentication: Authentication?) {
         self.baseURL = baseURL

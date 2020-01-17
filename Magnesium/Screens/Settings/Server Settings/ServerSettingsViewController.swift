@@ -1,5 +1,5 @@
 //
-//  DelugeSettingsViewController.swift
+//  ServerSettingsViewController.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-12.
@@ -10,19 +10,13 @@ import Combine
 import SwiftUI
 import UIKit
 
-final class DelugeSettingsViewController: PresentableTableViewController {
+final class ServerSettingsViewController: PresentableTableViewController {
     private enum Section: Int {
         case settings
         case delete
     }
 
-    private enum SettingsRow: Int, CaseIterable {
-        case name
-        case server
-        case password
-    }
-
-    private let viewModel: DelugeSettingsViewModel
+    private let viewModel: ServerSettingsViewModel
     private var observers = [AnyCancellable]()
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
@@ -40,7 +34,7 @@ final class DelugeSettingsViewController: PresentableTableViewController {
         return UIBarButtonItem(customView: activityView)
     }()
 
-    init(viewModel: DelugeSettingsViewModel) {
+    init(viewModel: ServerSettingsViewModel) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         isModalInPresentation = true
@@ -95,11 +89,12 @@ final class DelugeSettingsViewController: PresentableTableViewController {
 
             cell.configure(with: viewModel.inputs[indexPath.row])
             cell.proceedToNextInput = { [weak self] in
-                if indexPath.row < SettingsRow.allCases.count - 1 {
+                guard let strongSelf = self else { return }
+                if indexPath.row < strongSelf.viewModel.inputs.count - 1 {
                     let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
-                    self?.tableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
+                    strongSelf.tableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
                 } else {
-                    self?.performSave()
+                    strongSelf.performSave()
                 }
             }
             return cell
@@ -126,7 +121,8 @@ final class DelugeSettingsViewController: PresentableTableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
 
         if indexPath.section == Section.delete.rawValue {
-            viewModel.didSelectDelete()
+            guard let cell = tableView.cellForRow(at: indexPath) else { return }
+            viewModel.didSelectDelete(from: .view(cell, rect: cell.bounds))
         }
     }
 
@@ -151,7 +147,7 @@ final class DelugeSettingsViewController: PresentableTableViewController {
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
             ) -> UINavigationController {
-                let viewController = DelugeSettingsViewController(viewModel: viewModel)
+                let viewController = ServerSettingsViewController(viewModel: viewModel)
                 return UINavigationController(rootViewController: viewController)
             }
 
@@ -163,7 +159,7 @@ final class DelugeSettingsViewController: PresentableTableViewController {
 
         static var previews: some View {
             let server = Server(name: "Deluge", type: .deluge, data: Data())
-            let viewModel = DefaultDelugeSettingsViewModel(
+            let viewModel = DelugeSettingsViewModel(
                 coordinator: PreviewAddServerCoordinator(),
                 preferences: PreviewPreferences(),
                 server: server

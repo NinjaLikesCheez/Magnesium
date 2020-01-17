@@ -41,15 +41,3 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 }
-
-private final class MockPreferences: Preferences {
-    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
-        return Empty().eraseToAnyPublisher()
-    }
-
-    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {}
-    func value<T>(for key: PreferenceKey<T>) -> T? { return nil }
-    func set<T>(_ value: T, for key: PreferenceKey<T>) {}
-    func containsValue<T>(for key: PreferenceKey<T>) -> Bool { return false }
-    func removeValue<T>(for key: PreferenceKey<T>) {}
-}

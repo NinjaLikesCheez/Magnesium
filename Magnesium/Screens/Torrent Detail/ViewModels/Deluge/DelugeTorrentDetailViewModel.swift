@@ -66,10 +66,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         fileMap: FileMap?
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
-        sections.append(.init(type: .header, items: [
+        sections.append(TorrentDetailSection(type: .header, items: [
             .header(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject).eraseToAny()),
         ]))
-        sections.append(.init(type: .info, items: [
+        sections.append(TorrentDetailSection(type: .info, items: [
             .info(TorrentDetailInfoViewModel(
                 name: "Size",
                 value: torrentSubject
@@ -138,7 +138,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         ]))
 
         if !torrent.trackers.isEmpty {
-            sections.append(.init(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
+            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
         }
 
         if let fileMap = fileMap {
@@ -152,7 +152,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .map {
                     TorrentDetailItem.file(DelugeTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
                 }
-            sections.append(.init(type: .files, items: items))
+            sections.append(TorrentDetailSection(type: .files, items: items))
         }
 
         return sections
