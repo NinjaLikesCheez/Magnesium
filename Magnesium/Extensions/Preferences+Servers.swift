@@ -35,12 +35,36 @@ enum ServerType: String, Codable {
 }
 
 extension Preferences {
+    var selectedServerPublisher: AnyPublisher<Server?, Never> {
+        return valuePublisher(for: PreferenceKeys.servers)
+            .combineLatest(valuePublisher(for: PreferenceKeys.selectedServerID))
+            .map { servers, selectedServerID -> Server? in
+                return servers?.first { $0.id == selectedServerID } ?? servers?.first
+            }
+            .eraseToAnyPublisher()
+    }
+
+    private func updateSelectedServerID() {
+        guard let server = getSelectedServer() else {
+            removeValue(for: PreferenceKeys.selectedServerID)
+            return
+        }
+
+        _ = try? set(server.id, for: PreferenceKeys.selectedServerID)
+    }
+
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server, Never> {
         return valueUpdatedPublisher(for: PreferenceKeys.servers)
             .compactMap { servers -> Server? in
                 servers?.first(where: { $0.id == server.id })
             }
             .eraseToAnyPublisher()
+    }
+
+    func getSelectedServer() -> Server? {
+        let servers = getServers()
+        guard let selectedServerID = try? value(for: PreferenceKeys.selectedServerID) else { return servers.first }
+        return servers.first { $0.id == selectedServerID } ?? servers.first
     }
 
     func getServers() -> [Server] {
@@ -57,15 +81,18 @@ extension Preferences {
         }
 
         _ = try? set(servers, for: PreferenceKeys.servers)
+        updateSelectedServerID()
     }
 
     func remove(server: Server) {
         var servers = getServers()
         servers.removeAll { $0.id == server.id }
         _ = try? set(servers, for: PreferenceKeys.servers)
+        updateSelectedServerID()
     }
 
     func removeServers() {
         removeValue(for: PreferenceKeys.servers)
+        removeValue(for: PreferenceKeys.selectedServerID)
     }
 }

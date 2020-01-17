@@ -48,7 +48,8 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
             server: server,
             navigationController: navigatonController,
             presenter: presenter,
-            preferences: preferences)
+            preferences: preferences
+        )
         addChildCoordinator(childCoordinator: coordinator)
         coordinator.start()
     }

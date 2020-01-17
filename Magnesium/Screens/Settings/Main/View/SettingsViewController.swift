@@ -11,22 +11,15 @@ import SwiftUI
 import UIKit
 
 final class SettingsViewController: UITableViewController {
-    private class DataSource: UITableViewDiffableDataSource<Section, Row> {
+    private class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {
+            case .changeServer:
+                return nil
             case .servers:
                 return "Servers"
             }
         }
-    }
-
-    private enum Section: Hashable {
-        case servers
-    }
-
-    private enum Row: Hashable {
-        case server(id: AnyHashable, name: String)
-        case addServer
     }
 
     private let viewModel: SettingsViewModel
@@ -54,6 +47,15 @@ final class SettingsViewController: UITableViewController {
 
         dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
             switch item {
+            case let .changeServer(name):
+                var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "detail")
+                if cell == nil {
+                    cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
+                }
+                cell.textLabel?.text = "Selected Server"
+                cell.detailTextLabel?.text = name
+                cell.accessoryType = .disclosureIndicator
+                return cell
             case let .server(id: _, name: name):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
                 cell.textLabel?.text = name
@@ -69,9 +71,9 @@ final class SettingsViewController: UITableViewController {
 
         tableView.dataSource = dataSource
 
-        viewModel.servers
-            .sink { [weak self] servers in
-                self?.update(servers: servers)
+        viewModel.sections
+            .sink { [weak self] sections in
+                self?.update(sections: sections)
             }
             .store(in: &observers)
     }
@@ -80,11 +82,12 @@ final class SettingsViewController: UITableViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func update(servers: [(id: AnyHashable, name: String)]?) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Row>()
-        snapshot.appendSections([Section.servers])
-        snapshot.appendItems(servers?.map { Row.server(id: $0.0, name: $0.1) } ?? [], toSection: .servers)
-        snapshot.appendItems([Row.addServer], toSection: .servers)
+    private func update(sections: [SettingsSection]) {
+        var snapshot = NSDiffableDataSourceSnapshot<SettingsSectionType, SettingsItem>()
+        for section in sections {
+            snapshot.appendSections([section.type])
+            snapshot.appendItems(section.items, toSection: section.type)
+        }
         dataSource.apply(snapshot, animatingDifferences: false)
     }
 
@@ -97,6 +100,9 @@ final class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch dataSource.itemIdentifier(for: indexPath) {
+        case .changeServer:
+            tableView.deselectRow(at: indexPath, animated: false)
+            viewModel.didSelectChangeServer()
         case .server:
             viewModel.didSelectServer(at: indexPath.row)
         case .addServer:
@@ -125,17 +131,24 @@ final class SettingsViewController: UITableViewController {
             ) {}
         }
 
-        private final class Coordinator: PreviewCoordinator, SettingsCoordinator {
-            func complete() {}
-            func showServerSettings(_ server: Server) {}
-            func showAddServer() {}
+        private final class ViewModel: SettingsViewModel {
+            var coordinator: SettingsCoordinator?
+
+            var sections: AnyPublisher<[SettingsSection], Never> = Just([
+                SettingsSection(type: .changeServer, items: [.changeServer("Desktop")]),
+                SettingsSection(type: .servers, items: [
+                    .server(id: 0, name: "Desktop"),
+                    .addServer,
+                ]),
+            ]).eraseToAnyPublisher()
+
+            func didSelectChangeServer() {}
+            func didSelectServer(at index: Int) {}
+            func didSelectAddServer() {}
         }
 
         static var previews: some View {
-            let viewModel = DefaultSettingsViewModel(
-                coordinator: Coordinator(),
-                preferences: PreviewPreferences()
-            )
+            let viewModel = ViewModel()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

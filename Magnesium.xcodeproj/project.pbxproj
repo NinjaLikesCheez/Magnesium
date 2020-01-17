@@ -41,6 +41,8 @@
 		E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233FB23CFF9C300038D30 /* AddServerViewController.swift */; };
 		E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */; };
 		E976FA44237E3647006B9DA9 /* ByteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E976FA43237E3647006B9DA9 /* ByteFormatter.swift */; };
+		E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97750E923D1686F00264638 /* SettingsSection.swift */; };
+		E97750ED23D1688500264638 /* SettingsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97750EC23D1688500264638 /* SettingsItem.swift */; };
 		E97B543123B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */; };
 		E97B543323B547EC006FFCC9 /* TorrentDetailInfoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543223B547EC006FFCC9 /* TorrentDetailInfoViewModel.swift */; };
 		E97B543623B581B7006FFCC9 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543523B581B7006FFCC9 /* SplitViewController.swift */; };
@@ -134,6 +136,8 @@
 		E97233FB23CFF9C300038D30 /* AddServerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewController.swift; sourceTree = "<group>"; };
 		E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailTrackerTableViewCell.swift; sourceTree = "<group>"; };
 		E976FA43237E3647006B9DA9 /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
+		E97750E923D1686F00264638 /* SettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
+		E97750EC23D1688500264638 /* SettingsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsItem.swift; sourceTree = "<group>"; };
 		E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSectionHeaderView.swift; sourceTree = "<group>"; };
 		E97B543223B547EC006FFCC9 /* TorrentDetailInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailInfoViewModel.swift; sourceTree = "<group>"; };
 		E97B543523B581B7006FFCC9 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
@@ -228,10 +232,10 @@
 		E90DC4F423CEC09400FB53E6 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				E9B7D5C423D15ECD0025FFA8 /* ServerSettingsCoordinator.swift */,
-				E94C28A323D14D13006F26D2 /* SettingsCoordinator.swift */,
-				E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */,
-				E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */,
+				E97750EF23D1689E00264638 /* Coordinator */,
+				E97750EB23D1687200264638 /* Model */,
+				E97750EE23D1689700264638 /* View */,
+				E97750F023D168AC00264638 /* ViewModel */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -374,6 +378,40 @@
 				E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		E97750EB23D1687200264638 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E97750E923D1686F00264638 /* SettingsSection.swift */,
+				E97750EC23D1688500264638 /* SettingsItem.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		E97750EE23D1689700264638 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		E97750EF23D1689E00264638 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				E94C28A323D14D13006F26D2 /* SettingsCoordinator.swift */,
+				E9B7D5C423D15ECD0025FFA8 /* ServerSettingsCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		E97750F023D168AC00264638 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		E97B543423B581AC006FFCC9 /* Views */ = {
@@ -718,6 +756,7 @@
 				E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */,
 				E99FC26023D1479E0019A992 /* Alert.swift in Sources */,
 				E99FC25623D1389B0019A992 /* Coordinator.swift in Sources */,
+				E97750ED23D1688500264638 /* SettingsItem.swift in Sources */,
 				E9B40E9423B3FFFD009E30AE /* AnyTorrentDetailHeaderViewModel.swift in Sources */,
 				E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModel.swift in Sources */,
 				E9A0BD9323D0040300AEC254 /* AddServerViewModel.swift in Sources */,
@@ -745,6 +784,7 @@
 				E9C39AE023CC27A800BB3556 /* TextInputTableViewCellViewModel.swift in Sources */,
 				E9B40EA223B4057C009E30AE /* TorrentDetailInfoTableViewCell.swift in Sources */,
 				E9B7D5C123D15BDA0025FFA8 /* PreviewAddServerCoordinator.swift in Sources */,
+				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
 				E97B543623B581B7006FFCC9 /* SplitViewController.swift in Sources */,
 				E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */,
 				E93F5D6D23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift in Sources */,

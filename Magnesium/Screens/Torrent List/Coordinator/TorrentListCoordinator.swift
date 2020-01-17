@@ -19,10 +19,11 @@ protocol TorrentListCoordinator: Coordinator {
 final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     private let splitViewController: UISplitViewController
     private let preferences: Preferences
-    private var masterNavigationController: UINavigationController?
     private let didCompleteSubject = PassthroughSubject<Never, Never>()
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    private var masterNavigationController: UINavigationController?
+    private var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
+    var childCoordinatorObservers = [AnyCancellable]()
 
     var didComplete: AnyPublisher<Never, Never> {
         return didCompleteSubject.eraseToAnyPublisher()
@@ -34,11 +35,26 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     }
 
     func start() {
-        let viewController = TorrentListViewController(viewModel: torrentListViewModel())
+        observers = []
+        preferences.selectedServerPublisher
+            .sink { [weak self] in self?.start(with: $0) }
+            .store(in: &observers)
+    }
+
+    private func start(with server: Server?) {
+        let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
+            ?? EmptyTorrentListViewModel(coordinator: self, preferences: preferences)
+        let viewController = TorrentListViewController(viewModel: viewModel)
+
         let navigationController = UINavigationController()
         navigationController.navigationBar.prefersLargeTitles = true
         navigationController.setViewControllers([viewController], animated: true)
-        splitViewController.viewControllers = [navigationController, emptyDetailViewController()]
+
+        let detailViewController = UIViewController()
+        detailViewController.view.backgroundColor = .systemGroupedBackground
+        let detailNavigationController = UINavigationController(rootViewController: detailViewController)
+
+        splitViewController.viewControllers = [navigationController, detailNavigationController]
         masterNavigationController = navigationController
     }
 
@@ -66,18 +82,5 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         addChildCoordinator(childCoordinator: coordinator)
         coordinator.start()
         splitViewController.present(navigationController, animated: true, completion: nil)
-    }
-
-    private func emptyDetailViewController() -> UIViewController {
-        let viewController = UIViewController()
-        viewController.view.backgroundColor = .systemGroupedBackground
-        return UINavigationController(rootViewController: viewController)
-    }
-
-    private func torrentListViewModel() -> TorrentListViewModel {
-        return preferences.getServers()
-            .compactMap { $0.listViewModel(coordinator: self, preferences: preferences) }
-            .last
-            ?? EmptyTorrentListViewModel(coordinator: self, preferences: preferences)
     }
 }
