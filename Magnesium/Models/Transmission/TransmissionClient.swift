@@ -75,6 +75,8 @@ final class TransmissionClient {
                     switch response.statusCode {
                     case 200 ..< 300:
                         break
+                    case 401:
+                        return Fail(error: .unauthenticated).eraseToAnyPublisher()
                     case 409:
                         guard handleSessionID,
                             let sessionID = response.allHeaderFields[Headers.sessionID] as? String

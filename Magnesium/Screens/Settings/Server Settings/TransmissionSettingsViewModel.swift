@@ -173,7 +173,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
 
         isLoadingSubject.send(true)
         let client = TransmissionClient(baseURL: url, authentication: authentication)
-        client.getTorrents()
+        client.getTorrents() // TODO: use simple auth methods
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
