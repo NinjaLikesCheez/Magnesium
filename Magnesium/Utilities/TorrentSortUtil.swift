@@ -51,8 +51,16 @@ enum TorrentSortUtil {
             case .orderedDescending:
                 return sortOption.direction == .descending
             case .orderedSame:
-                if obj1.name != obj2.name {
-                    return obj1.name < obj2.name
+                if sortOption.property != .name {
+                    let result = obj1.name.compare(obj2.name, options: [.numeric, .caseInsensitive])
+                    switch result {
+                    case .orderedAscending:
+                        return true
+                    case .orderedDescending:
+                        return false
+                    case .orderedSame:
+                        break
+                    }
                 }
 
                 return obj1.hash < obj2.hash
