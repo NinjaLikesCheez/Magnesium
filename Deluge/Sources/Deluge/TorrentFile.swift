@@ -11,9 +11,9 @@ public struct TorrentFile {
     /// The file's current progress.
     public let progress: Float
     /// The file's download priority.
-    public let priority: Int
+    public let priority: Priority
 
-    public init(name: String, index: Int, path: String, size: Int64, progress: Float, priority: Int) {
+    public init(name: String, index: Int, path: String, size: Int64, progress: Float, priority: Priority) {
         self.name = name
         self.index = index
         self.path = path
@@ -39,6 +39,6 @@ extension TorrentFile {
         self.path = path
         self.size = size
         self.progress = progress
-        self.priority = priority
+        self.priority = Priority(priority)
     }
 }

@@ -1,5 +1,5 @@
 /// A priority value for Deluge downloads.
-public struct Priority: RawRepresentable, Codable, Equatable, Hashable {
+public struct Priority: RawRepresentable, Equatable, Hashable {
     public static let low = Priority(1)
     public static let normal = Priority(4)
     public static let high = Priority(7)
