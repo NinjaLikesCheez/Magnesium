@@ -6,6 +6,8 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
+import Coordinator
+
 protocol AddServerViewModel {
     var types: [String] { get }
     func didSelectType(at index: Int)

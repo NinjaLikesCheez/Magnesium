@@ -8,14 +8,14 @@
 
 import Combine
 
-protocol Coordinator: AnyObject {
+public protocol Coordinator: AnyObject {
     var childCoordinators: [Coordinator] { get set }
     var childCoordinatorObservers: [AnyCancellable] { get set }
     func start() -> Presentable
     func complete()
 }
 
-extension Coordinator {
+public extension Coordinator {
     func complete() {}
 
     func addChildCoordinator(childCoordinator: Coordinator) {

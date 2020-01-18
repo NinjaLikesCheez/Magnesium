@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension UIViewController {
+public extension UIViewController {
     var isBeingDismissedForCoordinator: Bool {
         var navigationControllerIsDismissing: Bool = false
         if let navigationController = navigationController {

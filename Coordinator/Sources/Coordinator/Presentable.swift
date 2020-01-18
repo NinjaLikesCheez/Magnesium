@@ -8,6 +8,6 @@
 
 import Combine
 
-protocol Presentable {
+public protocol Presentable {
     var didDismiss: AnyPublisher<Never, Never> { get }
 }

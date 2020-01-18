@@ -1,5 +1,5 @@
 //
-//  PresentableViewController.swift
+//  PresentableTableViewController.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-17.
@@ -9,13 +9,14 @@
 import Combine
 import UIKit
 
-class PresentableViewController: UIViewController, Presentable {
+open class PresentableTableViewController: UITableViewController, Presentable {
     private let didDismissSubject = PassthroughSubject<Never, Never>()
-    var didDismiss: AnyPublisher<Never, Never> {
+
+    open var didDismiss: AnyPublisher<Never, Never> {
         return didDismissSubject.eraseToAnyPublisher()
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isBeingDismissedForCoordinator {
             didDismissSubject.send(completion: .finished)

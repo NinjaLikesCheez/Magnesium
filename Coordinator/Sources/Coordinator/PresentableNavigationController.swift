@@ -9,14 +9,14 @@
 import Combine
 import UIKit
 
-class PresentableNavigationController: UINavigationController, Presentable {
+open class PresentableNavigationController: UINavigationController, Presentable {
     private let didDismissSubject = PassthroughSubject<Never, Never>()
 
-    var didDismiss: AnyPublisher<Never, Never> {
+    open var didDismiss: AnyPublisher<Never, Never> {
         return didDismissSubject.eraseToAnyPublisher()
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isBeingDismissedForCoordinator {
             didDismissSubject.send(completion: .finished)
