@@ -1,7 +1,10 @@
 included:
   - Magnesium
   - MagnesiumTests
-  - Navigator
+  - Coordinator
+  - Preferences
+  - Deluge
+  - Transmission
 
 disabled_rules:
   - cyclomatic_complexity

@@ -1,3 +1,3 @@
 # Coordinator
 
-A description of this package.
+A coordinator interface that uses Combine.

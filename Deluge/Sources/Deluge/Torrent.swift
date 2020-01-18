@@ -18,19 +18,19 @@ public struct Torrent {
     public let name: String
     /// The torrent's current state.
     public let state: State
-    /// The date this torrent was added to the server.
+    /// The date the torrent was added to the server.
     public let dateAdded: Date
-    /// The torrent's current download rate.
+    /// The torrent's current download rate in bytes/s.
     public let downloadRate: Int
-    /// The torrent's current upload rate.
+    /// The torrent's current upload rate in bytes/s.
     public let uploadRate: Int
     /// The torrent's current ETA.
     public let eta: TimeInterval
     /// The torrent's current progress.
     public let progress: Float
-    /// The amount of data currently downloaded for this torrent in bytes.
+    /// The amount of data currently downloaded for the torrent in bytes.
     public let downloaded: Int64
-    /// The amount of data currently uploaded for this torrent in bytes.
+    /// The amount of data currently uploaded for the torrent in bytes.
     public let uploaded: Int64
     /// The size of the torrent in bytes.
     public let size: Int64
@@ -46,6 +46,44 @@ public struct Torrent {
     public let trackers: [String]
     /// The torrent's label.
     public let label: String
+
+    public init(
+        hash: String,
+        name: String,
+        state: State,
+        dateAdded: Date,
+        downloadRate: Int,
+        uploadRate: Int,
+        eta: TimeInterval,
+        progress: Float,
+        downloaded: Int64,
+        uploaded: Int64,
+        size: Int64,
+        seeds: Int,
+        totalSeeds: Int,
+        peers: Int,
+        totalPeers: Int,
+        trackers: [String],
+        label: String
+    ) {
+        self.hash = hash
+        self.name = name
+        self.state = state
+        self.dateAdded = dateAdded
+        self.downloadRate = downloadRate
+        self.uploadRate = uploadRate
+        self.eta = eta
+        self.progress = progress
+        self.downloaded = downloaded
+        self.uploaded = uploaded
+        self.size = size
+        self.seeds = seeds
+        self.totalSeeds = totalSeeds
+        self.peers = peers
+        self.totalPeers = totalPeers
+        self.trackers = trackers
+        self.label = label
+    }
 }
 
 extension Torrent {

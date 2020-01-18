@@ -16,7 +16,7 @@ open class PresentableTableViewController: UITableViewController, Presentable {
         return didDismissSubject.eraseToAnyPublisher()
     }
 
-    open override func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isBeingDismissedForCoordinator {
             didDismissSubject.send(completion: .finished)

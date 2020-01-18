@@ -1,3 +1,3 @@
 # Deluge
 
-A description of this package.
+An API client to interact with a Deluge server.

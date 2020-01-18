@@ -11,7 +11,7 @@ import Foundation
 import Preferences
 
 final class TransmissionTorrentListViewModel: TorrentListViewModel {
-    private let client: TransmissionClient
+    private let client: DefaultTransmissionClient
     private let preferences: Preferences
     private let torrents = TorrentSubjectMapManager<Int, TransmissionTorrent>()
     private var observers = [AnyCancellable]()
@@ -19,7 +19,7 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private(set) weak var coordinator: TorrentListCoordinator?
     let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
 
-    init(coordinator: TorrentListCoordinator, client: TransmissionClient, preferences: Preferences) {
+    init(coordinator: TorrentListCoordinator, client: DefaultTransmissionClient, preferences: Preferences) {
         self.coordinator = coordinator
         self.client = client
         self.preferences = preferences
@@ -61,8 +61,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             .store(in: &observers)
     }
 
-    func refreshTorrents() -> AnyPublisher<Never, TransmissionClientError> {
-        return client.getTorrents()
+    func refreshTorrents() -> AnyPublisher<Never, TransmissionError> {
+        return client.fetchTorrents()
             .handleEvents(receiveOutput: { new in
                 self.torrents.update(with: new.map { ($0.id, $0) })
             })

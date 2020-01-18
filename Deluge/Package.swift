@@ -18,9 +18,5 @@ let package = Package(
             name: "Deluge",
             dependencies: []
         ),
-        .testTarget(
-            name: "DelugeTests",
-            dependencies: ["Deluge"]
-        ),
     ]
 )

@@ -1,53 +1,28 @@
-//
-//  TransmissionClient.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-14.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import Foundation
 
-enum TransmissionClientError: Error {
-    case encoding(Error)
-    case decoding(Error)
-    case request(URLError)
-    case statusCode(Int)
-    case noSessionID
-    case unauthenticated
-    case unexpectedResponse
-    case serverError(result: String?)
-}
-
-extension TransmissionClientError: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-        case let .encoding(error):
-            return error.localizedDescription
-        case let .decoding(error):
-            return error.localizedDescription
-        case let .request(error):
-            return error.localizedDescription
-        case let .statusCode(statusCode):
-            return "The server returned an unexpected status code (\(statusCode))."
-        case .noSessionID:
-            return "Unable to retrieve Session ID."
-        case .unauthenticated:
-            return "Unable to authenticate. Verify that your credentials are correct."
-        case .unexpectedResponse:
-            return "The server returned an unexpected response."
-        case let .serverError(result: result):
-            if let result = result {
-                return "The server returned an error: \(result)"
-            } else {
-                return "The server returned an error."
-            }
-        }
+/// An API client to interact with a Transmission server.
+public final class Client {
+    /// Errors that can occur during client operations.
+    public enum Error: Swift.Error {
+        /// An error occurred while encoding the request.
+        case encoding(Swift.Error)
+        /// An error occurred while decoding the response.
+        case decoding(Swift.Error)
+        /// A request error occurred.
+        case request(URLError)
+        /// The server returned an unexpected status code.
+        case statusCode(Int)
+        /// Unable to obtain a Session ID.
+        case noSessionID
+        /// The provided authentication was not valid.
+        case unauthenticated
+        /// The server returned an unexpected response.
+        case unexpectedResponse
+        /// The server returned an error result.
+        case serverError(result: String?)
     }
-}
 
-final class TransmissionClient {
     private enum Headers {
         static let sessionID = "X-Transmission-Session-Id"
     }
@@ -58,11 +33,19 @@ final class TransmissionClient {
         URLSession.shared
     }()
 
-    let baseURL: URL
-    let username: String?
-    let password: String?
+    /// The URL of the Transmission server.
+    public let baseURL: URL
+    /// The username to authenticate with.
+    public let username: String?
+    /// The password to authenticate with.
+    public let password: String?
 
-    init(baseURL: URL, username: String?, password: String?) {
+    /// Creates a new `Client` with the given parameters.
+    /// - Parameters:
+    ///   - baseURL: The URL of the Transmission server.
+    ///   - username: The username to authenticate with.
+    ///   - password: The password to authenticate with.
+    public init(baseURL: URL, username: String?, password: String?) {
         self.baseURL = baseURL
         self.username = username
         self.password = password
@@ -72,14 +55,16 @@ final class TransmissionClient {
         method: String,
         args: [String: Any],
         handleSessionID: Bool = true
-    ) -> AnyPublisher<[String: Any], TransmissionClientError> {
+    ) -> AnyPublisher<[String: Any], Error> {
         let rpcUrl = baseURL.appendingPathComponent("transmission").appendingPathComponent("rpc")
 
         var request = URLRequest(url: rpcUrl)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        if let username = username, let password = password {
+        if username != nil || password != nil {
+            let username = self.username ?? ""
+            let password = self.password ?? ""
             if let data = "\(username):\(password)".data(using: .utf8) {
                 request.addValue("Basic \(data.base64EncodedString())", forHTTPHeaderField: "Authorization")
             }
@@ -100,7 +85,7 @@ final class TransmissionClient {
 
         return session.dataTaskPublisher(for: request)
             .mapError { .request($0) }
-            .flatMap { data, response -> AnyPublisher<[String: Any], TransmissionClientError> in
+            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
                 if let response = response as? HTTPURLResponse {
                     switch response.statusCode {
                     case 200 ..< 300:
@@ -124,7 +109,7 @@ final class TransmissionClient {
                 switch self.parse(data: data, response: response) {
                 case let .success(response):
                     return Just(response)
-                        .setFailureType(to: TransmissionClientError.self)
+                        .setFailureType(to: Error.self)
                         .eraseToAnyPublisher()
                 case let .failure(error):
                     return Fail(error: error).eraseToAnyPublisher()
@@ -133,7 +118,7 @@ final class TransmissionClient {
             .eraseToAnyPublisher()
     }
 
-    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], TransmissionClientError> {
+    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], Error> {
         let dict: [String: Any]
 
         do {
@@ -158,13 +143,15 @@ final class TransmissionClient {
         }
     }
 
-    func authenticate() -> AnyPublisher<Never, TransmissionClientError> {
+    /// Attempts to authenticate with the server.
+    public func authenticate() -> AnyPublisher<Never, Error> {
         return request(method: "session-get", args: ["fields": ["version"]])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
 
-    func getTorrents() -> AnyPublisher<[TransmissionTorrent], TransmissionClientError> {
+    /// Fetches the list of torrents from the server.
+    public func fetchTorrents() -> AnyPublisher<[Torrent], Error> {
         let fields = [
             "id",
             "hashString",
@@ -182,17 +169,44 @@ final class TransmissionClient {
         ]
 
         return request(method: "torrent-get", args: ["fields": fields])
-            .flatMap { response -> AnyPublisher<[TransmissionTorrent], TransmissionClientError> in
+            .flatMap { response -> AnyPublisher<[Torrent], Error> in
                 guard let arguments = response["arguments"] as? [String: Any],
                     let torrents = arguments["torrents"] as? [[String: Any]]
                 else {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return Just(torrents.compactMap { TransmissionTorrent(dictionary: $0) })
-                    .setFailureType(to: TransmissionClientError.self)
+                return Just(torrents.compactMap { Torrent(dictionary: $0) })
+                    .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
+    }
+}
+
+extension Client.Error: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case let .encoding(error):
+            return error.localizedDescription
+        case let .decoding(error):
+            return error.localizedDescription
+        case let .request(error):
+            return error.localizedDescription
+        case let .statusCode(statusCode):
+            return "The server returned an unexpected status code (\(statusCode))."
+        case .noSessionID:
+            return "Unable to retrieve Session ID."
+        case .unauthenticated:
+            return "Unable to authenticate. Verify that your credentials are correct."
+        case .unexpectedResponse:
+            return "The server returned an unexpected response."
+        case let .serverError(result: result):
+            if let result = result {
+                return "The server returned an error: \(result)"
+            } else {
+                return "The server returned an error."
+            }
+        }
     }
 }

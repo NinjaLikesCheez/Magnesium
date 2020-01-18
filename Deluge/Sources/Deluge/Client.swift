@@ -23,7 +23,7 @@ public final class Client {
         URLSession.shared
     }()
 
-    /// The URL of the deluge server.
+    /// The URL of the Deluge server.
     public let baseURL: URL
     /// The password to authentication with.
     public let password: String

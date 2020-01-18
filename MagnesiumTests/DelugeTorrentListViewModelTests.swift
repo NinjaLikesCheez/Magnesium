@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Coordinator
 @testable import Magnesium
 import Preferences
 import XCTest
@@ -113,7 +114,7 @@ private final class MockDelugeClient: DelugeClient {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
+    func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
         requests.torrents += 1
 
         let torrents = [
@@ -142,11 +143,11 @@ private final class MockDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    func getLabels() -> AnyPublisher<[String], DelugeError> {
+    func fetchLabels() -> AnyPublisher<[String], DelugeError> {
         return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
+    func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
         return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 

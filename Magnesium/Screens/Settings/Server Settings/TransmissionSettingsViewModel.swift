@@ -171,7 +171,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         let password = passwordValue.value
 
         isLoadingSubject.send(true)
-        let client = TransmissionClient(baseURL: url, username: username, password: password)
+        let client = DefaultTransmissionClient(baseURL: url, username: username, password: password)
         client.authenticate()
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -214,7 +214,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         coordinator?.showAlert(alert, from: source)
     }
 
-    private func displayError(_ error: TransmissionClientError) {
+    private func displayError(_ error: TransmissionError) {
         let message: String
         switch error {
         case .unauthenticated:

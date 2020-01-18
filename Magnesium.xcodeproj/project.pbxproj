@@ -17,7 +17,6 @@
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
 		E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */; };
-		E92A5FB423CE0BC90019F984 /* TransmissionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92A5FB323CE0BC90019F984 /* TransmissionClient.swift */; };
 		E93A3D5B23AC52ED007BBD63 /* PreviewViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93A3D5A23AC52ED007BBD63 /* PreviewViewContainer.swift */; };
 		E93F5D6323BA85CC00B0FFA4 /* UIImage+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F5D6223BA85CC00B0FFA4 /* UIImage+Color.swift */; };
 		E93F5D6523BA93F200B0FFA4 /* TorrentDetailFileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F5D6423BA93F200B0FFA4 /* TorrentDetailFileViewModel.swift */; };
@@ -42,6 +41,8 @@
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
 		E96B0071237A43760091FA71 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E96B006F237A43760091FA71 /* LaunchScreen.storyboard */; };
 		E96B007F237A473E0091FA71 /* TorrentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B007E237A473E0091FA71 /* TorrentState.swift */; };
+		E96B724F23D39368005E8E89 /* Transmission.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B724E23D39368005E8E89 /* Transmission.swift */; };
+		E96B725123D3937B005E8E89 /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E96B725023D3937B005E8E89 /* Transmission */; };
 		E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */; };
 		E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233FB23CFF9C300038D30 /* AddServerViewController.swift */; };
 		E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */; };
@@ -55,8 +56,6 @@
 		E97B543623B581B7006FFCC9 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543523B581B7006FFCC9 /* SplitViewController.swift */; };
 		E97D971023C6A32B005FD8F3 /* DelugeRefreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */; };
 		E97D971623C6B286005FD8F3 /* DelugeTorrentFileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97D971523C6B286005FD8F3 /* DelugeTorrentFileViewModel.swift */; };
-		E97DAD8523CE184B00F3E888 /* TransmissionTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8423CE184B00F3E888 /* TransmissionTorrent.swift */; };
-		E97DAD8723CE236400F3E888 /* TransmissionTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8623CE236400F3E888 /* TransmissionTracker.swift */; };
 		E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModel.swift */; };
 		E97DAD8C23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8B23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift */; };
 		E9801EF223D37E1400181FFD /* TorrentSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9801EF123D37E1400181FFD /* TorrentSortTests.swift */; };
@@ -119,7 +118,6 @@
 		E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewController.swift; sourceTree = "<group>"; };
 		E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputTableViewCell.swift; sourceTree = "<group>"; };
 		E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewController.swift; sourceTree = "<group>"; };
-		E92A5FB323CE0BC90019F984 /* TransmissionClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionClient.swift; sourceTree = "<group>"; };
 		E93A3D5A23AC52ED007BBD63 /* PreviewViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewContainer.swift; sourceTree = "<group>"; };
 		E93F5D6223BA85CC00B0FFA4 /* UIImage+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Color.swift"; sourceTree = "<group>"; };
 		E93F5D6423BA93F200B0FFA4 /* TorrentDetailFileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailFileViewModel.swift; sourceTree = "<group>"; };
@@ -145,6 +143,7 @@
 		E96B0070237A43760091FA71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E96B0072237A43760091FA71 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E96B007E237A473E0091FA71 /* TorrentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentState.swift; sourceTree = "<group>"; };
+		E96B724E23D39368005E8E89 /* Transmission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transmission.swift; sourceTree = "<group>"; };
 		E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E97233FB23CFF9C300038D30 /* AddServerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewController.swift; sourceTree = "<group>"; };
 		E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailTrackerTableViewCell.swift; sourceTree = "<group>"; };
@@ -152,13 +151,12 @@
 		E97750E923D1686F00264638 /* SettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
 		E97750EC23D1688500264638 /* SettingsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsItem.swift; sourceTree = "<group>"; };
 		E9786AF523D38D5600E4157E /* Deluge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deluge.swift; sourceTree = "<group>"; };
+		E9786AF923D38FF300E4157E /* Transmission */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Transmission; sourceTree = "<group>"; };
 		E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSectionHeaderView.swift; sourceTree = "<group>"; };
 		E97B543223B547EC006FFCC9 /* TorrentDetailInfoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailInfoViewModel.swift; sourceTree = "<group>"; };
 		E97B543523B581B7006FFCC9 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
 		E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeRefreshable.swift; sourceTree = "<group>"; };
 		E97D971523C6B286005FD8F3 /* DelugeTorrentFileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentFileViewModel.swift; sourceTree = "<group>"; };
-		E97DAD8423CE184B00F3E888 /* TransmissionTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrent.swift; sourceTree = "<group>"; };
-		E97DAD8623CE236400F3E888 /* TransmissionTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTracker.swift; sourceTree = "<group>"; };
 		E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentListViewModel.swift; sourceTree = "<group>"; };
 		E97DAD8B23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentListItemViewModel.swift; sourceTree = "<group>"; };
 		E9801EF123D37E1400181FFD /* TorrentSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentSortTests.swift; sourceTree = "<group>"; };
@@ -211,6 +209,7 @@
 			files = (
 				E9282C8923CC170900776CD3 /* Preferences in Frameworks */,
 				E9801EF523D37F8700181FFD /* Coordinator in Frameworks */,
+				E96B725123D3937B005E8E89 /* Transmission in Frameworks */,
 				E9786AF823D38E6200E4157E /* Deluge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,6 +234,7 @@
 				E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */,
 				E93F5D6223BA85CC00B0FFA4 /* UIImage+Color.swift */,
 				E9786AF523D38D5600E4157E /* Deluge.swift */,
+				E96B724E23D39368005E8E89 /* Transmission.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -272,10 +272,7 @@
 		E92A5FB223CE0BBD0019F984 /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
-				E92A5FB323CE0BC90019F984 /* TransmissionClient.swift */,
 				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
-				E97DAD8423CE184B00F3E888 /* TransmissionTorrent.swift */,
-				E97DAD8623CE236400F3E888 /* TransmissionTracker.swift */,
 			);
 			path = Transmission;
 			sourceTree = "<group>";
@@ -353,6 +350,7 @@
 				E9801EF323D37E8300181FFD /* Coordinator */,
 				E9801EF823D380CB00181FFD /* Deluge */,
 				E9282C8723CC16FF00776CD3 /* Preferences */,
+				E9786AF923D38FF300E4157E /* Transmission */,
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
 				E96B0062237A43740091FA71 /* Products */,
@@ -665,6 +663,7 @@
 				E9282C8823CC170900776CD3 /* Preferences */,
 				E9801EF423D37F8700181FFD /* Coordinator */,
 				E9786AF723D38E6200E4157E /* Deluge */,
+				E96B725023D3937B005E8E89 /* Transmission */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -779,7 +778,6 @@
 				E90366DF23AAB46400C6AB46 /* TorrentTableViewCell.swift in Sources */,
 				E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */,
 				E9624D2B23D1FF080051EA99 /* Session.swift in Sources */,
-				E97DAD8723CE236400F3E888 /* TransmissionTracker.swift in Sources */,
 				E9B40E9023B3FD64009E30AE /* TorrentDetailSection.swift in Sources */,
 				E9B7D5C523D15ECD0025FFA8 /* ServerSettingsCoordinator.swift in Sources */,
 				E97D971023C6A32B005FD8F3 /* DelugeRefreshable.swift in Sources */,
@@ -813,7 +811,6 @@
 				E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */,
 				E9C8258E23C58509003B1D72 /* DelugeTorrentDetailViewModel.swift in Sources */,
 				E94C28A423D14D13006F26D2 /* SettingsCoordinator.swift in Sources */,
-				E97DAD8523CE184B00F3E888 /* TransmissionTorrent.swift in Sources */,
 				E9B40E9223B3FDA0009E30AE /* TorrentDetailHeaderViewModel.swift in Sources */,
 				E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */,
 				E9F24E0B23CE3B160089E45F /* DelugeSettingsViewModel.swift in Sources */,
@@ -831,6 +828,7 @@
 				E9A6510523AB176000EA8264 /* AnyTorrentListItemViewModel.swift in Sources */,
 				E9460D1D237BB3B100A08E68 /* TorrentListViewModel.swift in Sources */,
 				E9624D4023D2368A0051EA99 /* TransmissionServerSettings.swift in Sources */,
+				E96B724F23D39368005E8E89 /* Transmission.swift in Sources */,
 				E9C8258623C579E9003B1D72 /* DelugeTorrentListViewModel.swift in Sources */,
 				E99FC26823D148CC0019A992 /* TorrentDetailCoordinator.swift in Sources */,
 				E99FC26223D1479E0019A992 /* AlertAction.swift in Sources */,
@@ -840,7 +838,6 @@
 				E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */,
 				E959FA9E23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift in Sources */,
 				E9C8258223C5775B003B1D72 /* DelugeTorrentListItemViewModel.swift in Sources */,
-				E92A5FB423CE0BC90019F984 /* TransmissionClient.swift in Sources */,
 				E93F5D6B23BA993A00B0FFA4 /* AnyTorrentDetailFileViewModel.swift in Sources */,
 				E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */,
 				E94C28A823D157D4006F26D2 /* AddServerCoordinator.swift in Sources */,
@@ -1115,6 +1112,10 @@
 		E9282C8823CC170900776CD3 /* Preferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Preferences;
+		};
+		E96B725023D3937B005E8E89 /* Transmission */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Transmission;
 		};
 		E9786AF723D38E6200E4157E /* Deluge */ = {
 			isa = XCSwiftPackageProductDependency;

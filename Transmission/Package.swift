@@ -3,19 +3,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "Coordinator",
+    name: "Transmission",
     platforms: [
         .iOS(.v13),
     ],
     products: [
         .library(
-            name: "Coordinator",
-            targets: ["Coordinator"]
+            name: "Transmission",
+            targets: ["Transmission"]
         ),
     ],
     targets: [
         .target(
-            name: "Coordinator",
+            name: "Transmission",
             dependencies: []
         ),
     ]

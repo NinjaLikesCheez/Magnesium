@@ -25,7 +25,7 @@ extension Server {
             guard let settings = try? JSONDecoder().decode(TransmissionServerSettings.self, from: data) else {
                 return nil
             }
-            let client = TransmissionClient(
+            let client = DefaultTransmissionClient(
                 baseURL: settings.url,
                 username: settings.username,
                 password: settings.password
