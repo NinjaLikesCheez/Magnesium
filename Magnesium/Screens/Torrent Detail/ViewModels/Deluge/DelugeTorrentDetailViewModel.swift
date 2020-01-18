@@ -171,17 +171,24 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     @objc
     private func updateTimerFired(_ timer: Timer) {
-        refresh()
+        refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     func refresh() -> AnyPublisher<Never, Error> {
-        // TODO: display error
         return refresher.refreshTorrents()
             .mapError { $0 as Error }
             .flatMap { _ in self.refreshFiles() }
             .ui()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case let .failure(error):
+                    self?.displayError(error, title: "Update Failed")
+                case .finished:
+                    break
+                }
+            })
             .eraseToAnyPublisher()
     }
 
@@ -270,5 +277,15 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         }))
         alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
         coordinator?.showAlert(alert, from: source)
+    }
+
+    private func displayError(_ error: Error, title: String) {
+        var alert = Alert(
+            title: title,
+            message: error.localizedDescription,
+            style: .alert
+        )
+        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        coordinator?.showAlert(alert)
     }
 }

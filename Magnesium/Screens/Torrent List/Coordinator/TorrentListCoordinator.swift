@@ -10,7 +10,7 @@ import Combine
 import Preferences
 import UIKit
 
-protocol TorrentListCoordinator: Coordinator {
+protocol TorrentListCoordinator: PresentationCoordinator {
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel)
     func showSettings()
 }
@@ -23,6 +23,10 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     private var observers = [AnyCancellable]()
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
+
+    var presentationViewController: UIViewController {
+        return masterNavigationController ?? splitViewController
+    }
 
     init(splitViewController: UISplitViewController, session: Session, preferences: Preferences) {
         self.splitViewController = splitViewController

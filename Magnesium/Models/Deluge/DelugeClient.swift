@@ -38,15 +38,39 @@ extension DelugeClient {
     }
 }
 
-enum DelugeClientError: Swift.Error {
-    case encoding(Swift.Error)
-    case decoding(Swift.Error)
-    case request(URLError)
+enum DelugeClientError: Error {
+    case encoding(Error)
+    case decoding(Error)
+    case request(Error)
     case unauthenticated
     case unexpectedResponse
     case serverError(message: String?)
     case ensureWebInterfaceConnectivity
-    case noLabelPlugin
+}
+
+extension DelugeClientError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case let .encoding(error):
+            return error.localizedDescription
+        case let .decoding(error):
+            return error.localizedDescription
+        case let .request(error):
+            return error.localizedDescription
+        case .unauthenticated:
+            return "Unable to authenticate. Verify that your credentials are correct."
+        case .unexpectedResponse:
+            return "The server returned an unexpected response."
+        case let .serverError(message: message):
+            if let message = message {
+                return "The server returned an error: \(message)"
+            } else {
+                return "The server returned an error."
+            }
+        case .ensureWebInterfaceConnectivity:
+            return "Unable to retreive torrents. Ensure the web interface is connected to the daemon."
+        }
+    }
 }
 
 final class DefaultDelugeClient: DelugeClient {

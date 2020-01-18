@@ -56,7 +56,7 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     }
 
     private func updateTimerFired(_ timer: Timer) {
-        refresh()
+        refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -71,14 +71,31 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     }
 
     func refresh() -> AnyPublisher<Never, Error> {
-        // TODO: display error
         return refreshTorrents()
             .mapError { $0 as Error }
             .ui()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case let .failure(error):
+                    self?.displayError(error, title: "Update Failed")
+                case .finished:
+                    break
+                }
+            })
             .eraseToAnyPublisher()
     }
 
     func didSelectItem(at index: Int) {
         // TODO:
+    }
+
+    private func displayError(_ error: Error, title: String) {
+        var alert = Alert(
+            title: title,
+            message: error.localizedDescription,
+            style: .alert
+        )
+        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        coordinator?.showAlert(alert)
     }
 }

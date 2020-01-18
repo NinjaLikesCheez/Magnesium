@@ -421,8 +421,8 @@
 			isa = PBXGroup;
 			children = (
 				E976FA43237E3647006B9DA9 /* ByteFormatter.swift */,
-				E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */,
 				E98D936023D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift */,
+				E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */,
 				E98D936223D2849E0013A1E1 /* TorrentSortUtil.swift */,
 			);
 			path = Utilities;

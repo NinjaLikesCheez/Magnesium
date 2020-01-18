@@ -197,7 +197,7 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
         let message: String
         switch error {
         case .unauthenticated:
-            message = "Ensure your server URL and password are correct."
+            message = "Ensure your password is correct."
         default:
             message = error.localizedDescription
         }

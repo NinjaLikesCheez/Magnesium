@@ -9,15 +9,42 @@
 import Combine
 import Foundation
 
-enum TransmissionClientError: Swift.Error {
-    case encoding(Swift.Error)
-    case decoding(Swift.Error)
+enum TransmissionClientError: Error {
+    case encoding(Error)
+    case decoding(Error)
     case request(URLError)
     case statusCode(Int)
     case noSessionID
     case unauthenticated
     case unexpectedResponse
     case serverError(result: String?)
+}
+
+extension TransmissionClientError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case let .encoding(error):
+            return error.localizedDescription
+        case let .decoding(error):
+            return error.localizedDescription
+        case let .request(error):
+            return error.localizedDescription
+        case let .statusCode(statusCode):
+            return "The server returned an unexpected status code (\(statusCode))."
+        case .noSessionID:
+            return "Unable to retrieve Session ID."
+        case .unauthenticated:
+            return "Unable to authenticate. Verify that your credentials are correct."
+        case .unexpectedResponse:
+            return "The server returned an unexpected response."
+        case let .serverError(result: result):
+            if let result = result {
+                return "The server returned an error: \(result)"
+            } else {
+                return "The server returned an error."
+            }
+        }
+    }
 }
 
 final class TransmissionClient {

@@ -86,6 +86,7 @@ private final class MockCoordinator: TorrentListCoordinator {
         let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     }
 
+    let presentationViewController = UIViewController()
     private(set) var wasShowTorrentDetailCalled = false
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []

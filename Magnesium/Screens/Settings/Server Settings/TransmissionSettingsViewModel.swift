@@ -224,7 +224,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         let message: String
         switch error {
         case .unauthenticated:
-            message = "Ensure your server URL and password are correct."
+            message = "Ensure your username and password are correct."
         default:
             message = error.localizedDescription
         }
