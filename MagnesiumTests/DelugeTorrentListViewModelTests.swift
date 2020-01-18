@@ -43,11 +43,41 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
         let expectation = self.expectation(description: "Update")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, labels: 1))
+            XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1))
             expectation.fulfill()
         }
 
-        wait(for: [expectation], timeout: 2)
+        waitForExpectations(timeout: 2)
+    }
+
+    func testAutoUpdateStopsWhenDisabled() throws {
+        let coordinator = MockCoordinator()
+        let client = MockDelugeClient()
+        let viewModel = DelugeTorrentListViewModel(
+            coordinator: coordinator,
+            client: client,
+            preferences: preferences
+        )
+        _ = viewModel
+        client.resetRequests()
+
+        let firstCheck = expectation(description: "First check")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1))
+            firstCheck.fulfill()
+        }
+
+        waitForExpectations(timeout: 2)
+
+        try preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
+
+        let secondCheck = expectation(description: "Second check")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1))
+            secondCheck.fulfill()
+        }
+
+        waitForExpectations(timeout: 2)
     }
 }
 
@@ -70,7 +100,6 @@ private final class MockCoordinator: TorrentListCoordinator {
 private final class MockDelugeClient: DelugeClient {
     struct Requests: Equatable {
         var torrents = 0
-        var labels = 0
     }
 
     private(set) var requests = Requests()
@@ -80,7 +109,6 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     func authenticate() -> AnyPublisher<Never, DelugeClientError> {
-        XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
@@ -114,7 +142,6 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     func getLabels() -> AnyPublisher<[String], DelugeClientError> {
-        requests.labels += 1
         return Just([]).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
     }
 
@@ -123,22 +150,18 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
     func resume(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeClientError> {
-        XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
     func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
-        XCTFail()
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 }

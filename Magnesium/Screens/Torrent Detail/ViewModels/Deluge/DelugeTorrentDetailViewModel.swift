@@ -67,6 +67,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
+    deinit {
+        autoUpdateTimer?.invalidate()
+    }
+
     private static func createSections(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
         torrent: DelugeTorrent,
@@ -156,11 +160,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     private func configureAutoUpdateTimer(interval: TimeInterval?) {
-        guard let interval = interval, interval > 0 else {
-            autoUpdateTimer = nil
-            return
-        }
-
+        autoUpdateTimer?.invalidate()
+        guard let interval = interval, interval > 0 else { return }
         let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
             self?.updateTimerFired($0)
         }
@@ -170,7 +171,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     @objc
     private func updateTimerFired(_ timer: Timer) {
-        guard timer.isValid else { return }
         refresh()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
