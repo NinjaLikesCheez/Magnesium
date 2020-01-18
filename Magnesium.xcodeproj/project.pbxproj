@@ -269,14 +269,6 @@
 			path = Deluge;
 			sourceTree = "<group>";
 		};
-		E92A5FB223CE0BBD0019F984 /* Transmission */ = {
-			isa = PBXGroup;
-			children = (
-				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
-			);
-			path = Transmission;
-			sourceTree = "<group>";
-		};
 		E93A3D5923AC52DF007BBD63 /* Preview */ = {
 			isa = PBXGroup;
 			children = (
@@ -389,14 +381,14 @@
 			isa = PBXGroup;
 			children = (
 				E99FC26523D148290019A992 /* Alert */,
-				E9C8257B23C56C4E003B1D72 /* Deluge */,
-				E92A5FB223CE0BBD0019F984 /* Transmission */,
 				E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */,
+				E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */,
 				E95BB40323CA404C002F0520 /* PreferenceKeys.swift */,
+				E9624D2A23D1FF080051EA99 /* Session.swift */,
 				E9C8258723C57E47003B1D72 /* SortOption.swift */,
 				E9C8258323C5787E003B1D72 /* TorrentExt.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
-				E9624D2A23D1FF080051EA99 /* Session.swift */,
+				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -600,14 +592,6 @@
 				E9C39ADF23CC27A800BB3556 /* TextInputTableViewCellViewModel.swift */,
 			);
 			path = TextInputTableViewCell;
-			sourceTree = "<group>";
-		};
-		E9C8257B23C56C4E003B1D72 /* Deluge */ = {
-			isa = PBXGroup;
-			children = (
-				E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */,
-			);
-			path = Deluge;
 			sourceTree = "<group>";
 		};
 		E9C8258023C57744003B1D72 /* Deluge */ = {
