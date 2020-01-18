@@ -25,9 +25,9 @@ public struct Torrent {
     /// The date the torrent was added to the server.
     public let dateAdded: Date
     /// The torrent's current download rate in bytes/s.
-    public let downloadRate: Int
+    public let downloadRate: Int64
     /// The torrent's current upload rate in bytes/s.
-    public let uploadRate: Int
+    public let uploadRate: Int64
     /// The torrent's current ETA.
     public let eta: TimeInterval
     /// The torrent's current progress.
@@ -47,8 +47,8 @@ public struct Torrent {
         name: String,
         status: Status,
         dateAdded: Date,
-        downloadRate: Int,
-        uploadRate: Int,
+        downloadRate: Int64,
+        uploadRate: Int64,
         eta: TimeInterval,
         progress: Float,
         downloaded: Int64,
@@ -80,8 +80,8 @@ extension Torrent {
             let statusCode = dictionary["status"] as? Int,
             let status = Status(rawValue: statusCode),
             let addedDate = dictionary["addedDate"] as? TimeInterval,
-            let downloadRate = dictionary["rateDownload"] as? Int,
-            let uploadRate = dictionary["rateUpload"] as? Int,
+            let downloadRate = dictionary["rateDownload"] as? Int64,
+            let uploadRate = dictionary["rateUpload"] as? Int64,
             let eta = dictionary["eta"] as? TimeInterval,
             let progress = dictionary["percentDone"] as? Double,
             let downloaded = dictionary["downloadedEver"] as? Int64,

@@ -10,8 +10,8 @@ import Foundation
 
 protocol TorrentExt {
     var commonState: TorrentState { get }
-    var downloadRate: Int { get }
-    var uploadRate: Int { get }
+    var downloadRate: Int64 { get }
+    var uploadRate: Int64 { get }
     var eta: TimeInterval { get }
     var progress: Float { get }
     var size: Int64 { get }
@@ -29,22 +29,30 @@ extension TorrentExt {
     }
 
     var speedString: String {
+        let formatter = ByteCountFormatter()
+        formatter.allowsNonnumericFormatting = false
+        formatter.allowedUnits = ByteCountFormatter.Units.useAll.subtracting(.useBytes)
+
         if commonState == .downloading {
             return """
-            ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
-            ↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s
+            ↓ \(formatter.string(fromByteCount: downloadRate))/s \
+            ↑ \(formatter.string(fromByteCount: uploadRate))/s
             """
         } else if commonState == .seeding {
-            return "↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s"
+            return "↑ \(formatter.string(fromByteCount: uploadRate))/s"
         } else {
             return ""
         }
     }
 
     var progressString: String {
+        let formatter = ByteCountFormatter()
+        formatter.allowsNonnumericFormatting = false
+        formatter.zeroPadsFractionDigits = true
+
         return """
-        \(ByteFormatter.string(fromByteCount: downloaded)) / \
-        \(ByteFormatter.string(fromByteCount: size)) \
+        \(formatter.string(fromByteCount: downloaded)) / \
+        \(formatter.string(fromByteCount: size)) \
         (\(Int(progress * 100))%)
         """
     }

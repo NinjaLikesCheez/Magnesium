@@ -141,6 +141,6 @@ private struct MockTorrent: SortableTorrent {
 
     let name: String
     let dateAdded: Date
-    let downloadRate: Int
-    let uploadRate: Int
+    let downloadRate: Int64
+    let uploadRate: Int64
 }

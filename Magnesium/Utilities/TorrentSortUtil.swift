@@ -13,8 +13,8 @@ protocol SortableTorrent {
     var hash: String { get }
     var name: String { get }
     var dateAdded: Date { get }
-    var downloadRate: Int { get }
-    var uploadRate: Int { get }
+    var downloadRate: Int64 { get }
+    var uploadRate: Int64 { get }
 }
 
 enum TorrentSortUtil {

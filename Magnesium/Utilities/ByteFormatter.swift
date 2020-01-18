@@ -9,7 +9,7 @@
 enum ByteFormatter {
     private static let unitSize = 1024
 
-    static func string(fromByteCount byteCount: Int) -> String {
+    static func string(fromByteCount byteCount: Int64) -> String {
         if byteCount < unitSize * unitSize {
             return String(format: "%.1f KB", Double(byteCount) / Double(unitSize))
         } else if byteCount < unitSize * unitSize * unitSize {
@@ -19,9 +19,5 @@ enum ByteFormatter {
         } else {
             return String(format: "%.1f TB", Double(byteCount) / Double(unitSize * unitSize * unitSize * unitSize))
         }
-    }
-
-    static func string(fromByteCount byteCount: Int64) -> String {
-        return string(fromByteCount: Int(byteCount))
     }
 }
