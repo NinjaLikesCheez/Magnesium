@@ -42,6 +42,7 @@ struct TransmissionTorrent {
     }
 
     let id: Int
+    let hash: String
     let name: String
     let state: TorrentState
     let dateAdded: Date
@@ -58,6 +59,7 @@ struct TransmissionTorrent {
 extension TransmissionTorrent {
     init?(dictionary: [String: Any]) {
         guard let id = dictionary["id"] as? Int,
+            let hash = dictionary["hashString"] as? String,
             let name = dictionary["name"] as? String,
             let statusCode = dictionary["status"] as? Int,
             let status = Status(rawValue: statusCode),
@@ -76,6 +78,7 @@ extension TransmissionTorrent {
         }
 
         self.id = id
+        self.hash = hash
         self.name = name
         state = status.state
         dateAdded = Date(timeIntervalSince1970: addedDate)
@@ -91,3 +94,4 @@ extension TransmissionTorrent {
 }
 
 extension TransmissionTorrent: TorrentExt {}
+extension TransmissionTorrent: SortableTorrent {}

@@ -11,17 +11,24 @@ import Foundation
 import Preferences
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
-    private typealias TorrentSubject = CurrentValueSubject<DelugeTorrent, Never>
-    private typealias FileSubject = CurrentValueSubject<DelugeTorrentFile, Never>
-    private typealias FileMap = [String: FileSubject]
     private static let refreshDelay: TimeInterval = 1
 
     private let client: DelugeClient
     private let refresher: DelugeRefreshable
-    private let torrentSubject: TorrentSubject
-    private let fileMap = CurrentValueSubject<FileMap?, Never>(nil)
+    private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
+
+    private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
+        CurrentValueSubjectMapManager(sort: Just {
+            $0.sorted {
+                $0.value.path.compare(
+                    $1.value.path,
+                    options: [.numeric, .caseInsensitive]
+                ) == .orderedAscending
+            }
+        }.eraseToAnyPublisher())
+    }()
 
     let sections: AnyPublisher<[TorrentDetailSection], Never>
     weak var coordinator: TorrentDetailCoordinator?
@@ -37,12 +44,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         self.refresher = refresher
 
         sections = torrentSubject
-            .combineLatest(fileMap)
-            .map { torrent, fileMap in
+            .combineLatest(files.sorted)
+            .map { torrent, files in
                 DelugeTorrentDetailViewModel.createSections(
                     torrentSubject: torrentSubject,
                     torrent: torrent,
-                    fileMap: fileMap
+                    files: files
                 )
             }
             .removeDuplicates()
@@ -61,9 +68,9 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     private static func createSections(
-        torrentSubject: TorrentSubject,
+        torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
         torrent: DelugeTorrent,
-        fileMap: FileMap?
+        files: [CurrentValueSubject<DelugeTorrentFile, Never>]
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
@@ -73,9 +80,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .info(TorrentDetailInfoViewModel(
                 name: "Size",
                 value: torrentSubject
-                    .map { torrent in
-                        ByteFormatter.string(fromByteCount: torrent.size)
-                    }
+                    .map { ByteFormatter.string(fromByteCount: $0.size) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
@@ -141,18 +146,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
         }
 
-        if let fileMap = fileMap {
-            let items = fileMap.values
-                .sorted {
-                    $0.value.path.compare(
-                        $1.value.path,
-                        options: [.numeric, .caseInsensitive]
-                    ) == .orderedAscending
-                }
-                .map {
-                    TorrentDetailItem.file(DelugeTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
-                }
-            sections.append(TorrentDetailSection(type: .files, items: items))
+        if !files.isEmpty {
+            sections.append(TorrentDetailSection(type: .files, items: files.map {
+                .file(DelugeTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
+            }))
         }
 
         return sections
@@ -160,12 +157,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func configureAutoUpdateTimer(interval: TimeInterval?) {
         guard let interval = interval, interval > 0 else {
-            autoUpdateTimer?.invalidate()
             autoUpdateTimer = nil
             return
         }
 
-        autoUpdateTimer?.invalidate()
         let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
             self?.updateTimerFired($0)
         }
@@ -182,6 +177,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     func refresh() -> AnyPublisher<Never, Error> {
+        // TODO: display error
         return refresher.refreshTorrents()
             .mapError { $0 as Error }
             .flatMap { _ in self.refreshFiles() }
@@ -191,21 +187,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func refreshFiles() -> AnyPublisher<Never, Error> {
         return client.getTorrentFiles(hash: torrentSubject.value.hash)
-            .map { files -> FileMap in
-                files.reduce(into: FileMap()) { map, file in
-                    map[file.path] = CurrentValueSubject(file)
-                }
-            }
             .handleEvents(receiveOutput: { new in
-                let current = self.fileMap.value ?? [:]
-                self.fileMap.send(
-                    current
-                        .filter { new[$0.key] != nil }
-                        .merging(new) { current, new in
-                            current.send(new.value)
-                            return current
-                        }
-                )
+                self.files.update(with: new.map { ($0.path, $0) })
             })
             .mapError { $0 as Error }
             .ignoreOutput()

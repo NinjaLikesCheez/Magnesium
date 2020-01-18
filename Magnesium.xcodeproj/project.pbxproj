@@ -64,6 +64,8 @@
 		E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModel.swift */; };
 		E97DAD8C23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8B23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift */; };
 		E98D935F23D2474B0013A1E1 /* MockPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D935E23D2474B0013A1E1 /* MockPreferences.swift */; };
+		E98D936123D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D936023D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift */; };
+		E98D936323D2849E0013A1E1 /* TorrentSortUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D936223D2849E0013A1E1 /* TorrentSortUtil.swift */; };
 		E9999A8323BAE1BD00E8309D /* Publishers+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */; };
 		E99FC25623D1389B0019A992 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25523D1389B0019A992 /* Coordinator.swift */; };
 		E99FC25823D13A340019A992 /* TorrentListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25723D13A340019A992 /* TorrentListCoordinator.swift */; };
@@ -170,6 +172,8 @@
 		E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentListViewModel.swift; sourceTree = "<group>"; };
 		E97DAD8B23CE269900F3E888 /* TransmissionTorrentListItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentListItemViewModel.swift; sourceTree = "<group>"; };
 		E98D935E23D2474B0013A1E1 /* MockPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPreferences.swift; sourceTree = "<group>"; };
+		E98D936023D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentValueSubjectMapManager.swift; sourceTree = "<group>"; };
+		E98D936223D2849E0013A1E1 /* TorrentSortUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentSortUtil.swift; sourceTree = "<group>"; };
 		E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publishers+UI.swift"; sourceTree = "<group>"; };
 		E99FC25523D1389B0019A992 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		E99FC25723D13A340019A992 /* TorrentListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListCoordinator.swift; sourceTree = "<group>"; };
@@ -418,6 +422,8 @@
 			children = (
 				E976FA43237E3647006B9DA9 /* ByteFormatter.swift */,
 				E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */,
+				E98D936023D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift */,
+				E98D936223D2849E0013A1E1 /* TorrentSortUtil.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -796,6 +802,7 @@
 				E9B40E9023B3FD64009E30AE /* TorrentDetailSection.swift in Sources */,
 				E9B7D5C523D15ECD0025FFA8 /* ServerSettingsCoordinator.swift in Sources */,
 				E97D971023C6A32B005FD8F3 /* DelugeRefreshable.swift in Sources */,
+				E98D936323D2849E0013A1E1 /* TorrentSortUtil.swift in Sources */,
 				E99FC25A23D13C270019A992 /* AppCoordinator.swift in Sources */,
 				E90366DC23AAB3BD00C6AB46 /* TorrentListViewController.swift in Sources */,
 				E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */,
@@ -810,6 +817,7 @@
 				E97750ED23D1688500264638 /* SettingsItem.swift in Sources */,
 				E9624D3323D2216F0051EA99 /* Presentable.swift in Sources */,
 				E9B40E9423B3FFFD009E30AE /* AnyTorrentDetailHeaderViewModel.swift in Sources */,
+				E98D936123D2845D0013A1E1 /* CurrentValueSubjectMapManager.swift in Sources */,
 				E9624D3723D222C80051EA99 /* PresentableNavigationController.swift in Sources */,
 				E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModel.swift in Sources */,
 				E9624D3E23D236130051EA99 /* TransmissionSettingsViewModel.swift in Sources */,

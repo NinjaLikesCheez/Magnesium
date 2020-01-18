@@ -87,3 +87,4 @@ extension DelugeTorrent {
 }
 
 extension DelugeTorrent: TorrentExt {}
+extension DelugeTorrent: SortableTorrent {}

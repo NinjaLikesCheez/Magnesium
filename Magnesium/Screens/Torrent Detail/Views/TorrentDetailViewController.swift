@@ -137,17 +137,9 @@ final class TorrentDetailViewController: UITableViewController {
     }
 
     @objc
-    private func refreshControlTriggered(_ sender: Any) {
-        refreshObserver = viewModel.refresh().sink(receiveCompletion: { [weak self] completion in
-            switch completion {
-            case .finished:
-                break
-            case let .failure(error):
-                // TODO: display error
-                debugPrint(error)
-            }
-
-            self?.refreshControl?.endRefreshing()
+    private func refreshControlTriggered(_ sender: UIRefreshControl) {
+        refreshObserver = viewModel.refresh().sink(receiveCompletion: { [weak sender] _ in
+            sender?.endRefreshing()
         }, receiveValue: { _ in })
     }
 
