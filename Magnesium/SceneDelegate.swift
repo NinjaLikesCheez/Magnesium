@@ -6,7 +6,6 @@
 //  Copyright © 2019 James Hurst. All rights reserved.
 //
 
-import Preferences
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {

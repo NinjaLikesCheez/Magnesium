@@ -52,11 +52,6 @@ final class TransmissionClient {
         static let sessionID = "X-Transmission-Session-Id"
     }
 
-    struct Authentication {
-        var username: String
-        var password: String
-    }
-
     private var sessionID: String?
 
     private lazy var session: URLSession = {

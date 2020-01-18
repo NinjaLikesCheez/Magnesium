@@ -8,7 +8,6 @@
 
 #if DEBUG
     final class PreviewAddServerCoordinator: PreviewCoordinator, AddServerCoordinator {
-        func complete() {}
         func showServerSettings(for type: ServerType) {}
     }
 #endif

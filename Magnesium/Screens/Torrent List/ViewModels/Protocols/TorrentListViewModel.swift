@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Preferences
 
 protocol TorrentListViewModel: AnyObject {
     var coordinator: TorrentListCoordinator? { get }

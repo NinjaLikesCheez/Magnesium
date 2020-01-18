@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 struct TransmissionTracker {
     let id: Int
     let host: String

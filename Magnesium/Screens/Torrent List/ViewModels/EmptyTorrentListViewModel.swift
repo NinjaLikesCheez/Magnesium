@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Preferences
 
 final class EmptyTorrentListViewModel: TorrentListViewModel {
     var coordinator: TorrentListCoordinator?
