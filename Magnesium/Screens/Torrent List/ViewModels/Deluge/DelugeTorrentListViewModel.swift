@@ -61,8 +61,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .store(in: &observers)
     }
 
-    func refreshTorrents() -> AnyPublisher<Never, DelugeClientError> {
-        return client.getTorrents()
+    func refreshTorrents() -> AnyPublisher<Never, DelugeError> {
+        return client.fetchTorrents()
             .handleEvents(receiveOutput: { new in
                 self.torrents.update(with: new.map { ($0.hash, $0) })
             })

@@ -93,5 +93,10 @@ extension TransmissionTorrent {
     }
 }
 
-extension TransmissionTorrent: TorrentExt {}
+extension TransmissionTorrent: TorrentExt {
+    var commonState: TorrentState {
+        return state
+    }
+}
+
 extension TransmissionTorrent: SortableTorrent {}

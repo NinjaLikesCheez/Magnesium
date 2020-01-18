@@ -34,12 +34,12 @@ struct DelugeTorrentListItemViewModel: TorrentListItemViewModel {
             .ui()
             .eraseToAnyPublisher()
         progressColor = torrentSubject
-            .map(\.state)
+            .map(\.commonState)
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
         state = torrentSubject
-            .map(\.state)
+            .map(\.commonState)
             .map { $0.displayString }
             .ui()
             .eraseToAnyPublisher()

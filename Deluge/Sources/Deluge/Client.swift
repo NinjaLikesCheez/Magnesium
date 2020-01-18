@@ -1,87 +1,38 @@
-//
-//  DelugeClient.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-07.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import Foundation
 
-protocol DelugeClient {
-    func authenticate() -> AnyPublisher<Never, DelugeClientError>
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeClientError>
-    func getLabels() -> AnyPublisher<[String], DelugeClientError>
-    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeClientError>
-    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeClientError>
-    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeClientError>
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeClientError>
-    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeClientError>
-}
-
-extension DelugeClient {
-    func pause(hash: String) -> AnyPublisher<Never, DelugeClientError> {
-        return pause(hashes: [hash])
+/// An API client to interact with a Deluge server.
+public final class Client {
+    /// Errors that can occur during client operations.
+    public enum Error: Swift.Error {
+        /// An error occurred while encoding the request.
+        case encoding(Swift.Error)
+        /// An error occurred while decoding the response.
+        case decoding(Swift.Error)
+        /// A request error occurred.
+        case request(URLError)
+        /// The provided authentication was not valid.
+        case unauthenticated
+        /// The server returned an unexpected response.
+        case unexpectedResponse
+        /// The server returned an error message.
+        case serverError(message: String?)
     }
 
-    func resume(hash: String) -> AnyPublisher<Never, DelugeClientError> {
-        return resume(hashes: [hash])
-    }
-
-    func remove(hash: String, removeData: Bool) -> AnyPublisher<Never, DelugeClientError> {
-        return remove(hashes: [hash], removeData: removeData)
-    }
-
-    func recheck(hash: String) -> AnyPublisher<Never, DelugeClientError> {
-        return recheck(hashes: [hash])
-    }
-}
-
-enum DelugeClientError: Error {
-    case encoding(Error)
-    case decoding(Error)
-    case request(Error)
-    case unauthenticated
-    case unexpectedResponse
-    case serverError(message: String?)
-    case ensureWebInterfaceConnectivity
-}
-
-extension DelugeClientError: LocalizedError {
-    var errorDescription: String? {
-        switch self {
-        case let .encoding(error):
-            return error.localizedDescription
-        case let .decoding(error):
-            return error.localizedDescription
-        case let .request(error):
-            return error.localizedDescription
-        case .unauthenticated:
-            return "Unable to authenticate. Verify that your credentials are correct."
-        case .unexpectedResponse:
-            return "The server returned an unexpected response."
-        case let .serverError(message: message):
-            if let message = message {
-                return "The server returned an error: \(message)"
-            } else {
-                return "The server returned an error."
-            }
-        case .ensureWebInterfaceConnectivity:
-            return "Unable to retreive torrents. Ensure the web interface is connected to the daemon."
-        }
-    }
-}
-
-final class DefaultDelugeClient: DelugeClient {
     private lazy var session: URLSession = {
         URLSession.shared
     }()
 
-    let baseURL: URL
-    let password: String
+    /// The URL of the deluge server.
+    public let baseURL: URL
+    /// The password to authentication with.
+    public let password: String
 
-    init(baseURL: URL, password: String) {
+    /// Creates a new `Client` with the given parameters.
+    /// - Parameters:
+    ///   - baseURL: The URL of the Deluge server.
+    ///   - password: The password to authentication with.
+    public init(baseURL: URL, password: String) {
         self.baseURL = baseURL
         self.password = password
     }
@@ -90,7 +41,7 @@ final class DefaultDelugeClient: DelugeClient {
         method: String,
         params: [Any],
         authenticateIfNeeded: Bool = true
-    ) -> AnyPublisher<[String: Any], DelugeClientError> {
+    ) -> AnyPublisher<[String: Any], Error> {
         let rpcUrl = baseURL.appendingPathComponent("json")
 
         var request = URLRequest(url: rpcUrl)
@@ -108,24 +59,24 @@ final class DefaultDelugeClient: DelugeClient {
         }
 
         return session.dataTaskPublisher(for: request)
-            .mapError { DelugeClientError.request($0) }
-            .flatMap { data, response -> AnyPublisher<[String: Any], DelugeClientError> in
+            .mapError { .request($0) }
+            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
                 switch self.parse(data: data, response: response) {
                 case let .success(response):
                     return Just(response)
-                        .setFailureType(to: DelugeClientError.self)
+                        .setFailureType(to: Error.self)
                         .eraseToAnyPublisher()
                 case let .failure(error):
                     return Fail(error: error).eraseToAnyPublisher()
                 }
             }
-            .catch { error -> AnyPublisher<[String: Any], DelugeClientError> in
+            .catch { error -> AnyPublisher<[String: Any], Error> in
                 guard case .unauthenticated = error, authenticateIfNeeded else {
                     return Fail(error: error).eraseToAnyPublisher()
                 }
 
                 return self.authenticate()
-                    .flatMap { _ -> AnyPublisher<[String: Any], DelugeClientError> in
+                    .flatMap { _ -> AnyPublisher<[String: Any], Error> in
                         self.request(method: method, params: params, authenticateIfNeeded: false)
                     }
                     .eraseToAnyPublisher()
@@ -133,7 +84,7 @@ final class DefaultDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], DelugeClientError> {
+    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], Error> {
         let dict: [String: Any]
 
         do {
@@ -157,9 +108,10 @@ final class DefaultDelugeClient: DelugeClient {
         return .success(dict)
     }
 
-    func authenticate() -> AnyPublisher<Never, DelugeClientError> {
+    /// Attempts to authenticate with the server.
+    public func authenticate() -> AnyPublisher<Never, Error> {
         return request(method: "auth.login", params: [password], authenticateIfNeeded: false)
-            .flatMap { response -> AnyPublisher<Never, DelugeClientError> in
+            .flatMap { response -> AnyPublisher<Never, Error> in
                 let authenticated = response["result"] as? Bool ?? false
                 guard authenticated else {
                     return Fail(error: .unauthenticated).eraseToAnyPublisher()
@@ -170,7 +122,8 @@ final class DefaultDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeClientError> {
+    /// Fetches the list of torrents from the server.
+    public func fetchTorrents() -> AnyPublisher<[Torrent], Error> {
         let keys = [
             "name",
             "state",
@@ -191,41 +144,42 @@ final class DefaultDelugeClient: DelugeClient {
         ]
 
         return request(method: "web.update_ui", params: [keys, []])
-            .flatMap { response -> AnyPublisher<[DelugeTorrent], DelugeClientError> in
+            .flatMap { response -> AnyPublisher<[Torrent], Error> in
                 guard let results = response["result"] as? [String: Any],
                     let torrents = results["torrents"] as? [String: [String: Any]]
                 else {
-                    return Fail(error: .ensureWebInterfaceConnectivity).eraseToAnyPublisher()
+                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return Just(torrents.compactMap { DelugeTorrent(hash: $0.key, dictionary: $0.value) })
-                    .setFailureType(to: DelugeClientError.self)
+                return Just(torrents.compactMap { Torrent(hash: $0.key, dictionary: $0.value) })
+                    .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
 
-    func getLabels() -> AnyPublisher<[String], DelugeClientError> {
+    /// Fetches the list labels from the server.
+    public func fetchLabels() -> AnyPublisher<[String], Error> {
         return request(method: "label.get_labels", params: [])
-            .flatMap { value -> AnyPublisher<[String], DelugeClientError> in
+            .flatMap { value -> AnyPublisher<[String], Error> in
                 guard let result = value["result"] as? [String] else {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return Just(result).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
+                return Just(result).setFailureType(to: Error.self).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
 
-    private func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[DelugeTorrentFile], DelugeClientError> {
+    private func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[TorrentFile], Error> {
         guard let results = response["result"] as? [String: Any],
             let contents = results["contents"] as? [String: [String: Any]]
         else {
             return .failure(.unexpectedResponse)
         }
 
-        func parseDirectory(_ contents: [String: [String: Any]]) -> [DelugeTorrentFile] {
-            var files = [DelugeTorrentFile]()
+        func parseDirectory(_ contents: [String: [String: Any]]) -> [TorrentFile] {
+            var files = [TorrentFile]()
             for (name, node) in contents {
                 guard let type = node["type"] as? String else {
                     continue
@@ -236,7 +190,7 @@ final class DefaultDelugeClient: DelugeClient {
                     guard let child = node["contents"] as? [String: [String: Any]] else { break }
                     files.append(contentsOf: parseDirectory(child))
                 case "file":
-                    guard let file = DelugeTorrentFile(name: name, dictionary: node) else { break }
+                    guard let file = TorrentFile(name: name, dictionary: node) else { break }
                     files.append(file)
                 default:
                     break
@@ -248,12 +202,14 @@ final class DefaultDelugeClient: DelugeClient {
         return .success(parseDirectory(contents))
     }
 
-    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeClientError> {
+    /// Fetches the files for a torrent.
+    /// - Parameter hash: The hash of the torrent to request files for.
+    public func fetchTorrentFiles(hash: String) -> AnyPublisher<[TorrentFile], Error> {
         return request(method: "web.get_torrent_files", params: [hash])
-            .flatMap { response -> AnyPublisher<[DelugeTorrentFile], DelugeClientError> in
+            .flatMap { response -> AnyPublisher<[TorrentFile], Error> in
                 switch self.parseTorrentFileResponse(response) {
                 case let .success(files):
-                    return Just(files).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
+                    return Just(files).setFailureType(to: Error.self).eraseToAnyPublisher()
                 case let .failure(error):
                     return Fail(error: error).eraseToAnyPublisher()
                 }
@@ -261,27 +217,60 @@ final class DefaultDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    /// Pauses torrents.
+    /// - Parameter hashes: The hashes of the torrents to pause.
+    public func pause(hashes: [String]) -> AnyPublisher<Never, Error> {
         return request(method: "core.pause_torrent", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
 
-    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    /// Resumes torrents.
+    /// - Parameter hashes: The hashes of the torrents to resume.
+    public func resume(hashes: [String]) -> AnyPublisher<Never, Error> {
         return request(method: "core.resume_torrent", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
 
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeClientError> {
+    /// Removes torrents from the server.
+    /// - Parameters:
+    ///   - hashes: The hashes of the torrents to remove.
+    ///   - removeData: If the torrents' data should be removed.
+    public func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, Error> {
         return request(method: "core.remove_torrents", params: [hashes, removeData])
             .ignoreOutput()
             .eraseToAnyPublisher()
     }
 
-    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    /// Rechecks torrents.
+    /// - Parameter hashes: The hashes of the torrents to recheck.
+    public func recheck(hashes: [String]) -> AnyPublisher<Never, Error> {
         return request(method: "core.force_recheck", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
+    }
+}
+
+extension Client.Error: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case let .encoding(error):
+            return error.localizedDescription
+        case let .decoding(error):
+            return error.localizedDescription
+        case let .request(error):
+            return error.localizedDescription
+        case .unauthenticated:
+            return "Unable to authenticate. Verify that your credentials are correct."
+        case .unexpectedResponse:
+            return "The server returned an unexpected response."
+        case let .serverError(message: message):
+            if let message = message {
+                return "The server returned an error: \(message)"
+            } else {
+                return "The server returned an error."
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 protocol TorrentExt {
-    var state: TorrentState { get }
+    var commonState: TorrentState { get }
     var downloadRate: Int { get }
     var uploadRate: Int { get }
     var eta: TimeInterval { get }
@@ -25,16 +25,16 @@ extension TorrentExt {
     }
 
     var isActive: Bool {
-        return state == .downloading || state == .seeding
+        return commonState == .downloading || commonState == .seeding
     }
 
     var speedString: String {
-        if state == .downloading {
+        if commonState == .downloading {
             return """
             ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
             ↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s
             """
-        } else if state == .seeding {
+        } else if commonState == .seeding {
             return "↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s"
         } else {
             return ""
@@ -50,7 +50,7 @@ extension TorrentExt {
     }
 
     var ratioOrETAString: String {
-        if state == .downloading {
+        if commonState == .downloading {
             return eta > 0
                 ? DateFormatters.etaFormatter.string(from: eta) ?? ""
                 : "∞"

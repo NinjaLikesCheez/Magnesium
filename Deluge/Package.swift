@@ -3,24 +3,24 @@
 import PackageDescription
 
 let package = Package(
-    name: "Coordinator",
+    name: "Deluge",
     platforms: [
         .iOS(.v13),
     ],
     products: [
         .library(
-            name: "Coordinator",
-            targets: ["Coordinator"]
+            name: "Deluge",
+            targets: ["Deluge"]
         ),
     ],
     targets: [
         .target(
-            name: "Coordinator",
+            name: "Deluge",
             dependencies: []
         ),
         .testTarget(
-            name: "CoordinatorTests",
-            dependencies: ["Coordinator"]
+            name: "DelugeTests",
+            dependencies: ["Deluge"]
         ),
     ]
 )

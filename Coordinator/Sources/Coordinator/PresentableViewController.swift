@@ -11,12 +11,12 @@ import UIKit
 
 open class PresentableViewController: UIViewController, Presentable {
     private let didDismissSubject = PassthroughSubject<Never, Never>()
-    
+
     public var didDismiss: AnyPublisher<Never, Never> {
         return didDismissSubject.eraseToAnyPublisher()
     }
 
-    override open func viewDidDisappear(_ animated: Bool) {
+    open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isBeingDismissedForCoordinator {
             didDismissSubject.send(completion: .finished)

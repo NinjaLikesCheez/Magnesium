@@ -109,11 +109,11 @@ private final class MockDelugeClient: DelugeClient {
         requests = Requests()
     }
 
-    func authenticate() -> AnyPublisher<Never, DelugeClientError> {
+    func authenticate() -> AnyPublisher<Never, DelugeError> {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeClientError> {
+    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
         requests.torrents += 1
 
         let torrents = [
@@ -138,31 +138,31 @@ private final class MockDelugeClient: DelugeClient {
             ),
         ]
         return Just(torrents)
-            .setFailureType(to: DelugeClientError.self)
+            .setFailureType(to: DelugeError.self)
             .eraseToAnyPublisher()
     }
 
-    func getLabels() -> AnyPublisher<[String], DelugeClientError> {
-        return Just([]).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
+    func getLabels() -> AnyPublisher<[String], DelugeError> {
+        return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeClientError> {
-        return Just([]).setFailureType(to: DelugeClientError.self).eraseToAnyPublisher()
+    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
+        return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
-    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeClientError> {
+    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeError> {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 
-    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeClientError> {
+    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
         return Empty(completeImmediately: true).eraseToAnyPublisher()
     }
 }

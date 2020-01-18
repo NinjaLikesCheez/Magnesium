@@ -37,13 +37,13 @@ struct DelugeTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
             .ui()
             .eraseToAnyPublisher()
         progressColor = torrentSubject
-            .map(\.state)
+            .map(\.commonState)
             .map { $0.displayColor }
             .ui()
             .eraseToAnyPublisher()
         status = torrentSubject
             .map { torrent in
-                "\(torrent.state.displayString) (\(Int(torrent.progress * 100))%)"
+                "\(torrent.commonState.displayString) (\(Int(torrent.progress * 100))%)"
             }
             .ui()
             .eraseToAnyPublisher()

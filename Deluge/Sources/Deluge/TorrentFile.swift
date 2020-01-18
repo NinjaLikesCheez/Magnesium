@@ -1,21 +1,20 @@
-//
-//  DelugeTorrentFile.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-08.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
-struct DelugeTorrentFile {
-    let name: String
-    let index: Int
-    let path: String
-    let size: Int64
-    let progress: Float
-    let priority: Int
+/// A Deluge torrent file.
+public struct TorrentFile {
+    /// The file name.
+    public let name: String
+    /// The file's index.
+    public let index: Int
+    /// The file's path.
+    public let path: String
+    /// The file's size in bytes.
+    public let size: Int64
+    /// The file's current progress.
+    public let progress: Float
+    /// The file's download priority.
+    public let priority: Int
 }
 
-extension DelugeTorrentFile {
+extension TorrentFile {
     init?(name: String, dictionary: [String: Any]) {
         guard let index = dictionary["index"] as? Int,
             let path = dictionary["path"] as? String,

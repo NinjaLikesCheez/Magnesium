@@ -195,7 +195,7 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
         coordinator?.showAlert(alert, from: source)
     }
 
-    private func displayError(_ error: DelugeClientError) {
+    private func displayError(_ error: DelugeError) {
         let message: String
         switch error {
         case .unauthenticated:

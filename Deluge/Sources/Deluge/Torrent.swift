@@ -1,34 +1,54 @@
-//
-//  DelugeTorrent.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-07.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Foundation
 
-struct DelugeTorrent {
-    let hash: String
-    let name: String
-    let state: TorrentState
-    let dateAdded: Date
-    let downloadRate: Int
-    let uploadRate: Int
-    let eta: TimeInterval
-    let progress: Float
-    let downloaded: Int64
-    let uploaded: Int64
-    let size: Int64
-    let seeds: Int
-    let totalSeeds: Int
-    let peers: Int
-    let totalPeers: Int
-    let trackers: [String]
-    let label: String
+/// A Deluge torrent.
+public struct Torrent {
+    /// The states of a torrent.
+    public enum State {
+        case downloading
+        case seeding
+        case paused
+        case checking
+        case queued
+        case error
+    }
+
+    /// The torrent's hash.
+    public let hash: String
+    /// The torrent's name.
+    public let name: String
+    /// The torrent's current state.
+    public let state: State
+    /// The date this torrent was added to the server.
+    public let dateAdded: Date
+    /// The torrent's current download rate.
+    public let downloadRate: Int
+    /// The torrent's current upload rate.
+    public let uploadRate: Int
+    /// The torrent's current ETA.
+    public let eta: TimeInterval
+    /// The torrent's current progress.
+    public let progress: Float
+    /// The amount of data currently downloaded for this torrent in bytes.
+    public let downloaded: Int64
+    /// The amount of data currently uploaded for this torrent in bytes.
+    public let uploaded: Int64
+    /// The size of the torrent in bytes.
+    public let size: Int64
+    /// The number of seeds currently connected to.
+    public let seeds: Int
+    /// The total number of seeds currently available.
+    public let totalSeeds: Int
+    /// The number of peers currently connected to.
+    public let peers: Int
+    /// The total number of peers currently available.
+    public let totalPeers: Int
+    /// The torrent's trackers.
+    public let trackers: [String]
+    /// The torrent's label.
+    public let label: String
 }
 
-extension DelugeTorrent {
+extension Torrent {
     init?(hash: String, dictionary: [String: Any]) {
         guard let name = dictionary["name"] as? String,
             let stateString = dictionary["state"] as? String,
@@ -85,6 +105,3 @@ extension DelugeTorrent {
         self.label = label
     }
 }
-
-extension DelugeTorrent: TorrentExt {}
-extension DelugeTorrent: SortableTorrent {}

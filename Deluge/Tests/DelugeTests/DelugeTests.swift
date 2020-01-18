@@ -1,12 +1,12 @@
-@testable import Coordinator
+@testable import Deluge
 import XCTest
 
-final class CoordinatorTests: XCTestCase {
+final class DelugeTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(Coordinator().text, "Hello, World!")
+        XCTAssertEqual(Deluge().text, "Hello, World!")
     }
 
     static var allTests = [

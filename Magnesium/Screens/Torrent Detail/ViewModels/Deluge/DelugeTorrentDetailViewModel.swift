@@ -193,7 +193,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     private func refreshFiles() -> AnyPublisher<Never, Error> {
-        return client.getTorrentFiles(hash: torrentSubject.value.hash)
+        return client.fetchTorrentFiles(hash: torrentSubject.value.hash)
             .handleEvents(receiveOutput: { new in
                 self.files.update(with: new.map { ($0.path, $0) })
             })
@@ -206,7 +206,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.actions.append(AlertAction(title: "Force Recheck", style: .default) {
-            self.client.recheck(hash: hash)
+            self.client.recheck(hashes: [hash])
                 .collect()
                 .delay(
                     for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
@@ -221,7 +221,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     func didSelectPause() {
-        client.pause(hash: torrentSubject.value.hash)
+        client.pause(hashes: [torrentSubject.value.hash])
             .collect()
             .delay(
                 for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
@@ -233,7 +233,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     func didSelectResume() {
-        client.resume(hash: torrentSubject.value.hash)
+        client.resume(hashes: [torrentSubject.value.hash])
             .collect()
             .delay(
                 for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
@@ -248,7 +248,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.actions.append(AlertAction(title: "Keep Data", style: .default) {
-            self.client.remove(hash: hash, removeData: false)
+            self.client.remove(hashes: [hash], removeData: false)
                 .collect()
                 .delay(
                     for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
@@ -262,7 +262,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .store(in: &self.observers)
         })
         alert.actions.append(AlertAction(title: "Remove Data", style: .destructive, handler: {
-            self.client.remove(hash: hash, removeData: true)
+            self.client.remove(hashes: [hash], removeData: true)
                 .collect()
                 .delay(
                     for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
