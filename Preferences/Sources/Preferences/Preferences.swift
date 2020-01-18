@@ -12,7 +12,7 @@ public protocol Preferences {
     ///   - key: The preference key.
     func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws
 
-    /// Retreives the value for a preference.
+    /// Retrieves the value for a preference.
     /// - Parameter key: The preference key.
     /// - Returns: The preference's value.
     func value<T>(for key: PreferenceKey<T>) throws -> T?

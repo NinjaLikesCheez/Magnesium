@@ -1,4 +1,4 @@
-/// A preference key with no associted type.
+/// A preference key with no associated type.
 public struct AnyPreferenceKey {
     /// The key's string value.
     public let value: String
