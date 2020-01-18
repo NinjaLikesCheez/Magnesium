@@ -9,11 +9,7 @@
 import Foundation
 
 struct TransmissionServerSettings: Codable {
-    struct Authentication: Codable {
-        var username: String
-        var password: String // TODO: keychain
-    }
-
     var url: URL
-    var authentication: Authentication?
+    var username: String?
+    var password: String? // TODO: keychain
 }

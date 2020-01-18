@@ -58,12 +58,13 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             isEnabled: serverEnabled.eraseToAnyPublisher(),
             keyboardType: .URL,
             returnKeyType: .next,
-            autocapitalizationType: .none
+            autocapitalizationType: .none,
+            autocorrectionType: .no
         )
     }()
 
     private lazy var usernameValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.authentication?.username)
+        return CurrentValueSubject(settings?.username)
     }()
 
     private lazy var usernameEnabled: CurrentValueSubject<Bool, Never> = {
@@ -76,14 +77,14 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             placeholder: "user (optional)",
             value: usernameValue,
             isEnabled: usernameEnabled.eraseToAnyPublisher(),
-            isSecure: true,
             returnKeyType: .next,
-            autocapitalizationType: .none
+            autocapitalizationType: .none,
+            autocorrectionType: .no
         )
     }()
 
     private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.authentication?.password)
+        return CurrentValueSubject(settings?.password)
     }()
 
     private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
@@ -166,25 +167,18 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             return
         }
 
-        var authentication: TransmissionClient.Authentication?
-        if let username = usernameValue.value, let password = passwordValue.value {
-            authentication = TransmissionClient.Authentication(username: username, password: password)
-        }
+        let username = usernameValue.value
+        let password = passwordValue.value
 
         isLoadingSubject.send(true)
-        let client = TransmissionClient(baseURL: url, authentication: authentication)
-        client.getTorrents() // TODO: use simple auth methods
+        let client = TransmissionClient(baseURL: url, username: username, password: password)
+        client.authenticate()
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:
                     do {
-                        let settings = TransmissionServerSettings(
-                            url: url,
-                            authentication: authentication.map {
-                                TransmissionServerSettings.Authentication(username: $0.username, password: $0.password)
-                            }
-                        )
+                        let settings = TransmissionServerSettings(url: url, username: username, password: password)
                         try self?.saveServer(name: name, settings: settings)
                     } catch {
                         self?.displayError(error, title: "Unable to Add Server")

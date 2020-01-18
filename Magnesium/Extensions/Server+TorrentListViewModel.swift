@@ -27,9 +27,8 @@ extension Server {
             }
             let client = TransmissionClient(
                 baseURL: settings.url,
-                authentication: settings.authentication.map {
-                    TransmissionClient.Authentication(username: $0.username, password: $0.password)
-                }
+                username: settings.username,
+                password: settings.password
             )
             return TransmissionTorrentListViewModel(coordinator: coordinator, client: client, preferences: preferences)
         }

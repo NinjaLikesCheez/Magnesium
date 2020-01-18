@@ -58,7 +58,8 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
             isEnabled: serverEnabled.eraseToAnyPublisher(),
             keyboardType: .URL,
             returnKeyType: .next,
-            autocapitalizationType: .none
+            autocapitalizationType: .none,
+            autocorrectionType: .no
         )
     }()
 
@@ -77,7 +78,8 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
             value: passwordValue,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
             isSecure: true,
-            returnKeyType: .send
+            returnKeyType: .send,
+            autocorrectionType: .no
         )
     }()
 

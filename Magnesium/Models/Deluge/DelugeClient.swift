@@ -78,8 +78,8 @@ final class DefaultDelugeClient: DelugeClient {
         URLSession.shared
     }()
 
-    var baseURL: URL
-    var password: String
+    let baseURL: URL
+    let password: String
 
     init(baseURL: URL, password: String) {
         self.baseURL = baseURL

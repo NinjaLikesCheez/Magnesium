@@ -63,12 +63,14 @@ final class TransmissionClient {
         URLSession.shared
     }()
 
-    var baseURL: URL
-    var authentication: Authentication? // TODO: actually use this
+    let baseURL: URL
+    let username: String?
+    let password: String?
 
-    init(baseURL: URL, authentication: Authentication?) {
+    init(baseURL: URL, username: String?, password: String?) {
         self.baseURL = baseURL
-        self.authentication = authentication
+        self.username = username
+        self.password = password
     }
 
     private func request(
@@ -81,6 +83,12 @@ final class TransmissionClient {
         var request = URLRequest(url: rpcUrl)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        if let username = username, let password = password {
+            if let data = "\(username):\(password)".data(using: .utf8) {
+                request.addValue("Basic \(data.base64EncodedString())", forHTTPHeaderField: "Authorization")
+            }
+        }
 
         if let sessionID = sessionID {
             request.addValue(sessionID, forHTTPHeaderField: Headers.sessionID)
@@ -155,9 +163,16 @@ final class TransmissionClient {
         }
     }
 
+    func authenticate() -> AnyPublisher<Never, TransmissionClientError> {
+        return request(method: "session-get", args: ["fields": ["version"]])
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
     func getTorrents() -> AnyPublisher<[TransmissionTorrent], TransmissionClientError> {
         let fields = [
             "id",
+            "hashString",
             "name",
             "status",
             "addedDate",
