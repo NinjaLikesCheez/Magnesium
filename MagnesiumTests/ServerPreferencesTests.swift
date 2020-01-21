@@ -52,7 +52,7 @@ class ServerPreferencesTests: XCTestCase {
             }
             .store(in: &observers)
         preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func testServerUpdatedPublisherEmitsUpdatedServer() {
@@ -69,7 +69,7 @@ class ServerPreferencesTests: XCTestCase {
         var server = self.server
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func testServerUpdatedPublisherNoValueWithSameServer() {
@@ -82,7 +82,7 @@ class ServerPreferencesTests: XCTestCase {
             }
             .store(in: &observers)
         preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func testServerUpdatedPublisherNilValueWithDeletedServer() {
@@ -95,6 +95,6 @@ class ServerPreferencesTests: XCTestCase {
             }
             .store(in: &observers)
         preferences.remove(server: server)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 }

@@ -100,7 +100,7 @@ class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(session.server, firstServer)
         try preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
         XCTAssertEqual(session.server, firstServer)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func testServerPublisherEmitsOnServerChange() throws {
