@@ -14,16 +14,7 @@ import XCTest
 class ServerPreferencesTests: XCTestCase {
     private let preferences = MockPreferences()
     private let server = Server(name: "Server 1", type: .deluge, data: Data())
-
-    override func setUp() {
-        super.setUp()
-        preferences.removeServers()
-    }
-
-    override func tearDown() {
-        super.tearDown()
-        preferences.removeServers()
-    }
+    private var observers = [AnyCancellable]()
 
     func testAddServer() {
         preferences.addOrUpdate(server: server)
@@ -54,13 +45,12 @@ class ServerPreferencesTests: XCTestCase {
 
     func testServerUpdatedPublisher() {
         let expectation = self.expectation(description: "Value received")
-        let observer = preferences.serverUpdatedPublisher(for: server)
+        preferences.serverUpdatedPublisher(for: server)
             .sink { updated in
                 XCTAssertEqual(updated, self.server)
                 expectation.fulfill()
             }
-        _ = observer
-
+            .store(in: &observers)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 1)
     }
@@ -69,14 +59,13 @@ class ServerPreferencesTests: XCTestCase {
         preferences.addOrUpdate(server: server)
 
         let expectation = self.expectation(description: "Value received")
-        let observer = preferences.serverUpdatedPublisher(for: server)
+        preferences.serverUpdatedPublisher(for: server)
             .sink { updated in
                 XCTAssertEqual(updated?.id, self.server.id)
                 XCTAssertEqual(updated?.name, "New Name")
                 expectation.fulfill()
             }
-        _ = observer
-
+            .store(in: &observers)
         var server = self.server
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
@@ -85,30 +74,26 @@ class ServerPreferencesTests: XCTestCase {
 
     func testServerUpdatedPublisherNoValueWithSameServer() {
         preferences.addOrUpdate(server: server)
-
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
-        let observer = preferences.serverUpdatedPublisher(for: server)
+        preferences.serverUpdatedPublisher(for: server)
             .sink { _ in
                 expectation.fulfill()
             }
-        _ = observer
-
+            .store(in: &observers)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 1)
     }
 
     func testServerUpdatedPublisherNilValueWithDeletedServer() {
         preferences.addOrUpdate(server: server)
-
         let expectation = self.expectation(description: "Value received")
-        let observer = preferences.serverUpdatedPublisher(for: server)
+        preferences.serverUpdatedPublisher(for: server)
             .sink { updated in
                 XCTAssertNil(updated)
                 expectation.fulfill()
             }
-        _ = observer
-
+            .store(in: &observers)
         preferences.remove(server: server)
         waitForExpectations(timeout: 1)
     }

@@ -14,11 +14,7 @@ import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
     private let preferences: Preferences = MockPreferences()
-
-    override func setUp() {
-        super.setUp()
-        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
-    }
+    private var observers = [AnyCancellable]()
 
     func testSelectionNavigatesToDetail() {
         let coordinator = MockCoordinator()
@@ -32,6 +28,8 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     }
 
     func testAutoUpdate() {
+        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
+
         let coordinator = MockCoordinator()
         let client = MockDelugeClient()
         let viewModel = DelugeTorrentListViewModel(
@@ -52,6 +50,8 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     }
 
     func testAutoUpdateStopsWhenDisabled() throws {
+        _ = try? preferences.registerDefault(1, for: PreferenceKeys.autoRefreshInterval)
+
         let coordinator = MockCoordinator()
         let client = MockDelugeClient()
         let viewModel = DelugeTorrentListViewModel(
@@ -80,6 +80,21 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
         waitForExpectations(timeout: 2)
     }
+
+    func testRefreshShowsError() {
+        let coordinator = MockCoordinator()
+        let client = MockDelugeClient()
+        let viewModel = DelugeTorrentListViewModel(
+            coordinator: coordinator,
+            client: client,
+            preferences: preferences
+        )
+        _ = viewModel
+        client.throwError = true
+        XCTAssertTrue(coordinator.alert == nil)
+        viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        XCTAssertEqual(coordinator.alert?.message, DelugeError.unauthenticated.errorDescription)
+    }
 }
 
 private final class MockCoordinator: TorrentListCoordinator {
@@ -88,14 +103,20 @@ private final class MockCoordinator: TorrentListCoordinator {
     }
 
     let presentationViewController = UIViewController()
-    private(set) var wasShowTorrentDetailCalled = false
+    var wasShowTorrentDetailCalled = false
+    var alert: Alert?
     var childCoordinators: [Coordinator] = []
     var childCoordinatorObservers: [AnyCancellable] = []
 
     func start() -> Presentable { return MockPresentable() }
     func showSettings() {}
+
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
         wasShowTorrentDetailCalled = true
+    }
+
+    func showAlert(_ alert: Alert, from source: PopoverSource? = nil) {
+        self.alert = alert
     }
 }
 
@@ -105,6 +126,7 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     private(set) var requests = Requests()
+    var throwError = false
 
     func resetRequests() {
         requests = Requests()
@@ -115,30 +137,12 @@ private final class MockDelugeClient: DelugeClient {
     }
 
     func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
-        requests.torrents += 1
+        guard !throwError else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
 
-        let torrents = [
-            DelugeTorrent(
-                hash: "",
-                name: "",
-                state: .seeding,
-                dateAdded: Date(),
-                downloadRate: 0,
-                uploadRate: 0,
-                eta: 0,
-                progress: 1,
-                downloaded: 0,
-                uploaded: 0,
-                size: 0,
-                seeds: 0,
-                totalSeeds: 0,
-                peers: 0,
-                totalPeers: 0,
-                trackers: [],
-                label: ""
-            ),
-        ]
-        return Just(torrents)
+        requests.torrents += 1
+        return Just([DelugeTorrent.mock()])
             .setFailureType(to: DelugeError.self)
             .eraseToAnyPublisher()
     }

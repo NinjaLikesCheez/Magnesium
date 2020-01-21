@@ -12,59 +12,25 @@ import XCTest
 
 class DelugeTorrentListItemViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
-
-    private let subject = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent(
-        hash: "A",
-        name: "",
-        state: .downloading,
-        dateAdded: Date(),
-        downloadRate: 0,
-        uploadRate: 0,
-        eta: 0,
-        progress: 0,
-        downloaded: 0,
-        uploaded: 0,
-        size: 0,
-        seeds: 0,
-        totalSeeds: 0,
-        peers: 0,
-        totalPeers: 0,
-        trackers: [],
-        label: ""
-    ))
-
+    private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
     private lazy var viewModel = DelugeTorrentListItemViewModel(torrentSubject: subject)
 
     func testEquality() {
-        var torrent = DelugeTorrent(
-            hash: "A",
-            name: "",
-            state: .seeding,
-            dateAdded: Date(),
-            downloadRate: 0,
-            uploadRate: 0,
-            eta: 0,
-            progress: 0,
-            downloaded: 0,
-            uploaded: 0,
-            size: 0,
-            seeds: 0,
-            totalSeeds: 0,
-            peers: 0,
-            totalPeers: 0,
-            trackers: [],
-            label: ""
-        )
+        var torrent1 = DelugeTorrent.mock()
+        torrent1.hash = "A"
+
+        var torrent2 = DelugeTorrent.mock()
+        torrent2.hash = "A"
 
         XCTAssertEqual(
-            DelugeTorrentListItemViewModel(torrentSubject: subject),
-            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent))
+            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent1)),
+            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent2))
         )
 
-        torrent.hash = "B"
+        torrent2.hash = "B"
         XCTAssertNotEqual(
-            DelugeTorrentListItemViewModel(torrentSubject: subject),
-            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent))
+            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent1)),
+            DelugeTorrentListItemViewModel(torrentSubject: CurrentValueSubject(torrent2))
         )
     }
 
