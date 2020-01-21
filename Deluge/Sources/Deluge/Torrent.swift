@@ -13,39 +13,39 @@ public struct Torrent {
     }
 
     /// The torrent's hash.
-    public let hash: String
+    public var hash: String
     /// The torrent's name.
-    public let name: String
+    public var name: String
     /// The torrent's current state.
-    public let state: State
+    public var state: State
     /// The date the torrent was added to the server.
-    public let dateAdded: Date
+    public var dateAdded: Date
     /// The torrent's current download rate in bytes/s.
-    public let downloadRate: Int64
+    public var downloadRate: Int64
     /// The torrent's current upload rate in bytes/s.
-    public let uploadRate: Int64
+    public var uploadRate: Int64
     /// The torrent's current ETA.
-    public let eta: TimeInterval
+    public var eta: TimeInterval
     /// The torrent's current progress.
-    public let progress: Float
+    public var progress: Float
     /// The amount of data currently downloaded for the torrent in bytes.
-    public let downloaded: Int64
+    public var downloaded: Int64
     /// The amount of data currently uploaded for the torrent in bytes.
-    public let uploaded: Int64
+    public var uploaded: Int64
     /// The size of the torrent in bytes.
-    public let size: Int64
+    public var size: Int64
     /// The number of seeds currently connected to.
-    public let seeds: Int
+    public var seeds: Int
     /// The total number of seeds currently available.
-    public let totalSeeds: Int
+    public var totalSeeds: Int
     /// The number of peers currently connected to.
-    public let peers: Int
+    public var peers: Int
     /// The total number of peers currently available.
-    public let totalPeers: Int
+    public var totalPeers: Int
     /// The torrent's trackers.
-    public let trackers: [String]
+    public var trackers: [String]
     /// The torrent's label.
-    public let label: String
+    public var label: String
 
     public init(
         hash: String,

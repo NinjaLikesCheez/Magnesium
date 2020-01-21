@@ -29,30 +29,22 @@ extension TorrentExt {
     }
 
     var speedString: String {
-        let formatter = ByteCountFormatter()
-        formatter.allowsNonnumericFormatting = false
-        formatter.allowedUnits = ByteCountFormatter.Units.useAll.subtracting(.useBytes)
-
         if commonState == .downloading {
             return """
-            ↓ \(formatter.string(fromByteCount: downloadRate))/s \
-            ↑ \(formatter.string(fromByteCount: uploadRate))/s
+            ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
+            ↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s
             """
         } else if commonState == .seeding {
-            return "↑ \(formatter.string(fromByteCount: uploadRate))/s"
+            return "↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s"
         } else {
             return ""
         }
     }
 
     var progressString: String {
-        let formatter = ByteCountFormatter()
-        formatter.allowsNonnumericFormatting = false
-        formatter.zeroPadsFractionDigits = true
-
         return """
-        \(formatter.string(fromByteCount: downloaded)) / \
-        \(formatter.string(fromByteCount: size)) \
+        \(ByteFormatter.string(fromByteCount: downloaded)) / \
+        \(ByteFormatter.string(fromByteCount: size)) \
         (\(Int(progress * 100))%)
         """
     }
@@ -63,7 +55,7 @@ extension TorrentExt {
                 ? DateFormatters.etaFormatter.string(from: eta) ?? ""
                 : "∞"
         } else {
-            return "Ratio: \(!ratio.isNaN ? String(format: "%.1f", ratio) : "∞")"
+            return "Ratio: \(!ratio.isInfinite ? String(format: "%.1f", ratio) : "∞")"
         }
     }
 }
