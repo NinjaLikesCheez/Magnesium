@@ -122,17 +122,47 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         viewModel.speed
             .dropFirst()
+            .first()
             .sink {
                 XCTAssertEqual($0, "↓ 8.1 MB/s ↑ 1.2 MB/s")
                 expectation.fulfill()
             }
             .store(in: &observers)
         var torrent = subject.value
+        torrent.state = .downloading
         torrent.downloadRate = 8_483_920
         torrent.uploadRate = 1_249_493
         subject.send(torrent)
-
         waitForExpectations(timeout: 0)
+
+        let seedingExpectation = self.expectation(description: "Value received")
+        viewModel.speed
+            .dropFirst()
+            .first()
+            .sink {
+                XCTAssertEqual($0, "↑ 1.2 MB/s")
+                seedingExpectation.fulfill()
+            }
+            .store(in: &observers)
+        torrent.state = .seeding
+        subject.send(torrent)
+        waitForExpectations(timeout: 0)
+
+        let emptyStates: [DelugeTorrent.State] = [.paused, .checking, .queued, .error]
+        for state in emptyStates {
+            let expectation = self.expectation(description: "Value received")
+            viewModel.speed
+                .dropFirst()
+                .first()
+                .sink {
+                    XCTAssertTrue($0.isEmpty)
+                    expectation.fulfill()
+                }
+                .store(in: &observers)
+            torrent.state = state
+            subject.send(torrent)
+            waitForExpectations(timeout: 0)
+        }
     }
 
     func testProgressString() {
