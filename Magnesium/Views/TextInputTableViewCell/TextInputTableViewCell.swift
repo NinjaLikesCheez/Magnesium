@@ -84,9 +84,9 @@ final class TextInputTableViewCell: UITableViewCell {
         textField.isSecureTextEntry = viewModel.isSecure
         textField.keyboardType = viewModel.keyboardType
         textField.returnKeyType = viewModel.returnKeyType
-        textField.textContentType = viewModel.textContentType
         textField.autocapitalizationType = viewModel.autocapitalizationType
         textField.autocorrectionType = viewModel.autocorrectionType
+        textField.textContentType = viewModel.textContentType
         viewModel.value
             .filter { [weak textField] in textField?.text != $0 }
             .assign(to: \.text, on: textField)

@@ -31,6 +31,12 @@ final class TorrentListViewController: UITableViewController {
             target: self,
             action: #selector(settingsButtonTapped(_:))
         )
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            image: UIImage(systemName: "plus"),
+            style: .plain,
+            target: self,
+            action: #selector(addButtonTapped(_:))
+        )
     }
 
     required init?(coder: NSCoder) {
@@ -89,6 +95,11 @@ final class TorrentListViewController: UITableViewController {
     }
 
     @objc
+    private func addButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.didSelectAdd()
+    }
+
+    @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
         refreshObserver = viewModel.refresh().sink(receiveCompletion: { [weak sender] _ in
             sender?.endRefreshing()
@@ -128,6 +139,7 @@ final class TorrentListViewController: UITableViewController {
         private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
             func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
             func showSettings() {}
+            func showAddLink() -> AnyPublisher<String, Never> { Empty().eraseToAnyPublisher() }
         }
 
         static var previews: some View {

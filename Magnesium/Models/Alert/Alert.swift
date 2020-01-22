@@ -33,4 +33,8 @@ public struct Alert {
         self.message = message
         self.style = style
     }
+
+    mutating func addAction(_ action: AlertAction) {
+        actions.append(action)
+    }
 }

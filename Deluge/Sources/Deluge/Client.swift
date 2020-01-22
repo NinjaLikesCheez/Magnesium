@@ -42,9 +42,8 @@ public final class Client {
         params: [Any],
         authenticateIfNeeded: Bool = true
     ) -> AnyPublisher<[String: Any], Error> {
-        let rpcUrl = baseURL.appendingPathComponent("json")
-
-        var request = URLRequest(url: rpcUrl)
+        let url = baseURL.appendingPathComponent("json")
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -58,6 +57,16 @@ public final class Client {
             return Fail(error: .encoding(error)).eraseToAnyPublisher()
         }
 
+        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
+            return self.request(method: method, params: params, authenticateIfNeeded: false)
+        }
+    }
+
+    private func send(
+        request: URLRequest,
+        authenticateIfNeeded: Bool,
+        retry: @escaping () -> AnyPublisher<[String: Any], Error>
+    ) -> AnyPublisher<[String: Any], Error> {
         return session.dataTaskPublisher(for: request)
             .mapError { .request($0) }
             .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
@@ -77,7 +86,7 @@ public final class Client {
 
                 return self.authenticate()
                     .flatMap { _ -> AnyPublisher<[String: Any], Error> in
-                        self.request(method: method, params: params, authenticateIfNeeded: false)
+                        retry()
                     }
                     .eraseToAnyPublisher()
             }
@@ -161,8 +170,8 @@ public final class Client {
     /// Fetches the list labels from the server.
     public func fetchLabels() -> AnyPublisher<[String], Error> {
         return request(method: "label.get_labels", params: [])
-            .flatMap { value -> AnyPublisher<[String], Error> in
-                guard let result = value["result"] as? [String] else {
+            .flatMap { response -> AnyPublisher<[String], Error> in
+                guard let result = response["result"] as? [String] else {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
@@ -249,6 +258,64 @@ public final class Client {
         return request(method: "core.force_recheck", params: [hashes])
             .ignoreOutput()
             .eraseToAnyPublisher()
+    }
+
+    /// Adds a torrent using a URL to a torrent file.
+    /// - Parameter url: The torrent file URL.
+    public func add(url: URL) -> AnyPublisher<Never, Error> {
+        return request(method: "core.add_torrent_url", params: [url.absoluteString, [String: Any]()])
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    /// Adds a torrent using a magnet link.
+    /// - Parameter magnetURL: The magnet link to add.
+    public func add(magnetURL: URL) -> AnyPublisher<Never, Error> {
+        return request(method: "core.add_torrent_magnet", params: [magnetURL.absoluteString, [String: Any]()])
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    /// Adds a torrent using a local file URL.
+    /// - Parameter fileURL: The URL of the file to add.
+    public func add(fileURL: URL) -> AnyPublisher<Never, Error> {
+        return upload(fileURL: fileURL)
+            .flatMap { response -> AnyPublisher<[String: Any], Error> in
+                guard let path = (response["files"] as? [String])?.first else {
+                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
+                }
+
+                return self.request(method: "web.add_torrents", params: [[["path": path]]])
+            }
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    private func upload(fileURL: URL, authenticateIfNeeded: Bool = true) -> AnyPublisher<[String: Any], Error> {
+        let url = baseURL.appendingPathComponent("json")
+        let boundary = UUID().uuidString
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.httpBody = multipartBody(fileURL: fileURL, boundary: boundary)
+        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
+            return self.upload(fileURL: fileURL, authenticateIfNeeded: false)
+        }
+    }
+
+    private func multipartBody(fileURL: URL, boundary: String) -> Data? {
+        guard fileURL.isFileURL, let data = try? Data(contentsOf: fileURL) else {
+            return nil
+        }
+
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n"
+            .data(using: .utf8)!)
+        body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n--\(boundary)--".data(using: .utf8)!)
+        return body
     }
 }
 

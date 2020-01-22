@@ -27,7 +27,7 @@ public struct AlertAction {
     ///   - title: The action's title.
     ///   - style: The action's style.
     ///   - handler: The action's handler.
-    public init(title: String, style: Style, handler: (() -> Void)?) {
+    public init(title: String, style: Style, handler: (() -> Void)? = nil) {
         self.title = title
         self.style = style
         self.handler = handler

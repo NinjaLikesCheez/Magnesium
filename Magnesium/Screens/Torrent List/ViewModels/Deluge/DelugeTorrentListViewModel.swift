@@ -13,11 +13,11 @@ import Preferences
 final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
     private let client: DelugeClient
     private let preferences: Preferences
-    private var observers = [AnyCancellable]()
     private let torrents = TorrentSubjectMapManager<String, DelugeTorrent>()
     private var autoUpdateTimer: Timer?
     private(set) weak var coordinator: TorrentListCoordinator?
     let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
+    var observers = [AnyCancellable]()
 
     init(coordinator: TorrentListCoordinator, client: DelugeClient, preferences: Preferences) {
         self.coordinator = coordinator
@@ -77,7 +77,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .handleEvents(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case let .failure(error):
-                    self?.displayError(error, title: "Update Failed")
+                    self?.showError(title: "Update Failed", message: error.localizedDescription)
                 case .finished:
                     break
                 }
@@ -96,13 +96,40 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         coordinator?.showTorrentDetail(viewModel)
     }
 
-    private func displayError(_ error: Error, title: String) {
+    func addLink(_ url: String) {
+        guard let url = URL(string: url) else {
+            showError(title: "Unable to Add Link", message: "That link doesn't appear to be valid.")
+            return
+        }
+
+        let publisher: AnyPublisher<Never, DelugeError>
+
+        if url.scheme == "magnet" {
+            publisher = client.add(magnetURL: url)
+        } else {
+            publisher = client.add(url: url)
+        }
+
+        publisher
+            .ui()
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case let .failure(error):
+                    self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func showError(title: String, message: String?) {
         var alert = Alert(
             title: title,
-            message: error.localizedDescription,
+            message: message,
             style: .alert
         )
-        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(AlertAction(title: "OK", style: .default))
         coordinator?.showAlert(alert)
     }
 }

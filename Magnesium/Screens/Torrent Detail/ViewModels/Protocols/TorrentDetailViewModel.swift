@@ -11,6 +11,8 @@ import Combine
 protocol TorrentDetailViewModel {
     var coordinator: TorrentDetailCoordinator? { get set }
     var sections: AnyPublisher<[TorrentDetailSection], Never> { get }
+    func didAppear()
+    func didDisappear()
     func refresh() -> AnyPublisher<Never, Error>
     func didSelectMoreOptions(from source: PopoverSource)
     func didSelectPause()

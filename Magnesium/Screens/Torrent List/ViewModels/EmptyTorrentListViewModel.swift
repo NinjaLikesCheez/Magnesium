@@ -9,7 +9,12 @@
 import Combine
 
 final class EmptyTorrentListViewModel: TorrentListViewModel {
+    var observers = [AnyCancellable]()
     var coordinator: TorrentListCoordinator?
+
+    var showAddButton: Bool {
+        return false
+    }
 
     init(coordinator: TorrentListCoordinator) {
         self.coordinator = coordinator
@@ -24,6 +29,10 @@ final class EmptyTorrentListViewModel: TorrentListViewModel {
     }
 
     func didSelectItem(at index: Int) {
+        // noop
+    }
+
+    func addLink(_ url: String) {
         // noop
     }
 }

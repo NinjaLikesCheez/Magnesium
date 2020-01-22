@@ -33,6 +33,6 @@ public extension Coordinator {
     }
 
     func removeChildCoordinator(childCoordinator: Coordinator) {
-        childCoordinators = childCoordinators.filter { $0 !== childCoordinator }
+        childCoordinators.removeAll { $0 === childCoordinator }
     }
 }

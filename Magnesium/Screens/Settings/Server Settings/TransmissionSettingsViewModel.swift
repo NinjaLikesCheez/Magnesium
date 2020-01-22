@@ -59,7 +59,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             keyboardType: .URL,
             returnKeyType: .next,
             autocapitalizationType: .none,
-            autocorrectionType: .no
+            textContentType: .URL
         )
     }()
 
@@ -181,10 +181,10 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
                         let settings = TransmissionServerSettings(url: url, username: username, password: password)
                         try self?.saveServer(name: name, settings: settings)
                     } catch {
-                        self?.displayError(error, title: "Unable to Add Server")
+                        self?.showError(title: "Unable to Add Server", message: error.localizedDescription)
                     }
                 case let .failure(error):
-                    self?.displayError(error)
+                    self?.showError(error)
                 }
                 self?.isLoadingSubject.send(false)
             }, receiveValue: { _ in })
@@ -205,16 +205,16 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
 
     func didSelectDelete(from source: PopoverSource) {
         var alert = Alert(title: nil, message: "Are you sure you want to delete this server?", style: .actionSheet)
-        alert.actions.append(AlertAction(title: "Delete Server", style: .destructive, handler: { [weak self] in
+        alert.addAction(AlertAction(title: "Delete Server", style: .destructive, handler: { [weak self] in
             guard let server = self?.server else { return }
             self?.preferences.remove(server: server)
             self?.coordinator?.complete()
         }))
-        alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         coordinator?.showAlert(alert, from: source)
     }
 
-    private func displayError(_ error: TransmissionError) {
+    private func showError(_ error: TransmissionError) {
         let message: String
         switch error {
         case .unauthenticated:
@@ -223,22 +223,16 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             message = error.localizedDescription
         }
 
+        showError(title: "Authentication Failed", message: message)
+    }
+
+    private func showError(title: String, message: String?) {
         var alert = Alert(
-            title: "Authentication Failed",
+            title: title,
             message: message,
             style: .alert
         )
-        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
-        coordinator?.showAlert(alert)
-    }
-
-    private func displayError(_ error: Error, title: String) {
-        var alert = Alert(
-            title: title,
-            message: error.localizedDescription,
-            style: .alert
-        )
-        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(AlertAction(title: "OK", style: .default))
         coordinator?.showAlert(alert)
     }
 }

@@ -17,9 +17,9 @@ protocol TextInputTableViewCellViewModel {
     var isSecure: Bool { get }
     var keyboardType: UIKeyboardType { get }
     var returnKeyType: UIReturnKeyType { get }
-    var textContentType: UITextContentType? { get }
     var autocapitalizationType: UITextAutocapitalizationType { get }
     var autocorrectionType: UITextAutocorrectionType { get }
+    var textContentType: UITextContentType? { get }
 }
 
 struct DefaultTextInputTableViewCellViewModel: TextInputTableViewCellViewModel {
@@ -30,7 +30,7 @@ struct DefaultTextInputTableViewCellViewModel: TextInputTableViewCellViewModel {
     var isSecure: Bool = false
     var keyboardType: UIKeyboardType = .default
     var returnKeyType: UIReturnKeyType = .default
-    var textContentType: UITextContentType?
     var autocapitalizationType: UITextAutocapitalizationType = .sentences
     var autocorrectionType: UITextAutocorrectionType = .default
+    var textContentType: UITextContentType?
 }

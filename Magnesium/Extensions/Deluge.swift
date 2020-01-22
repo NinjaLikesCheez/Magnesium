@@ -8,6 +8,7 @@
 
 import Combine
 import Deluge
+import Foundation
 
 typealias DelugeError = Deluge.Client.Error
 typealias DefaultDelugeClient = Deluge.Client
@@ -23,6 +24,9 @@ protocol DelugeClient {
     func resume(hashes: [String]) -> AnyPublisher<Never, DelugeError>
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeError>
     func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeError>
+    func add(url: URL) -> AnyPublisher<Never, DelugeError>
+    func add(magnetURL: URL) -> AnyPublisher<Never, DelugeError>
+    func add(fileURL: URL) -> AnyPublisher<Never, DelugeError>
 }
 
 extension DefaultDelugeClient: DelugeClient {}

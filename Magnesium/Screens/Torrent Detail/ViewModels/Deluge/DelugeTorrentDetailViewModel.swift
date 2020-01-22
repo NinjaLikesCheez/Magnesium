@@ -14,10 +14,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private static let refreshDelay: TimeInterval = 1
 
     private let client: DelugeClient
+    private let preferences: Preferences
     private let refresher: DelugeRefreshable
     private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
+    private var timerIntervalObserver: AnyCancellable?
 
     private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
         CurrentValueSubjectMapManager(sort: Just {
@@ -40,6 +42,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         refresher: DelugeRefreshable
     ) {
         self.torrentSubject = torrentSubject
+        self.preferences = preferences
         self.client = client
         self.refresher = refresher
 
@@ -58,12 +61,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
-
-        preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureAutoUpdateTimer(interval: value)
-            })
             .store(in: &observers)
     }
 
@@ -159,6 +156,22 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         return sections
     }
 
+    func didAppear() {
+        if let timer = autoUpdateTimer, timer.isValid {
+            return
+        }
+
+        timerIntervalObserver = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
+                self?.configureAutoUpdateTimer(interval: value)
+            })
+    }
+
+    func didDisappear() {
+        autoUpdateTimer?.invalidate()
+        timerIntervalObserver?.cancel()
+    }
+
     private func configureAutoUpdateTimer(interval: TimeInterval?) {
         autoUpdateTimer?.invalidate()
         guard let interval = interval, interval > 0 else { return }
@@ -184,7 +197,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .handleEvents(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case let .failure(error):
-                    self?.displayError(error, title: "Update Failed")
+                    self?.showError(title: "Update Failed", message: error.localizedDescription)
                 case .finished:
                     break
                 }
@@ -205,7 +218,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     func didSelectMoreOptions(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.actions.append(AlertAction(title: "Force Recheck", style: .default) {
+        alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
             self.client.recheck(hashes: [hash])
                 .collect()
                 .delay(
@@ -216,7 +229,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
-        alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         coordinator?.showAlert(alert, from: source)
     }
 
@@ -247,7 +260,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     func didSelectRemove(from source: PopoverSource) {
         let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.actions.append(AlertAction(title: "Keep Data", style: .default) {
+        alert.addAction(AlertAction(title: "Keep Data", style: .default) {
             self.client.remove(hashes: [hash], removeData: false)
                 .collect()
                 .delay(
@@ -261,7 +274,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
-        alert.actions.append(AlertAction(title: "Remove Data", style: .destructive, handler: {
+        alert.addAction(AlertAction(title: "Remove Data", style: .destructive, handler: {
             self.client.remove(hashes: [hash], removeData: true)
                 .collect()
                 .delay(
@@ -275,17 +288,17 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         }))
-        alert.actions.append(AlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         coordinator?.showAlert(alert, from: source)
     }
 
-    private func displayError(_ error: Error, title: String) {
+    private func showError(title: String, message: String?) {
         var alert = Alert(
             title: title,
-            message: error.localizedDescription,
+            message: message,
             style: .alert
         )
-        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(AlertAction(title: "OK", style: .default))
         coordinator?.showAlert(alert)
     }
 }

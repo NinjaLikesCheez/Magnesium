@@ -120,6 +120,16 @@ final class TorrentDetailViewController: UITableViewController {
             .store(in: &observers)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel.didAppear()
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel.didDisappear()
+    }
+
     private func update(with sections: [TorrentDetailSection]) {
         let animate = !isFirstSnapshot
         isFirstSnapshot = false

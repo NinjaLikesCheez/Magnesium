@@ -14,10 +14,10 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private let client: DefaultTransmissionClient
     private let preferences: Preferences
     private let torrents = TorrentSubjectMapManager<Int, TransmissionTorrent>()
-    private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
     private(set) weak var coordinator: TorrentListCoordinator?
     let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
+    var observers = [AnyCancellable]()
 
     init(coordinator: TorrentListCoordinator, client: DefaultTransmissionClient, preferences: Preferences) {
         self.coordinator = coordinator
@@ -77,7 +77,7 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             .handleEvents(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case let .failure(error):
-                    self?.displayError(error, title: "Update Failed")
+                    self?.showError(title: "Update Failed", message: error.localizedDescription)
                 case .finished:
                     break
                 }
@@ -89,13 +89,17 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
         // TODO:
     }
 
-    private func displayError(_ error: Error, title: String) {
+    func addLink(_ url: String) {
+        // TODO:
+    }
+
+    private func showError(title: String, message: String?) {
         var alert = Alert(
             title: title,
-            message: error.localizedDescription,
+            message: message,
             style: .alert
         )
-        alert.actions.append(AlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(AlertAction(title: "OK", style: .default))
         coordinator?.showAlert(alert)
     }
 }
