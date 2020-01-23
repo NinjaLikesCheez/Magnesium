@@ -9,6 +9,8 @@ public final class Client {
         case encoding(Swift.Error)
         /// An error occurred while decoding the response.
         case decoding(Swift.Error)
+        /// A filesystem error occurred.
+        case filesystem(Swift.Error)
         /// A request error occurred.
         case request(URLError)
         /// The server returned an unexpected status code.
@@ -56,9 +58,8 @@ public final class Client {
         args: [String: Any],
         handleSessionID: Bool = true
     ) -> AnyPublisher<[String: Any], Error> {
-        let rpcUrl = baseURL.appendingPathComponent("transmission").appendingPathComponent("rpc")
-
-        var request = URLRequest(url: rpcUrl)
+        let url = baseURL.appendingPathComponent("transmission").appendingPathComponent("rpc")
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
@@ -182,6 +183,27 @@ public final class Client {
             }
             .eraseToAnyPublisher()
     }
+
+    /// Adds a torrent using a link to a torrent file or a magnet link.
+    /// - Parameter url: A torrent link or magnet link.
+    public func add(url: URL) -> AnyPublisher<Never, Error> {
+        return request(method: "torrent-add", args: ["filename": url.absoluteString])
+            .ignoreOutput()
+            .eraseToAnyPublisher()
+    }
+
+    /// Adds a torrent using a local file URL.
+    /// - Parameter fileURL: The URL of the file to add.
+    public func add(fileURL: URL) -> AnyPublisher<Never, Error> {
+        do {
+            let data = try Data(contentsOf: fileURL)
+            return request(method: "torrent-add", args: ["metainfo": data.base64EncodedString()])
+                .ignoreOutput()
+                .eraseToAnyPublisher()
+        } catch {
+            return Fail(error: .filesystem(error)).eraseToAnyPublisher()
+        }
+    }
 }
 
 extension Client.Error: LocalizedError {
@@ -190,6 +212,8 @@ extension Client.Error: LocalizedError {
         case let .encoding(error):
             return error.localizedDescription
         case let .decoding(error):
+            return error.localizedDescription
+        case let .filesystem(error):
             return error.localizedDescription
         case let .request(error):
             return error.localizedDescription

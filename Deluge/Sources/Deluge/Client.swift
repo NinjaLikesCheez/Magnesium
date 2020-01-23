@@ -260,8 +260,8 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Adds a torrent using a URL to a torrent file.
-    /// - Parameter url: The torrent file URL.
+    /// Adds a torrent using a link to a torrent file.
+    /// - Parameter url: The torrent file link.
     public func add(url: URL) -> AnyPublisher<Never, Error> {
         return request(method: "core.add_torrent_url", params: [url.absoluteString, [String: Any]()])
             .ignoreOutput()

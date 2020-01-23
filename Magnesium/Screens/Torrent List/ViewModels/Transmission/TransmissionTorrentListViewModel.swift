@@ -90,7 +90,22 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     }
 
     func addLink(_ url: String) {
-        // TODO:
+        guard let url = URL(string: url) else {
+            showError(title: "Unable to Add Link", message: "That link doesn't appear to be valid.")
+            return
+        }
+
+        client.add(url: url)
+            .ui()
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case let .failure(error):
+                    self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                case .finished:
+                    break
+                }
+            }, receiveValue: { _ in })
+            .store(in: &observers)
     }
 
     private func showError(title: String, message: String?) {
