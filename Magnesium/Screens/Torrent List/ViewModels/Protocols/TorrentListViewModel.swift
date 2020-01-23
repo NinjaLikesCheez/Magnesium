@@ -14,7 +14,7 @@ protocol TorrentListViewModel: AnyObject {
     var coordinator: TorrentListCoordinator? { get }
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> { get }
 
-    func refresh() -> AnyPublisher<Never, Error>
+    func refresh() -> AnyPublisher<Void, Error>
     func didSelectSettings()
     func didSelectAdd()
     func didSelectItem(at index: Int)

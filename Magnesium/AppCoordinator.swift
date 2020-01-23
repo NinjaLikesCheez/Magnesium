@@ -13,7 +13,7 @@ import UIKit
 
 final class AppCoordinator: Coordinator {
     private class AppPresentable: Presentable {
-        let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+        let didDismiss: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     }
 
     private let window: UIWindow

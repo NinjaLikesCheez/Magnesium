@@ -13,7 +13,7 @@ protocol TorrentDetailViewModel {
     var sections: AnyPublisher<[TorrentDetailSection], Never> { get }
     func didAppear()
     func didDisappear()
-    func refresh() -> AnyPublisher<Never, Error>
+    func refresh() -> AnyPublisher<Void, Error>
     func didSelectMoreOptions(from source: PopoverSource)
     func didSelectPause()
     func didSelectResume()

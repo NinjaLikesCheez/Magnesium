@@ -16,17 +16,17 @@ typealias DelugeTorrent = Deluge.Torrent
 typealias DelugeTorrentFile = Deluge.TorrentFile
 
 protocol DelugeClient {
-    func authenticate() -> AnyPublisher<Never, DelugeError>
+    func authenticate() -> AnyPublisher<Void, DelugeError>
     func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError>
     func fetchLabels() -> AnyPublisher<[String], DelugeError>
     func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError>
-    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeError>
-    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeError>
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeError>
-    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeError>
-    func add(url: URL) -> AnyPublisher<Never, DelugeError>
-    func add(magnetURL: URL) -> AnyPublisher<Never, DelugeError>
-    func add(fileURL: URL) -> AnyPublisher<Never, DelugeError>
+    func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError>
+    func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError>
+    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError>
+    func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError>
+    func add(url: URL) -> AnyPublisher<Void, DelugeError>
+    func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError>
+    func add(fileURL: URL) -> AnyPublisher<Void, DelugeError>
 }
 
 extension DefaultDelugeClient: DelugeClient {}

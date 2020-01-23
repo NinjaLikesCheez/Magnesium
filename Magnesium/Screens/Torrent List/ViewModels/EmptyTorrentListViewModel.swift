@@ -24,8 +24,8 @@ final class EmptyTorrentListViewModel: TorrentListViewModel {
         return Just([]).eraseToAnyPublisher()
     }
 
-    func refresh() -> AnyPublisher<Never, Error> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func refresh() -> AnyPublisher<Void, Error> {
+        return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 
     func didSelectItem(at index: Int) {

@@ -21,7 +21,7 @@ final class MockPreferences: Preferences {
         storage[key.value] = value
     }
 
-    func value<T>(for key: PreferenceKey<T>) throws -> T? {
+    func value<T>(for key: PreferenceKey<T>) -> T? {
         return storage[key.value] as? T
     }
 

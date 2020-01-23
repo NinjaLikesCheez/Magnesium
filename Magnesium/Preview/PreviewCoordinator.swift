@@ -12,7 +12,7 @@ import UIKit
 
 #if DEBUG
     class PreviewPresentable: Presentable {
-        let didDismiss: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+        let didDismiss: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
     }
 
     class PreviewCoordinator: Coordinator, PresentationCoordinator {

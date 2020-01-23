@@ -139,7 +139,7 @@ final class TorrentListViewController: UITableViewController {
         private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
             func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
             func showSettings() {}
-            func showAddLink() -> AnyPublisher<String, Never> { Empty().eraseToAnyPublisher() }
+            func showAddLink() -> AnyPublisher<String, Never> { Empty(completeImmediately: true).eraseToAnyPublisher() }
         }
 
         static var previews: some View {

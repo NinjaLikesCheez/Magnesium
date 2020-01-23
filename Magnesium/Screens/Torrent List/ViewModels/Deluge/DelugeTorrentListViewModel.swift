@@ -61,16 +61,16 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .store(in: &observers)
     }
 
-    func refreshTorrents() -> AnyPublisher<Never, DelugeError> {
+    func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
         return client.fetchTorrents()
             .handleEvents(receiveOutput: { new in
                 self.torrents.update(with: new.map { ($0.hash, $0) })
             })
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
-    func refresh() -> AnyPublisher<Never, Error> {
+    func refresh() -> AnyPublisher<Void, Error> {
         return refreshTorrents()
             .mapError { $0 as Error }
             .ui()
@@ -102,7 +102,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             return
         }
 
-        let publisher: AnyPublisher<Never, DelugeError>
+        let publisher: AnyPublisher<Void, DelugeError>
 
         if url.scheme == "magnet" {
             publisher = client.add(magnetURL: url)

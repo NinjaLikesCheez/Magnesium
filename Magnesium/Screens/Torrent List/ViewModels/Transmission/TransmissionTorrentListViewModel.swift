@@ -61,16 +61,16 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             .store(in: &observers)
     }
 
-    func refreshTorrents() -> AnyPublisher<Never, TransmissionError> {
+    func refreshTorrents() -> AnyPublisher<Void, TransmissionError> {
         return client.fetchTorrents()
             .handleEvents(receiveOutput: { new in
                 self.torrents.update(with: new.map { ($0.id, $0) })
             })
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
-    func refresh() -> AnyPublisher<Never, Error> {
+    func refresh() -> AnyPublisher<Void, Error> {
         return refreshTorrents()
             .mapError { $0 as Error }
             .ui()

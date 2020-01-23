@@ -100,7 +100,9 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            subject.send(completion: .finished)
+        })
         presentationViewController.present(alertController, animated: true, completion: nil)
         return subject.eraseToAnyPublisher()
     }

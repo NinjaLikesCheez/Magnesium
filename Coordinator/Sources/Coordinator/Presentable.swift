@@ -9,5 +9,5 @@
 import Combine
 
 public protocol Presentable {
-    var didDismiss: AnyPublisher<Never, Never> { get }
+    var didDismiss: AnyPublisher<Void, Never> { get }
 }

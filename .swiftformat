@@ -1,3 +1,4 @@
 --stripunusedargs closure-only
 --maxwidth 120
 --disable redundantReturn
+--disable specifiers

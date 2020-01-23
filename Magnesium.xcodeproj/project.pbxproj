@@ -93,6 +93,8 @@
 		E9C8259023C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9C8258F23C58526003B1D72 /* DelugeTorrentDetailHeaderViewModel.swift */; };
 		E9CE4C3423B453BE001D1C63 /* DateFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */; };
 		E9DF151423D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */; };
+		E9E411B523D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E411B423D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift */; };
+		E9E411B723D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E411B623D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift */; };
 		E9E9F0F423807044007C6D2D /* TorrentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */; };
 		E9F24E0B23CE3B160089E45F /* DelugeSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */; };
 		E9F24E0D23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0C23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift */; };
@@ -201,6 +203,8 @@
 		E9CC160D23AD5CD400EA1B4C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatters.swift; sourceTree = "<group>"; };
 		E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentListItemViewModelTests.swift; sourceTree = "<group>"; };
+		E9E411B423D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentDetailViewModelTests.swift; sourceTree = "<group>"; };
+		E9E411B623D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DelugeTorrentListViewModelTests.swift; sourceTree = "<group>"; };
 		E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeSettingsViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0C23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTorrentListViewModel.swift; sourceTree = "<group>"; };
@@ -623,14 +627,16 @@
 			isa = PBXGroup;
 			children = (
 				E9624D2C23D204AA0051EA99 /* DefaultSessionTests.swift */,
+				E9AE9E5723D695BD0018D180 /* DelugeTorrent+TestUtil.swift */,
+				E9E411B423D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift */,
+				E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */,
+				E9E411B623D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift */,
+				E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */,
 				E9CC160D23AD5CD400EA1B4C /* Info.plist */,
+				E95127FB23D7F3C7000EF582 /* MockDelugeClient.swift */,
 				E98D935E23D2474B0013A1E1 /* MockPreferences.swift */,
 				E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */,
 				E9801EF123D37E1400181FFD /* TorrentSortTests.swift */,
-				E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */,
-				E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */,
-				E9AE9E5723D695BD0018D180 /* DelugeTorrent+TestUtil.swift */,
-				E95127FB23D7F3C7000EF582 /* MockDelugeClient.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -850,7 +856,9 @@
 				E9AE9E5623D695120018D180 /* DelugeTorrentTests.swift in Sources */,
 				E9DF151423D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift in Sources */,
 				E98D935F23D2474B0013A1E1 /* MockPreferences.swift in Sources */,
+				E9E411B523D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift in Sources */,
 				E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */,
+				E9E411B723D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift in Sources */,
 				E9AE9E5823D695BD0018D180 /* DelugeTorrent+TestUtil.swift in Sources */,
 				E95127FC23D7F3C7000EF582 /* MockDelugeClient.swift in Sources */,
 				E9801EF223D37E1400181FFD /* TorrentSortTests.swift in Sources */,

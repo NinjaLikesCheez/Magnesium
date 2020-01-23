@@ -118,15 +118,15 @@ public final class Client {
     }
 
     /// Attempts to authenticate with the server.
-    public func authenticate() -> AnyPublisher<Never, Error> {
+    public func authenticate() -> AnyPublisher<Void, Error> {
         return request(method: "auth.login", params: [password], authenticateIfNeeded: false)
-            .flatMap { response -> AnyPublisher<Never, Error> in
+            .flatMap { response -> AnyPublisher<Void, Error> in
                 let authenticated = response["result"] as? Bool ?? false
                 guard authenticated else {
                     return Fail(error: .unauthenticated).eraseToAnyPublisher()
                 }
 
-                return Empty(completeImmediately: true).eraseToAnyPublisher()
+                return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
@@ -228,17 +228,17 @@ public final class Client {
 
     /// Pauses torrents.
     /// - Parameter hashes: The hashes of the torrents to pause.
-    public func pause(hashes: [String]) -> AnyPublisher<Never, Error> {
+    public func pause(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.pause_torrent", params: [hashes])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Resumes torrents.
     /// - Parameter hashes: The hashes of the torrents to resume.
-    public func resume(hashes: [String]) -> AnyPublisher<Never, Error> {
+    public func resume(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.resume_torrent", params: [hashes])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
@@ -246,39 +246,39 @@ public final class Client {
     /// - Parameters:
     ///   - hashes: The hashes of the torrents to remove.
     ///   - removeData: If the torrents' data should be removed.
-    public func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, Error> {
+    public func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, Error> {
         return request(method: "core.remove_torrents", params: [hashes, removeData])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Rechecks torrents.
     /// - Parameter hashes: The hashes of the torrents to recheck.
-    public func recheck(hashes: [String]) -> AnyPublisher<Never, Error> {
+    public func recheck(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.force_recheck", params: [hashes])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Adds a torrent using a link to a torrent file.
     /// - Parameter url: The torrent file link.
-    public func add(url: URL) -> AnyPublisher<Never, Error> {
+    public func add(url: URL) -> AnyPublisher<Void, Error> {
         return request(method: "core.add_torrent_url", params: [url.absoluteString, [String: Any]()])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Adds a torrent using a magnet link.
     /// - Parameter magnetURL: The magnet link to add.
-    public func add(magnetURL: URL) -> AnyPublisher<Never, Error> {
+    public func add(magnetURL: URL) -> AnyPublisher<Void, Error> {
         return request(method: "core.add_torrent_magnet", params: [magnetURL.absoluteString, [String: Any]()])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Adds a torrent using a local file URL.
     /// - Parameter fileURL: The URL of the file to add.
-    public func add(fileURL: URL) -> AnyPublisher<Never, Error> {
+    public func add(fileURL: URL) -> AnyPublisher<Void, Error> {
         return upload(fileURL: fileURL)
             .flatMap { response -> AnyPublisher<[String: Any], Error> in
                 guard let path = (response["files"] as? [String])?.first else {
@@ -287,7 +287,7 @@ public final class Client {
 
                 return self.request(method: "web.add_torrents", params: [[["path": path]]])
             }
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 

@@ -13,6 +13,7 @@ import Foundation
 final class MockDelugeClient: DelugeClient {
     struct Requests: Equatable {
         var torrents = 0
+        var torrentFiles = 0
         var addURL = 0
         var addMagnetURL = 0
 
@@ -23,14 +24,15 @@ final class MockDelugeClient: DelugeClient {
 
     struct Errors {
         var torrents = false
+        var torrentFiles = false
         var addURL = false
     }
 
     var requests = Requests()
     var errors = Errors()
 
-    func authenticate() -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func authenticate() -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
@@ -49,40 +51,45 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
+        guard !errors.torrentFiles else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
+        requests.torrentFiles += 1
         return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func pause(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func resume(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func recheck(hashes: [String]) -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func add(url: URL) -> AnyPublisher<Never, DelugeError> {
+    func add(url: URL) -> AnyPublisher<Void, DelugeError> {
         guard !errors.addURL else {
             return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         }
 
         requests.addURL += 1
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func add(magnetURL: URL) -> AnyPublisher<Never, DelugeError> {
+    func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError> {
         requests.addMagnetURL += 1
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func add(fileURL: URL) -> AnyPublisher<Never, DelugeError> {
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
+    func add(fileURL: URL) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 }

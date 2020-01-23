@@ -189,7 +189,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
-    func refresh() -> AnyPublisher<Never, Error> {
+    func refresh() -> AnyPublisher<Void, Error> {
         return refresher.refreshTorrents()
             .mapError { $0 as Error }
             .flatMap { _ in self.refreshFiles() }
@@ -205,13 +205,13 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .eraseToAnyPublisher()
     }
 
-    private func refreshFiles() -> AnyPublisher<Never, Error> {
+    private func refreshFiles() -> AnyPublisher<Void, Error> {
         return client.fetchTorrentFiles(hash: torrentSubject.value.hash)
             .handleEvents(receiveOutput: { new in
                 self.files.update(with: new.map { ($0.path, $0) })
             })
             .mapError { $0 as Error }
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 

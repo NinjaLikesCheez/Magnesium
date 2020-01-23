@@ -145,9 +145,9 @@ public final class Client {
     }
 
     /// Attempts to authenticate with the server.
-    public func authenticate() -> AnyPublisher<Never, Error> {
+    public func authenticate() -> AnyPublisher<Void, Error> {
         return request(method: "session-get", args: ["fields": ["version"]])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
@@ -186,19 +186,19 @@ public final class Client {
 
     /// Adds a torrent using a link to a torrent file or a magnet link.
     /// - Parameter url: A torrent link or magnet link.
-    public func add(url: URL) -> AnyPublisher<Never, Error> {
+    public func add(url: URL) -> AnyPublisher<Void, Error> {
         return request(method: "torrent-add", args: ["filename": url.absoluteString])
-            .ignoreOutput()
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     /// Adds a torrent using a local file URL.
     /// - Parameter fileURL: The URL of the file to add.
-    public func add(fileURL: URL) -> AnyPublisher<Never, Error> {
+    public func add(fileURL: URL) -> AnyPublisher<Void, Error> {
         do {
             let data = try Data(contentsOf: fileURL)
             return request(method: "torrent-add", args: ["metainfo": data.base64EncodedString()])
-                .ignoreOutput()
+                .map { _ in () }
                 .eraseToAnyPublisher()
         } catch {
             return Fail(error: .filesystem(error)).eraseToAnyPublisher()
