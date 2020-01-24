@@ -56,7 +56,11 @@ final class MockDelugeClient: DelugeClient {
         }
 
         requests.torrentFiles += 1
-        return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        return Just([
+            DelugeTorrentFile.mock(name: "file.rar"),
+            DelugeTorrentFile.mock(name: "file.r00"),
+            DelugeTorrentFile.mock(name: "file.r01"),
+        ]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {

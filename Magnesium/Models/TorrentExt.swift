@@ -45,7 +45,7 @@ extension TorrentExt {
         return """
         \(ByteFormatter.string(fromByteCount: downloaded)) / \
         \(ByteFormatter.string(fromByteCount: size)) \
-        (\(Int(progress * 100))%)
+        (\(String(format: "%.0f", progress * 100))%)
         """
     }
 

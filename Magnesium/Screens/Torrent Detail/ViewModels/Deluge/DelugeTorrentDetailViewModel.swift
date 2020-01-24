@@ -123,7 +123,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .info(TorrentDetailInfoViewModel(
                 name: "Ratio",
                 value: torrentSubject
-                    .map { !$0.ratio.isNaN ? String(format: "%.3f", $0.ratio) : "∞" }
+                    .map { !$0.ratio.isInfinite ? String(format: "%.3f", $0.ratio) : "∞" }
                     .ui()
                     .eraseToAnyPublisher()
             )),

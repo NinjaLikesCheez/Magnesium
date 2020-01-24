@@ -43,7 +43,7 @@ struct DelugeTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
             .eraseToAnyPublisher()
         status = torrentSubject
             .map { torrent in
-                "\(torrent.commonState.displayString) (\(Int(torrent.progress * 100))%)"
+                "\(torrent.commonState.displayString) (\(String(format: "%.2f", torrent.progress * 100))%)"
             }
             .ui()
             .eraseToAnyPublisher()
