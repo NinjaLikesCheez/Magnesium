@@ -14,6 +14,10 @@ final class MockDelugeClient: DelugeClient {
     struct Requests: Equatable {
         var torrents = 0
         var torrentFiles = 0
+        var pause = 0
+        var resume = 0
+        var remove = [Bool]()
+        var recheck = 0
         var addURL = 0
         var addMagnetURL = 0
 
@@ -64,18 +68,22 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.pause += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.resume += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
+        requests.remove.append(removeData)
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.recheck += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 

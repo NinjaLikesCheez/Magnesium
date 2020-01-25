@@ -11,8 +11,6 @@ import Foundation
 import Preferences
 
 final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
-    private static let refreshDelay: TimeInterval = 1
-
     private let client: DelugeClient
     private let preferences: Preferences
     private let refresher: DelugeRefreshable
@@ -220,11 +218,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
             self.client.recheck(hashes: [hash])
-                .collect()
-                .delay(
-                    for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
-                    scheduler: DispatchQueue.global(qos: .userInitiated)
-                )
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                 .store(in: &self.observers)
@@ -235,11 +228,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectPause() {
         client.pause(hashes: [torrentSubject.value.hash])
-            .collect()
-            .delay(
-                for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
-                scheduler: DispatchQueue.global(qos: .userInitiated)
-            )
             .flatMap { _ in self.refresher.refreshTorrents() }
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
@@ -247,11 +235,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectResume() {
         client.resume(hashes: [torrentSubject.value.hash])
-            .collect()
-            .delay(
-                for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
-                scheduler: DispatchQueue.global(qos: .userInitiated)
-            )
             .flatMap { _ in self.refresher.refreshTorrents() }
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
@@ -262,11 +245,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Keep Data", style: .default) {
             self.client.remove(hashes: [hash], removeData: false)
-                .collect()
-                .delay(
-                    for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
-                    scheduler: DispatchQueue.global(qos: .userInitiated)
-                )
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
                 .sink(receiveCompletion: { [weak self] _ in
@@ -276,11 +254,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         })
         alert.addAction(AlertAction(title: "Remove Data", style: .destructive, handler: {
             self.client.remove(hashes: [hash], removeData: true)
-                .collect()
-                .delay(
-                    for: .seconds(DelugeTorrentDetailViewModel.refreshDelay),
-                    scheduler: DispatchQueue.global(qos: .userInitiated)
-                )
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
                 .sink(receiveCompletion: { [weak self] _ in

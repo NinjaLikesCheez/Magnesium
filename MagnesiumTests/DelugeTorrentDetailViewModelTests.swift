@@ -26,7 +26,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             torrentSubject: subject,
             client: client,
             preferences: preferences,
-            refresher: MockRefreshable()
+            refresher: MockRefreshable(client: client)
         )
         viewModel.coordinator = coordinator
     }
@@ -39,7 +39,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1.1)
     }
 
     func testAutoUpdate() throws {
@@ -52,7 +52,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
             firstCheck.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1.1)
 
         viewModel.didDisappear()
 
@@ -61,7 +61,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
             secondCheck.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1.1)
     }
 
     func testAutoUpdateStopsWhenDisabled() throws {
@@ -74,7 +74,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
             firstCheck.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1.1)
 
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
 
@@ -83,7 +83,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
             secondCheck.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 1.1)
     }
 
     func testRefreshShowsError() {
@@ -231,6 +231,57 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             .store(in: &observers)
         waitForExpectations(timeout: 0)
     }
+
+    func testMoreOptionsAlert() {
+        viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
+        let alert = coordinator.alert!
+        let expected = ["Force Recheck", "Cancel"]
+        XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
+    }
+
+    func testForceRecheck() {
+        client.requests.reset()
+        viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
+        let recheck = coordinator.alert!.actions[0].handler!
+        recheck()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
+    }
+
+    func testPause() {
+        client.requests.reset()
+        viewModel.didSelectPause()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, pause: 1))
+    }
+
+    func testResume() {
+        client.requests.reset()
+        viewModel.didSelectResume()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, resume: 1))
+    }
+
+    func testRemoveAlert() {
+        client.requests.reset()
+        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        let alert = coordinator.alert!
+        let expected = ["Keep Data", "Remove Data", "Cancel"]
+        XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
+    }
+
+    func testRemoveKeepData() {
+        client.requests.reset()
+        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        let keepData = coordinator.alert!.actions[0].handler!
+        keepData()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [false]))
+    }
+
+    func testRemoveRemoveData() {
+        client.requests.reset()
+        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        let removeData = coordinator.alert!.actions[1].handler!
+        removeData()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
+    }
 }
 
 // swiftlint:disable:next static_operator
@@ -239,8 +290,14 @@ private func == (lhs: (String, String), rhs: (String, String)) -> Bool {
 }
 
 private final class MockRefreshable: DelugeRefreshable {
+    private let client: DelugeClient
+
+    init(client: DelugeClient) {
+        self.client = client
+    }
+
     func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        return client.fetchTorrents().map { _ in () }.eraseToAnyPublisher()
     }
 }
 
