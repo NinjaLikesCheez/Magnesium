@@ -21,7 +21,6 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
     private let preferences: Preferences
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController
-    private let didCompleteSubject = PassthroughSubject<Void, Never>()
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 

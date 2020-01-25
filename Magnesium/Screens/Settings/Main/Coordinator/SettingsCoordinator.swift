@@ -18,7 +18,6 @@ enum SettingsCoordinatorEvent {
 protocol SettingsCoordinator: Coordinator, AlertPresenter where Event == SettingsCoordinatorEvent {}
 
 final class DefaultSettingsCoordinator: SettingsCoordinator {
-    private let viewModel: SettingsViewModel
     private let preferences: Preferences
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
@@ -34,8 +33,8 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
     }
 
     init(session: Session, preferences: Preferences) {
-        viewModel = DefaultSettingsViewModel(session: session, preferences: preferences)
         self.preferences = preferences
+        let viewModel = DefaultSettingsViewModel(session: session, preferences: preferences)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)

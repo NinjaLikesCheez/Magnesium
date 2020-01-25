@@ -7,7 +7,6 @@
 //
 
 import Combine
-import Coordinator
 
 enum AddServerEvent {
     case selected(type: ServerType)

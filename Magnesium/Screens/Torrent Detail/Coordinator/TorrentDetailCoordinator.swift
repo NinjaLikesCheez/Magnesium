@@ -8,7 +8,6 @@
 
 import Combine
 import Coordinator
-import UIKit
 
 enum TorrentDetailCoordinatorEvent {
     case complete
@@ -17,7 +16,6 @@ enum TorrentDetailCoordinatorEvent {
 protocol TorrentDetailCoordinator: Coordinator, AlertPresenter where Event == TorrentDetailCoordinatorEvent {}
 
 final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
-    private let viewModel: TorrentDetailViewModel
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     var observers = [AnyCancellable]()
@@ -32,7 +30,6 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
     }
 
     init(viewModel: TorrentDetailViewModel) {
-        self.viewModel = viewModel
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)

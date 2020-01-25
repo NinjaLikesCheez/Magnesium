@@ -32,12 +32,15 @@ final class TorrentListViewController: PresentableTableViewController {
             target: self,
             action: #selector(settingsButtonTapped(_:))
         )
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "plus"),
-            style: .plain,
-            target: self,
-            action: #selector(addButtonTapped(_:))
-        )
+
+        if viewModel.showAddButton {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(
+                image: UIImage(systemName: "plus"),
+                style: .plain,
+                target: self,
+                action: #selector(addButtonTapped(_:))
+            )
+        }
     }
 
     required init?(coder: NSCoder) {

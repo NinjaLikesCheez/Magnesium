@@ -9,7 +9,6 @@
 import Combine
 import Coordinator
 import Preferences
-import UIKit
 
 enum ServerSettingsCoordinatorEvent {
     case complete
@@ -18,7 +17,6 @@ enum ServerSettingsCoordinatorEvent {
 protocol ServerSettingsCoordinator: Coordinator where Event == ServerSettingsCoordinatorEvent {}
 
 final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPresenter {
-    private let viewModel: ServerSettingsViewModel
     private let viewController: ServerSettingsViewController
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
     var observers = [AnyCancellable]()
@@ -33,6 +31,7 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPr
     }
 
     init(server: Server, preferences: Preferences) {
+        let viewModel: ServerSettingsViewModel
         switch server.type {
         case .deluge:
             viewModel = DelugeSettingsViewModel(preferences: preferences, server: server)

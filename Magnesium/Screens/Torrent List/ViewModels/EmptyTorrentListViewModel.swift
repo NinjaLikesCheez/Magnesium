@@ -11,7 +11,6 @@ import Combine
 final class EmptyTorrentListViewModel: TorrentListViewModel {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     let showAddButton = false
-    var observers = [AnyCancellable]()
 
     var events: AnyPublisher<TorrentListEvent, Never> {
         return eventSubject.eraseToAnyPublisher()

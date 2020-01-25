@@ -1,5 +1,4 @@
 import Combine
-import Foundation
 
 /// A type that is able to store preferences.
 public protocol Preferences {
