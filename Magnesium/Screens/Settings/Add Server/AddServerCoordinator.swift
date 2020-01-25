@@ -16,31 +16,31 @@ protocol AddServerCoordinator: ServerSettingsCoordinator {
 }
 
 final class DefaultAddServerCoordinator: AddServerCoordinator {
-    private let navigationController: UINavigationController
-    private let presenter: UIViewController
     private let preferences: Preferences
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    private let didCompleteSubject = PassthroughSubject<Void, Never>()
+    var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
 
-    var presentationViewController: UIViewController {
-        return navigationController
-    }
-
-    init(navigationController: UINavigationController, presenter: UIViewController, preferences: Preferences) {
-        self.navigationController = navigationController
-        self.presenter = presenter
-        self.preferences = preferences
-    }
-
-    func start() -> Presentable {
+    private lazy var viewController: AddServerViewController = {
         let viewModel = DefaultAddServerViewModel(coordinator: self)
-        let viewController = AddServerViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
+        return AddServerViewController(viewModel: viewModel)
+    }()
+
+    var presentable: Presentable {
         return viewController
     }
 
+    var didComplete: AnyPublisher<Void, Never> {
+        return didCompleteSubject.eraseToAnyPublisher()
+    }
+
+    init(preferences: Preferences) {
+        self.preferences = preferences
+    }
+
     func complete() {
-        navigationController.popToViewController(presenter, animated: true)
+        didCompleteSubject.send(())
+        didCompleteSubject.send(completion: .finished)
     }
 
     func showServerSettings(for type: ServerType) {
@@ -53,6 +53,6 @@ final class DefaultAddServerCoordinator: AddServerCoordinator {
         }
 
         let viewController = ServerSettingsViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
+        self.viewController.navigationController?.pushViewController(viewController, animated: true)
     }
 }

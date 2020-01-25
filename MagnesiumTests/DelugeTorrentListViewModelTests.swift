@@ -109,20 +109,12 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 }
 
 private final class MockCoordinator: TorrentListCoordinator {
-    private final class MockPresentable: Presentable {
-        let didDismiss: AnyPublisher<Void, Never> = Empty().eraseToAnyPublisher()
-    }
-
-    let presentationViewController = UIViewController()
+    let presentable: Presentable = PresentableViewController()
+    var observers = [AnyCancellable]()
     var childCoordinators = [Coordinator]()
-    var childCoordinatorObservers = [AnyCancellable]()
     var wasShowAddLinkCalled = false
     var wasShowTorrentDetailCalled = false
     var alert: Alert?
-
-    func start() -> Presentable {
-        return MockPresentable()
-    }
 
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
         wasShowTorrentDetailCalled = true

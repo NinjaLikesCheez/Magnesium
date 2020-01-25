@@ -1,7 +1,7 @@
 import Combine
 import UIKit
 
-open class PresentableNavigationController: UINavigationController, Presentable {
+open class PresentableSplitViewController: UISplitViewController, Presentable {
     private let didDismissSubject = PassthroughSubject<Void, Never>()
 
     open var didDismiss: AnyPublisher<Void, Never> {

@@ -18,6 +18,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
+    let sections: AnyPublisher<[TorrentDetailSection], Never>
+    weak var coordinator: TorrentDetailCoordinator?
 
     private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
         CurrentValueSubjectMapManager(sort: Just {
@@ -29,9 +31,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             }
         }.eraseToAnyPublisher())
     }()
-
-    let sections: AnyPublisher<[TorrentDetailSection], Never>
-    weak var coordinator: TorrentDetailCoordinator?
 
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,

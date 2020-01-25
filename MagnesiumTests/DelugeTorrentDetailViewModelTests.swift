@@ -302,20 +302,17 @@ private final class MockRefreshable: DelugeRefreshable {
 }
 
 private final class MockCoordinator: TorrentDetailCoordinator {
-    private final class MockPresentable: Presentable {
-        let didDismiss: AnyPublisher<Void, Never> = Empty().eraseToAnyPublisher()
-    }
-
-    let presentationViewController = UIViewController()
+    let didComplete: AnyPublisher<Void, Never> = Empty().eraseToAnyPublisher()
+    let presentable: Presentable = PresentableViewController()
     var childCoordinators = [Coordinator]()
-    var childCoordinatorObservers = [AnyCancellable]()
+    var observers = [AnyCancellable]()
     var alert: Alert?
-
-    func start() -> Presentable {
-        return MockPresentable()
-    }
 
     func showAlert(_ alert: Alert, from source: PopoverSource?) {
         self.alert = alert
+    }
+
+    func complete() {
+        // noop
     }
 }

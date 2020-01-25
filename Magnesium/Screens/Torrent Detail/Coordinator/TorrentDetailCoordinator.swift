@@ -10,40 +10,36 @@ import Combine
 import Coordinator
 import UIKit
 
-protocol TorrentDetailCoordinator: PresentationCoordinator {}
+protocol TorrentDetailCoordinator: Coordinator, AlertPresenter {
+    var didComplete: AnyPublisher<Void, Never> { get }
+    func complete()
+}
 
 final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
     private let viewModel: TorrentDetailViewModel
-    private let splitViewController: UISplitViewController
-    private var navigationController: UINavigationController?
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    private let didCompleteSubject = PassthroughSubject<Void, Never>()
+    var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
 
-    var presentationViewController: UIViewController {
-        return navigationController ?? splitViewController
-    }
-
-    init(viewModel: TorrentDetailViewModel, splitViewController: UISplitViewController) {
-        self.viewModel = viewModel
-        self.splitViewController = splitViewController
-    }
-
-    func start() -> Presentable {
+    private lazy var navigationController: PresentableNavigationController = {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
-        let navigationController = PresentableNavigationController(rootViewController: viewController)
-        self.navigationController = navigationController
-        splitViewController.showDetailViewController(navigationController, sender: nil)
+        return PresentableNavigationController(rootViewController: viewController)
+    }()
+
+    var presentable: Presentable {
         return navigationController
     }
 
+    var didComplete: AnyPublisher<Void, Never> {
+        return didCompleteSubject.eraseToAnyPublisher()
+    }
+
+    init(viewModel: TorrentDetailViewModel) {
+        self.viewModel = viewModel
+    }
+
     func complete() {
-        if let navigationController = navigationController?.navigationController {
-            navigationController.popViewController(animated: true)
-        } else {
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .systemGroupedBackground
-            let navigationController = UINavigationController(rootViewController: viewController)
-            splitViewController.showDetailViewController(navigationController, sender: nil)
-        }
+        didCompleteSubject.send(())
+        didCompleteSubject.send(completion: .finished)
     }
 }

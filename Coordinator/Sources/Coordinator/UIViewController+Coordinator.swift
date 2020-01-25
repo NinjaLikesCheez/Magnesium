@@ -8,17 +8,12 @@
 
 import UIKit
 
-public extension UIViewController {
-    var isBeingDismissedForCoordinator: Bool {
-        var navigationControllerIsDismissing: Bool = false
-        if let navigationController = navigationController {
-            navigationControllerIsDismissing = navigationController.isBeingDismissed
-                || navigationController.isMovingFromParent
-        }
-        return isBeingDismissed || isMovingFromParent || navigationControllerIsDismissing || !isInViewHierarchy
+extension UIViewController {
+    var shouldSendDismiss: Bool {
+        return isBeingDismissed || isMovingFromParent || !isInViewHierarchy
     }
 
-    private var isInViewHierarchy: Bool {
+    var isInViewHierarchy: Bool {
         return isBeingPresented
             || presentingViewController != nil
             || presentedViewController != nil

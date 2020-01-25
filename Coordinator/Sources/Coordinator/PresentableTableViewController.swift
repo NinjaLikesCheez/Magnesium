@@ -1,11 +1,3 @@
-//
-//  PresentableTableViewController.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-17.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import UIKit
 
@@ -16,9 +8,13 @@ open class PresentableTableViewController: UITableViewController, Presentable {
         return didDismissSubject.eraseToAnyPublisher()
     }
 
+    public var viewController: UIViewController {
+        return self
+    }
+
     override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if isBeingDismissedForCoordinator {
+        if shouldSendDismiss {
             didDismissSubject.send(())
             didDismissSubject.send(completion: .finished)
         }

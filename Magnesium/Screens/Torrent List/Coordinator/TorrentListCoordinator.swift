@@ -11,78 +11,64 @@ import Coordinator
 import Preferences
 import UIKit
 
-protocol TorrentListCoordinator: PresentationCoordinator {
+protocol TorrentListCoordinator: Coordinator, AlertPresenter {
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel)
     func showSettings()
     func showAddLink() -> AnyPublisher<String, Never>
 }
 
 final class DefaultTorrentListCoordinator: TorrentListCoordinator {
-    private let splitViewController: UISplitViewController
+    private let server: Server?
+    private let presentationCoordinator: Coordinator
     private let session: Session
     private let preferences: Preferences
-    private var masterNavigationController: UINavigationController?
-    private var observers = [AnyCancellable]()
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
 
-    var presentationViewController: UIViewController {
-        return masterNavigationController ?? splitViewController
+    private lazy var navigationController: PresentableNavigationController = {
+        let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
+            ?? EmptyTorrentListViewModel(coordinator: self)
+        let viewController = TorrentListViewController(viewModel: viewModel)
+        let navigationController = PresentableNavigationController(rootViewController: viewController)
+        navigationController.navigationBar.prefersLargeTitles = true
+        return navigationController
+    }()
+
+    var presentable: Presentable {
+        return navigationController
     }
 
-    init(splitViewController: UISplitViewController, session: Session, preferences: Preferences) {
-        self.splitViewController = splitViewController
+    init(server: Server?, presentationCoordinator: Coordinator, session: Session, preferences: Preferences) {
+        self.server = server
+        self.presentationCoordinator = presentationCoordinator
         self.session = session
         self.preferences = preferences
     }
 
-    func start() -> Presentable {
-        observers = []
-        let masterNavigationController = PresentableNavigationController()
-        masterNavigationController.navigationBar.prefersLargeTitles = true
-        self.masterNavigationController = masterNavigationController
-        session.serverPublisher
-            .sink { [weak self] in self?.start(with: $0) }
-            .store(in: &observers)
-        return masterNavigationController
-    }
-
-    private func start(with server: Server?) {
-        guard let masterNavigationController = masterNavigationController else { return }
-
-        let viewModel = server?.listViewModel(coordinator: self, preferences: preferences)
-            ?? EmptyTorrentListViewModel(coordinator: self)
-        let viewController = TorrentListViewController(viewModel: viewModel)
-        masterNavigationController.setViewControllers([viewController], animated: false)
-
-        let detailViewController = UIViewController()
-        detailViewController.view.backgroundColor = .systemGroupedBackground
-        let detailNavigationController = UINavigationController(rootViewController: detailViewController)
-        splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
-    }
-
     func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
         var viewModel = viewModel
-        let coordinator = DefaultTorrentDetailCoordinator(
-            viewModel: viewModel,
-            splitViewController: splitViewController
-        )
+        let coordinator = DefaultTorrentDetailCoordinator(viewModel: viewModel)
         viewModel.coordinator = coordinator
-        addChildCoordinator(childCoordinator: coordinator)
-        startChildCoordinator(childCoordinator: coordinator)
+        addChildCoordinator(coordinator)
+        coordinator.didComplete
+            .sink { [weak self, weak coordinator] _ in
+                self?.dismissDetailViewController(coordinator?.presentable.viewController)
+            }
+            .store(in: &observers)
+        navigationController.showDetailViewController(coordinator.presentable.viewController, sender: nil)
     }
 
     func showSettings() {
-        let navigationController = UINavigationController()
-        let coordinator = DefaultSettingsCoordinator(
-            navigationController: navigationController,
-            session: session,
-            preferences: preferences
-        )
-        addChildCoordinator(childCoordinator: coordinator)
-        startChildCoordinator(childCoordinator: coordinator)
-        navigationController.modalPresentationStyle = .formSheet
-        splitViewController.present(navigationController, animated: true, completion: nil)
+        let coordinator = DefaultSettingsCoordinator(session: session, preferences: preferences)
+        presentationCoordinator.addChildCoordinator(coordinator)
+        coordinator.didComplete
+            .sink { [weak presentationCoordinator] _ in
+                presentationCoordinator?.presentable.viewController.dismiss(animated: true)
+            }
+            .store(in: &presentationCoordinator.observers)
+        let viewController = coordinator.presentable.viewController
+        viewController.modalPresentationStyle = .formSheet
+        presentationCoordinator.presentable.viewController.present(viewController, animated: true, completion: nil)
     }
 
     func showAddLink() -> AnyPublisher<String, Never> {
@@ -103,7 +89,19 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
             subject.send(completion: .finished)
         })
-        presentationViewController.present(alertController, animated: true, completion: nil)
+        presentable.viewController.present(alertController, animated: true, completion: nil)
         return subject.eraseToAnyPublisher()
+    }
+
+    private func dismissDetailViewController(_ viewController: UIViewController?) {
+        guard let viewController = viewController else { return }
+        if let navigationController = (viewController as? UINavigationController)?.navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            let viewController = UIViewController()
+            viewController.view.backgroundColor = .systemGroupedBackground
+            let navigationController = UINavigationController(rootViewController: viewController)
+            self.navigationController.showDetailViewController(navigationController, sender: nil)
+        }
     }
 }

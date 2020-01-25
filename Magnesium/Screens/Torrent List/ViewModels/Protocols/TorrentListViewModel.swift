@@ -16,7 +16,7 @@ protocol TorrentListViewModel: AnyObject {
 
     func refresh() -> AnyPublisher<Void, Error>
     func didSelectSettings()
-    func didSelectAdd()
+    func didSelectAdd(from source: PopoverSource)
     func didSelectItem(at index: Int)
     func addLink(_ url: String)
 }
@@ -30,7 +30,7 @@ extension TorrentListViewModel {
         coordinator?.showSettings()
     }
 
-    func didSelectAdd() {
+    func didSelectAdd(from source: PopoverSource) {
         var alert = Alert(title: "Add Torrent", message: "How would you like to add the torrent?", style: .actionSheet)
         alert.addAction(AlertAction(title: "Add Link", style: .default) {
             self.coordinator?.showAddLink()
@@ -43,6 +43,6 @@ extension TorrentListViewModel {
             // TODO:
         })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert)
+        coordinator?.showAlert(alert, from: source)
     }
 }

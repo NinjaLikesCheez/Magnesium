@@ -11,33 +11,19 @@ import Coordinator
 import Preferences
 import UIKit
 
-protocol ServerSettingsCoordinator: PresentationCoordinator {}
+protocol ServerSettingsCoordinator: Coordinator, AlertPresenter {
+    var didComplete: AnyPublisher<Void, Never> { get }
+    func complete()
+}
 
 final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
     private let server: Server
-    private let navigationController: UINavigationController
-    private let presenter: UIViewController
     private let preferences: Preferences
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    private let didCompleteSubject = PassthroughSubject<Void, Never>()
+    var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
 
-    var presentationViewController: UIViewController {
-        return navigationController
-    }
-
-    init(
-        server: Server,
-        navigationController: UINavigationController,
-        presenter: UIViewController,
-        preferences: Preferences
-    ) {
-        self.server = server
-        self.navigationController = navigationController
-        self.presenter = presenter
-        self.preferences = preferences
-    }
-
-    func start() -> Presentable {
+    private lazy var viewController: ServerSettingsViewController = {
         let viewModel: ServerSettingsViewModel
         switch server.type {
         case .deluge:
@@ -46,12 +32,24 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
             viewModel = TransmissionSettingsViewModel(coordinator: self, preferences: preferences, server: server)
         }
 
-        let viewController = ServerSettingsViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
+        return ServerSettingsViewController(viewModel: viewModel)
+    }()
+
+    var presentable: Presentable {
         return viewController
     }
 
+    var didComplete: AnyPublisher<Void, Never> {
+        return didCompleteSubject.eraseToAnyPublisher()
+    }
+
+    init(server: Server, preferences: Preferences) {
+        self.server = server
+        self.preferences = preferences
+    }
+
     func complete() {
-        navigationController.popToViewController(presenter, animated: true)
+        didCompleteSubject.send(())
+        didCompleteSubject.send(completion: .finished)
     }
 }

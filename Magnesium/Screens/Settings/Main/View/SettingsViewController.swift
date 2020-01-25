@@ -11,7 +11,7 @@ import Coordinator
 import SwiftUI
 import UIKit
 
-final class SettingsViewController: PresentableTableViewController {
+final class SettingsViewController: UITableViewController {
     private class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {

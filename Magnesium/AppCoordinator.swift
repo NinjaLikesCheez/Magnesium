@@ -12,12 +12,10 @@ import Preferences
 import UIKit
 
 final class AppCoordinator: Coordinator {
-    private class AppPresentable: Presentable {
-        let didDismiss: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
-    }
-
     private let window: UIWindow
     private lazy var session: Session = DefaultSession(preferences: preferences)
+    var observers = [AnyCancellable]()
+    var childCoordinators = [Coordinator]()
 
     private var preferences: Preferences = {
         let preferences = UserDefaultsPreferences()
@@ -25,24 +23,54 @@ final class AppCoordinator: Coordinator {
         return preferences
     }()
 
-    var childCoordinators: [Coordinator] = []
-    var childCoordinatorObservers: [AnyCancellable] = []
+    private lazy var splitViewController: PresentableSplitViewController = {
+        let splitViewController = PresentableSplitViewController()
+        splitViewController.delegate = self
+        splitViewController.preferredDisplayMode = .allVisible
+        return splitViewController
+    }()
+
+    var presentable: Presentable {
+        return splitViewController
+    }
 
     init(window: UIWindow) {
         self.window = window
+        window.rootViewController = presentable.viewController
+
+        session.serverPublisher
+            .sink { [weak self] in self?.show(server: $0) }
+            .store(in: &observers)
+
+        window.makeKeyAndVisible()
     }
 
-    func start() -> Presentable {
-        let splitViewController = SplitViewController()
-        window.rootViewController = splitViewController
-        let coordinator = DefaultTorrentListCoordinator(
-            splitViewController: splitViewController,
+    private func show(server: Server?) {
+        let listCoordinator = DefaultTorrentListCoordinator(
+            server: server,
+            presentationCoordinator: self,
             session: session,
             preferences: preferences
         )
-        addChildCoordinator(childCoordinator: coordinator)
-        startChildCoordinator(childCoordinator: coordinator)
-        window.makeKeyAndVisible()
-        return AppPresentable()
+        addChildCoordinator(listCoordinator)
+        let detailViewController = UIViewController()
+        detailViewController.view.backgroundColor = .systemGroupedBackground
+        let detailNavigationController = UINavigationController(rootViewController: detailViewController)
+        splitViewController.viewControllers = [listCoordinator.presentable.viewController, detailNavigationController]
+    }
+}
+
+extension AppCoordinator: UISplitViewControllerDelegate {
+    func splitViewController(
+        _ splitViewController: UISplitViewController,
+        collapseSecondary secondaryViewController: UIViewController,
+        onto primaryViewController: UIViewController
+    ) -> Bool {
+        if let navigationController = secondaryViewController as? UINavigationController,
+            !(navigationController.viewControllers.first is TorrentDetailViewController) {
+            return true
+        }
+
+        return false
     }
 }

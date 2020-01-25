@@ -96,7 +96,7 @@ final class TorrentListViewController: UITableViewController {
 
     @objc
     private func addButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.didSelectAdd()
+        viewModel.didSelectAdd(from: .barButton(sender))
     }
 
     @objc

@@ -1,5 +1,5 @@
 //
-//  PresentationCoordinator.swift
+//  AlertPresenter.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-16.
@@ -9,12 +9,11 @@
 import Coordinator
 import UIKit
 
-protocol PresentationCoordinator: Coordinator {
-    var presentationViewController: UIViewController { get }
+protocol AlertPresenter {
     func showAlert(_ alert: Alert, from source: PopoverSource?)
 }
 
-extension PresentationCoordinator {
+extension AlertPresenter where Self: Coordinator {
     func showAlert(_ alert: Alert) {
         showAlert(alert, from: nil)
     }
@@ -30,6 +29,6 @@ extension PresentationCoordinator {
         case .none:
             break
         }
-        presentationViewController.present(alertController, animated: true, completion: nil)
+        presentable.viewController.present(alertController, animated: true, completion: nil)
     }
 }

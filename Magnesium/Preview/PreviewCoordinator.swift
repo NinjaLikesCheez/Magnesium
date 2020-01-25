@@ -11,14 +11,9 @@ import Coordinator
 import UIKit
 
 #if DEBUG
-    class PreviewPresentable: Presentable {
-        let didDismiss: AnyPublisher<Void, Never> = Just(()).eraseToAnyPublisher()
-    }
-
-    class PreviewCoordinator: Coordinator, PresentationCoordinator {
-        let presentationViewController = UIViewController()
-        var childCoordinators: [Coordinator] = []
-        var childCoordinatorObservers: [AnyCancellable] = []
-        func start() -> Presentable { return PreviewPresentable() }
+    class PreviewCoordinator: Coordinator {
+        let presentable: Presentable = PresentableViewController()
+        var observers = [AnyCancellable]()
+        var childCoordinators = [Coordinator]()
     }
 #endif
