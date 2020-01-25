@@ -25,7 +25,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             torrentSubject: subject,
             client: client,
             preferences: preferences,
-            refresher: MockRefreshable(client: client)
+            refresher: MockDelugeRefresher(client: client)
         )
     }
 
@@ -365,16 +365,4 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 // swiftlint:disable:next static_operator
 private func == (lhs: (String, String), rhs: (String, String)) -> Bool {
     return lhs.0 == rhs.0 && lhs.1 == rhs.1
-}
-
-private final class MockRefreshable: DelugeRefreshable {
-    private let client: DelugeClient
-
-    init(client: DelugeClient) {
-        self.client = client
-    }
-
-    func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
-        return client.fetchTorrents().map { _ in () }.eraseToAnyPublisher()
-    }
 }
