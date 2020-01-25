@@ -14,13 +14,17 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
     private let client: DelugeClient
     private let preferences: Preferences
     private let torrents = TorrentSubjectMapManager<String, DelugeTorrent>()
+    private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
-    private(set) weak var coordinator: TorrentListCoordinator?
     let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
+    let showAddButton = true
     var observers = [AnyCancellable]()
 
-    init(coordinator: TorrentListCoordinator, client: DelugeClient, preferences: Preferences) {
-        self.coordinator = coordinator
+    var events: AnyPublisher<TorrentListEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
+    init(client: DelugeClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
 
@@ -85,6 +89,10 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .eraseToAnyPublisher()
     }
 
+    func didSelectAdd(from source: PopoverSource) {
+        eventSubject.send(.add(source: source))
+    }
+
     func didSelectItem(at index: Int) {
         let subject = torrents.subject(at: index)
         let viewModel = DelugeTorrentDetailViewModel(
@@ -93,7 +101,11 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             preferences: preferences,
             refresher: self
         )
-        coordinator?.showTorrentDetail(viewModel)
+        eventSubject.send(.detail(viewModel: viewModel))
+    }
+
+    func didSelectSettings() {
+        eventSubject.send(.settings)
     }
 
     func addLink(_ url: String) {
@@ -130,6 +142,6 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             style: .alert
         )
         alert.addAction(AlertAction(title: "OK", style: .default))
-        coordinator?.showAlert(alert)
+        eventSubject.send(.alert(alert, source: nil))
     }
 }

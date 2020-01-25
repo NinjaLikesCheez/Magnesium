@@ -117,8 +117,8 @@ final class SettingsViewController: UITableViewController {
 
 #if DEBUG
     struct SettingsViewController_Previews: PreviewProvider {
-        private struct Container: UIViewControllerRepresentable {
-            let viewModel: SettingsViewModel
+        private struct Container<VM: SettingsViewModel>: UIViewControllerRepresentable {
+            let viewModel: VM
 
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
@@ -134,7 +134,7 @@ final class SettingsViewController: UITableViewController {
         }
 
         private final class ViewModel: SettingsViewModel {
-            var coordinator: SettingsCoordinator?
+            let events: AnyPublisher<SettingsEvent, Never> = Empty().eraseToAnyPublisher()
 
             var sections: AnyPublisher<[SettingsSection], Never> = Just([
                 SettingsSection(type: .changeServer, items: [.changeServer("Desktop")]),
@@ -144,6 +144,7 @@ final class SettingsViewController: UITableViewController {
                 ]),
             ]).eraseToAnyPublisher()
 
+            func didSelectClose() {}
             func didSelectChangeServer(from source: PopoverSource) {}
             func didSelectServer(at index: Int) {}
             func didSelectAddServer() {}

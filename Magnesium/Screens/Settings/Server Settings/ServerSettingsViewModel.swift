@@ -8,7 +8,13 @@
 
 import Combine
 
+enum ServerSettingsEvent {
+    case complete
+    case alert(Alert, source: PopoverSource?)
+}
+
 protocol ServerSettingsViewModel {
+    var events: AnyPublisher<ServerSettingsEvent, Never> { get }
     var title: String { get }
     var saveButtonTitle: String { get }
     var canDelete: Bool { get }

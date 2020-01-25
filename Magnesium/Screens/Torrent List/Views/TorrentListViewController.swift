@@ -136,14 +136,8 @@ final class TorrentListViewController: UITableViewController {
             ) {}
         }
 
-        private final class Coordinator: PreviewCoordinator, TorrentListCoordinator {
-            func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {}
-            func showSettings() {}
-            func showAddLink() -> AnyPublisher<String, Never> { Empty(completeImmediately: true).eraseToAnyPublisher() }
-        }
-
         static var previews: some View {
-            let viewModel = EmptyTorrentListViewModel(coordinator: Coordinator())
+            let viewModel = EmptyTorrentListViewModel()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

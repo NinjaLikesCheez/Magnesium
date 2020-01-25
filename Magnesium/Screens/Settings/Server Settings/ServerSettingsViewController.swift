@@ -159,12 +159,7 @@ final class ServerSettingsViewController: PresentableTableViewController {
         }
 
         static var previews: some View {
-            let server = Server(name: "Deluge", type: .deluge, data: Data())
-            let viewModel = DelugeSettingsViewModel(
-                coordinator: PreviewAddServerCoordinator(),
-                preferences: PreviewPreferences(),
-                server: server
-            )
+            let viewModel = DelugeSettingsViewModel(preferences: PreviewPreferences())
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

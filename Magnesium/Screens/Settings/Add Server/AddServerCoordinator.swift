@@ -11,47 +11,60 @@ import Coordinator
 import Preferences
 import UIKit
 
-protocol AddServerCoordinator: ServerSettingsCoordinator {
-    func showServerSettings(for type: ServerType)
+enum AddServerCoordinatorEvent {
+    case complete
 }
 
-final class DefaultAddServerCoordinator: AddServerCoordinator {
+protocol AddServerCoordinator: Coordinator where Event == AddServerCoordinatorEvent {}
+
+final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
     private let preferences: Preferences
+    private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
+    private let viewController: AddServerViewController
     private let didCompleteSubject = PassthroughSubject<Void, Never>()
     var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
-
-    private lazy var viewController: AddServerViewController = {
-        let viewModel = DefaultAddServerViewModel(coordinator: self)
-        return AddServerViewController(viewModel: viewModel)
-    }()
+    var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
         return viewController
     }
 
-    var didComplete: AnyPublisher<Void, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
+    var events: AnyPublisher<AddServerCoordinatorEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
     }
 
     init(preferences: Preferences) {
         self.preferences = preferences
+        let viewModel = DefaultAddServerViewModel()
+        viewController = AddServerViewController(viewModel: viewModel)
+        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
     }
 
-    func complete() {
-        didCompleteSubject.send(())
-        didCompleteSubject.send(completion: .finished)
+    private func handle(event: AddServerEvent) {
+        switch event {
+        case let .selected(type: type):
+            showServerSettings(for: type)
+        }
     }
 
-    func showServerSettings(for type: ServerType) {
+    private func handle(event: ServerSettingsEvent) {
+        switch event {
+        case .complete:
+            eventSubject.send(.complete)
+        case let .alert(alert, source: source):
+            showAlert(alert, from: source)
+        }
+    }
+
+    private func showServerSettings(for type: ServerType) {
         let viewModel: ServerSettingsViewModel
         switch type {
         case .deluge:
-            viewModel = DelugeSettingsViewModel(coordinator: self, preferences: preferences)
+            viewModel = DelugeSettingsViewModel(preferences: preferences)
         case .transmission:
-            viewModel = TransmissionSettingsViewModel(coordinator: self, preferences: preferences)
+            viewModel = TransmissionSettingsViewModel(preferences: preferences)
         }
-
+        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         self.viewController.navigationController?.pushViewController(viewController, animated: true)
     }

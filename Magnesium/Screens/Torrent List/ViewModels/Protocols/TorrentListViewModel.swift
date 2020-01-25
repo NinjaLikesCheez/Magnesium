@@ -8,41 +8,21 @@
 
 import Combine
 
+enum TorrentListEvent {
+    case add(source: PopoverSource)
+    case detail(viewModel: TorrentDetailViewModel)
+    case settings
+    case alert(Alert, source: PopoverSource?)
+}
+
 protocol TorrentListViewModel: AnyObject {
-    var observers: [AnyCancellable] { get set }
+    var events: AnyPublisher<TorrentListEvent, Never> { get }
     var showAddButton: Bool { get }
-    var coordinator: TorrentListCoordinator? { get }
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> { get }
 
     func refresh() -> AnyPublisher<Void, Error>
-    func didSelectSettings()
     func didSelectAdd(from source: PopoverSource)
     func didSelectItem(at index: Int)
+    func didSelectSettings()
     func addLink(_ url: String)
-}
-
-extension TorrentListViewModel {
-    var showAddButton: Bool {
-        return true
-    }
-
-    func didSelectSettings() {
-        coordinator?.showSettings()
-    }
-
-    func didSelectAdd(from source: PopoverSource) {
-        var alert = Alert(title: "Add Torrent", message: "How would you like to add the torrent?", style: .actionSheet)
-        alert.addAction(AlertAction(title: "Add Link", style: .default) {
-            self.coordinator?.showAddLink()
-                .sink(receiveValue: { [weak self] url in
-                    self?.addLink(url)
-                })
-                .store(in: &self.observers)
-        })
-        alert.addAction(AlertAction(title: "Add File", style: .default) {
-            // TODO:
-        })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert, from: source)
-    }
 }

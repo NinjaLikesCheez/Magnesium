@@ -15,11 +15,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     private let preferences: Preferences
     private let refresher: DelugeRefreshable
     private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
+    private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
     let sections: AnyPublisher<[TorrentDetailSection], Never>
-    weak var coordinator: TorrentDetailCoordinator?
 
     private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
         CurrentValueSubjectMapManager(sort: Just {
@@ -31,6 +31,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             }
         }.eraseToAnyPublisher())
     }()
+
+    var events: AnyPublisher<TorrentDetailEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
 
     init(
         torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
@@ -222,7 +226,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .store(in: &self.observers)
         })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert, from: source)
+        eventSubject.send(.alert(alert, source: source))
     }
 
     func didSelectPause() {
@@ -247,7 +251,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
                 .sink(receiveCompletion: { [weak self] _ in
-                    self?.coordinator?.complete()
+                    self?.eventSubject.send(.complete)
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         })
@@ -256,12 +260,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
                 .flatMap { _ in self.refresher.refreshTorrents() }
                 .ui()
                 .sink(receiveCompletion: { [weak self] _ in
-                    self?.coordinator?.complete()
+                    self?.eventSubject.send(.complete)
                 }, receiveValue: { _ in })
                 .store(in: &self.observers)
         }))
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert, from: source)
+        eventSubject.send(.alert(alert, source: source))
     }
 
     private func showError(title: String, message: String?) {
@@ -271,6 +275,6 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             style: .alert
         )
         alert.addAction(AlertAction(title: "OK", style: .default))
-        coordinator?.showAlert(alert)
+        eventSubject.send(.alert(alert, source: nil))
     }
 }

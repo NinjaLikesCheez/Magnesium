@@ -9,27 +9,32 @@
 import Combine
 import Preferences
 
-protocol SettingsViewModel {
-    var coordinator: SettingsCoordinator? { get }
-    var sections: AnyPublisher<[SettingsSection], Never> { get }
-    func didSelectChangeServer(from source: PopoverSource)
-    func didSelectClose()
-    func didSelectServer(at index: Int)
-    func didSelectAddServer()
+enum SettingsEvent {
+    case complete
+    case selected(server: Server)
+    case addServer
+    case alert(Alert, source: PopoverSource?)
 }
 
-extension SettingsViewModel {
-    func didSelectClose() {
-        coordinator?.complete()
-    }
+protocol SettingsViewModel {
+    var events: AnyPublisher<SettingsEvent, Never> { get }
+    var sections: AnyPublisher<[SettingsSection], Never> { get }
+    func didSelectClose()
+    func didSelectChangeServer(from source: PopoverSource)
+    func didSelectServer(at index: Int)
+    func didSelectAddServer()
 }
 
 final class DefaultSettingsViewModel: SettingsViewModel {
     private let session: Session
     private let preferences: Preferences
     private var observers = [AnyCancellable]()
+    private let eventSubject = PassthroughSubject<SettingsEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
-    private(set) weak var coordinator: SettingsCoordinator?
+
+    var events: AnyPublisher<SettingsEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
 
     var sections: AnyPublisher<[SettingsSection], Never> {
         return sectionsSubject
@@ -37,8 +42,7 @@ final class DefaultSettingsViewModel: SettingsViewModel {
             .eraseToAnyPublisher()
     }
 
-    init(coordinator: SettingsCoordinator, session: Session, preferences: Preferences) {
-        self.coordinator = coordinator
+    init(session: Session, preferences: Preferences) {
         self.session = session
         self.preferences = preferences
 
@@ -71,6 +75,10 @@ final class DefaultSettingsViewModel: SettingsViewModel {
         sectionsSubject.send(sections)
     }
 
+    func didSelectClose() {
+        eventSubject.send(.complete)
+    }
+
     func didSelectChangeServer(from source: PopoverSource) {
         let servers = preferences.getServers()
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
@@ -80,15 +88,15 @@ final class DefaultSettingsViewModel: SettingsViewModel {
             }))
         }
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert, from: source)
+        eventSubject.send(.alert(alert, source: source))
     }
 
     func didSelectServer(at index: Int) {
         let server = preferences.getServers()[index]
-        coordinator?.showServerSettings(server)
+        eventSubject.send(.selected(server: server))
     }
 
     func didSelectAddServer() {
-        coordinator?.showAddServer()
+        eventSubject.send(.addServer)
     }
 }

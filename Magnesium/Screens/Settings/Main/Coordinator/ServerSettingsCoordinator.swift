@@ -11,45 +11,45 @@ import Coordinator
 import Preferences
 import UIKit
 
-protocol ServerSettingsCoordinator: Coordinator, AlertPresenter {
-    var didComplete: AnyPublisher<Void, Never> { get }
-    func complete()
+enum ServerSettingsCoordinatorEvent {
+    case complete
 }
 
-final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator {
-    private let server: Server
-    private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Void, Never>()
+protocol ServerSettingsCoordinator: Coordinator where Event == ServerSettingsCoordinatorEvent {}
+
+final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPresenter {
+    private let viewModel: ServerSettingsViewModel
+    private let viewController: ServerSettingsViewController
+    private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
     var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
-
-    private lazy var viewController: ServerSettingsViewController = {
-        let viewModel: ServerSettingsViewModel
-        switch server.type {
-        case .deluge:
-            viewModel = DelugeSettingsViewModel(coordinator: self, preferences: preferences, server: server)
-        case .transmission:
-            viewModel = TransmissionSettingsViewModel(coordinator: self, preferences: preferences, server: server)
-        }
-
-        return ServerSettingsViewController(viewModel: viewModel)
-    }()
+    var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
         return viewController
     }
 
-    var didComplete: AnyPublisher<Void, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
+    var events: AnyPublisher<ServerSettingsCoordinatorEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
     }
 
     init(server: Server, preferences: Preferences) {
-        self.server = server
-        self.preferences = preferences
+        switch server.type {
+        case .deluge:
+            viewModel = DelugeSettingsViewModel(preferences: preferences, server: server)
+        case .transmission:
+            viewModel = TransmissionSettingsViewModel(preferences: preferences, server: server)
+        }
+
+        viewController = ServerSettingsViewController(viewModel: viewModel)
+        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
     }
 
-    func complete() {
-        didCompleteSubject.send(())
-        didCompleteSubject.send(completion: .finished)
+    private func handle(event: ServerSettingsEvent) {
+        switch event {
+        case .complete:
+            eventSubject.send(.complete)
+        case let .alert(alert, source: source):
+            showAlert(alert, from: source)
+        }
     }
 }

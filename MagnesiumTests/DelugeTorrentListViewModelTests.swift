@@ -13,7 +13,6 @@ import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
-    private let coordinator = MockCoordinator()
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
     private var viewModel: TorrentListViewModel!
@@ -21,11 +20,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        viewModel = DelugeTorrentListViewModel(
-            coordinator: coordinator,
-            client: client,
-            preferences: preferences
-        )
+        viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
     }
 
     func testAutoUpdate() throws {
@@ -62,22 +57,53 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func testRefreshShowsError() {
         client.errors.torrents = true
-        XCTAssertNil(coordinator.alert)
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
-        XCTAssertEqual(coordinator.alert?.title, "Update Failed")
+        XCTAssertEqual(alert?.title, "Update Failed")
     }
 
-    func testAddShowsSelection() {
-        XCTAssertNil(coordinator.alert)
-        viewModel.didSelectAdd()
-        XCTAssertEqual(coordinator.alert?.title, "Add Torrent")
+    func testAdd() {
+        var event: TorrentListEvent?
+        viewModel.events
+            .first()
+            .sink { event = $0 }
+            .store(in: &observers)
+        viewModel.didSelectAdd(from: .view(UIView(), rect: .zero))
+        guard case .add = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
     }
 
     func testAddLinkURLValidation() {
-        let url = "^"
-        XCTAssertNil(coordinator.alert)
-        viewModel.addLink(url)
-        XCTAssertEqual(coordinator.alert?.message, "That link doesn't appear to be valid.")
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
+        viewModel.addLink("^")
+        XCTAssertEqual(alert?.message, "That link doesn't appear to be valid.")
     }
 
     func testAddMagnetLink() {
@@ -96,40 +122,34 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func testAddShowsError() {
         client.errors.addURL = true
-        let url = "https://example.com"
-        XCTAssertNil(coordinator.alert)
-        viewModel.addLink(url)
-        XCTAssertEqual(coordinator.alert?.title, "Failed to Add Torrent")
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
+        viewModel.addLink("https://example.com")
+        XCTAssertEqual(alert?.title, "Failed to Add Torrent")
     }
 
     func testSelectionNavigatesToDetail() {
+        var event: TorrentListEvent!
+        viewModel.events
+            .first()
+            .sink { event = $0 }
+            .store(in: &observers)
         viewModel.didSelectItem(at: 0)
-        XCTAssertTrue(coordinator.wasShowTorrentDetailCalled)
-    }
-}
-
-private final class MockCoordinator: TorrentListCoordinator {
-    let presentable: Presentable = PresentableViewController()
-    var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
-    var wasShowAddLinkCalled = false
-    var wasShowTorrentDetailCalled = false
-    var alert: Alert?
-
-    func showTorrentDetail(_ viewModel: TorrentDetailViewModel) {
-        wasShowTorrentDetailCalled = true
-    }
-
-    func showSettings() {
-        // noop
-    }
-
-    func showAddLink() -> AnyPublisher<String, Never> {
-        wasShowAddLinkCalled = true
-        return Empty(completeImmediately: true).eraseToAnyPublisher()
-    }
-
-    func showAlert(_ alert: Alert, from source: PopoverSource? = nil) {
-        self.alert = alert
+        guard case .detail = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
     }
 }

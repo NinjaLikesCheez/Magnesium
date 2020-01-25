@@ -8,8 +8,13 @@
 
 import Combine
 
+enum TorrentDetailEvent {
+    case complete
+    case alert(Alert, source: PopoverSource?)
+}
+
 protocol TorrentDetailViewModel {
-    var coordinator: TorrentDetailCoordinator? { get set }
+    var events: AnyPublisher<TorrentDetailEvent, Never> { get }
     var sections: AnyPublisher<[TorrentDetailSection], Never> { get }
     func didAppear()
     func didDisappear()

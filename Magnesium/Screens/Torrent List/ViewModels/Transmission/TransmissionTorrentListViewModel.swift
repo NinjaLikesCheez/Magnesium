@@ -14,13 +14,17 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
     private let client: DefaultTransmissionClient
     private let preferences: Preferences
     private let torrents = TorrentSubjectMapManager<Int, TransmissionTorrent>()
+    private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
-    private(set) weak var coordinator: TorrentListCoordinator?
     let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
+    let showAddButton = true
     var observers = [AnyCancellable]()
 
-    init(coordinator: TorrentListCoordinator, client: DefaultTransmissionClient, preferences: Preferences) {
-        self.coordinator = coordinator
+    var events: AnyPublisher<TorrentListEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
+    init(client: DefaultTransmissionClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
 
@@ -85,8 +89,16 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             .eraseToAnyPublisher()
     }
 
+    func didSelectAdd(from source: PopoverSource) {
+        eventSubject.send(.add(source: source))
+    }
+
     func didSelectItem(at index: Int) {
         // TODO:
+    }
+
+    func didSelectSettings() {
+        eventSubject.send(.settings)
     }
 
     func addLink(_ url: String) {
@@ -115,6 +127,6 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             style: .alert
         )
         alert.addAction(AlertAction(title: "OK", style: .default))
-        coordinator?.showAlert(alert)
+        eventSubject.send(.alert(alert, source: nil))
     }
 }

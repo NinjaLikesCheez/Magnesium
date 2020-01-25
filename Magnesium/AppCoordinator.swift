@@ -14,8 +14,9 @@ import UIKit
 final class AppCoordinator: Coordinator {
     private let window: UIWindow
     private lazy var session: Session = DefaultSession(preferences: preferences)
+    let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
+    var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     private var preferences: Preferences = {
         let preferences = UserDefaultsPreferences()
@@ -46,17 +47,55 @@ final class AppCoordinator: Coordinator {
     }
 
     private func show(server: Server?) {
-        let listCoordinator = DefaultTorrentListCoordinator(
-            server: server,
-            presentationCoordinator: self,
-            session: session,
-            preferences: preferences
-        )
-        addChildCoordinator(listCoordinator)
+        let listCoordinator = DefaultTorrentListCoordinator(server: server, session: session, preferences: preferences)
+        addChildCoordinator(listCoordinator) { [weak self] _, event in
+            switch event {
+            case .settings:
+                self?.showSettings()
+            case let .detail(viewModel: viewModel):
+                self?.showTorrentDetail(viewModel: viewModel)
+            }
+        }
         let detailViewController = UIViewController()
         detailViewController.view.backgroundColor = .systemGroupedBackground
         let detailNavigationController = UINavigationController(rootViewController: detailViewController)
         splitViewController.viewControllers = [listCoordinator.presentable.viewController, detailNavigationController]
+    }
+
+    private func showSettings() {
+        let coordinator = DefaultSettingsCoordinator(session: session, preferences: preferences)
+        addChildCoordinator(coordinator) { coordinator, event in
+            switch event {
+            case .complete:
+                coordinator.presentable.viewController.dismiss(animated: true)
+            }
+        }
+        let viewController = coordinator.presentable.viewController
+        viewController.modalPresentationStyle = .formSheet
+        splitViewController.present(viewController, animated: true, completion: nil)
+    }
+
+    private func showTorrentDetail(viewModel: TorrentDetailViewModel) {
+        let coordinator = DefaultTorrentDetailCoordinator(viewModel: viewModel)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            switch event {
+            case .complete:
+                self?.dismissDetailViewController(coordinator.presentable.viewController)
+            }
+        }
+        splitViewController.showDetailViewController(coordinator.presentable.viewController, sender: nil)
+    }
+
+    private func dismissDetailViewController(_ viewController: UIViewController?) {
+        guard let viewController = viewController else { return }
+        if let navigationController = (viewController as? UINavigationController)?.navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            let viewController = UIViewController()
+            viewController.view.backgroundColor = .systemGroupedBackground
+            let navigationController = UINavigationController(rootViewController: viewController)
+            splitViewController.showDetailViewController(navigationController, sender: nil)
+        }
     }
 }
 

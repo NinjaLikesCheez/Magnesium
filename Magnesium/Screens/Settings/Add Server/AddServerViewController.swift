@@ -64,7 +64,7 @@ final class AddServerViewController: PresentableTableViewController {
         }
 
         static var previews: some View {
-            let viewModel = DefaultAddServerViewModel(coordinator: PreviewAddServerCoordinator())
+            let viewModel = DefaultAddServerViewModel()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

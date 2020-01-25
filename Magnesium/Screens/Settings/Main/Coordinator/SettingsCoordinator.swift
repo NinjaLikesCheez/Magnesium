@@ -11,64 +11,69 @@ import Coordinator
 import Preferences
 import UIKit
 
-protocol SettingsCoordinator: Coordinator, AlertPresenter {
-    var didComplete: AnyPublisher<Void, Never> { get }
-    func showServerSettings(_ server: Server)
-    func showAddServer()
-    func complete()
+enum SettingsCoordinatorEvent {
+    case complete
 }
 
-final class DefaultSettingsCoordinator: SettingsCoordinator {
-    private let session: Session
-    private let preferences: Preferences
-    private let didCompleteSubject = PassthroughSubject<Void, Never>()
-    var observers = [AnyCancellable]()
-    var childCoordinators = [Coordinator]()
+protocol SettingsCoordinator: Coordinator, AlertPresenter where Event == SettingsCoordinatorEvent {}
 
-    private lazy var navigationController: PresentableNavigationController = {
-        let viewModel = DefaultSettingsViewModel(coordinator: self, session: session, preferences: preferences)
-        let viewController = SettingsViewController(viewModel: viewModel)
-        return PresentableNavigationController(rootViewController: viewController)
-    }()
+final class DefaultSettingsCoordinator: SettingsCoordinator {
+    private let viewModel: SettingsViewModel
+    private let preferences: Preferences
+    private let navigationController: PresentableNavigationController
+    private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
+    var observers = [AnyCancellable]()
+    var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
         return navigationController
     }
 
-    var didComplete: AnyPublisher<Void, Never> {
-        return didCompleteSubject.eraseToAnyPublisher()
+    var events: AnyPublisher<SettingsCoordinatorEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
     }
 
     init(session: Session, preferences: Preferences) {
-        self.session = session
+        viewModel = DefaultSettingsViewModel(session: session, preferences: preferences)
         self.preferences = preferences
+        let viewController = SettingsViewController(viewModel: viewModel)
+        navigationController = PresentableNavigationController(rootViewController: viewController)
+        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
     }
 
-    func showServerSettings(_ server: Server) {
+    func handle(event: SettingsEvent) {
+        switch event {
+        case .complete:
+            eventSubject.send(.complete)
+        case let .selected(server: server):
+            showSettings(for: server)
+        case .addServer:
+            showAddServer()
+        case let .alert(alert, source: source):
+            showAlert(alert, from: source)
+        }
+    }
+
+    private func showSettings(for server: Server) {
         let coordinator = DefaultServerSettingsCoordinator(server: server, preferences: preferences)
-        addChildCoordinator(coordinator)
-        coordinator.didComplete
-            .sink { [weak self, weak coordinator] _ in
-                self?.popToPreviousViewController(coordinator?.presentable.viewController)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            switch event {
+            case .complete:
+                self?.popToPreviousViewController(coordinator.presentable.viewController)
             }
-            .store(in: &observers)
+        }
         navigationController.pushViewController(coordinator.presentable.viewController, animated: true)
     }
 
-    func showAddServer() {
+    private func showAddServer() {
         let coordinator = DefaultAddServerCoordinator(preferences: preferences)
-        addChildCoordinator(coordinator)
-        coordinator.didComplete
-            .sink { [weak self, weak coordinator] _ in
-                self?.popToPreviousViewController(coordinator?.presentable.viewController)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            switch event {
+            case .complete:
+                self?.popToPreviousViewController(coordinator.presentable.viewController)
             }
-            .store(in: &observers)
+        }
         navigationController.pushViewController(coordinator.presentable.viewController, animated: true)
-    }
-
-    func complete() {
-        didCompleteSubject.send(())
-        didCompleteSubject.send(completion: .finished)
     }
 
     private func popToPreviousViewController(_ viewController: UIViewController?) {

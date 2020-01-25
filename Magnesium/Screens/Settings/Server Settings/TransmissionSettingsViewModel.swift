@@ -11,9 +11,9 @@ import Foundation
 import Preferences
 
 final class TransmissionSettingsViewModel: ServerSettingsViewModel {
-    private weak var coordinator: ServerSettingsCoordinator?
     private let preferences: Preferences
     private let server: Server?
+    private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
     private var observers = [AnyCancellable]()
@@ -102,6 +102,10 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         )
     }()
 
+    var events: AnyPublisher<ServerSettingsEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
     var title: String {
         return server == nil ? "Add Server" : "Edit Server"
     }
@@ -130,8 +134,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         return [nameViewModel, serverViewModel, usernameViewModel, passwordViewModel]
     }
 
-    init(coordinator: ServerSettingsCoordinator, preferences: Preferences, server: Server? = nil) {
-        self.coordinator = coordinator
+    init(preferences: Preferences, server: Server? = nil) {
         self.preferences = preferences
         self.server = server
         nameValue
@@ -200,7 +203,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         } else {
             preferences.addOrUpdate(server: Server(name: name, type: .transmission, data: data))
         }
-        coordinator?.complete()
+        eventSubject.send(.complete)
     }
 
     func didSelectDelete(from source: PopoverSource) {
@@ -208,10 +211,10 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         alert.addAction(AlertAction(title: "Delete Server", style: .destructive, handler: { [weak self] in
             guard let server = self?.server else { return }
             self?.preferences.remove(server: server)
-            self?.coordinator?.complete()
+            self?.eventSubject.send(.complete)
         }))
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        coordinator?.showAlert(alert, from: source)
+        eventSubject.send(.alert(alert, source: source))
     }
 
     private func showError(_ error: TransmissionError) {
@@ -233,6 +236,6 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             style: .alert
         )
         alert.addAction(AlertAction(title: "OK", style: .default))
-        coordinator?.showAlert(alert)
+        eventSubject.send(.alert(alert, source: nil))
     }
 }

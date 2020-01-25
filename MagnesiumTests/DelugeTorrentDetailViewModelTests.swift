@@ -13,7 +13,6 @@ import Preferences
 import XCTest
 
 final class DelugeTorrentDetailViewModelTests: XCTestCase {
-    private let coordinator = MockCoordinator()
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
@@ -28,7 +27,6 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             preferences: preferences,
             refresher: MockRefreshable(client: client)
         )
-        viewModel.coordinator = coordinator
     }
 
     func testNoAutoUpdateIfNotDidAppear() throws {
@@ -88,9 +86,22 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
     func testRefreshShowsError() {
         client.errors.torrentFiles = true
-        XCTAssertNil(coordinator.alert)
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
-        XCTAssertEqual(coordinator.alert?.title, "Update Failed")
+        XCTAssertEqual(alert?.title, "Update Failed")
     }
 
     func testHasHeader() {
@@ -233,16 +244,42 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     }
 
     func testMoreOptionsAlert() {
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
-        let alert = coordinator.alert!
         let expected = ["Force Recheck", "Cancel"]
-        XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
+        XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
     func testForceRecheck() {
         client.requests.reset()
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
-        let recheck = coordinator.alert!.actions[0].handler!
+        let recheck = alert!.actions[0].handler!
         recheck()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
     }
@@ -261,24 +298,65 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
     func testRemoveAlert() {
         client.requests.reset()
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
-        let alert = coordinator.alert!
         let expected = ["Keep Data", "Remove Data", "Cancel"]
-        XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
+        XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
     func testRemoveKeepData() {
         client.requests.reset()
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
-        let keepData = coordinator.alert!.actions[0].handler!
+        let keepData = alert!.actions[0].handler!
         keepData()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [false]))
     }
 
     func testRemoveRemoveData() {
         client.requests.reset()
+
+        var alert: Alert?
+        viewModel.events
+            .first()
+            .sink {
+                switch $0 {
+                case let .alert(inner, source: _):
+                    alert = inner
+                default:
+                    XCTFail("Unexpected event")
+                }
+            }
+            .store(in: &observers)
+
         viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
-        let removeData = coordinator.alert!.actions[1].handler!
+        let removeData = alert!.actions[1].handler!
         removeData()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
     }
@@ -298,21 +376,5 @@ private final class MockRefreshable: DelugeRefreshable {
 
     func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
         return client.fetchTorrents().map { _ in () }.eraseToAnyPublisher()
-    }
-}
-
-private final class MockCoordinator: TorrentDetailCoordinator {
-    let didComplete: AnyPublisher<Void, Never> = Empty().eraseToAnyPublisher()
-    let presentable: Presentable = PresentableViewController()
-    var childCoordinators = [Coordinator]()
-    var observers = [AnyCancellable]()
-    var alert: Alert?
-
-    func showAlert(_ alert: Alert, from source: PopoverSource?) {
-        self.alert = alert
-    }
-
-    func complete() {
-        // noop
     }
 }
