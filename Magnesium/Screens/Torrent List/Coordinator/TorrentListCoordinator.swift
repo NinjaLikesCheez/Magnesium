@@ -22,13 +22,13 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
     private let viewModel: TorrentListViewModel
     private let session: Session
     private let preferences: Preferences
-    private let navigationController: PresentableNavigationController
+    private let viewController: TorrentListViewController
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return navigationController
+        return viewController
     }
 
     var events: AnyPublisher<TorrentListCoordinatorEvent, Never> {
@@ -39,9 +39,7 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         viewModel = server?.listViewModel(preferences: preferences) ?? EmptyTorrentListViewModel()
         self.session = session
         self.preferences = preferences
-        let viewController = TorrentListViewController(viewModel: viewModel)
-        navigationController = PresentableNavigationController(rootViewController: viewController)
-        navigationController.navigationBar.prefersLargeTitles = true
+        viewController = TorrentListViewController(viewModel: viewModel)
         viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
     }
 
@@ -84,6 +82,6 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
             viewModel?.addLink(alertController.textFields?.first?.text ?? "")
         })
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        presentable.viewController.present(alertController, animated: true, completion: nil)
+        viewController.present(alertController, animated: true, completion: nil)
     }
 }

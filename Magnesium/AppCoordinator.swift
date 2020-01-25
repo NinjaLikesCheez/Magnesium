@@ -31,18 +31,22 @@ final class AppCoordinator: Coordinator {
         return splitViewController
     }()
 
+    private var masterNavigationController: PresentableNavigationController = {
+        let navigationController = PresentableNavigationController()
+        navigationController.navigationBar.prefersLargeTitles = true
+        return navigationController
+    }()
+
     var presentable: Presentable {
         return splitViewController
     }
 
     init(window: UIWindow) {
         self.window = window
-        window.rootViewController = presentable.viewController
-
         session.serverPublisher
             .sink { [weak self] in self?.show(server: $0) }
             .store(in: &observers)
-
+        window.rootViewController = splitViewController
         window.makeKeyAndVisible()
     }
 
@@ -56,10 +60,11 @@ final class AppCoordinator: Coordinator {
                 self?.showTorrentDetail(viewModel: viewModel)
             }
         }
+        masterNavigationController.setViewControllers([listCoordinator.presentable.viewController], animated: false)
         let detailViewController = UIViewController()
         detailViewController.view.backgroundColor = .systemGroupedBackground
         let detailNavigationController = UINavigationController(rootViewController: detailViewController)
-        splitViewController.viewControllers = [listCoordinator.presentable.viewController, detailNavigationController]
+        splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
     }
 
     private func showSettings() {
@@ -86,15 +91,25 @@ final class AppCoordinator: Coordinator {
         splitViewController.showDetailViewController(coordinator.presentable.viewController, sender: nil)
     }
 
-    private func dismissDetailViewController(_ viewController: UIViewController?) {
-        guard let viewController = viewController else { return }
-        if let navigationController = (viewController as? UINavigationController)?.navigationController {
-            navigationController.popViewController(animated: true)
-        } else {
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .systemGroupedBackground
-            let navigationController = UINavigationController(rootViewController: viewController)
-            splitViewController.showDetailViewController(navigationController, sender: nil)
+    private func dismissDetailViewController(_ viewController: UIViewController) {
+        let detailViewController = UIViewController()
+        detailViewController.view.backgroundColor = .systemGroupedBackground
+        let detailNavigationController = UINavigationController(rootViewController: detailViewController)
+
+        UIView.performWithoutAnimation {
+            splitViewController.showDetailViewController(detailNavigationController, sender: nil)
+        }
+
+        if masterNavigationController.viewControllers.contains(detailNavigationController) {
+            masterNavigationController.popViewController(animated: false)
+        }
+
+        let viewController = viewController is UINavigationController
+            ? viewController
+            : viewController.navigationController ?? viewController
+        if let index = masterNavigationController.viewControllers.firstIndex(of: viewController), index > 0 {
+            let previousViewController = masterNavigationController.viewControllers[index - 1]
+            masterNavigationController.popToViewController(previousViewController, animated: true)
         }
     }
 }

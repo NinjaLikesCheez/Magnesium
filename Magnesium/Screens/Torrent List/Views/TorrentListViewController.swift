@@ -7,10 +7,11 @@
 //
 
 import Combine
+import Coordinator
 import SwiftUI
 import UIKit
 
-final class TorrentListViewController: UITableViewController {
+final class TorrentListViewController: PresentableTableViewController {
     private enum Section {
         case main
     }
