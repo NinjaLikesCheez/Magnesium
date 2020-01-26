@@ -196,12 +196,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .flatMap { _ in self.refreshFiles() }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case let .failure(error):
-                    self?.showError(title: "Update Failed", message: error.localizedDescription)
-                case .finished:
-                    break
-                }
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Update Failed", message: error.localizedDescription)
             })
             .eraseToAnyPublisher()
     }
@@ -217,55 +213,88 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     }
 
     func didSelectMoreOptions(from source: PopoverSource) {
-        let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
-            self.client.recheck(hashes: [hash])
-                .flatMap { _ in self.refresher.refreshTorrents() }
-                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                .store(in: &self.observers)
+            self.recheck()
         })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         eventSubject.send(.alert(alert, source: source))
     }
 
+    private func recheck() {
+        client.recheck(hashes: [torrentSubject.value.hash])
+            .handleEvents(receiveCompletion: { completion in
+                guard case .finished = completion else { return }
+                self.refresher.refreshTorrents()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &self.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Recheck", message: error.localizedDescription)
+            }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
     func didSelectPause() {
         client.pause(hashes: [torrentSubject.value.hash])
-            .flatMap { _ in self.refresher.refreshTorrents() }
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .handleEvents(receiveCompletion: { completion in
+                guard case .finished = completion else { return }
+                self.refresher.refreshTorrents()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &self.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Pause", message: error.localizedDescription)
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     func didSelectResume() {
         client.resume(hashes: [torrentSubject.value.hash])
-            .flatMap { _ in self.refresher.refreshTorrents() }
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .handleEvents(receiveCompletion: { completion in
+                guard case .finished = completion else { return }
+                self.refresher.refreshTorrents()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &self.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Resume", message: error.localizedDescription)
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     func didSelectRemove(from source: PopoverSource) {
-        let hash = torrentSubject.value.hash
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Keep Data", style: .default) {
-            self.client.remove(hashes: [hash], removeData: false)
-                .flatMap { _ in self.refresher.refreshTorrents() }
-                .ui()
-                .sink(receiveCompletion: { [weak self] _ in
-                    self?.eventSubject.send(.complete)
-                }, receiveValue: { _ in })
-                .store(in: &self.observers)
+            self.remove(removeData: false)
         })
-        alert.addAction(AlertAction(title: "Remove Data", style: .destructive, handler: {
-            self.client.remove(hashes: [hash], removeData: true)
-                .flatMap { _ in self.refresher.refreshTorrents() }
-                .ui()
-                .sink(receiveCompletion: { [weak self] _ in
-                    self?.eventSubject.send(.complete)
-                }, receiveValue: { _ in })
-                .store(in: &self.observers)
-        }))
+        alert.addAction(AlertAction(title: "Remove Data", style: .destructive) {
+            self.remove(removeData: true)
+        })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         eventSubject.send(.alert(alert, source: source))
+    }
+
+    private func remove(removeData: Bool) {
+        client.remove(hashes: [torrentSubject.value.hash], removeData: removeData)
+            .handleEvents(receiveCompletion: { completion in
+                guard case .finished = completion else { return }
+                self.refresher.refreshTorrents()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &self.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Remove", message: error.localizedDescription)
+            }, receiveValue: { _ in })
+            .store(in: &observers)
     }
 
     private func showError(title: String, message: String?) {

@@ -207,12 +207,12 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
     }
 
     func didSelectDelete(from source: PopoverSource) {
+        guard let server = server else { return }
         var alert = Alert(title: nil, message: "Are you sure you want to delete this server?", style: .actionSheet)
-        alert.addAction(AlertAction(title: "Delete Server", style: .destructive, handler: { [weak self] in
-            guard let server = self?.server else { return }
-            self?.preferences.remove(server: server)
-            self?.eventSubject.send(.complete)
-        }))
+        alert.addAction(AlertAction(title: "Delete Server", style: .destructive) {
+            self.preferences.remove(server: server)
+            self.eventSubject.send(.complete)
+        })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         eventSubject.send(.alert(alert, source: source))
     }

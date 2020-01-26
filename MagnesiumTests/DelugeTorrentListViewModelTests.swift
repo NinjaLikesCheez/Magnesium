@@ -55,21 +55,17 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1.1)
     }
 
-    func testRefreshShowsError() {
+    func testRefreshError() {
         client.errors.torrents = true
 
         var alert: Alert?
-        viewModel.events
-            .first()
-            .sink {
-                switch $0 {
-                case let .alert(inner, source: _):
-                    alert = inner
-                default:
-                    XCTFail("Unexpected event")
-                }
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
             }
-            .store(in: &observers)
+            alert = inner
+        }.store(in: &observers)
 
         viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
         XCTAssertEqual(alert?.title, "Update Failed")
@@ -90,17 +86,13 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func testAddLinkURLValidation() {
         var alert: Alert?
-        viewModel.events
-            .first()
-            .sink {
-                switch $0 {
-                case let .alert(inner, source: _):
-                    alert = inner
-                default:
-                    XCTFail("Unexpected event")
-                }
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
             }
-            .store(in: &observers)
+            alert = inner
+        }.store(in: &observers)
 
         viewModel.addLink("^")
         XCTAssertEqual(alert?.message, "That link doesn't appear to be valid.")
@@ -120,21 +112,17 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(addURL: 1))
     }
 
-    func testAddShowsError() {
+    func testAddError() {
         client.errors.addURL = true
 
         var alert: Alert?
-        viewModel.events
-            .first()
-            .sink {
-                switch $0 {
-                case let .alert(inner, source: _):
-                    alert = inner
-                default:
-                    XCTFail("Unexpected event")
-                }
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
             }
-            .store(in: &observers)
+            alert = inner
+        }.store(in: &observers)
 
         viewModel.addLink("https://example.com")
         XCTAssertEqual(alert?.title, "Failed to Add Torrent")

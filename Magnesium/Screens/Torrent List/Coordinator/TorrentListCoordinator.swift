@@ -58,8 +58,8 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
 
     func showAdd(from source: PopoverSource) {
         var alert = Alert(title: "Add Torrent", message: "How would you like to add the torrent?", style: .actionSheet)
-        alert.addAction(AlertAction(title: "Add Link", style: .default) { [weak self] in
-            self?.showAddLink()
+        alert.addAction(AlertAction(title: "Add Link", style: .default) {
+            self.showAddLink()
         })
         alert.addAction(AlertAction(title: "Add File", style: .default) {
             // TODO:

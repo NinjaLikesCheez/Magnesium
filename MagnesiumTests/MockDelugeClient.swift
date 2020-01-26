@@ -29,6 +29,11 @@ final class MockDelugeClient: DelugeClient {
     struct Errors {
         var torrents = false
         var torrentFiles = false
+        var pause = false
+        var resume = false
+        var removeKeepData = false
+        var removeWithData = false
+        var recheck = false
         var addURL = false
     }
 
@@ -68,21 +73,37 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        guard !errors.pause else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
         requests.pause += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        guard !errors.resume else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
         requests.resume += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
+        guard !(removeData && errors.removeWithData), !(!removeData && errors.removeKeepData) else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
         requests.remove.append(removeData)
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        guard !errors.recheck else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
         requests.recheck += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }

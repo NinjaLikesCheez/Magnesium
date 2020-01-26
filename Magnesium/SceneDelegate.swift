@@ -9,7 +9,7 @@
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    private var coordinator: AppCoordinator!
+    private var coordinator: AppCoordinator?
     var window: UIWindow?
 
     func scene(
@@ -33,5 +33,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.window = window
             coordinator = AppCoordinator(window: window)
         }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url, url.pathExtension == "torrent" else { return }
+        coordinator?.addTorrentFile(at: url)
     }
 }

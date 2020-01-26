@@ -11,7 +11,7 @@ import Coordinator
 import Preferences
 import UIKit
 
-final class AppCoordinator: Coordinator {
+final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
     private lazy var session: Session = DefaultSession(preferences: preferences)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
@@ -111,6 +111,76 @@ final class AppCoordinator: Coordinator {
             let previousViewController = masterNavigationController.viewControllers[index - 1]
             masterNavigationController.popToViewController(previousViewController, animated: true)
         }
+    }
+
+    func addTorrentFile(at url: URL) {
+        guard let server = session.server else { return }
+        var alert = Alert(
+            title: "Add Torrent",
+            message: "Add \(url.lastPathComponent) to \(server.name)?",
+            style: .alert
+        )
+        alert.addAction(AlertAction(title: "Add", style: .default) {
+            self.addTorrentFile(at: url, to: server)
+        })
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        showAlert(alert, useTopViewController: true)
+    }
+
+    private func addTorrentFile(at url: URL, to server: Server) {
+        var isAccessingSecurityScopedResource = false
+        if !FileManager.default.isReadableFile(atPath: url.absoluteString) {
+            _ = url.startAccessingSecurityScopedResource()
+            isAccessingSecurityScopedResource = true
+        }
+
+        defer {
+            if isAccessingSecurityScopedResource {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        switch server.type {
+        case .deluge:
+            guard let settings = try? JSONDecoder().decode(DelugeServerSettings.self, from: server.data) else { return }
+            let client = DefaultDelugeClient(
+                baseURL: settings.url,
+                password: settings.password
+            )
+            client.add(fileURL: url)
+                .ui()
+                .sink(receiveCompletion: { [weak self] completion in
+                    guard case let .failure(error) = completion else { return }
+                    self?.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                    }, receiveValue: { _ in })
+                .store(in: &observers)
+        case .transmission:
+            guard let settings = try? JSONDecoder().decode(TransmissionServerSettings.self, from: server.data) else {
+                return
+            }
+            let client = DefaultTransmissionClient(
+                baseURL: settings.url,
+                username: settings.username,
+                password: settings.password
+            )
+            client.add(fileURL: url)
+                .ui()
+                .sink(receiveCompletion: { [weak self] completion in
+                    guard case let .failure(error) = completion else { return }
+                    self?.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+                .store(in: &observers)
+        }
+    }
+
+    private func showError(title: String, message: String?) {
+        var alert = Alert(
+            title: title,
+            message: message,
+            style: .alert
+        )
+        alert.addAction(AlertAction(title: "OK", style: .default))
+        showAlert(alert, useTopViewController: true)
     }
 }
 

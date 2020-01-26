@@ -9,6 +9,8 @@ public final class Client {
         case encoding(Swift.Error)
         /// An error occurred while decoding the response.
         case decoding(Swift.Error)
+        /// A filesystem error occurred.
+        case filesystem(Swift.Error)
         /// A request error occurred.
         case request(URLError)
         /// The provided authentication was not valid.
@@ -297,15 +299,25 @@ public final class Client {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.httpBody = multipartBody(fileURL: fileURL, boundary: boundary)
+
+        switch multipartBody(fileURL: fileURL, boundary: boundary) {
+        case let .success(data):
+            request.httpBody = data
+        case let .failure(error):
+            return Fail(error: error).eraseToAnyPublisher()
+        }
+
         return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
             return self.upload(fileURL: fileURL, authenticateIfNeeded: false)
         }
     }
 
-    private func multipartBody(fileURL: URL, boundary: String) -> Data? {
-        guard fileURL.isFileURL, let data = try? Data(contentsOf: fileURL) else {
-            return nil
+    private func multipartBody(fileURL: URL, boundary: String) -> Result<Data, Error> {
+        let data: Data
+        do {
+            data = try Data(contentsOf: fileURL)
+        } catch {
+            return .failure(.filesystem(error))
         }
 
         var body = Data()
@@ -315,7 +327,7 @@ public final class Client {
         body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
         body.append(data)
         body.append("\r\n--\(boundary)--".data(using: .utf8)!)
-        return body
+        return .success(body)
     }
 }
 
@@ -325,6 +337,8 @@ extension Client.Error: LocalizedError {
         case let .encoding(error):
             return error.localizedDescription
         case let .decoding(error):
+            return error.localizedDescription
+        case let .filesystem(error):
             return error.localizedDescription
         case let .request(error):
             return error.localizedDescription

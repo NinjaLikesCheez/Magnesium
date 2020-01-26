@@ -79,12 +79,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
             .mapError { $0 as Error }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case let .failure(error):
-                    self?.showError(title: "Update Failed", message: error.localizedDescription)
-                case .finished:
-                    break
-                }
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Update Failed", message: error.localizedDescription)
             })
             .eraseToAnyPublisher()
     }
@@ -110,12 +106,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
         client.add(url: url)
             .ui()
             .sink(receiveCompletion: { completion in
-                switch completion {
-                case let .failure(error):
-                    self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
-                case .finished:
-                    break
-                }
+                guard case let .failure(error) = completion else { return }
+                self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
