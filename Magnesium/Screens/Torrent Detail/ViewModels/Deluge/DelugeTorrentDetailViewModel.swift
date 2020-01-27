@@ -294,8 +294,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Remove", message: error.localizedDescription)
+                switch completion {
+                case .finished:
+                    self?.eventSubject.send(.complete)
+                case let .failure(error):
+                    self?.showError(title: "Failed to Remove", message: error.localizedDescription)
+                }
             }, receiveValue: { _ in })
             .store(in: &observers)
     }

@@ -393,11 +393,20 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-
         viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
         let remove = alert!.actions[0].handler!
+
+        var event: TorrentDetailEvent?
+        viewModel.events.first().sink { inner in
+            event = inner
+        }.store(in: &observers)
         remove()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [false]))
+
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 
     func testRemoveKeepDataError() {

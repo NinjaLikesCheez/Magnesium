@@ -196,7 +196,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
                     XCTAssertEqual($0, "Ratio: ∞")
                     expectation.fulfill()
                 }
-            .store(in: &observers)
+                .store(in: &observers)
             torrent.state = state
             subject.send(torrent)
             waitForExpectations(timeout: 0)
