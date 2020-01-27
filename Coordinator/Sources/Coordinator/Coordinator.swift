@@ -21,6 +21,8 @@ public protocol Coordinator: AnyObject {
     /// A publisher that emits events to be received by this coordinator.
     var received: AnyPublisher<Received, Never> { get }
 
+    /// Handle a received event.
+    /// - Parameter event: The event to handle.
     func handle(event: Received)
 }
 
