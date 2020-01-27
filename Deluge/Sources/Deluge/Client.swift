@@ -287,14 +287,14 @@ public final class Client {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return self.request(method: "web.add_torrents", params: [[["path": path]]])
+                return self.request(method: "web.add_torrents", params: [[["path": path, "options": [String: Any]()]]])
             }
             .map { _ in () }
             .eraseToAnyPublisher()
     }
 
     private func upload(fileURL: URL, authenticateIfNeeded: Bool = true) -> AnyPublisher<[String: Any], Error> {
-        let url = baseURL.appendingPathComponent("json")
+        let url = baseURL.appendingPathComponent("upload")
         let boundary = UUID().uuidString
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -324,7 +324,7 @@ public final class Client {
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n"
             .data(using: .utf8)!)
-        body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/x-bittorrent\r\n\r\n".data(using: .utf8)!)
         body.append(data)
         body.append("\r\n--\(boundary)--".data(using: .utf8)!)
         return .success(body)
