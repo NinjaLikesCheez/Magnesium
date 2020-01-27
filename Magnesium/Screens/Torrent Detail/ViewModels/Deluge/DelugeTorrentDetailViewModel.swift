@@ -193,7 +193,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     func refresh() -> AnyPublisher<Void, Error> {
         return refresher.refreshTorrents()
             .mapError { $0 as Error }
-            .flatMap { _ in self.refreshFiles() }
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+                guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+                return strongSelf.refreshFiles()
+            }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -223,11 +226,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func recheck() {
         client.recheck(hashes: [torrentSubject.value.hash])
-            .handleEvents(receiveCompletion: { completion in
-                guard case .finished = completion else { return }
-                self.refresher.refreshTorrents()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.refresher.refreshTorrents()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &self.observers)
+                    .store(in: &strongSelf.observers)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -239,11 +242,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectPause() {
         client.pause(hashes: [torrentSubject.value.hash])
-            .handleEvents(receiveCompletion: { completion in
-                guard case .finished = completion else { return }
-                self.refresher.refreshTorrents()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.refresher.refreshTorrents()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &self.observers)
+                    .store(in: &strongSelf.observers)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -255,11 +258,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     func didSelectResume() {
         client.resume(hashes: [torrentSubject.value.hash])
-            .handleEvents(receiveCompletion: { completion in
-                guard case .finished = completion else { return }
-                self.refresher.refreshTorrents()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.refresher.refreshTorrents()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &self.observers)
+                    .store(in: &strongSelf.observers)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -283,11 +286,11 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func remove(removeData: Bool) {
         client.remove(hashes: [torrentSubject.value.hash], removeData: removeData)
-            .handleEvents(receiveCompletion: { completion in
-                guard case .finished = completion else { return }
-                self.refresher.refreshTorrents()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.refresher.refreshTorrents()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &self.observers)
+                    .store(in: &strongSelf.observers)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in

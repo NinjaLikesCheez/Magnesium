@@ -67,8 +67,8 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
     func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
         return client.fetchTorrents()
-            .handleEvents(receiveOutput: { new in
-                self.torrents.update(with: new.map { ($0.hash, $0) })
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.torrents.update(with: new.map { ($0.hash, $0) })
             })
             .map { _ in () }
             .eraseToAnyPublisher()
@@ -120,9 +120,9 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
         publisher
             .ui()
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                self?.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }

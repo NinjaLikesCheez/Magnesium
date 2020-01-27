@@ -67,8 +67,8 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
 
     func refreshTorrents() -> AnyPublisher<Void, TransmissionError> {
         return client.fetchTorrents()
-            .handleEvents(receiveOutput: { new in
-                self.torrents.update(with: new.map { ($0.id, $0) })
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.torrents.update(with: new.map { ($0.id, $0) })
             })
             .map { _ in () }
             .eraseToAnyPublisher()
@@ -105,9 +105,9 @@ final class TransmissionTorrentListViewModel: TorrentListViewModel {
 
         client.add(url: url)
             .ui()
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
+                self?.showError(title: "Failed to Add Torrent", message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }

@@ -86,7 +86,7 @@ public final class Client {
 
         return session.dataTaskPublisher(for: request)
             .mapError { .request($0) }
-            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
+            .flatMap { [weak self] data, response -> AnyPublisher<[String: Any], Error> in
                 if let response = response as? HTTPURLResponse {
                     switch response.statusCode {
                     case 200 ..< 300:
@@ -100,14 +100,18 @@ public final class Client {
                             return Fail(error: .noSessionID).eraseToAnyPublisher()
                         }
 
-                        self.sessionID = sessionID
-                        return self.request(method: method, args: args, handleSessionID: false)
+                        guard let strongSelf = self else {
+                            return Empty(completeImmediately: true).eraseToAnyPublisher()
+                        }
+
+                        strongSelf.sessionID = sessionID
+                        return strongSelf.request(method: method, args: args, handleSessionID: false)
                     default:
                         return Fail(error: .statusCode(response.statusCode)).eraseToAnyPublisher()
                     }
                 }
 
-                switch self.parse(data: data, response: response) {
+                switch Client.parse(data: data, response: response) {
                 case let .success(response):
                     return Just(response)
                         .setFailureType(to: Error.self)
@@ -119,7 +123,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], Error> {
+    private static func parse(data: Data, response: URLResponse) -> Result<[String: Any], Error> {
         let dict: [String: Any]
 
         do {

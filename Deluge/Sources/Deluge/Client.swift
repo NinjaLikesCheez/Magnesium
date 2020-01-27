@@ -59,8 +59,9 @@ public final class Client {
             return Fail(error: .encoding(error)).eraseToAnyPublisher()
         }
 
-        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
-            return self.request(method: method, params: params, authenticateIfNeeded: false)
+        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) { [weak self] in
+            guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+            return strongSelf.request(method: method, params: params, authenticateIfNeeded: false)
         }
     }
 
@@ -71,8 +72,9 @@ public final class Client {
     ) -> AnyPublisher<[String: Any], Error> {
         return session.dataTaskPublisher(for: request)
             .mapError { .request($0) }
-            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
-                switch self.parse(data: data, response: response) {
+            .flatMap { [weak self] data, response -> AnyPublisher<[String: Any], Error> in
+                guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+                switch strongSelf.parse(data: data, response: response) {
                 case let .success(response):
                     return Just(response)
                         .setFailureType(to: Error.self)
@@ -81,12 +83,16 @@ public final class Client {
                     return Fail(error: error).eraseToAnyPublisher()
                 }
             }
-            .catch { error -> AnyPublisher<[String: Any], Error> in
+            .catch { [weak self] error -> AnyPublisher<[String: Any], Error> in
+                guard let strongSelf = self else {
+                    return Empty(completeImmediately: true).eraseToAnyPublisher()
+                }
+
                 guard case .unauthenticated = error, authenticateIfNeeded else {
                     return Fail(error: error).eraseToAnyPublisher()
                 }
 
-                return self.authenticate()
+                return strongSelf.authenticate()
                     .flatMap { _ -> AnyPublisher<[String: Any], Error> in
                         retry()
                     }
@@ -182,7 +188,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    private func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[TorrentFile], Error> {
+    private static func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[TorrentFile], Error> {
         guard let results = response["result"] as? [String: Any],
             let contents = results["contents"] as? [String: [String: Any]]
         else {
@@ -218,7 +224,7 @@ public final class Client {
     public func fetchTorrentFiles(hash: String) -> AnyPublisher<[TorrentFile], Error> {
         return request(method: "web.get_torrent_files", params: [hash])
             .flatMap { response -> AnyPublisher<[TorrentFile], Error> in
-                switch self.parseTorrentFileResponse(response) {
+                switch Client.parseTorrentFileResponse(response) {
                 case let .success(files):
                     return Just(files).setFailureType(to: Error.self).eraseToAnyPublisher()
                 case let .failure(error):
@@ -282,12 +288,19 @@ public final class Client {
     /// - Parameter fileURL: The URL of the file to add.
     public func add(fileURL: URL) -> AnyPublisher<Void, Error> {
         return upload(fileURL: fileURL)
-            .flatMap { response -> AnyPublisher<[String: Any], Error> in
+            .flatMap { [weak self] response -> AnyPublisher<[String: Any], Error> in
+                guard let strongSelf = self else {
+                    return Empty(completeImmediately: true).eraseToAnyPublisher()
+                }
+
                 guard let path = (response["files"] as? [String])?.first else {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return self.request(method: "web.add_torrents", params: [[["path": path, "options": [String: Any]()]]])
+                return strongSelf.request(
+                    method: "web.add_torrents",
+                    params: [[["path": path, "options": [String: Any]()]]]
+                )
             }
             .map { _ in () }
             .eraseToAnyPublisher()
@@ -307,8 +320,9 @@ public final class Client {
             return Fail(error: error).eraseToAnyPublisher()
         }
 
-        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
-            return self.upload(fileURL: fileURL, authenticateIfNeeded: false)
+        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) { [weak self] in
+            guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+            return strongSelf.upload(fileURL: fileURL, authenticateIfNeeded: false)
         }
     }
 
