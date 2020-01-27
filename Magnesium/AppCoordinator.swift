@@ -15,6 +15,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
     private lazy var session: Session = DefaultSession(preferences: preferences)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 

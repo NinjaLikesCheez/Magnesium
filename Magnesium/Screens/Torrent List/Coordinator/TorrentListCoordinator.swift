@@ -35,15 +35,18 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         return eventSubject.eraseToAnyPublisher()
     }
 
+    var received: AnyPublisher<TorrentListEvent, Never> {
+        return viewModel.events.eraseToAnyPublisher()
+    }
+
     init(server: Server?, session: Session, preferences: Preferences) {
         viewModel = server?.listViewModel(preferences: preferences) ?? EmptyTorrentListViewModel()
         self.session = session
         self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
     }
 
-    private func handle(event: TorrentListEvent) {
+    func handle(event: TorrentListEvent) {
         switch event {
         case let .add(source: source):
             showAdd(from: source)

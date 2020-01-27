@@ -19,6 +19,7 @@ protocol ServerSettingsCoordinator: Coordinator where Event == ServerSettingsCoo
 final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPresenter {
     private let viewController: ServerSettingsViewController
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
+    let received: AnyPublisher<ServerSettingsEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -40,10 +41,23 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPr
         }
 
         viewController = ServerSettingsViewController(viewModel: viewModel)
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
+        received = viewModel.events.eraseToAnyPublisher()
     }
 
-    private func handle(event: ServerSettingsEvent) {
+    init(type: ServerType, preferences: Preferences) {
+        let viewModel: ServerSettingsViewModel
+        switch type {
+        case .deluge:
+            viewModel = DelugeSettingsViewModel(preferences: preferences)
+        case .transmission:
+            viewModel = TransmissionSettingsViewModel(preferences: preferences)
+        }
+
+        received = viewModel.events.eraseToAnyPublisher()
+        viewController = ServerSettingsViewController(viewModel: viewModel)
+    }
+
+    func handle(event: ServerSettingsEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

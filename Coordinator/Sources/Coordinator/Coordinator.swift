@@ -7,6 +7,8 @@ import Combine
 public protocol Coordinator: AnyObject {
     /// The type of event emitted by this coordinator.
     associatedtype Event
+    /// The type of event received by this coordinator.
+    associatedtype Received
 
     /// Combine observers used for child coordinators.
     var observers: [AnyCancellable] { get set }
@@ -16,6 +18,10 @@ public protocol Coordinator: AnyObject {
     var presentable: Presentable { get }
     /// A publisher of events that this coordinator can emit.
     var events: AnyPublisher<Event, Never> { get }
+    /// A publisher that emits events to be received by this coordinator.
+    var received: AnyPublisher<Received, Never> { get }
+
+    func handle(event: Received)
 }
 
 public extension Coordinator {
@@ -34,6 +40,11 @@ public extension Coordinator {
             .sink { [weak coordinator] event in
                 guard let coordinator = coordinator else { return }
                 eventHandler(coordinator, event)
+            }
+            .store(in: &observers)
+        coordinator.received
+            .sink { [weak coordinator] event in
+                coordinator?.handle(event: event)
             }
             .store(in: &observers)
     }
@@ -63,4 +74,8 @@ public extension Coordinator {
             value.presentable.isInViewHierarchy
         }
     }
+}
+
+public extension Coordinator where Received == Never {
+    func handle(event: Never) {}
 }

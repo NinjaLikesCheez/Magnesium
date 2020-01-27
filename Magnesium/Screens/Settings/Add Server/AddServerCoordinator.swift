@@ -21,6 +21,7 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
     private let preferences: Preferences
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController
+    let received: AnyPublisher<AddServerEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -36,35 +37,24 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
         self.preferences = preferences
         let viewModel = DefaultAddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
+        received = viewModel.events.eraseToAnyPublisher()
     }
 
-    private func handle(event: AddServerEvent) {
+    func handle(event: AddServerEvent) {
         switch event {
         case let .selected(type: type):
             showServerSettings(for: type)
         }
     }
 
-    private func handle(event: ServerSettingsEvent) {
-        switch event {
-        case .complete:
-            eventSubject.send(.complete)
-        case let .alert(alert, source: source):
-            showAlert(alert, from: source)
-        }
-    }
-
     private func showServerSettings(for type: ServerType) {
-        let viewModel: ServerSettingsViewModel
-        switch type {
-        case .deluge:
-            viewModel = DelugeSettingsViewModel(preferences: preferences)
-        case .transmission:
-            viewModel = TransmissionSettingsViewModel(preferences: preferences)
+        let coordinator = DefaultServerSettingsCoordinator(type: type, preferences: preferences)
+        addChildCoordinator(coordinator) { [weak self] _, event in
+            switch event {
+            case .complete:
+                self?.eventSubject.send(.complete)
+            }
         }
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
-        let viewController = ServerSettingsViewController(viewModel: viewModel)
-        self.viewController.navigationController?.pushViewController(viewController, animated: true)
+        viewController.navigationController?.pushViewController(coordinator.presentable.viewController, animated: true)
     }
 }

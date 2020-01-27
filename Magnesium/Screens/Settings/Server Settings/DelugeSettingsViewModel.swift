@@ -59,6 +59,7 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
             keyboardType: .URL,
             returnKeyType: .next,
             autocapitalizationType: .none,
+            autocorrectionType: .no,
             textContentType: .URL
         )
     }()

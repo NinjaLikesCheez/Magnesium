@@ -59,6 +59,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             keyboardType: .URL,
             returnKeyType: .next,
             autocapitalizationType: .none,
+            autocorrectionType: .no,
             textContentType: .URL
         )
     }()

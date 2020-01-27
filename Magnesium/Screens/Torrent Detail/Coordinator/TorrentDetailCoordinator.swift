@@ -18,6 +18,7 @@ protocol TorrentDetailCoordinator: Coordinator, AlertPresenter where Event == To
 final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
+    let received: AnyPublisher<TorrentDetailEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -32,10 +33,10 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
     init(viewModel: TorrentDetailViewModel) {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
+        received = viewModel.events.eraseToAnyPublisher()
     }
 
-    private func handle(event: TorrentDetailEvent) {
+    func handle(event: TorrentDetailEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

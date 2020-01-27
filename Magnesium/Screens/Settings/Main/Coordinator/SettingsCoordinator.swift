@@ -21,6 +21,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
     private let preferences: Preferences
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
+    let received: AnyPublisher<SettingsEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -37,7 +38,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
         let viewModel = DefaultSettingsViewModel(session: session, preferences: preferences)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
-        viewModel.events.sink { [weak self] in self?.handle(event: $0) }.store(in: &observers)
+        received = viewModel.events
     }
 
     func handle(event: SettingsEvent) {
