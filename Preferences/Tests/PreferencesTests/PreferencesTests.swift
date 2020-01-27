@@ -38,25 +38,21 @@ class UserDefaultPreferencesTests: XCTestCase {
 
     func testValueUpdated() throws {
         let expectation = self.expectation(description: "Value received")
-        preferenceManager.valueUpdated
-            .sink { anyKey, value in
-                XCTAssertEqual(anyKey.value, self.key.value)
-                XCTAssertEqual(value as? String, "Value")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        preferenceManager.valueUpdated.sink { anyKey, value in
+            XCTAssertEqual(anyKey.value, self.key.value)
+            XCTAssertEqual(value as? String, "Value")
+            expectation.fulfill()
+        }.store(in: &observers)
         try preferenceManager.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
 
     func testValueUpdatedPublisher() throws {
         let expectation = self.expectation(description: "Value received")
-        preferenceManager.valueUpdatedPublisher(for: key)
-            .sink { value in
-                XCTAssertEqual(value, "Value")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        preferenceManager.valueUpdatedPublisher(for: key).sink { value in
+            XCTAssertEqual(value, "Value")
+            expectation.fulfill()
+        }.store(in: &observers)
         try preferenceManager.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
@@ -76,24 +72,17 @@ class UserDefaultPreferencesTests: XCTestCase {
     func testValuePublisher() throws {
         try preferenceManager.set("Initial", for: key)
         let firstExpectation = expectation(description: "Value received")
-        preferenceManager.valuePublisher(for: key)
-            .first()
-            .sink { value in
-                XCTAssertEqual(value, "Initial")
-                firstExpectation.fulfill()
-            }
-            .store(in: &observers)
+        preferenceManager.valuePublisher(for: key).first().sink { value in
+            XCTAssertEqual(value, "Initial")
+            firstExpectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
 
         let secondExpectation = expectation(description: "Value received")
-        preferenceManager.valuePublisher(for: key)
-            .dropFirst()
-            .first()
-            .sink { value in
-                XCTAssertEqual(value, "New")
-                secondExpectation.fulfill()
-            }
-            .store(in: &observers)
+        preferenceManager.valuePublisher(for: key).dropFirst().first().sink { value in
+            XCTAssertEqual(value, "New")
+            secondExpectation.fulfill()
+        }.store(in: &observers)
         try preferenceManager.set("New", for: key)
         waitForExpectations(timeout: 0)
     }

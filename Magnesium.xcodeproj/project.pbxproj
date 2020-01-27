@@ -98,6 +98,7 @@
 		E9F24E0D23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0C23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift */; };
 		E9F24E0F23CE4ECB0089E45F /* DelugeServerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */; };
 		E9F24E1223CE55180089E45F /* PreviewPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E1123CE55180089E45F /* PreviewPreferences.swift */; };
+		E9F4002423DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F4002323DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -206,6 +207,7 @@
 		E9F24E0C23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyTorrentListViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeServerSettings.swift; sourceTree = "<group>"; };
 		E9F24E1123CE55180089E45F /* PreviewPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPreferences.swift; sourceTree = "<group>"; };
+		E9F4002323DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentDetailHeaderViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -631,6 +633,7 @@
 				E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */,
 				E9801EF123D37E1400181FFD /* TorrentSortTests.swift */,
 				E9472CA923DCCE1D00D5CCDD /* MockDelugeRefresher.swift */,
+				E9F4002323DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -847,6 +850,7 @@
 				E9472CAA23DCCE1D00D5CCDD /* MockDelugeRefresher.swift in Sources */,
 				E9AE9E5623D695120018D180 /* DelugeTorrentTests.swift in Sources */,
 				E9DF151423D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift in Sources */,
+				E9F4002423DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift in Sources */,
 				E98D935F23D2474B0013A1E1 /* MockPreferences.swift in Sources */,
 				E9E411B523D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift in Sources */,
 				E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */,

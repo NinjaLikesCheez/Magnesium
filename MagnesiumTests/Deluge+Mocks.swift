@@ -19,7 +19,7 @@ extension DelugeTorrent {
             downloadRate: 1_540_527,
             uploadRate: 465_158,
             eta: 361,
-            progress: 0.18983800888061523,
+            progress: 0.189838,
             downloaded: 130_583_716,
             uploaded: 56_455_257,
             size: 687_865_856,

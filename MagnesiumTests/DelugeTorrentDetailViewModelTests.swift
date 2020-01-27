@@ -104,7 +104,9 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         viewModel.sections
             .sink { sections in
-                XCTAssertEqual(sections[0].type, .header)
+                let section = sections[0]
+                XCTAssertEqual(section.type, .header)
+                XCTAssertEqual(section.items.count, 1)
                 expectation.fulfill()
             }
             .store(in: &observers)

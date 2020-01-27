@@ -29,13 +29,10 @@ class DefaultSessionTests: XCTestCase {
     func testServerPublisherEmitsOnAddFirstServer() {
         let server = Server(name: "Server", type: .deluge, data: Data())
         let expectation = self.expectation(description: "Value received")
-        session.serverPublisher
-            .dropFirst()
-            .sink { new in
-                XCTAssertEqual(new, server)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        session.serverPublisher.dropFirst().sink { new in
+            XCTAssertEqual(new, server)
+            expectation.fulfill()
+        }.store(in: &observers)
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(session.server, server)
         waitForExpectations(timeout: 0)
@@ -46,15 +43,11 @@ class DefaultSessionTests: XCTestCase {
         preferences.addOrUpdate(server: server)
 
         let expectation = self.expectation(description: "Value received")
-        session.serverPublisher
-            .dropFirst()
-            .sink { new in
-                XCTAssertEqual(new?.id, server.id)
-                XCTAssertEqual(new?.name, "New Name")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
-
+        session.serverPublisher.dropFirst().sink { new in
+            XCTAssertEqual(new?.id, server.id)
+            XCTAssertEqual(new?.name, "New Name")
+            expectation.fulfill()
+        }.store(in: &observers)
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(session.server, server)
@@ -68,14 +61,10 @@ class DefaultSessionTests: XCTestCase {
         preferences.addOrUpdate(server: secondServer)
 
         let expectation = self.expectation(description: "Value received")
-        session.serverPublisher
-            .dropFirst()
-            .sink { new in
-                XCTAssertEqual(new, secondServer)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
-
+        session.serverPublisher.dropFirst().sink { new in
+            XCTAssertEqual(new, secondServer)
+            expectation.fulfill()
+        }.store(in: &observers)
         XCTAssertEqual(session.server, firstServer)
         preferences.remove(server: firstServer)
         XCTAssertEqual(session.server, secondServer)
@@ -90,13 +79,9 @@ class DefaultSessionTests: XCTestCase {
 
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
-        session.serverPublisher
-            .dropFirst()
-            .sink { _ in
-                expectation.fulfill()
-            }
-            .store(in: &observers)
-
+        session.serverPublisher.dropFirst().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
         XCTAssertEqual(session.server, firstServer)
         try preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
         XCTAssertEqual(session.server, firstServer)
@@ -110,13 +95,10 @@ class DefaultSessionTests: XCTestCase {
         preferences.addOrUpdate(server: secondServer)
 
         let expectation = self.expectation(description: "Value received")
-        session.serverPublisher
-            .dropFirst()
-            .sink { new in
-                XCTAssertEqual(new, secondServer)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        session.serverPublisher.dropFirst().sink { new in
+            XCTAssertEqual(new, secondServer)
+            expectation.fulfill()
+        }.store(in: &observers)
 
         XCTAssertEqual(session.server, firstServer)
         session.setServer(secondServer)

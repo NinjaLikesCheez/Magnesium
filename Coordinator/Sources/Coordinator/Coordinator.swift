@@ -24,8 +24,7 @@ public extension Coordinator {
     /// - Parameter eventHandler: The event handler for the child coordinator.
     func addChildCoordinator<C: Coordinator>(_ coordinator: C, eventHandler: @escaping (C, C.Event) -> Void) {
         childCoordinators[ObjectIdentifier(coordinator)] = AnyCoordinator(coordinator)
-        coordinator.presentable
-            .didDismiss
+        coordinator.presentable.didDismiss
             .sink(receiveCompletion: { [weak self, weak coordinator] _ in
                 guard let coordinator = coordinator else { return }
                 self?.removeChildCoordinator(coordinator)
@@ -43,8 +42,7 @@ public extension Coordinator {
     /// - Parameter coordinator: The child coordinator to add.
     func addChildCoordinator<C: Coordinator>(_ coordinator: C) where C.Event == Never {
         childCoordinators[ObjectIdentifier(coordinator)] = AnyCoordinator(coordinator)
-        coordinator.presentable
-            .didDismiss
+        coordinator.presentable.didDismiss
             .sink(receiveCompletion: { [weak self, weak coordinator] _ in
                 guard let coordinator = coordinator else { return }
                 self?.removeChildCoordinator(coordinator)
