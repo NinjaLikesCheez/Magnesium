@@ -204,8 +204,8 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
         return client.fetchTorrentFiles(hash: torrentSubject.value.hash)
-            .handleEvents(receiveOutput: { new in
-                self.files.update(with: new.map { ($0.path, $0) })
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.files.update(with: new.map { ($0.path, $0) })
             })
             .mapError { $0 as Error }
             .map { _ in () }
