@@ -117,14 +117,14 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .info(TorrentDetailInfoViewModel(
                 name: "ETA",
                 value: torrentSubject
-                    .map { $0.eta > 0 ? DateFormatters.etaFormatter.string(from: $0.eta) ?? "" : "∞" }
+                    .map(\.etaString)
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(TorrentDetailInfoViewModel(
                 name: "Ratio",
                 value: torrentSubject
-                    .map { !$0.ratio.isInfinite ? String(format: "%.3f", $0.ratio) : "∞" }
+                    .map { $0.ratioString(precision: 3) }
                     .ui()
                     .eraseToAnyPublisher()
             )),

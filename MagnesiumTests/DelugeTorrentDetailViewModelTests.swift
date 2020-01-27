@@ -190,6 +190,23 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
+    func testNanRatio() {
+        var torrent = subject.value
+        torrent.downloaded = 0
+        torrent.uploaded = 0
+        subject.send(torrent)
+
+        let expectation = self.expectation(description: "Value received")
+        viewModel.sections
+            .sink { sections in
+                let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+                XCTAssertEqual(eta.1, "∞")
+                expectation.fulfill()
+            }
+            .store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
     func testTrackers() {
         let expected = ["udp://tracker.archlinux.org:6969", "http://tracker.archlinux.org:6969/announce"]
 

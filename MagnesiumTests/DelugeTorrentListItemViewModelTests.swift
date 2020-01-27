@@ -163,17 +163,11 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testRatio() {
-        let downloaded = subject.value.downloaded
-        let states: [DelugeTorrent.State] = [
-            .seeding,
-            .paused,
-            .checking,
-            .queued,
-            .error,
-        ]
+    let ratioStates: [DelugeTorrent.State] = [.seeding, .paused, .checking, .queued, .error]
 
-        for state in states {
+    func testRatio() {
+        var torrent = subject.value
+        for state in ratioStates {
             let expectation = self.expectation(description: "Value received")
             viewModel.ratioOrETA
                 .dropFirst()
@@ -184,22 +178,46 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
                 }
                 .store(in: &observers)
 
-            var torrent = subject.value
             torrent.state = state
-            torrent.downloaded = downloaded
             subject.send(torrent)
             waitForExpectations(timeout: 0)
+        }
+    }
 
-            let infiniteExpectation = self.expectation(description: "Value received")
+    func testInfiniteRatio() {
+        var torrent = subject.value
+        torrent.downloaded = 0
+        for state in ratioStates {
+            let expectation = self.expectation(description: "Value received")
             viewModel.ratioOrETA
                 .dropFirst()
                 .first()
                 .sink {
                     XCTAssertEqual($0, "Ratio: ∞")
-                    infiniteExpectation.fulfill()
+                    expectation.fulfill()
+                }
+            .store(in: &observers)
+            torrent.state = state
+            subject.send(torrent)
+            waitForExpectations(timeout: 0)
+        }
+    }
+
+    func testNanRatio() {
+        var torrent = subject.value
+        torrent.downloaded = 0
+        torrent.uploaded = 0
+        for state in ratioStates {
+            let expectation = self.expectation(description: "Value received")
+            viewModel.ratioOrETA
+                .dropFirst()
+                .first()
+                .sink {
+                    XCTAssertEqual($0, "Ratio: ∞")
+                    expectation.fulfill()
                 }
                 .store(in: &observers)
-            torrent.downloaded = 0
+            torrent.state = state
             subject.send(torrent)
             waitForExpectations(timeout: 0)
         }

@@ -49,13 +49,19 @@ extension TorrentExt {
         """
     }
 
+    var etaString: String {
+        return eta > 0 ? DateFormatters.etaFormatter.string(from: eta) ?? "" : "∞"
+    }
+
+    func ratioString(precision: Int = 1) -> String {
+        return !ratio.isInfinite && !ratio.isNaN ? String(format: "%.\(precision)f", ratio) : "∞"
+    }
+
     var ratioOrETAString: String {
         if commonState == .downloading {
-            return eta > 0
-                ? DateFormatters.etaFormatter.string(from: eta) ?? ""
-                : "∞"
+            return etaString
         } else {
-            return "Ratio: \(!ratio.isInfinite ? String(format: "%.1f", ratio) : "∞")"
+            return "Ratio: \(ratioString())"
         }
     }
 }
