@@ -27,11 +27,11 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         let expectation = self.expectation(description: "Update")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 1))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1.1)
+        waitForExpectations(timeout: 1.2)
     }
 
     func testAutoUpdateStopsWhenDisabled() throws {
@@ -39,20 +39,20 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         client.requests.reset()
 
         let firstCheck = expectation(description: "First check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 1))
             firstCheck.fulfill()
         }
-        waitForExpectations(timeout: 1.1)
+        waitForExpectations(timeout: 1.2)
 
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
 
         let secondCheck = expectation(description: "Second check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 1))
             secondCheck.fulfill()
         }
-        waitForExpectations(timeout: 1.1)
+        waitForExpectations(timeout: 1.2)
     }
 
     func testRefreshError() {
