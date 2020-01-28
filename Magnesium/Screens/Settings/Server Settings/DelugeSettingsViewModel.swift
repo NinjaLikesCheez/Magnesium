@@ -24,6 +24,12 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
         }
     }()
 
+    private lazy var keychain: DelugeKeychainData? = {
+        return (server?.keychainData).flatMap { data in
+            try? JSONDecoder().decode(DelugeKeychainData.self, from: data)
+        }
+    }()
+
     private lazy var nameValue: CurrentValueSubject<String?, Never> = {
         return CurrentValueSubject(server?.name)
     }()
@@ -65,7 +71,7 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
     }()
 
     private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.password)
+        return CurrentValueSubject(keychain?.password)
     }()
 
     private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
@@ -162,8 +168,9 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
                 switch completion {
                 case .finished:
                     do {
-                        let settings = DelugeServerSettings(url: url, password: password)
-                        try self?.saveServer(name: name, settings: settings)
+                        let settings = DelugeServerSettings(url: url)
+                        let keychain = DelugeKeychainData(password: password)
+                        try self?.saveServer(name: name, settings: settings, keychain: keychain)
                     } catch {
                         self?.showError(title: "Unable to Add Server", message: error.localizedDescription)
                     }
@@ -175,14 +182,22 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
             .store(in: &observers)
     }
 
-    private func saveServer(name: String, settings: DelugeServerSettings) throws {
-        let data = try JSONEncoder().encode(settings)
+    private func saveServer(name: String, settings: DelugeServerSettings, keychain: DelugeKeychainData) throws {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(settings)
+        let keychainData = try encoder.encode(keychain)
         if var server = server {
             server.name = name
             server.data = data
+            server.keychainData = keychainData
             preferences.addOrUpdate(server: server)
         } else {
-            preferences.addOrUpdate(server: Server(name: name, type: .deluge, data: data))
+            preferences.addOrUpdate(server: Server(
+                name: name,
+                type: .deluge,
+                data: data,
+                keychainData: keychainData
+            ))
         }
         eventSubject.send(.complete)
     }

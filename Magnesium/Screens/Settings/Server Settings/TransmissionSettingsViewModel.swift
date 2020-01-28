@@ -24,6 +24,12 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         }
     }()
 
+    private lazy var keychain: TransmissionKeychainData? = {
+        return (server?.keychainData).flatMap { data in
+            try? JSONDecoder().decode(TransmissionKeychainData.self, from: data)
+        }
+    }()
+
     private lazy var nameValue: CurrentValueSubject<String?, Never> = {
         return CurrentValueSubject(server?.name)
     }()
@@ -85,7 +91,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
     }()
 
     private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.password)
+        return CurrentValueSubject(keychain?.password)
     }()
 
     private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
@@ -182,8 +188,9 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
                 switch completion {
                 case .finished:
                     do {
-                        let settings = TransmissionServerSettings(url: url, username: username, password: password)
-                        try self?.saveServer(name: name, settings: settings)
+                        let settings = TransmissionServerSettings(url: url, username: username)
+                        let keychain = TransmissionKeychainData(password: password)
+                        try self?.saveServer(name: name, settings: settings, keychain: keychain)
                     } catch {
                         self?.showError(title: "Unable to Add Server", message: error.localizedDescription)
                     }
@@ -195,14 +202,26 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             .store(in: &observers)
     }
 
-    private func saveServer(name: String, settings: TransmissionServerSettings) throws {
-        let data = try JSONEncoder().encode(settings)
+    private func saveServer(
+        name: String,
+        settings: TransmissionServerSettings,
+        keychain: TransmissionKeychainData
+    ) throws {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(settings)
+        let keychainData = try encoder.encode(keychain)
         if var server = server {
             server.name = name
             server.data = data
+            server.keychainData = keychainData
             preferences.addOrUpdate(server: server)
         } else {
-            preferences.addOrUpdate(server: Server(name: name, type: .transmission, data: data))
+            preferences.addOrUpdate(server: Server(
+                name: name,
+                type: .transmission,
+                data: data,
+                keychainData: keychainData
+            ))
         }
         eventSubject.send(.complete)
     }

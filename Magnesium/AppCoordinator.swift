@@ -143,10 +143,16 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
         switch server.type {
         case .deluge:
-            guard let settings = try? JSONDecoder().decode(DelugeServerSettings.self, from: server.data) else { return }
+            let decoder = JSONDecoder()
+            guard let settings = try? decoder.decode(DelugeServerSettings.self, from: server.data),
+                let keychain = try? decoder.decode(DelugeKeychainData.self, from: server.data)
+            else {
+                return
+            }
+
             let client = DefaultDelugeClient(
                 baseURL: settings.url,
-                password: settings.password
+                password: keychain.password
             )
             client.add(fileURL: url)
                 .ui()
@@ -156,13 +162,17 @@ final class AppCoordinator: Coordinator, AlertPresenter {
                     }, receiveValue: { _ in })
                 .store(in: &observers)
         case .transmission:
-            guard let settings = try? JSONDecoder().decode(TransmissionServerSettings.self, from: server.data) else {
+            let decoder = JSONDecoder()
+            guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
+                let keychain = try? decoder.decode(TransmissionKeychainData.self, from: server.data)
+            else {
                 return
             }
+
             let client = DefaultTransmissionClient(
                 baseURL: settings.url,
                 username: settings.username,
-                password: settings.password
+                password: keychain.password
             )
             client.add(fileURL: url)
                 .ui()

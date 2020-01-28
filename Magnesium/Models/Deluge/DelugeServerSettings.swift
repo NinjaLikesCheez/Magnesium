@@ -10,5 +10,4 @@ import Foundation
 
 struct DelugeServerSettings: Codable {
     var url: URL
-    var password: String // TODO: keychain
 }

@@ -13,8 +13,18 @@ import XCTest
 
 class ServerPreferencesTests: XCTestCase {
     private let preferences = MockPreferences()
-    private let server = Server(name: "Server 1", type: .deluge, data: Data())
+    private let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
     private var observers = [AnyCancellable]()
+
+    override func setUp() {
+        super.setUp()
+        preferences.removeServers()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+        preferences.removeServers()
+    }
 
     func testAddServer() {
         preferences.addOrUpdate(server: server)
@@ -46,6 +56,7 @@ class ServerPreferencesTests: XCTestCase {
     func testServerUpdatedPublisher() {
         let expectation = self.expectation(description: "Value received")
         preferences.serverUpdatedPublisher(for: server)
+            .first()
             .sink { updated in
                 XCTAssertEqual(updated, self.server)
                 expectation.fulfill()
@@ -60,6 +71,7 @@ class ServerPreferencesTests: XCTestCase {
 
         let expectation = self.expectation(description: "Value received")
         preferences.serverUpdatedPublisher(for: server)
+        .first()
             .sink { updated in
                 XCTAssertEqual(updated?.id, self.server.id)
                 XCTAssertEqual(updated?.name, "New Name")
@@ -77,6 +89,7 @@ class ServerPreferencesTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
         preferences.serverUpdatedPublisher(for: server)
+            .first()
             .sink { _ in
                 expectation.fulfill()
             }
@@ -89,6 +102,7 @@ class ServerPreferencesTests: XCTestCase {
         preferences.addOrUpdate(server: server)
         let expectation = self.expectation(description: "Value received")
         preferences.serverUpdatedPublisher(for: server)
+            .first()
             .sink { updated in
                 XCTAssertNil(updated)
                 expectation.fulfill()
@@ -96,5 +110,58 @@ class ServerPreferencesTests: XCTestCase {
             .store(in: &observers)
         preferences.remove(server: server)
         waitForExpectations(timeout: 0)
+    }
+
+    private func getKeychainCount() -> Int {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecReturnAttributes as String: true,
+            kSecMatchLimit as String: kSecMatchLimitAll,
+        ]
+
+        var result: AnyObject?
+        let status = withUnsafeMutablePointer(to: &result) {
+            SecItemCopyMatching(query as CFDictionary, $0)
+        }
+
+        if status == errSecItemNotFound {
+            return 0
+        }
+
+        guard status == errSecSuccess else {
+            XCTFail("SecItemCopyMatching returned \(status)")
+            return -1
+        }
+
+        guard let items = result as? [[String: Any]] else {
+            XCTFail("Unable to cast result")
+            return -1
+        }
+
+        return items.count
+    }
+
+    func testKeychainPersistance() {
+        let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
+        preferences.addOrUpdate(server: server)
+        let fetched = preferences.getServers().first!
+        XCTAssertEqual(getKeychainCount(), 1)
+        XCTAssertEqual(fetched.keychainData, server.keychainData)
+    }
+
+    func testRemovesKeychainData() {
+        let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
+        preferences.addOrUpdate(server: server)
+        XCTAssertEqual(getKeychainCount(), 1)
+        preferences.remove(server: server)
+        XCTAssertEqual(getKeychainCount(), 0)
+    }
+
+    func testRemoveServersRemovesKeychainData() {
+        let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
+        preferences.addOrUpdate(server: server)
+        XCTAssertEqual(getKeychainCount(), 1)
+        preferences.removeServers()
+        XCTAssertEqual(getKeychainCount(), 0)
     }
 }

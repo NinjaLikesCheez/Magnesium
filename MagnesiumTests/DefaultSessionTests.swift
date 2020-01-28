@@ -27,7 +27,7 @@ class DefaultSessionTests: XCTestCase {
     }
 
     func testServerPublisherEmitsOnAddFirstServer() {
-        let server = Server(name: "Server", type: .deluge, data: Data())
+        let server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         let expectation = self.expectation(description: "Value received")
         session.serverPublisher.dropFirst().sink { new in
             XCTAssertEqual(new, server)
@@ -39,7 +39,7 @@ class DefaultSessionTests: XCTestCase {
     }
 
     func testServerPublisherEmitsOnUpdateServer() {
-        var server = Server(name: "Server", type: .deluge, data: Data())
+        var server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server)
 
         let expectation = self.expectation(description: "Value received")
@@ -55,8 +55,8 @@ class DefaultSessionTests: XCTestCase {
     }
 
     func testServerPublisherEmitsNextServerOnDelete() {
-        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
-        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
 
@@ -72,8 +72,8 @@ class DefaultSessionTests: XCTestCase {
     }
 
     func testServerPublisherDoesNotEmitOnPreferenceChange() throws {
-        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
-        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
 
@@ -89,8 +89,8 @@ class DefaultSessionTests: XCTestCase {
     }
 
     func testServerPublisherEmitsOnServerChange() throws {
-        let firstServer = Server(name: "Server 1", type: .deluge, data: Data())
-        let secondServer = Server(name: "Server 2", type: .deluge, data: Data())
+        let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
+        let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
 

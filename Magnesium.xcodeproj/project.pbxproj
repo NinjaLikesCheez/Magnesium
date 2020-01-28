@@ -13,6 +13,8 @@
 		E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */; };
 		E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */; };
 		E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */; };
+		E913FD8623DFD65E008179F1 /* DelugeKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */; };
+		E913FD8A23DFD683008179F1 /* TransmissionKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */; };
 		E9282C8923CC170900776CD3 /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E9282C8823CC170900776CD3 /* Preferences */; };
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
@@ -118,6 +120,8 @@
 		E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Server+TorrentListViewModel.swift"; sourceTree = "<group>"; };
 		E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeKeychainData.swift; sourceTree = "<group>"; };
+		E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionKeychainData.swift; sourceTree = "<group>"; };
 		E9282C8723CC16FF00776CD3 /* Preferences */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Preferences; sourceTree = "<group>"; };
 		E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewController.swift; sourceTree = "<group>"; };
 		E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputTableViewCell.swift; sourceTree = "<group>"; };
@@ -270,6 +274,25 @@
 			path = Main;
 			sourceTree = "<group>";
 		};
+		E913FD8723DFD667008179F1 /* Deluge */ = {
+			isa = PBXGroup;
+			children = (
+				E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */,
+				E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */,
+				E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */,
+			);
+			path = Deluge;
+			sourceTree = "<group>";
+		};
+		E913FD8823DFD674008179F1 /* Transmission */ = {
+			isa = PBXGroup;
+			children = (
+				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
+				E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */,
+			);
+			path = Transmission;
+			sourceTree = "<group>";
+		};
 		E9282C8A23CC1A1C00776CD3 /* Deluge */ = {
 			isa = PBXGroup;
 			children = (
@@ -387,14 +410,13 @@
 			isa = PBXGroup;
 			children = (
 				E99FC26523D148290019A992 /* Alert */,
-				E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */,
-				E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */,
+				E913FD8723DFD667008179F1 /* Deluge */,
+				E913FD8823DFD674008179F1 /* Transmission */,
 				E95BB40323CA404C002F0520 /* PreferenceKeys.swift */,
 				E9624D2A23D1FF080051EA99 /* Session.swift */,
 				E9C8258723C57E47003B1D72 /* SortOption.swift */,
 				E9C8258323C5787E003B1D72 /* TorrentExt.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
-				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -780,6 +802,7 @@
 				E98D936323D2849E0013A1E1 /* TorrentSortUtil.swift in Sources */,
 				E99FC25A23D13C270019A992 /* AppCoordinator.swift in Sources */,
 				E90366DC23AAB3BD00C6AB46 /* TorrentListViewController.swift in Sources */,
+				E913FD8623DFD65E008179F1 /* DelugeKeychainData.swift in Sources */,
 				E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */,
 				E94C28A623D1546B006F26D2 /* Alert+ViewController.swift in Sources */,
 				E97B543323B547EC006FFCC9 /* TorrentDetailInfoViewModel.swift in Sources */,
@@ -806,6 +829,7 @@
 				E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */,
 				E9C8258E23C58509003B1D72 /* DelugeTorrentDetailViewModel.swift in Sources */,
 				E94C28A423D14D13006F26D2 /* SettingsCoordinator.swift in Sources */,
+				E913FD8A23DFD683008179F1 /* TransmissionKeychainData.swift in Sources */,
 				E9B40E9223B3FDA0009E30AE /* TorrentDetailHeaderViewModel.swift in Sources */,
 				E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */,
 				E9F24E0B23CE3B160089E45F /* DelugeSettingsViewModel.swift in Sources */,
