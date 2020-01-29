@@ -15,12 +15,10 @@ enum AddServerCoordinatorEvent {
     case complete
 }
 
-protocol AddServerCoordinator: Coordinator where Event == AddServerCoordinatorEvent {}
-
-final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
+final class AddServerCoordinator: Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
-    private let viewController: AddServerViewController
+    private let viewController: AddServerViewController<AddServerViewModel>
     let received: AnyPublisher<AddServerEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
@@ -35,14 +33,14 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
 
     init(preferences: Preferences) {
         self.preferences = preferences
-        let viewModel = DefaultAddServerViewModel()
+        let viewModel = AddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
         received = viewModel.events
     }
 
     func handle(_ event: AddServerEvent) {
         switch event {
-        case let .selected(type: type):
+        case let .add(type: type):
             showServerSettings(for: type)
         }
     }

@@ -43,7 +43,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
         switch event {
         case .complete:
             eventSubject.send(.complete)
-        case let .selected(server: server):
+        case let .edit(server: server):
             showSettings(for: server)
         case .addServer:
             showAddServer()
@@ -64,7 +64,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showAddServer() {
-        let coordinator = DefaultAddServerCoordinator(preferences: preferences)
+        let coordinator = AddServerCoordinator(preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             switch event {
             case .complete:

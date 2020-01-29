@@ -11,7 +11,7 @@ import Preferences
 
 enum SettingsEvent {
     case complete
-    case selected(server: Server)
+    case edit(server: Server)
     case addServer
     case alert(Alert, source: PopoverSource?)
 }
@@ -84,7 +84,7 @@ final class SettingsViewModel: ViewModel, EventProducer {
 
         case let .selectServer(index):
             let server = preferences.getServers()[index]
-            eventSubject.send(.selected(server: server))
+            eventSubject.send(.edit(server: server))
 
         case .addServer:
             eventSubject.send(.addServer)

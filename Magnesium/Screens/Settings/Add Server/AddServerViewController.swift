@@ -10,10 +10,11 @@ import Coordinator
 import SwiftUI
 import UIKit
 
-final class AddServerViewController: PresentableTableViewController {
-    private let viewModel: AddServerViewModel
+final class AddServerViewController<VM: ViewModel>: PresentableTableViewController
+    where VM.ViewEvent == AddServerViewEvent, VM.ViewState == AddServerViewState {
+    private let viewModel: VM
 
-    init(viewModel: AddServerViewModel) {
+    init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         title = "Add Server"
@@ -30,18 +31,18 @@ final class AddServerViewController: PresentableTableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.types.count
+        return viewModel.state.types.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-        cell.textLabel?.text = viewModel.types[indexPath.row]
+        cell.textLabel?.text = viewModel.state.types[indexPath.row]
         cell.accessoryType = .disclosureIndicator
         return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.didSelectType(at: indexPath.row)
+        viewModel.handle(.selectType(index: indexPath.row))
     }
 }
 
@@ -64,7 +65,7 @@ final class AddServerViewController: PresentableTableViewController {
         }
 
         static var previews: some View {
-            let viewModel = DefaultAddServerViewModel()
+            let viewModel = AddServerViewModel()
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")

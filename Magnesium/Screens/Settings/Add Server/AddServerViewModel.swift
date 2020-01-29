@@ -9,28 +9,34 @@
 import Combine
 
 enum AddServerEvent {
-    case selected(type: ServerType)
+    case add(type: ServerType)
 }
 
-protocol AddServerViewModel {
-    var events: AnyPublisher<AddServerEvent, Never> { get }
-    var types: [String] { get }
-    func didSelectType(at index: Int)
+enum AddServerViewEvent {
+    case selectType(index: Int)
 }
 
-final class DefaultAddServerViewModel: AddServerViewModel {
+struct AddServerViewState {
+    var types: [String]
+}
+
+final class AddServerViewModel: ViewModel, EventProducer {
     private let eventSubject = PassthroughSubject<AddServerEvent, Never>()
     private let serverTypes: [ServerType] = [.deluge, .transmission]
+    let state: AddServerViewState
+
+    init() {
+        state = AddServerViewState(types: serverTypes.map { $0.displayString })
+    }
 
     var events: AnyPublisher<AddServerEvent, Never> {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    var types: [String] {
-        return serverTypes.map { $0.displayString }
-    }
-
-    func didSelectType(at index: Int) {
-        eventSubject.send(.selected(type: serverTypes[index]))
+    func handle(_ event: AddServerViewEvent) {
+        switch event {
+        case let .selectType(index: index):
+            eventSubject.send(.add(type: serverTypes[index]))
+        }
     }
 }
