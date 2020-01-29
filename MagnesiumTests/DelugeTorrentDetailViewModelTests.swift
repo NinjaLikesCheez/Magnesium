@@ -251,7 +251,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let expected = ["Force Recheck", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
@@ -268,7 +268,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let recheck = alert!.actions[0].handler!
         recheck()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
@@ -286,7 +286,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionsAlert = inner
         }.store(in: &observers)
-        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let recheck = optionsAlert!.actions[0].handler!
 
         var errorAlert: Alert?
@@ -362,7 +362,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
+        viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let expected = ["Keep Data", "Remove Data", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
@@ -378,7 +378,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
+        viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = alert!.actions[0].handler!
 
         var event: TorrentDetailEvent?
@@ -406,7 +406,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionAlert = inner
         }.store(in: &observers)
-        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
+        viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = optionAlert!.actions[0].handler!
 
         var errorAlert: Alert?
@@ -434,7 +434,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
+        viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = alert!.actions[1].handler!
         remove()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
@@ -452,7 +452,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionAlert = inner
         }.store(in: &observers)
-        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
+        viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = optionAlert!.actions[1].handler!
 
         var errorAlert: Alert?
