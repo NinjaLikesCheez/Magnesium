@@ -1,83 +1,46 @@
 import Combine
 
-@inline(never)
-private func _abstract(
-    file: StaticString = #file,
-    line: UInt = #line
-) -> Never {
-    fatalError("Method must be overridden", file: file, line: line)
-}
-
-private class _AnyCoordinatorBoxBase: Coordinator {
-    var base: Any { _abstract() }
-    var presentable: Presentable { _abstract() }
-    var events: AnyPublisher<Any, Never> { _abstract() }
-    var received: AnyPublisher<Any, Never> { _abstract() }
-
-    var observers: [AnyCancellable] {
-        get { _abstract() }
-        set { _abstract() } // swiftlint:disable:this unused_setter_value
-    }
-
-    var childCoordinators: [AnyHashable: AnyCoordinator] {
-        get { _abstract() }
-        set { _abstract() } // swiftlint:disable:this unused_setter_value
-    }
-
-    func handle(_ event: Any) { _abstract() }
-}
-
-private final class _AnyCoordinatorBox<Base: Coordinator>: _AnyCoordinatorBoxBase {
-    private let _base: Base
-
-    override var base: Any { _base }
-    override var presentable: Presentable { _base.presentable }
-    override var events: AnyPublisher<Any, Never> { _base.events.map { $0 as Any }.eraseToAnyPublisher() }
-    override var received: AnyPublisher<Any, Never> { _base.received.map { $0 as Any }.eraseToAnyPublisher() }
-
-    override var observers: [AnyCancellable] {
-        get { _base.observers }
-        set { _base.observers = newValue }
-    }
-
-    override var childCoordinators: [AnyHashable: AnyCoordinator] {
-        get { _base.childCoordinators }
-        set { _base.childCoordinators = newValue }
-    }
-
-    init(_ base: Base) {
-        _base = base
-    }
-
-    override func handle(_ event: Any) {
-        guard let event = event as? Base.Received else { return }
-        _base.handle(event)
-    }
-}
-
 public final class AnyCoordinator: Coordinator {
-    private let box: _AnyCoordinatorBoxBase
+    private let _presentable: () -> Presentable
+    private let _events: () -> AnyPublisher<Any, Never>
+    private let _received: () -> AnyPublisher<Any, Never>
+    private let _observers: () -> [AnyCancellable]
+    private let _setObservers: ([AnyCancellable]) -> Void
+    private let _childCoordinators: () -> [AnyHashable: AnyCoordinator]
+    private let _setChildCoordinators: ([AnyHashable: AnyCoordinator]) -> Void
+    private let _handle: (Any) -> Void
 
-    public var base: Any { box.base }
-    public var presentable: Presentable { box.presentable }
-    public var events: AnyPublisher<Any, Never> { box.events }
-    public var received: AnyPublisher<Any, Never> { box.received }
+    public let base: Any
+    public var presentable: Presentable { _presentable() }
+    public var events: AnyPublisher<Any, Never> { _events() }
+    public var received: AnyPublisher<Any, Never> { _received() }
 
     public var observers: [AnyCancellable] {
-        get { box.observers }
-        set { box.observers = newValue }
+        get { _observers() }
+        set { _setObservers(newValue) }
     }
 
     public var childCoordinators: [AnyHashable: AnyCoordinator] {
-        get { box.childCoordinators }
-        set { box.childCoordinators = newValue }
+        get { _childCoordinators() }
+        set { _setChildCoordinators(newValue) }
     }
 
-    public init<C: Coordinator>(_ coordinator: C) {
-        box = _AnyCoordinatorBox(coordinator)
+    public init<Base>(_ base: Base) where Base: Coordinator {
+        self.base = base
+        _presentable = { base.presentable }
+        _events = { base.events.map { $0 as Any }.eraseToAnyPublisher() }
+        _received = { base.received.map { $0 as Any }.eraseToAnyPublisher() }
+        _observers = { base.observers }
+        _setObservers = { base.observers = $0 }
+        _childCoordinators = { base.childCoordinators }
+        _setChildCoordinators = { base.childCoordinators = $0 }
+        _handle = {
+            guard let event = $0 as? Base.Received else { return }
+            base.handle(event)
+        }
     }
 
     public func handle(_ event: Any) {
-        box.handle(event)
+        _handle(event)
     }
 }
