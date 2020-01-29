@@ -11,8 +11,8 @@ import Coordinator
 import SwiftUI
 import UIKit
 
-final class TorrentListViewController<VM>: PresentableTableViewController
-    where VM: ViewModel, VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
+final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
+    where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
     private enum Section {
         case main
     }
@@ -144,8 +144,8 @@ final class TorrentListViewController<VM>: PresentableTableViewController
 
 #if DEBUG
     struct TorrentListViewController_Previews: PreviewProvider {
-        private struct Container<VM>: UIViewControllerRepresentable
-            where VM: ViewModel, VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
+        private struct Container<VM: ViewModel>: UIViewControllerRepresentable
+            where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
             let viewModel: VM
 
             func makeUIViewController(

@@ -37,7 +37,7 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
         self.preferences = preferences
         let viewModel = DefaultAddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
-        received = viewModel.events.eraseToAnyPublisher()
+        received = viewModel.events
     }
 
     func handle(_ event: AddServerEvent) {
@@ -48,7 +48,7 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
     }
 
     private func showServerSettings(for type: ServerType) {
-        let coordinator = DefaultServerSettingsCoordinator(type: type, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(type: type, preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] _, event in
             switch event {
             case .complete:

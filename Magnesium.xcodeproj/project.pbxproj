@@ -550,20 +550,20 @@
 			path = Coordinator;
 			sourceTree = "<group>";
 		};
-		E9B40E9723B404DF009E30AE /* Base */ = {
+		E9B40E9723B404DF009E30AE /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				E93F5D6423BA93F200B0FFA4 /* TorrentDetailFileViewModel.swift */,
 				E9B40E9123B3FDA0009E30AE /* TorrentDetailHeaderViewModel.swift */,
 				E9E9F0F323807044007C6D2D /* TorrentDetailViewModel.swift */,
 			);
-			path = Base;
+			path = Core;
 			sourceTree = "<group>";
 		};
 		E9B40E9823B404E8009E30AE /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				E9B40E9723B404DF009E30AE /* Base */,
+				E9B40E9723B404DF009E30AE /* Core */,
 				E9C8258C23C584ED003B1D72 /* Deluge */,
 			);
 			path = ViewModels;
@@ -603,7 +603,7 @@
 		E9B40E9E23B40559009E30AE /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				E9B40E9F23B4055E009E30AE /* Base */,
+				E9B40E9F23B4055E009E30AE /* Core */,
 				E9C8258023C57744003B1D72 /* Deluge */,
 				E97DAD8823CE264000F3E888 /* Transmission */,
 				E9F24E0C23CE4E1F0089E45F /* EmptyTorrentListViewModel.swift */,
@@ -611,13 +611,13 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		E9B40E9F23B4055E009E30AE /* Base */ = {
+		E9B40E9F23B4055E009E30AE /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				E94ACA53237B35E60082B1A6 /* TorrentListItemViewModel.swift */,
 				E9460D1C237BB3B100A08E68 /* TorrentListViewModel.swift */,
 			);
-			path = Base;
+			path = Core;
 			sourceTree = "<group>";
 		};
 		E9C39ADE23CC278E00BB3556 /* TextInputTableViewCell */ = {

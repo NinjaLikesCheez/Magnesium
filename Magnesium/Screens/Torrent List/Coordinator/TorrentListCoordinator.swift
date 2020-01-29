@@ -17,11 +17,11 @@ enum TorrentListCoordinatorEvent {
 }
 
 final class TorrentListCoordinator: Coordinator, AlertPresenter {
-    private let viewModel: AnyTorrentListViewModel
     private let session: Session
     private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
+    let received: AnyPublisher<TorrentListEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -33,15 +33,13 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    var received: AnyPublisher<TorrentListEvent, Never> {
-        return viewModel.events.eraseToAnyPublisher()
-    }
-
     init(server: Server?, session: Session, preferences: Preferences) {
-        viewModel = server?.listViewModel(preferences: preferences) ?? AnyProducerViewModel(EmptyTorrentListViewModel())
+        let viewModel = server?.listViewModel(preferences: preferences)
+            ?? AnyProducerViewModel(EmptyTorrentListViewModel())
         self.session = session
         self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
+        received = viewModel.events
     }
 
     func handle(_ event: TorrentListEvent) {

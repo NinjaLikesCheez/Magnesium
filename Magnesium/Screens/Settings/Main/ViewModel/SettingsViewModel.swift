@@ -16,21 +16,24 @@ enum SettingsEvent {
     case alert(Alert, source: PopoverSource?)
 }
 
-protocol SettingsViewModel {
-    var events: AnyPublisher<SettingsEvent, Never> { get }
-    var sections: AnyPublisher<[SettingsSection], Never> { get }
-    func didSelectClose()
-    func didSelectChangeServer(from source: PopoverSource)
-    func didSelectServer(at index: Int)
-    func didSelectAddServer()
+enum SettingsViewEvent {
+    case close
+    case changeServer(source: PopoverSource)
+    case selectServer(index: Int)
+    case addServer
 }
 
-final class DefaultSettingsViewModel: SettingsViewModel {
+struct SettingsViewState {
+    var sections: AnyPublisher<[SettingsSection], Never>
+}
+
+final class SettingsViewModel: ViewModel, EventProducer {
     private let session: Session
     private let preferences: Preferences
     private var observers = [AnyCancellable]()
     private let eventSubject = PassthroughSubject<SettingsEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
+    let state: SettingsViewState
 
     var events: AnyPublisher<SettingsEvent, Never> {
         return eventSubject.eraseToAnyPublisher()
@@ -45,6 +48,7 @@ final class DefaultSettingsViewModel: SettingsViewModel {
     init(session: Session, preferences: Preferences) {
         self.session = session
         self.preferences = preferences
+        state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
         preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
             .sink { [weak self] _ in
@@ -62,6 +66,31 @@ final class DefaultSettingsViewModel: SettingsViewModel {
         updateSections()
     }
 
+    func handle(_ event: SettingsViewEvent) {
+        switch event {
+        case .close:
+            eventSubject.send(.complete)
+
+        case let .changeServer(source):
+            let servers = preferences.getServers()
+            var alert = Alert(title: nil, message: nil, style: .actionSheet)
+            for server in servers {
+                alert.addAction(AlertAction(title: server.name, style: .default) {
+                    self.session.setServer(server)
+                })
+            }
+            alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+            eventSubject.send(.alert(alert, source: source))
+
+        case let .selectServer(index):
+            let server = preferences.getServers()[index]
+            eventSubject.send(.selected(server: server))
+
+        case .addServer:
+            eventSubject.send(.addServer)
+        }
+    }
+
     private func updateSections() {
         let servers = preferences.getServers()
         var sections = [SettingsSection]()
@@ -73,30 +102,5 @@ final class DefaultSettingsViewModel: SettingsViewModel {
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
         sectionsSubject.send(sections)
-    }
-
-    func didSelectClose() {
-        eventSubject.send(.complete)
-    }
-
-    func didSelectChangeServer(from source: PopoverSource) {
-        let servers = preferences.getServers()
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        for server in servers {
-            alert.addAction(AlertAction(title: server.name, style: .default) {
-                self.session.setServer(server)
-            })
-        }
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        eventSubject.send(.alert(alert, source: source))
-    }
-
-    func didSelectServer(at index: Int) {
-        let server = preferences.getServers()[index]
-        eventSubject.send(.selected(server: server))
-    }
-
-    func didSelectAddServer() {
-        eventSubject.send(.addServer)
     }
 }

@@ -69,7 +69,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showSettings() {
-        let coordinator = DefaultSettingsCoordinator(session: session, preferences: preferences)
+        let coordinator = SettingsCoordinator(session: session, preferences: preferences)
         addChildCoordinator(coordinator) { coordinator, event in
             switch event {
             case .complete:

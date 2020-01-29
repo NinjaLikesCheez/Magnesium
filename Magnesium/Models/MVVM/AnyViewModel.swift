@@ -16,9 +16,9 @@ public class AnyViewModel<ViewEvent, ViewState>: ViewModel, Identifiable {
     public let id: AnyHashable
     public var state: ViewState { _state() }
 
-    public init<Base>(
+    public init<Base: ViewModel & Identifiable>(
         _ base: Base
-    ) where Base: ViewModel, Base: Identifiable, Base.ViewEvent == ViewEvent, Base.ViewState == ViewState {
+    ) where Base.ViewEvent == ViewEvent, Base.ViewState == ViewState {
         self.base = base
         id = AnyHashable(base.id)
         _state = { base.state }

@@ -14,9 +14,7 @@ enum ServerSettingsCoordinatorEvent {
     case complete
 }
 
-protocol ServerSettingsCoordinator: Coordinator where Event == ServerSettingsCoordinatorEvent {}
-
-final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPresenter {
+final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     private let viewController: ServerSettingsViewController
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
     let received: AnyPublisher<ServerSettingsEvent, Never>
@@ -41,7 +39,7 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPr
         }
 
         viewController = ServerSettingsViewController(viewModel: viewModel)
-        received = viewModel.events.eraseToAnyPublisher()
+        received = viewModel.events
     }
 
     init(type: ServerType, preferences: Preferences) {
@@ -53,7 +51,7 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPr
             viewModel = TransmissionSettingsViewModel(preferences: preferences)
         }
 
-        received = viewModel.events.eraseToAnyPublisher()
+        received = viewModel.events
         viewController = ServerSettingsViewController(viewModel: viewModel)
     }
 

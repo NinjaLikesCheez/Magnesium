@@ -15,9 +15,7 @@ enum SettingsCoordinatorEvent {
     case complete
 }
 
-protocol SettingsCoordinator: Coordinator, AlertPresenter where Event == SettingsCoordinatorEvent {}
-
-final class DefaultSettingsCoordinator: SettingsCoordinator {
+final class SettingsCoordinator: Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
@@ -35,7 +33,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
 
     init(session: Session, preferences: Preferences) {
         self.preferences = preferences
-        let viewModel = DefaultSettingsViewModel(session: session, preferences: preferences)
+        let viewModel = SettingsViewModel(session: session, preferences: preferences)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         received = viewModel.events
@@ -55,7 +53,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
     }
 
     private func showSettings(for server: Server) {
-        let coordinator = DefaultServerSettingsCoordinator(server: server, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(server: server, preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             switch event {
             case .complete:

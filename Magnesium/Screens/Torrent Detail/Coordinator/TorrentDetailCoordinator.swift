@@ -13,10 +13,8 @@ enum TorrentDetailCoordinatorEvent {
     case complete
 }
 
-final class TorrentDetailCoordinator<VM>: Coordinator, AlertPresenter
+final class TorrentDetailCoordinator<VM: ViewModel & EventProducer>: Coordinator, AlertPresenter
     where
-    VM: ViewModel,
-    VM: EventProducer,
     VM.Event == TorrentDetailEvent,
     VM.ViewEvent == TorrentDetailViewEvent,
     VM.ViewState == TorrentDetailViewState {
@@ -37,7 +35,7 @@ final class TorrentDetailCoordinator<VM>: Coordinator, AlertPresenter
     init(viewModel: VM) {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
-        received = viewModel.events.eraseToAnyPublisher()
+        received = viewModel.events
     }
 
     func handle(_ event: TorrentDetailEvent) {

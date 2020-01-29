@@ -10,7 +10,8 @@ import Combine
 import SwiftUI
 import UIKit
 
-final class SettingsViewController: UITableViewController {
+final class SettingsViewController<VM: ViewModel>: UITableViewController
+    where VM.ViewEvent == SettingsViewEvent, VM.ViewState == SettingsViewState {
     private class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {
@@ -22,11 +23,11 @@ final class SettingsViewController: UITableViewController {
         }
     }
 
-    private let viewModel: SettingsViewModel
+    private let viewModel: VM
     private var observers = [AnyCancellable]()
     private var dataSource: DataSource!
 
-    init(viewModel: SettingsViewModel) {
+    init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         title = "Settings"
@@ -71,7 +72,7 @@ final class SettingsViewController: UITableViewController {
 
         tableView.dataSource = dataSource
 
-        viewModel.sections
+        viewModel.state.sections
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }
@@ -93,7 +94,7 @@ final class SettingsViewController: UITableViewController {
 
     @objc
     private func closeButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.didSelectClose()
+        viewModel.handle(.close)
     }
 
     // MARK: UITableViewDelegate
@@ -103,11 +104,11 @@ final class SettingsViewController: UITableViewController {
         case .changeServer:
             tableView.deselectRow(at: indexPath, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.didSelectChangeServer(from: .view(cell, rect: cell.bounds))
+            viewModel.handle(.changeServer(source: .view(cell, rect: cell.bounds)))
         case .server:
-            viewModel.didSelectServer(at: indexPath.row)
+            viewModel.handle(.selectServer(index: indexPath.row))
         case .addServer:
-            viewModel.didSelectAddServer()
+            viewModel.handle(.addServer)
         case .none:
             break
         }
@@ -116,8 +117,8 @@ final class SettingsViewController: UITableViewController {
 
 #if DEBUG
     struct SettingsViewController_Previews: PreviewProvider {
-        private struct Container<VM: SettingsViewModel>: UIViewControllerRepresentable {
-            let viewModel: VM
+        private struct Container: UIViewControllerRepresentable {
+            let viewModel: SettingsViewModel
 
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
@@ -132,25 +133,12 @@ final class SettingsViewController: UITableViewController {
             ) {}
         }
 
-        private final class ViewModel: SettingsViewModel {
-            let events: AnyPublisher<SettingsEvent, Never> = Empty().eraseToAnyPublisher()
-
-            var sections: AnyPublisher<[SettingsSection], Never> = Just([
-                SettingsSection(type: .changeServer, items: [.changeServer("Desktop")]),
-                SettingsSection(type: .servers, items: [
-                    .server(id: 0, name: "Desktop"),
-                    .addServer,
-                ]),
-            ]).eraseToAnyPublisher()
-
-            func didSelectClose() {}
-            func didSelectChangeServer(from source: PopoverSource) {}
-            func didSelectServer(at index: Int) {}
-            func didSelectAddServer() {}
-        }
-
         static var previews: some View {
-            let viewModel = ViewModel()
+            let preferences = PreviewPreferences()
+            let viewModel = SettingsViewModel(
+                session: DefaultSession(preferences: preferences),
+                preferences: preferences
+            )
             return Group {
                 Container(viewModel: viewModel)
                     .previewDisplayName("Light")
