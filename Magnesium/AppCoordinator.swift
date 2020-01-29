@@ -52,7 +52,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func show(server: Server?) {
-        let listCoordinator = DefaultTorrentListCoordinator(server: server, session: session, preferences: preferences)
+        let listCoordinator = TorrentListCoordinator(server: server, session: session, preferences: preferences)
         addChildCoordinator(listCoordinator) { [weak self] _, event in
             switch event {
             case .settings:
@@ -82,7 +82,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showTorrentDetail(viewModel: AnyTorrentDetailViewModel) {
-        let coordinator = DefaultTorrentDetailCoordinator(viewModel: viewModel)
+        let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             switch event {
             case .complete:

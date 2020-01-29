@@ -13,9 +13,13 @@ enum TorrentDetailCoordinatorEvent {
     case complete
 }
 
-protocol TorrentDetailCoordinator: Coordinator, AlertPresenter where Event == TorrentDetailCoordinatorEvent {}
-
-final class DefaultTorrentDetailCoordinator<VM: AnyTorrentDetailViewModel>: TorrentDetailCoordinator {
+final class TorrentDetailCoordinator<VM>: Coordinator, AlertPresenter
+    where
+    VM: ViewModel,
+    VM: EventProducer,
+    VM.Event == TorrentDetailEvent,
+    VM.ViewEvent == TorrentDetailViewEvent,
+    VM.ViewState == TorrentDetailViewState {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     let received: AnyPublisher<TorrentDetailEvent, Never>

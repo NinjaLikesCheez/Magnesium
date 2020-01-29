@@ -16,9 +16,7 @@ enum TorrentListCoordinatorEvent {
     case settings
 }
 
-protocol TorrentListCoordinator: Coordinator, AlertPresenter where Event == TorrentListCoordinatorEvent {}
-
-final class DefaultTorrentListCoordinator: TorrentListCoordinator {
+final class TorrentListCoordinator: Coordinator, AlertPresenter {
     private let viewModel: AnyTorrentListViewModel
     private let session: Session
     private let preferences: Preferences
