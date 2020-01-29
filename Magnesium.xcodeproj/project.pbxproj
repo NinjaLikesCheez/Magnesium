@@ -340,6 +340,17 @@
 			path = "Torrent Detail";
 			sourceTree = "<group>";
 		};
+		E961EE4C23E14ABC00D12821 /* MVVM */ = {
+			isa = PBXGroup;
+			children = (
+				E961EE4223E1142700D12821 /* ViewModel.swift */,
+				E961EE4623E146D300D12821 /* AnyViewModel.swift */,
+				E961EE4823E146F000D12821 /* EventProducer.swift */,
+				E961EE4A23E14A1800D12821 /* AnyProducerViewModel.swift */,
+			);
+			path = MVVM;
+			sourceTree = "<group>";
+		};
 		E9624D3C23D235EA0051EA99 /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
@@ -409,6 +420,7 @@
 		E96B0080237A478E0091FA71 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E961EE4C23E14ABC00D12821 /* MVVM */,
 				E99FC26523D148290019A992 /* Alert */,
 				E913FD8723DFD667008179F1 /* Deluge */,
 				E913FD8823DFD674008179F1 /* Transmission */,
@@ -417,10 +429,6 @@
 				E9C8258723C57E47003B1D72 /* SortOption.swift */,
 				E9C8258323C5787E003B1D72 /* TorrentExt.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
-				E961EE4223E1142700D12821 /* ViewModel.swift */,
-				E961EE4623E146D300D12821 /* AnyViewModel.swift */,
-				E961EE4823E146F000D12821 /* EventProducer.swift */,
-				E961EE4A23E14A1800D12821 /* AnyProducerViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
