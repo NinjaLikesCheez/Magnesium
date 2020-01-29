@@ -14,7 +14,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     private let client: DelugeClient
     private let preferences: Preferences
     private let refresher: DelugeRefreshable
-    private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
+    private let subject: CurrentValueSubject<DelugeTorrent, Never>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
@@ -38,21 +38,21 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     init(
-        torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
+        subject: CurrentValueSubject<DelugeTorrent, Never>,
         client: DelugeClient,
         preferences: Preferences,
         refresher: DelugeRefreshable
     ) {
-        self.torrentSubject = torrentSubject
+        self.subject = subject
         self.preferences = preferences
         self.client = client
         self.refresher = refresher
 
-        let sections = torrentSubject
+        let sections = subject
             .combineLatest(files.sorted)
             .map { torrent, files in
                 DelugeTorrentDetailViewModel.createSections(
-                    torrentSubject: torrentSubject,
+                    subject: subject,
                     torrent: torrent,
                     files: files
                 )
@@ -72,60 +72,29 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     private static func createSections(
-        torrentSubject: CurrentValueSubject<DelugeTorrent, Never>,
+        subject: CurrentValueSubject<DelugeTorrent, Never>,
         torrent: DelugeTorrent,
         files: [CurrentValueSubject<DelugeTorrentFile, Never>]
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
-            .header(AnyViewModel(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject))),
+            .header(AnyViewModel(DelugeTorrentDetailHeaderViewModel(subject: subject))),
         ]))
+        let ui = subject.ui()
         sections.append(TorrentDetailSection(type: .info, items: [
-            .info("Size", torrentSubject
-                    .map { ByteFormatter.string(fromByteCount: $0.size) }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Download Speed", torrentSubject
-                    .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Upload Speed", torrentSubject
-                    .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Downloaded", torrentSubject
-                    .map { ByteFormatter.string(fromByteCount: $0.downloaded) }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Uploaded", torrentSubject
-                    .map { ByteFormatter.string(fromByteCount: $0.uploaded) }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("ETA", torrentSubject
-                    .map(\.etaString)
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Ratio", torrentSubject
-                    .map { $0.ratioString(precision: 3) }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Peers", torrentSubject
-                    .map { "\($0.peers) (\($0.totalPeers))" }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
-            .info("Seeds", torrentSubject
-                    .map { "\($0.seeds) (\($0.totalSeeds))" }
-                    .ui()
-                    .eraseToAnyPublisher()
-            ),
+            .info("Size", ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher()),
+            .info("Download Speed", ui
+                .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
+                .eraseToAnyPublisher()),
+            .info("Upload Speed", ui
+                .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
+                .eraseToAnyPublisher()),
+            .info("Downloaded", ui.map { ByteFormatter.string(fromByteCount: $0.downloaded) }.eraseToAnyPublisher()),
+            .info("Uploaded", ui.map { ByteFormatter.string(fromByteCount: $0.uploaded) }.eraseToAnyPublisher()),
+            .info("ETA", ui.map(\.etaString).eraseToAnyPublisher()),
+            .info("Ratio", ui.map { $0.ratioString(precision: 3) }.eraseToAnyPublisher()),
+            .info("Peers", ui.map { "\($0.peers) (\($0.totalPeers))" }.eraseToAnyPublisher()),
+            .info("Seeds", ui.map { "\($0.seeds) (\($0.totalSeeds))" }.eraseToAnyPublisher()),
         ]))
 
         if !torrent.trackers.isEmpty {
@@ -134,7 +103,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
 
         if !files.isEmpty {
             sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(AnyViewModel(DelugeTorrentDetailFileViewModel(fileSubject: $0)))
+                .file(AnyViewModel(DelugeTorrentDetailFileViewModel(subject: $0)))
             }))
         }
 
@@ -176,23 +145,6 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
         timerIntervalObserver?.cancel()
     }
 
-    private func configureAutoUpdateTimer(interval: TimeInterval?) {
-        autoUpdateTimer?.invalidate()
-        guard let interval = interval, interval > 0 else { return }
-        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
-            self?.updateTimerFired($0)
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        autoUpdateTimer = timer
-    }
-
-    @objc
-    private func updateTimerFired(_ timer: Timer) {
-        refreshFiles()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
     private func handleRefresh() {
         guard !isLoadingSubject.value else { return }
         isLoadingSubject.send(true)
@@ -212,16 +164,6 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
             .store(in: &observers)
     }
 
-    private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return client.fetchTorrentFiles(hash: torrentSubject.value.hash)
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.files.update(with: new.map { ($0.path, $0) })
-            })
-            .mapError { $0 as Error }
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
     private func handleMoreOptions(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
@@ -232,7 +174,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     private func recheck() {
-        client.recheck(hashes: [torrentSubject.value.hash])
+        client.recheck(hashes: [subject.value.hash])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.refresher.refreshTorrents()
@@ -248,7 +190,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     private func handlePause() {
-        client.pause(hashes: [torrentSubject.value.hash])
+        client.pause(hashes: [subject.value.hash])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.refresher.refreshTorrents()
@@ -264,7 +206,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     private func handleResume() {
-        client.resume(hashes: [torrentSubject.value.hash])
+        client.resume(hashes: [subject.value.hash])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.refresher.refreshTorrents()
@@ -292,7 +234,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     }
 
     private func remove(removeData: Bool) {
-        client.remove(hashes: [torrentSubject.value.hash], removeData: removeData)
+        client.remove(hashes: [subject.value.hash], removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.refresher.refreshTorrents()
@@ -309,6 +251,32 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
                 }
             }, receiveValue: { _ in })
             .store(in: &observers)
+    }
+
+    private func configureAutoUpdateTimer(interval: TimeInterval?) {
+        autoUpdateTimer?.invalidate()
+        guard let interval = interval, interval > 0 else { return }
+        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
+            self?.updateTimerFired($0)
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        autoUpdateTimer = timer
+    }
+
+    private func updateTimerFired(_ timer: Timer) {
+        refreshFiles()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func refreshFiles() -> AnyPublisher<Void, Error> {
+        return client.fetchTorrentFiles(hash: subject.value.hash)
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.files.update(with: new.map { ($0.path, $0) })
+            })
+            .mapError { $0 as Error }
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
     private func showError(title: String, message: String?) {

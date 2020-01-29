@@ -16,12 +16,13 @@ struct DelugeTorrentDetailFileViewModel: ViewModel, Identifiable {
         return path
     }
 
-    init(fileSubject: CurrentValueSubject<DelugeTorrentFile, Never>) {
-        path = fileSubject.value.path
+    init(subject: CurrentValueSubject<DelugeTorrentFile, Never>) {
+        path = subject.value.path
+        let ui = subject.ui()
         state = TorrentDetailFileViewState(
-            name: fileSubject.value.name,
-            size: fileSubject.map { ByteFormatter.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher(),
-            progress: fileSubject.map { "\(Int($0.progress * 100))%" }.ui().eraseToAnyPublisher()
+            name: subject.value.name,
+            size: ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher(),
+            progress: ui.map { "\(Int($0.progress * 100))%" }.eraseToAnyPublisher()
         )
     }
 }

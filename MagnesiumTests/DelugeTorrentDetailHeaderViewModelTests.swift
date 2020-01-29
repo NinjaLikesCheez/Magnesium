@@ -13,7 +13,7 @@ import XCTest
 class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
-    private lazy var viewModel = DelugeTorrentDetailHeaderViewModel(torrentSubject: subject)
+    private lazy var viewModel = DelugeTorrentDetailHeaderViewModel(subject: subject)
 
     func testName() {
         let expectation = self.expectation(description: "Value received")

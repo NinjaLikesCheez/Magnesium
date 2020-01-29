@@ -10,14 +10,14 @@ import Combine
 import Foundation
 import Preferences
 
-final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable {
+final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefreshable {
     private let client: DelugeClient
     private let preferences: Preferences
     private let torrents = TorrentSubjectMapManager<String, DelugeTorrent>()
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
-    let items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
-    let showAddButton = true
+    let state: TorrentListViewState
     var observers = [AnyCancellable]()
 
     var events: AnyPublisher<TorrentListEvent, Never> {
@@ -28,11 +28,12 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
         self.client = client
         self.preferences = preferences
 
-        items = torrents.sorted
-            .map { $0.map { DelugeTorrentListItemViewModel(torrentSubject: $0).eraseToAny() } }
-            .removeDuplicates()
+        let items = torrents.sorted
+            .map { $0.map { AnyViewModel(DelugeTorrentListItemViewModel(subject: $0)) } }
+            .removeDuplicates { $0.map { $0.id } != $1.map { $0.id } }
             .ui()
             .eraseToAnyPublisher()
+        state = TorrentListViewState(items: items, isLoading: isLoadingSubject.eraseToAnyPublisher())
 
         refresh()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
@@ -47,6 +48,39 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
 
     deinit {
         autoUpdateTimer?.invalidate()
+    }
+
+    func handle(_ event: TorrentListViewEvent) {
+        switch event {
+        case let .add(source):
+            let linkSubject = PassthroughSubject<String, Never>()
+            linkSubject
+                .sink { [weak self] in self?.addLink($0) }
+                .store(in: &observers)
+            eventSubject.send(.add(source: source, linkSubject: linkSubject))
+
+        case .refresh:
+            guard !isLoadingSubject.value else { return }
+            isLoadingSubject.send(false)
+            refresh()
+                .sink(receiveCompletion: { [weak self] _ in
+                    self?.isLoadingSubject.send(false)
+                    }, receiveValue: { _ in })
+                .store(in: &observers)
+
+        case let .selectItem(index):
+            let subject = torrents.subject(at: index)
+            let viewModel = DelugeTorrentDetailViewModel(
+                subject: subject,
+                client: client,
+                preferences: preferences,
+                refresher: self
+            )
+            eventSubject.send(.detail(viewModel: AnyProducerViewModel(viewModel)))
+
+        case .settings:
+            eventSubject.send(.settings)
+        }
     }
 
     private func configureAutoUpdateTimer(interval: TimeInterval?) {
@@ -65,16 +99,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .store(in: &observers)
     }
 
-    func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
-        return client.fetchTorrents()
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.torrents.update(with: new.map { ($0.hash, $0) })
-            })
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    func refresh() -> AnyPublisher<Void, Error> {
+    private func refresh() -> AnyPublisher<Void, Error> {
         return refreshTorrents()
             .mapError { $0 as Error }
             .ui()
@@ -85,25 +110,16 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             .eraseToAnyPublisher()
     }
 
-    func didSelectAdd(from source: PopoverSource) {
-        eventSubject.send(.add(source: source))
+    func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
+        return client.fetchTorrents()
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.torrents.update(with: new.map { ($0.hash, $0) })
+            })
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 
-    func didSelectItem(at index: Int) {
-        let subject = torrents.subject(at: index)
-        let viewModel = DelugeTorrentDetailViewModel(
-            torrentSubject: subject,
-            client: client,
-            preferences: preferences,
-            refresher: self
-        )
-        eventSubject.send(.detail(viewModel: AnyProducerViewModel(viewModel)))
-    }
-
-    func didSelectSettings() {
-        eventSubject.send(.settings)
-    }
-
+    // internal for testing
     func addLink(_ url: String) {
         guard let url = URL(string: url) else {
             showError(title: "Unable to Add Link", message: "That link doesn't appear to be valid.")

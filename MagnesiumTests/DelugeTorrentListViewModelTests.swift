@@ -15,7 +15,7 @@ import XCTest
 final class DelugeTorrentListViewModelTests: XCTestCase {
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
-    private var viewModel: TorrentListViewModel!
+    private var viewModel: DelugeTorrentListViewModel!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
@@ -67,7 +67,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        viewModel.handle(.refresh)
         XCTAssertEqual(alert?.title, "Update Failed")
     }
 
@@ -77,7 +77,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             .first()
             .sink { event = $0 }
             .store(in: &observers)
-        viewModel.didSelectAdd(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.add(source: .view(UIView(), rect: .zero)))
         guard case .add = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -134,7 +134,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             .first()
             .sink { event = $0 }
             .store(in: &observers)
-        viewModel.didSelectItem(at: 0)
+        viewModel.handle(.selectItem(index: 0))
         guard case .detail = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

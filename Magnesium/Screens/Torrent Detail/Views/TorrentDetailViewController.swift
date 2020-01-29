@@ -168,7 +168,7 @@ final class TorrentDetailViewController<VM: ViewModel>: UITableViewController, T
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.moreOptions(.barButton(sender)))
+        viewModel.handle(.moreOptions(source: .barButton(sender)))
     }
 
     // MARK: UITableViewDelegate
@@ -206,6 +206,6 @@ extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate 
     }
 
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
-        viewModel.handle(.remove(.view(sender, rect: sender.bounds)))
+        viewModel.handle(.remove(source: .view(sender, rect: sender.bounds)))
     }
 }

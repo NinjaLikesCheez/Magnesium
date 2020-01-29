@@ -106,15 +106,11 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
     }
 
     var isLoading: AnyPublisher<Bool, Never> {
-        return isLoadingSubject
-            .ui()
-            .eraseToAnyPublisher()
+        return isLoadingSubject.ui().eraseToAnyPublisher()
     }
 
     var isSaveButtonEnabled: AnyPublisher<Bool, Never> {
-        return isSaveButtonEnabledSubject
-            .ui()
-            .eraseToAnyPublisher()
+        return isSaveButtonEnabledSubject.ui().eraseToAnyPublisher()
     }
 
     var inputs: [TextInputTableViewCellViewModel] {

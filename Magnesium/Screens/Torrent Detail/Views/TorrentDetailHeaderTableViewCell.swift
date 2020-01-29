@@ -243,12 +243,12 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
         static var previews: some View {
             let state = TorrentDetailHeaderViewState(
-                 name: Just("Torrent").eraseToAnyPublisher(),
-                 isActive: Just(true).eraseToAnyPublisher(),
-                 progress: Just(1).eraseToAnyPublisher(),
-                 progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-                 status: Just("Seeding (100%)").eraseToAnyPublisher()
-             )
+                name: Just("Torrent").eraseToAnyPublisher(),
+                isActive: Just(true).eraseToAnyPublisher(),
+                progress: Just(1).eraseToAnyPublisher(),
+                progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
+                status: Just("Seeding (100%)").eraseToAnyPublisher()
+            )
             return Group {
                 Container(state: state)
                     .previewDisplayName("Light")

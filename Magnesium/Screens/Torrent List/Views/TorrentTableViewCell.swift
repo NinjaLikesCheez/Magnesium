@@ -135,38 +135,38 @@ final class TorrentTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure<VM: TorrentListItemViewModel>(with viewModel: VM) {
+    func configure(with state: TorrentListItemViewState) {
         // swiftlint:disable array_init
-        viewModel.name
+        state.name
             .map { text -> String? in text }
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
-        viewModel.progress
+        state.progress
             .assign(to: \.progress, on: progressView)
             .store(in: &observers)
 
-        viewModel.progressColor
+        state.progressColor
             .map { color -> UIColor? in color }
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        viewModel.state
+        state.state
             .map { text -> String? in text }
             .assign(to: \.text, on: stateLabel)
             .store(in: &observers)
 
-        viewModel.speed
+        state.speed
             .map { text -> String? in text }
             .assign(to: \.text, on: speedLabel)
             .store(in: &observers)
 
-        viewModel.progressString
+        state.progressString
             .map { text -> String? in text }
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
 
-        viewModel.ratioOrETA
+        state.ratioOrETA
             .map { text -> String? in text }
             .assign(to: \.text, on: ratioOrETALabel)
             .store(in: &observers)
@@ -177,7 +177,7 @@ final class TorrentTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: AnyTorrentListItemViewModel
+            let state: TorrentListItemViewState
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -191,37 +191,25 @@ final class TorrentTableViewCell: UITableViewCell {
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: viewModel)
-            }
-        }
-
-        private struct ViewModel: TorrentListItemViewModel, Hashable {
-            let id = UUID()
-            var name: AnyPublisher<String, Never> = Just("Torrent").eraseToAnyPublisher()
-            var progress: AnyPublisher<Float, Never> = Just(1).eraseToAnyPublisher()
-            var progressColor: AnyPublisher<UIColor, Never> = Just(TorrentState.seeding.displayColor)
-                .eraseToAnyPublisher()
-            var state: AnyPublisher<String, Never> = Just("Seeding").eraseToAnyPublisher()
-            var speed: AnyPublisher<String, Never> = Just("↑ 0.0 KB/s").eraseToAnyPublisher()
-            var progressString: AnyPublisher<String, Never> = Just("1.0 GB / 1.0 GB").eraseToAnyPublisher()
-            var ratioOrETA: AnyPublisher<String, Never> = Just("Ratio: 1.0").eraseToAnyPublisher()
-
-            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
-                return lhs.id == rhs.id
-            }
-
-            func hash(into hasher: inout Hasher) {
-                hasher.combine(id)
+                uiView.inner.configure(with: state)
             }
         }
 
         static var previews: some View {
-            let viewModel = ViewModel().eraseToAny()
+            let state = TorrentListItemViewState(
+                name: Just("Torrent").eraseToAnyPublisher(),
+                progress: Just(1).eraseToAnyPublisher(),
+                progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
+                state: Just("Seeding").eraseToAnyPublisher(),
+                speed: Just("↑ 0.0 KB/s").eraseToAnyPublisher(),
+                progressString: Just("1.0 GB / 1.0 GB").eraseToAnyPublisher(),
+                ratioOrETA: Just("Ratio: 1.0").eraseToAnyPublisher()
+            )
             return Group {
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewDisplayName("Light")
                     .previewLayout(.sizeThatFits)
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewDisplayName("Dark")
                     .previewLayout(.sizeThatFits)
                     .environment(\.colorScheme, .dark)

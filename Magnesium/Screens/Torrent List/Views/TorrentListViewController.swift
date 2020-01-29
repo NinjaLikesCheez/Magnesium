@@ -11,18 +11,31 @@ import Coordinator
 import SwiftUI
 import UIKit
 
-final class TorrentListViewController: PresentableTableViewController {
+final class TorrentListViewController<VM>: PresentableTableViewController
+    where VM: ViewModel, VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
     private enum Section {
         case main
     }
 
-    private let viewModel: TorrentListViewModel
+    private struct Item: Equatable, Hashable {
+        let viewModel: AnyTorrentListItemViewModel
+
+        static func == (lhs: Item, rhs: Item) -> Bool {
+            return type(of: lhs.viewModel.base) == type(of: rhs.viewModel.base) && lhs.viewModel.id == rhs.viewModel.id
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(viewModel.id)
+        }
+    }
+
+    private let viewModel: VM
     private var observers = [AnyCancellable]()
     private var refreshObserver: AnyCancellable?
-    private var dataSource: UITableViewDiffableDataSource<Section, AnyTorrentListItemViewModel>!
+    private var dataSource: UITableViewDiffableDataSource<Section, Item>!
     fileprivate var applySnapshotInBackground = true
 
-    init(viewModel: TorrentListViewModel) {
+    init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
         title = "Torrents"
@@ -33,7 +46,7 @@ final class TorrentListViewController: PresentableTableViewController {
             action: #selector(settingsButtonTapped(_:))
         )
 
-        if viewModel.showAddButton {
+        if viewModel.state.showAddButton {
             navigationItem.rightBarButtonItem = UIBarButtonItem(
                 image: UIImage(systemName: "plus"),
                 style: .plain,
@@ -41,6 +54,16 @@ final class TorrentListViewController: PresentableTableViewController {
                 action: #selector(addButtonTapped(_:))
             )
         }
+
+        viewModel.state.isLoading
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.refreshControl?.beginRefreshing()
+                } else {
+                    self?.refreshControl?.endRefreshing()
+                }
+            }
+            .store(in: &observers)
     }
 
     required init?(coder: NSCoder) {
@@ -65,24 +88,24 @@ final class TorrentListViewController: PresentableTableViewController {
                 return nil
             }
 
-            cell.configure(with: item)
+            cell.configure(with: item.viewModel.state)
             return cell
         }
 
         dataSource.defaultRowAnimation = .fade
         tableView.dataSource = dataSource
 
-        viewModel.items
+        viewModel.state.items
             .sink { [weak self] items in
                 self?.update(with: items)
             }
             .store(in: &observers)
     }
 
-    private func update(with items: [AnyTorrentListItemViewModel]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, AnyTorrentListItemViewModel>()
+    private func update(with viewModels: [AnyTorrentListItemViewModel]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(items, toSection: .main)
+        snapshot.appendItems(viewModels.map { Item(viewModel: $0) }, toSection: .main)
 
         if applySnapshotInBackground {
             DispatchQueue.global(qos: .userInteractive).async {
@@ -95,25 +118,23 @@ final class TorrentListViewController: PresentableTableViewController {
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.didSelectSettings()
+        viewModel.handle(.settings)
     }
 
     @objc
     private func addButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.didSelectAdd(from: .barButton(sender))
+        viewModel.handle(.add(source: .barButton(sender)))
     }
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        refreshObserver = viewModel.refresh().sink(receiveCompletion: { [weak sender] _ in
-            sender?.endRefreshing()
-        }, receiveValue: { _ in })
+        viewModel.handle(.refresh)
     }
 
     // MARK: UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.didSelectItem(at: indexPath.row)
+        viewModel.handle(.selectItem(index: indexPath.row))
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -123,19 +144,20 @@ final class TorrentListViewController: PresentableTableViewController {
 
 #if DEBUG
     struct TorrentListViewController_Previews: PreviewProvider {
-        private struct Container: UIViewControllerRepresentable {
-            let viewModel: TorrentListViewModel
+        private struct Container<VM>: UIViewControllerRepresentable
+            where VM: ViewModel, VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
+            let viewModel: VM
 
             func makeUIViewController(
                 context: UIViewControllerRepresentableContext<Container>
-            ) -> TorrentListViewController {
+            ) -> TorrentListViewController<VM> {
                 let viewController = TorrentListViewController(viewModel: viewModel)
                 viewController.applySnapshotInBackground = false
                 return viewController
             }
 
             func updateUIViewController(
-                _ uiViewController: TorrentListViewController,
+                _ uiViewController: TorrentListViewController<VM>,
                 context: UIViewControllerRepresentableContext<Container>
             ) {}
         }

@@ -17,17 +17,16 @@ struct DelugeTorrentDetailHeaderViewModel: ViewModel, Identifiable {
         return hash
     }
 
-    init(torrentSubject: CurrentValueSubject<DelugeTorrent, Never>) {
-        let torrent = torrentSubject.value
-        hash = torrent.hash
+    init(subject: CurrentValueSubject<DelugeTorrent, Never>) {
+        hash = subject.value.hash
+        let ui = subject.ui()
         state = TorrentDetailHeaderViewState(
-            name: torrentSubject.map(\.name).ui().eraseToAnyPublisher(),
-            isActive: torrentSubject.map(\.isActive).ui().eraseToAnyPublisher(),
-            progress: torrentSubject.map(\.progress).ui().eraseToAnyPublisher(),
-            progressColor: torrentSubject.map(\.commonState).map(\.displayColor).ui().eraseToAnyPublisher(),
-            status: torrentSubject
+            name: ui.map(\.name).eraseToAnyPublisher(),
+            isActive: ui.map(\.isActive).eraseToAnyPublisher(),
+            progress: ui.map(\.progress).eraseToAnyPublisher(),
+            progressColor: ui.map(\.commonState).map(\.displayColor).eraseToAnyPublisher(),
+            status: ui
                 .map { "\($0.commonState.displayString) (\(String(format: "%.2f", $0.progress * 100))%)" }
-                .ui()
                 .eraseToAnyPublisher()
         )
     }

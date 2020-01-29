@@ -8,35 +8,28 @@
 
 import Combine
 
-final class EmptyTorrentListViewModel: TorrentListViewModel {
+final class EmptyTorrentListViewModel: ViewModel, EventProducer {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
-    let showAddButton = false
+    private let isLoadingSubject = PassthroughSubject<Bool, Never>()
+
+    lazy var state = TorrentListViewState(
+        showAddButton: false,
+        items: Just([]).eraseToAnyPublisher(),
+        isLoading: isLoadingSubject.eraseToAnyPublisher()
+    )
 
     var events: AnyPublisher<TorrentListEvent, Never> {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    var items: AnyPublisher<[AnyTorrentListItemViewModel], Never> {
-        return Just([]).eraseToAnyPublisher()
-    }
-
-    func refresh() -> AnyPublisher<Void, Error> {
-        return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    }
-
-    func didSelectAdd(from source: PopoverSource) {
-        eventSubject.send(.add(source: source))
-    }
-
-    func didSelectItem(at index: Int) {
-        // noop
-    }
-
-    func didSelectSettings() {
-        eventSubject.send(.settings)
-    }
-
-    func addLink(_ url: String) {
-        // noop
+    func handle(_ event: TorrentListViewEvent) {
+        switch event {
+        case .add, .selectItem:
+            break
+        case .refresh:
+            isLoadingSubject.send(false)
+        case .settings:
+            eventSubject.send(.settings)
+        }
     }
 }

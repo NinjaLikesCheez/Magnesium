@@ -9,56 +9,21 @@
 import Combine
 import UIKit
 
-struct TransmissionTorrentListItemViewModel: TorrentListItemViewModel {
+struct TransmissionTorrentListItemViewModel: ViewModel, Identifiable {
     let id: Int
-    let name: AnyPublisher<String, Never>
-    let progress: AnyPublisher<Float, Never>
-    let progressColor: AnyPublisher<UIColor, Never>
-    let state: AnyPublisher<String, Never>
-    let speed: AnyPublisher<String, Never>
-    let progressString: AnyPublisher<String, Never>
-    let ratioOrETA: AnyPublisher<String, Never>
+    let state: TorrentListItemViewState
 
-    static func == (lhs: TransmissionTorrentListItemViewModel, rhs: TransmissionTorrentListItemViewModel) -> Bool {
-        return lhs.id == rhs.id
-    }
-
-    init(torrentSubject: CurrentValueSubject<TransmissionTorrent, Never>) {
-        let torrent = torrentSubject.value
-        id = torrent.id
-        name = torrentSubject
-            .map(\.name)
-            .ui()
-            .eraseToAnyPublisher()
-        progress = torrentSubject
-            .map(\.progress)
-            .ui()
-            .eraseToAnyPublisher()
-        progressColor = torrentSubject
-            .map(\.commonState)
-            .map { $0.displayColor }
-            .ui()
-            .eraseToAnyPublisher()
-        state = torrentSubject
-            .map(\.commonState)
-            .map { $0.displayString }
-            .ui()
-            .eraseToAnyPublisher()
-        speed = torrentSubject
-            .map(\.speedString)
-            .ui()
-            .eraseToAnyPublisher()
-        progressString = torrentSubject
-            .map(\.progressString)
-            .ui()
-            .eraseToAnyPublisher()
-        ratioOrETA = torrentSubject
-            .map(\.ratioOrETAString)
-            .ui()
-            .eraseToAnyPublisher()
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+    init(subject: CurrentValueSubject<TransmissionTorrent, Never>) {
+        id = subject.value.id
+        let ui = subject.ui()
+        state = TorrentListItemViewState(
+            name: ui.map(\.name).eraseToAnyPublisher(),
+            progress: ui.map(\.progress).eraseToAnyPublisher(),
+            progressColor: ui.map(\.commonState).map(\.displayColor).eraseToAnyPublisher(),
+            state: ui.map(\.commonState).map(\.displayString).eraseToAnyPublisher(),
+            speed: ui.map(\.speedString).eraseToAnyPublisher(),
+            progressString: ui.map(\.progressString).eraseToAnyPublisher(),
+            ratioOrETA: ui.map(\.ratioOrETAString).eraseToAnyPublisher()
+        )
     }
 }

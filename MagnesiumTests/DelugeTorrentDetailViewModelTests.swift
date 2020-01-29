@@ -22,7 +22,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         viewModel = DelugeTorrentDetailViewModel(
-            torrentSubject: subject,
+            subject: subject,
             client: client,
             preferences: preferences,
             refresher: MockDelugeRefresher(client: client)
