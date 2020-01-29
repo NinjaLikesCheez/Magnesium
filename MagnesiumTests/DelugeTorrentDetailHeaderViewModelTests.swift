@@ -17,7 +17,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
 
     func testName() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.name.sink {
+        viewModel.state.name.sink {
             XCTAssertEqual($0, "archlinux-2020.01.01-x86_64.iso")
             expectation.fulfill()
         }.store(in: &observers)
@@ -28,7 +28,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         var torrent = subject.value
         for state in [DelugeTorrent.State.downloading, .seeding] {
             var isActive: Bool!
-            viewModel.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
+            viewModel.state.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
             torrent.state = state
             subject.send(torrent)
             XCTAssertTrue(isActive)
@@ -39,7 +39,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         var torrent = subject.value
         for state in [DelugeTorrent.State.paused, .checking, .queued, .error] {
             var isActive: Bool!
-            viewModel.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
+            viewModel.state.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
             torrent.state = state
             subject.send(torrent)
             XCTAssertFalse(isActive)
@@ -48,7 +48,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
 
     func testProgress() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.progress.sink {
+        viewModel.state.progress.sink {
             XCTAssertEqual($0, 0.189838)
             expectation.fulfill()
         }.store(in: &observers)
@@ -67,7 +67,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
 
         for (state, result) in pairs {
             let expectation = self.expectation(description: "Value received")
-            viewModel.progressColor.dropFirst().first().sink {
+            viewModel.state.progressColor.dropFirst().first().sink {
                 XCTAssertEqual($0, result)
                 expectation.fulfill()
             }.store(in: &observers)
@@ -90,7 +90,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
 
         for (state, string) in pairs {
             let expectation = self.expectation(description: "Value received")
-            viewModel.status.dropFirst().first().sink {
+            viewModel.state.status.dropFirst().first().sink {
                 XCTAssertEqual($0, "\(string) (18.98%)")
                 expectation.fulfill()
             }.store(in: &observers)

@@ -178,27 +178,27 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure<VM: TorrentDetailHeaderViewModel>(with viewModel: VM) {
+    func configure(with state: TorrentDetailHeaderViewState) {
         // swiftlint:disable array_init
-        viewModel.name
+        state.name
             .map { text -> String? in text }
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
-        viewModel.isActive
+        state.isActive
             .sink(receiveValue: { [weak self] in self?.isActive = $0 })
             .store(in: &observers)
 
-        viewModel.progress
+        state.progress
             .assign(to: \.progress, on: progressView)
             .store(in: &observers)
 
-        viewModel.progressColor
+        state.progressColor
             .map { color -> UIColor? in color }
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        viewModel.status
+        state.status
             .map { text -> String? in text }
             .assign(to: \.text, on: statusLabel)
             .store(in: &observers)
@@ -223,7 +223,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentDetailHeaderTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: AnyTorrentDetailHeaderViewModel
+            let state: TorrentDetailHeaderViewState
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -237,35 +237,23 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: viewModel)
-            }
-        }
-
-        private struct ViewModel: TorrentDetailHeaderViewModel, Hashable {
-            let id = UUID()
-            var name: AnyPublisher<String, Never> = Just("Torrent").eraseToAnyPublisher()
-            var isActive: AnyPublisher<Bool, Never> = Just(true).eraseToAnyPublisher()
-            var progress: AnyPublisher<Float, Never> = Just(1).eraseToAnyPublisher()
-            var progressColor: AnyPublisher<UIColor, Never> = Just(TorrentState.seeding.displayColor)
-                .eraseToAnyPublisher()
-            var status: AnyPublisher<String, Never> = Just("Seeding (100%)").eraseToAnyPublisher()
-
-            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
-                return lhs.id == rhs.id
-            }
-
-            func hash(into hasher: inout Hasher) {
-                hasher.combine(id)
+                uiView.inner.configure(with: state)
             }
         }
 
         static var previews: some View {
-            let viewModel = ViewModel().eraseToAny()
+            let state = TorrentDetailHeaderViewState(
+                 name: Just("Torrent").eraseToAnyPublisher(),
+                 isActive: Just(true).eraseToAnyPublisher(),
+                 progress: Just(1).eraseToAnyPublisher(),
+                 progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
+                 status: Just("Seeding (100%)").eraseToAnyPublisher()
+             )
             return Group {
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewDisplayName("Light")
                     .previewLayout(.sizeThatFits)
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewLayout(.sizeThatFits)
                     .previewDisplayName("Dark")
                     .environment(\.colorScheme, .dark)

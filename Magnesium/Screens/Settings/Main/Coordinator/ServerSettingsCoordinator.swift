@@ -57,7 +57,7 @@ final class DefaultServerSettingsCoordinator: ServerSettingsCoordinator, AlertPr
         viewController = ServerSettingsViewController(viewModel: viewModel)
     }
 
-    func handle(event: ServerSettingsEvent) {
+    func handle(_ event: ServerSettingsEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

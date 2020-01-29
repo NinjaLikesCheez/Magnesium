@@ -81,7 +81,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         splitViewController.present(viewController, animated: true, completion: nil)
     }
 
-    private func showTorrentDetail(viewModel: TorrentDetailViewModel) {
+    private func showTorrentDetail(viewModel: AnyTorrentDetailViewModel) {
         let coordinator = DefaultTorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             switch event {
@@ -202,7 +202,7 @@ extension AppCoordinator: UISplitViewControllerDelegate {
         onto primaryViewController: UIViewController
     ) -> Bool {
         if let navigationController = secondaryViewController as? UINavigationController,
-            !(navigationController.viewControllers.first is TorrentDetailViewController) {
+            !(navigationController.viewControllers.first is TorrentDetailViewControllerIdentifiable) {
             return true
         }
 

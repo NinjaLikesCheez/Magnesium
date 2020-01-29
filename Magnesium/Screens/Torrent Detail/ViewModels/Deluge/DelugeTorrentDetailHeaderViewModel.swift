@@ -9,47 +9,26 @@
 import Combine
 import UIKit
 
-struct DelugeTorrentDetailHeaderViewModel: TorrentDetailHeaderViewModel {
-    let hash: String
-    let name: AnyPublisher<String, Never>
-    let isActive: AnyPublisher<Bool, Never>
-    let progress: AnyPublisher<Float, Never>
-    let progressColor: AnyPublisher<UIColor, Never>
-    let status: AnyPublisher<String, Never>
+struct DelugeTorrentDetailHeaderViewModel: ViewModel, Identifiable {
+    private let hash: String
+    let state: TorrentDetailHeaderViewState
 
-    static func == (lhs: DelugeTorrentDetailHeaderViewModel, rhs: DelugeTorrentDetailHeaderViewModel) -> Bool {
-        return lhs.hash == rhs.hash
+    var id: String {
+        return hash
     }
 
     init(torrentSubject: CurrentValueSubject<DelugeTorrent, Never>) {
         let torrent = torrentSubject.value
         hash = torrent.hash
-        name = torrentSubject
-            .map(\.name)
-            .ui()
-            .eraseToAnyPublisher()
-        isActive = torrentSubject
-            .map(\.isActive)
-            .ui()
-            .eraseToAnyPublisher()
-        progress = torrentSubject
-            .map(\.progress)
-            .ui()
-            .eraseToAnyPublisher()
-        progressColor = torrentSubject
-            .map(\.commonState)
-            .map { $0.displayColor }
-            .ui()
-            .eraseToAnyPublisher()
-        status = torrentSubject
-            .map { torrent in
-                "\(torrent.commonState.displayString) (\(String(format: "%.2f", torrent.progress * 100))%)"
-            }
-            .ui()
-            .eraseToAnyPublisher()
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(hash)
+        state = TorrentDetailHeaderViewState(
+            name: torrentSubject.map(\.name).ui().eraseToAnyPublisher(),
+            isActive: torrentSubject.map(\.isActive).ui().eraseToAnyPublisher(),
+            progress: torrentSubject.map(\.progress).ui().eraseToAnyPublisher(),
+            progressColor: torrentSubject.map(\.commonState).map(\.displayColor).ui().eraseToAnyPublisher(),
+            status: torrentSubject
+                .map { "\($0.commonState.displayString) (\(String(format: "%.2f", $0.progress * 100))%)" }
+                .ui()
+                .eraseToAnyPublisher()
+        )
     }
 }

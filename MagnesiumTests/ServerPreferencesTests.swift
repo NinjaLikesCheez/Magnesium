@@ -71,7 +71,7 @@ class ServerPreferencesTests: XCTestCase {
 
         let expectation = self.expectation(description: "Value received")
         preferences.serverUpdatedPublisher(for: server)
-        .first()
+            .first()
             .sink { updated in
                 XCTAssertEqual(updated?.id, self.server.id)
                 XCTAssertEqual(updated?.name, "New Name")

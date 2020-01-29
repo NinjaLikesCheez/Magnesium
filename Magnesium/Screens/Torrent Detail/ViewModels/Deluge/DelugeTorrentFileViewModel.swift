@@ -8,31 +8,20 @@
 
 import Combine
 
-struct DelugeTorrentDetailFileViewModel: TorrentDetailFileViewModel {
+struct DelugeTorrentDetailFileViewModel: ViewModel, Identifiable {
     private var path: String
-    let name: String
-    let size: AnyPublisher<String, Never>
-    let progress: AnyPublisher<String, Never>
+    let state: TorrentDetailFileViewState
 
-    static func == (lhs: DelugeTorrentDetailFileViewModel, rhs: DelugeTorrentDetailFileViewModel) -> Bool {
-        return lhs.path == rhs.path
+    var id: String {
+        return path
     }
 
     init(fileSubject: CurrentValueSubject<DelugeTorrentFile, Never>) {
-        let file = fileSubject.value
-        path = file.path
-        name = file.name
-        size = fileSubject
-            .map { ByteFormatter.string(fromByteCount: $0.size) }
-            .ui()
-            .eraseToAnyPublisher()
-        progress = fileSubject
-            .map { "\(Int($0.progress * 100))%" }
-            .ui()
-            .eraseToAnyPublisher()
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
+        path = fileSubject.value.path
+        state = TorrentDetailFileViewState(
+            name: fileSubject.value.name,
+            size: fileSubject.map { ByteFormatter.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher(),
+            progress: fileSubject.map { "\(Int($0.progress * 100))%" }.ui().eraseToAnyPublisher()
+        )
     }
 }

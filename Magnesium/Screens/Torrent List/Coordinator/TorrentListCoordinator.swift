@@ -12,7 +12,7 @@ import Preferences
 import UIKit
 
 enum TorrentListCoordinatorEvent {
-    case detail(viewModel: TorrentDetailViewModel)
+    case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
 }
 
@@ -46,7 +46,7 @@ final class DefaultTorrentListCoordinator: TorrentListCoordinator {
         viewController = TorrentListViewController(viewModel: viewModel)
     }
 
-    func handle(event: TorrentListEvent) {
+    func handle(_ event: TorrentListEvent) {
         switch event {
         case let .add(source: source):
             showAdd(from: source)

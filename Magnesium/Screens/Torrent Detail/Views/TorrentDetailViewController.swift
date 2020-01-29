@@ -9,16 +9,20 @@
 import Combine
 import UIKit
 
-final class TorrentDetailViewController: UITableViewController {
-    private let viewModel: TorrentDetailViewModel
+protocol TorrentDetailViewControllerIdentifiable {}
+
+final class TorrentDetailViewController<VM: ViewModel>: UITableViewController, TorrentDetailViewControllerIdentifiable
+    where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
+    private let viewModel: VM
     private var observers = [AnyCancellable]()
     private var refreshObserver: AnyCancellable?
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
 
-    init(viewModel: TorrentDetailViewModel) {
+    init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
+
         title = "Info"
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItems = [
@@ -29,6 +33,16 @@ final class TorrentDetailViewController: UITableViewController {
                 action: #selector(moreButtonTapped(_:))
             ),
         ]
+
+        viewModel.state.isLoading
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.refreshControl?.beginRefreshing()
+                } else {
+                    self?.refreshControl?.endRefreshing()
+                }
+            }
+            .store(in: &observers)
     }
 
     required init?(coder: NSCoder) {
@@ -67,9 +81,9 @@ final class TorrentDetailViewController: UITableViewController {
                 }
 
                 cell.delegate = self
-                cell.configure(with: viewModel)
+                cell.configure(with: viewModel.state)
                 return cell
-            case let .info(viewModel):
+            case let .info(name, value):
                 guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: "info",
                     for: indexPath
@@ -78,7 +92,8 @@ final class TorrentDetailViewController: UITableViewController {
                 }
 
                 cell.configure(
-                    with: viewModel,
+                    name: name,
+                    value: value,
                     isLastRow: indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
                 )
                 return cell
@@ -104,7 +119,7 @@ final class TorrentDetailViewController: UITableViewController {
                 }
 
                 cell.configure(
-                    with: viewModel,
+                    with: viewModel.state,
                     isLastRow: indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
                 )
                 return cell
@@ -113,7 +128,7 @@ final class TorrentDetailViewController: UITableViewController {
 
         tableView.dataSource = dataSource
 
-        viewModel.sections
+        viewModel.state.sections
             .sink { [weak self] sections in
                 self?.update(with: sections)
             }
@@ -122,12 +137,12 @@ final class TorrentDetailViewController: UITableViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        viewModel.didAppear()
+        viewModel.handle(.appear)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.didDisappear()
+        viewModel.handle(.disappear)
     }
 
     private func update(with sections: [TorrentDetailSection]) {
@@ -148,14 +163,12 @@ final class TorrentDetailViewController: UITableViewController {
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        refreshObserver = viewModel.refresh().sink(receiveCompletion: { [weak sender] _ in
-            sender?.endRefreshing()
-        }, receiveValue: { _ in })
+        viewModel.handle(.refresh)
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.didSelectMoreOptions(from: .barButton(sender))
+        viewModel.handle(.moreOptions(.barButton(sender)))
     }
 
     // MARK: UITableViewDelegate
@@ -185,14 +198,14 @@ final class TorrentDetailViewController: UITableViewController {
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.didSelectPause()
+        viewModel.handle(.pause)
     }
 
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.didSelectResume()
+        viewModel.handle(.resume)
     }
 
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
-        viewModel.didSelectRemove(from: .view(sender, rect: sender.bounds))
+        viewModel.handle(.remove(.view(sender, rect: sender.bounds)))
     }
 }

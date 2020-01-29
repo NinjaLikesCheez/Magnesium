@@ -10,7 +10,7 @@ import Combine
 
 enum TorrentListEvent {
     case add(source: PopoverSource)
-    case detail(viewModel: TorrentDetailViewModel)
+    case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
     case alert(Alert, source: PopoverSource?)
 }

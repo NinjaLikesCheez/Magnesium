@@ -79,10 +79,10 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with viewModel: TorrentDetailInfoViewModel, isLastRow: Bool) {
-        nameLabel.text = viewModel.name
+    func configure(name: String, value: AnyPublisher<String, Never>, isLastRow: Bool) {
+        nameLabel.text = name
         // swiftlint:disable:next array_init
-        viewModel.value
+        value
             .map { text -> String? in text }
             .assign(to: \.text, on: valueLabel)
             .store(in: &observers)
@@ -93,7 +93,8 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentDetailInfoTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: TorrentDetailInfoViewModel
+            let name: String
+            let value: AnyPublisher<String, Never>
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -107,17 +108,18 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: viewModel, isLastRow: false)
+                uiView.inner.configure(name: name, value: value, isLastRow: false)
             }
         }
 
         static var previews: some View {
-            let viewModel = TorrentDetailInfoViewModel(name: "Downloaded", value: Just("1.4 GB").eraseToAnyPublisher())
+            let name = "Downloaded"
+            let value = Just("1.4 GB").eraseToAnyPublisher()
             return Group {
-                Container(viewModel: viewModel)
+                Container(name: name, value: value)
                     .previewDisplayName("Light")
                     .previewLayout(.sizeThatFits)
-                Container(viewModel: viewModel)
+                Container(name: name, value: value)
                     .previewLayout(.sizeThatFits)
                     .previewDisplayName("Dark")
                     .environment(\.colorScheme, .dark)

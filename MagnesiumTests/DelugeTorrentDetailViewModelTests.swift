@@ -16,7 +16,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
-    private var viewModel: TorrentDetailViewModel!
+    private var viewModel: DelugeTorrentDetailViewModel!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
@@ -43,7 +43,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     func testAutoUpdate() throws {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
-        viewModel.didAppear()
+        viewModel.handle(.appear)
 
         let firstCheck = expectation(description: "First check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -52,7 +52,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }
         waitForExpectations(timeout: 1.1)
 
-        viewModel.didDisappear()
+        viewModel.handle(.disappear)
 
         let secondCheck = expectation(description: "Second check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -65,7 +65,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     func testAutoUpdateStopsWhenDisabled() throws {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
-        viewModel.didAppear()
+        viewModel.handle(.appear)
 
         let firstCheck = expectation(description: "First check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -96,20 +96,18 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        viewModel.handle(.refresh)
         XCTAssertEqual(alert?.title, "Update Failed")
     }
 
     func testHasHeader() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let section = sections[0]
-                XCTAssertEqual(section.type, .header)
-                XCTAssertEqual(section.items.count, 1)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        viewModel.state.sections.sink { sections in
+            let section = sections[0]
+            XCTAssertEqual(section.type, .header)
+            XCTAssertEqual(section.items.count, 1)
+            expectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
     }
 
@@ -117,18 +115,15 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(section.type, .info)
         return section.items.compactMap { item -> (String, String)? in
             switch item {
-            case let .info(viewModel):
+            case let .info(name, valuePublisher):
                 let expectation = self.expectation(description: "Value received")
                 var value: String!
-                viewModel.value
-                    .first()
-                    .sink(receiveValue: {
-                        value = $0
-                        expectation.fulfill()
-                    })
-                    .store(in: &self.observers)
+                valuePublisher.first().sink {
+                    value = $0
+                    expectation.fulfill()
+                }.store(in: &self.observers)
                 self.wait(for: [expectation], timeout: 0)
-                return (viewModel.name, value)
+                return (name, value)
             default:
                 XCTFail("Unexpected item")
                 return nil
@@ -150,13 +145,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         ]
 
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let rows = self.getInfoRows(in: sections[1])
-                XCTAssertEqual(rows.map { "\($0.0): \($0.1)" }, expected.map { "\($0.0): \($0.1)" })
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        viewModel.state.sections.sink { sections in
+            let rows = self.getInfoRows(in: sections[1])
+            XCTAssertEqual(rows.map { "\($0.0): \($0.1)" }, expected.map { "\($0.0): \($0.1)" })
+            expectation.fulfill()
+        }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -166,13 +159,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         subject.send(torrent)
 
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
-                XCTAssertEqual(eta.1, "∞")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -182,13 +173,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         subject.send(torrent)
 
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-                XCTAssertEqual(eta.1, "∞")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -199,13 +188,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         subject.send(torrent)
 
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-                XCTAssertEqual(eta.1, "∞")
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -213,48 +200,44 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         let expected = ["udp://tracker.archlinux.org:6969", "http://tracker.archlinux.org:6969/announce"]
 
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let section = sections[2]
-                XCTAssertEqual(section.type, .trackers)
+        viewModel.state.sections.sink { sections in
+            let section = sections[2]
+            XCTAssertEqual(section.type, .trackers)
 
-                let trackers = section.items.compactMap { item -> String? in
-                    switch item {
-                    case let .tracker(tracker):
-                        return tracker
-                    default:
-                        XCTFail("Unexpected item")
-                        return nil
-                    }
+            let trackers = section.items.compactMap { item -> String? in
+                switch item {
+                case let .tracker(tracker):
+                    return tracker
+                default:
+                    XCTFail("Unexpected item")
+                    return nil
                 }
-
-                XCTAssertEqual(trackers, expected)
-                expectation.fulfill()
             }
-            .store(in: &observers)
+
+            XCTAssertEqual(trackers, expected)
+            expectation.fulfill()
+        }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
     func testFilesSorted() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.sections
-            .sink { sections in
-                let section = sections[3]
-                XCTAssertEqual(section.type, .files)
+        viewModel.state.sections.sink { sections in
+            let section = sections[3]
+            XCTAssertEqual(section.type, .files)
 
-                let files = section.items.compactMap { item -> String? in
-                    switch item {
-                    case let .file(viewModel):
-                        return viewModel.name
-                    default:
-                        XCTFail("Unexpected item")
-                        return nil
-                    }
+            let files = section.items.compactMap { item -> String? in
+                switch item {
+                case let .file(viewModel):
+                    return viewModel.state.name
+                default:
+                    XCTFail("Unexpected item")
+                    return nil
                 }
-                XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
-                expectation.fulfill()
             }
-            .store(in: &observers)
+            XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
+            expectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
     }
 
@@ -268,7 +251,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
         let expected = ["Force Recheck", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
@@ -285,7 +268,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
         let recheck = alert!.actions[0].handler!
         recheck()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
@@ -303,7 +286,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionsAlert = inner
         }.store(in: &observers)
-        viewModel.didSelectMoreOptions(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.moreOptions(.view(UIView(), rect: .zero)))
         let recheck = optionsAlert!.actions[0].handler!
 
         var errorAlert: Alert?
@@ -321,7 +304,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
     func testPause() {
         client.requests.reset()
-        viewModel.didSelectPause()
+        viewModel.handle(.pause)
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, pause: 1))
     }
 
@@ -338,14 +321,14 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             errorAlert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectPause()
+        viewModel.handle(.pause)
         XCTAssertEqual(errorAlert?.title, "Failed to Pause")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
 
     func testResume() {
         client.requests.reset()
-        viewModel.didSelectResume()
+        viewModel.handle(.resume)
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, resume: 1))
     }
 
@@ -362,7 +345,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             errorAlert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectResume()
+        viewModel.handle(.resume)
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
@@ -379,7 +362,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
         let expected = ["Keep Data", "Remove Data", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
@@ -395,7 +378,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
         let remove = alert!.actions[0].handler!
 
         var event: TorrentDetailEvent?
@@ -423,7 +406,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionAlert = inner
         }.store(in: &observers)
-        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
         let remove = optionAlert!.actions[0].handler!
 
         var errorAlert: Alert?
@@ -451,7 +434,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
         let remove = alert!.actions[1].handler!
         remove()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
@@ -469,7 +452,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             optionAlert = inner
         }.store(in: &observers)
-        viewModel.didSelectRemove(from: .view(UIView(), rect: .zero))
+        viewModel.handle(.remove(.view(UIView(), rect: .zero)))
         let remove = optionAlert!.actions[1].handler!
 
         var errorAlert: Alert?

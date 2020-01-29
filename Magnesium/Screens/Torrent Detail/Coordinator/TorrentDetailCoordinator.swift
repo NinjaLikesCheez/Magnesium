@@ -15,7 +15,7 @@ enum TorrentDetailCoordinatorEvent {
 
 protocol TorrentDetailCoordinator: Coordinator, AlertPresenter where Event == TorrentDetailCoordinatorEvent {}
 
-final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
+final class DefaultTorrentDetailCoordinator<VM: AnyTorrentDetailViewModel>: TorrentDetailCoordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     let received: AnyPublisher<TorrentDetailEvent, Never>
@@ -30,13 +30,13 @@ final class DefaultTorrentDetailCoordinator: TorrentDetailCoordinator {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(viewModel: TorrentDetailViewModel) {
+    init(viewModel: VM) {
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         received = viewModel.events.eraseToAnyPublisher()
     }
 
-    func handle(event: TorrentDetailEvent) {
+    func handle(_ event: TorrentDetailEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

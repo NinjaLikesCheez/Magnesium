@@ -23,11 +23,12 @@ public protocol Coordinator: AnyObject {
 
     /// Handle a received event.
     /// - Parameter event: The event to handle.
-    func handle(event: Received)
+    func handle(_ event: Received)
 }
 
 public extension Coordinator {
-    /// Adds a child coordinator and automatically removes it when its presentable is dismissed.
+    /// Adds a child coordinator, automatically removes it when its presentable is dismissed, handles the child
+    /// coordinator's events, and sets up the child coordinator to handle it's received events.
     /// - Parameter coordinator: The child coordinator to add.
     /// - Parameter eventHandler: The event handler for the child coordinator.
     func addChildCoordinator<C: Coordinator>(_ coordinator: C, eventHandler: @escaping (C, C.Event) -> Void) {
@@ -46,7 +47,7 @@ public extension Coordinator {
             .store(in: &observers)
         coordinator.received
             .sink { [weak coordinator] event in
-                coordinator?.handle(event: event)
+                coordinator?.handle(event)
             }
             .store(in: &observers)
     }
@@ -79,5 +80,5 @@ public extension Coordinator {
 }
 
 public extension Coordinator where Received == Never {
-    func handle(event: Never) {}
+    func handle(_ event: Never) {}
 }

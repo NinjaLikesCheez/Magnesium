@@ -24,7 +24,7 @@ private class _AnyCoordinatorBoxBase: Coordinator {
         set { _abstract() } // swiftlint:disable:this unused_setter_value
     }
 
-    func handle(event: Any) { _abstract() }
+    func handle(_ event: Any) { _abstract() }
 }
 
 private final class _AnyCoordinatorBox<Base: Coordinator>: _AnyCoordinatorBoxBase {
@@ -49,9 +49,9 @@ private final class _AnyCoordinatorBox<Base: Coordinator>: _AnyCoordinatorBoxBas
         _base = base
     }
 
-    override func handle(event: Any) {
+    override func handle(_ event: Any) {
         guard let event = event as? Base.Received else { return }
-        _base.handle(event: event)
+        _base.handle(event)
     }
 }
 
@@ -77,7 +77,7 @@ public final class AnyCoordinator: Coordinator {
         box = _AnyCoordinatorBox(coordinator)
     }
 
-    public func handle(event: Any) {
-        box.handle(event: event)
+    public func handle(_ event: Any) {
+        box.handle(event)
     }
 }

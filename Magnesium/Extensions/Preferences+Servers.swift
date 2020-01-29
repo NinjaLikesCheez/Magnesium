@@ -165,7 +165,7 @@ extension Preferences {
     }
 
     func removeServers() {
-        let query: [String: Any] =  [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "servers" as String,
         ]

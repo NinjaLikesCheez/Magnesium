@@ -10,16 +10,17 @@ import Combine
 import Foundation
 import Preferences
 
-final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
+final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
     private let client: DelugeClient
     private let preferences: Preferences
     private let refresher: DelugeRefreshable
     private let torrentSubject: CurrentValueSubject<DelugeTorrent, Never>
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
     private var autoUpdateTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
-    let sections: AnyPublisher<[TorrentDetailSection], Never>
+    let state: TorrentDetailViewState
 
     private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
         CurrentValueSubjectMapManager(sort: Just {
@@ -47,7 +48,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
         self.client = client
         self.refresher = refresher
 
-        sections = torrentSubject
+        let sections = torrentSubject
             .combineLatest(files.sorted)
             .map { torrent, files in
                 DelugeTorrentDetailViewModel.createSections(
@@ -59,6 +60,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
+        state = TorrentDetailViewState(sections: sections, isLoading: isLoadingSubject.eraseToAnyPublisher())
 
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
@@ -76,72 +78,54 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
-            .header(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject).eraseToAny()),
+            .header(AnyViewModel(DelugeTorrentDetailHeaderViewModel(torrentSubject: torrentSubject))),
         ]))
         sections.append(TorrentDetailSection(type: .info, items: [
-            .info(TorrentDetailInfoViewModel(
-                name: "Size",
-                value: torrentSubject
+            .info("Size", torrentSubject
                     .map { ByteFormatter.string(fromByteCount: $0.size) }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Download Speed",
-                value: torrentSubject
+            ),
+            .info("Download Speed", torrentSubject
                     .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Upload Speed",
-                value: torrentSubject
+            ),
+            .info("Upload Speed", torrentSubject
                     .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Downloaded",
-                value: torrentSubject
+            ),
+            .info("Downloaded", torrentSubject
                     .map { ByteFormatter.string(fromByteCount: $0.downloaded) }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Uploaded",
-                value: torrentSubject
+            ),
+            .info("Uploaded", torrentSubject
                     .map { ByteFormatter.string(fromByteCount: $0.uploaded) }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "ETA",
-                value: torrentSubject
+            ),
+            .info("ETA", torrentSubject
                     .map(\.etaString)
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Ratio",
-                value: torrentSubject
+            ),
+            .info("Ratio", torrentSubject
                     .map { $0.ratioString(precision: 3) }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Peers",
-                value: torrentSubject
+            ),
+            .info("Peers", torrentSubject
                     .map { "\($0.peers) (\($0.totalPeers))" }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
-            .info(TorrentDetailInfoViewModel(
-                name: "Seeds",
-                value: torrentSubject
+            ),
+            .info("Seeds", torrentSubject
                     .map { "\($0.seeds) (\($0.totalSeeds))" }
                     .ui()
                     .eraseToAnyPublisher()
-            )),
+            ),
         ]))
 
         if !torrent.trackers.isEmpty {
@@ -150,14 +134,33 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
 
         if !files.isEmpty {
             sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(DelugeTorrentDetailFileViewModel(fileSubject: $0).eraseToAny())
+                .file(AnyViewModel(DelugeTorrentDetailFileViewModel(fileSubject: $0)))
             }))
         }
 
         return sections
     }
 
-    func didAppear() {
+    func handle(_ event: TorrentDetailViewEvent) {
+        switch event {
+        case .appear:
+            handleAppear()
+        case .disappear:
+            handleDisappear()
+        case .refresh:
+            handleRefresh()
+        case let .moreOptions(source):
+            handleMoreOptions(from: source)
+        case .pause:
+            handlePause()
+        case .resume:
+            handleResume()
+        case let .remove(source):
+            handleRemove(from: source)
+        }
+    }
+
+    private func handleAppear() {
         if let timer = autoUpdateTimer, timer.isValid {
             return
         }
@@ -168,7 +171,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             })
     }
 
-    func didDisappear() {
+    private func handleDisappear() {
         autoUpdateTimer?.invalidate()
         timerIntervalObserver?.cancel()
     }
@@ -190,8 +193,10 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
-    func refresh() -> AnyPublisher<Void, Error> {
-        return refresher.refreshTorrents()
+    private func handleRefresh() {
+        guard !isLoadingSubject.value else { return }
+        isLoadingSubject.send(true)
+        refresher.refreshTorrents()
             .mapError { $0 as Error }
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
                 guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
@@ -199,10 +204,12 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
+                self?.isLoadingSubject.send(false)
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: "Update Failed", message: error.localizedDescription)
             })
-            .eraseToAnyPublisher()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
@@ -215,7 +222,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .eraseToAnyPublisher()
     }
 
-    func didSelectMoreOptions(from source: PopoverSource) {
+    private func handleMoreOptions(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
             self.recheck()
@@ -240,7 +247,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
-    func didSelectPause() {
+    private func handlePause() {
         client.pause(hashes: [torrentSubject.value.hash])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -256,7 +263,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
-    func didSelectResume() {
+    private func handleResume() {
         client.resume(hashes: [torrentSubject.value.hash])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -272,7 +279,7 @@ final class DelugeTorrentDetailViewModel: TorrentDetailViewModel {
             .store(in: &observers)
     }
 
-    func didSelectRemove(from source: PopoverSource) {
+    private func handleRemove(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Keep Data", style: .default) {
             self.remove(removeData: false)

@@ -40,7 +40,7 @@ final class DefaultAddServerCoordinator: AddServerCoordinator, AlertPresenter {
         received = viewModel.events.eraseToAnyPublisher()
     }
 
-    func handle(event: AddServerEvent) {
+    func handle(_ event: AddServerEvent) {
         switch event {
         case let .selected(type: type):
             showServerSettings(for: type)

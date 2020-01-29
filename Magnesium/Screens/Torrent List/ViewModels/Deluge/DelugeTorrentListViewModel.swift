@@ -97,7 +97,7 @@ final class DelugeTorrentListViewModel: TorrentListViewModel, DelugeRefreshable 
             preferences: preferences,
             refresher: self
         )
-        eventSubject.send(.detail(viewModel: viewModel))
+        eventSubject.send(.detail(viewModel: AnyProducerViewModel(viewModel)))
     }
 
     func didSelectSettings() {

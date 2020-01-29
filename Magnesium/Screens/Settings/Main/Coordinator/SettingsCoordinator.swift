@@ -41,7 +41,7 @@ final class DefaultSettingsCoordinator: SettingsCoordinator {
         received = viewModel.events
     }
 
-    func handle(event: SettingsEvent) {
+    func handle(_ event: SettingsEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

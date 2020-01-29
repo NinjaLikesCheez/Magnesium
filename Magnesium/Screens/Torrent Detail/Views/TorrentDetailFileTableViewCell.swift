@@ -94,17 +94,17 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure<VM: TorrentDetailFileViewModel>(with viewModel: VM, isLastRow: Bool) {
-        nameLabel.text = viewModel.name
+    func configure(with state: TorrentDetailFileViewState, isLastRow: Bool) {
+        nameLabel.text = state.name
         separatorView.isHidden = isLastRow
 
         // swiftlint:disable array_init
-        viewModel.size
+        state.size
             .map { text -> String? in text }
             .assign(to: \.text, on: sizeLabel)
             .store(in: &observers)
 
-        viewModel.progress
+        state.progress
             .map { text -> String? in text }
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
@@ -115,7 +115,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 #if DEBUG
     struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: AnyTorrentDetailFileViewModel
+            let state: TorrentDetailFileViewState
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -129,32 +129,21 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: viewModel, isLastRow: false)
-            }
-        }
-
-        private struct ViewModel: TorrentDetailFileViewModel, Hashable {
-            let id = UUID()
-            var name: String = "file.rar"
-            var size: AnyPublisher<String, Never> = Just("50.0 MB").eraseToAnyPublisher()
-            var progress: AnyPublisher<String, Never> = Just("100%").eraseToAnyPublisher()
-
-            static func == (lhs: ViewModel, rhs: ViewModel) -> Bool {
-                return lhs.id == rhs.id
-            }
-
-            func hash(into hasher: inout Hasher) {
-                hasher.combine(id)
+                uiView.inner.configure(with: state, isLastRow: false)
             }
         }
 
         static var previews: some View {
-            let viewModel = ViewModel().eraseToAny()
+            let state = TorrentDetailFileViewState(
+                name: "file.rar",
+                size: Just("50.0 MB").eraseToAnyPublisher(),
+                progress: Just("100%").eraseToAnyPublisher()
+            )
             return Group {
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewDisplayName("Light")
                     .previewLayout(.sizeThatFits)
-                Container(viewModel: viewModel)
+                Container(state: state)
                     .previewLayout(.sizeThatFits)
                     .previewDisplayName("Dark")
                     .environment(\.colorScheme, .dark)
