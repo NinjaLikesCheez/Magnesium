@@ -80,7 +80,8 @@ final class DelugeSettingsViewModel: ViewModel, EventProducer {
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
             isSaveButtonEnabled: isSaveButtonEnabledSubject.eraseToAnyPublisher(),
-            inputs: [nameInput, serverInput, passwordInput])
+            inputs: [nameInput, serverInput, passwordInput]
+        )
 
         nameSubject
             .combineLatest(serverSubject, passwordSubject)
