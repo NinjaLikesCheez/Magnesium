@@ -1,0 +1,309 @@
+//
+//  DelugeSettingsViewModelTests.swift
+//  MagnesiumTests
+//
+//  Created by James Hurst on 2020-01-29.
+//  Copyright © 2020 James Hurst. All rights reserved.
+//
+
+import Combine
+@testable import Magnesium
+import XCTest
+
+class DelugeSettingsViewModelTests: XCTestCase {
+    private let client = MockDelugeClient()
+    private let preferences = MockPreferences()
+    private var observers = [AnyCancellable]()
+    private lazy var clientProvider = MockClientProvider(client: client)
+    private lazy var addViewModel = DelugeSettingsViewModel(
+        preferences: preferences,
+        clientProvider: clientProvider
+    )
+    private lazy var editViewModel = DelugeSettingsViewModel(
+        preferences: preferences,
+        server: server,
+        clientProvider: clientProvider
+    )
+    private lazy var server: Server = {
+        let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
+        let keychain = DelugeKeychainData(password: "password")
+        let encoder = JSONEncoder()
+        return Server(
+            name: "Server",
+            type: .deluge,
+            data: try! encoder.encode(settings), // swiftlint:disable:this force_try
+            keychainData: try! encoder.encode(keychain) // swiftlint:disable:this force_try
+        )
+    }()
+
+    func test_inputs() {
+        XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "password"])
+    }
+
+    func test_name_withServer_shouldUseExisting() {
+        XCTAssertEqual(editViewModel.state.inputs[0].value.value, "Server")
+    }
+
+    func test_serverURL_withServer_shouldUseExisting() throws {
+        XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://example.com")
+    }
+
+    func test_password_withServer_shouldUseExisting() throws {
+        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "password")
+    }
+
+    func test_title_withoutServer() {
+        XCTAssertEqual(addViewModel.state.title, "Add Server")
+    }
+
+    func test_title_withServer() {
+        XCTAssertEqual(editViewModel.state.title, "Edit Server")
+    }
+
+    func test_saveButtonTitle_withoutServer() {
+        XCTAssertEqual(addViewModel.state.saveButtonTitle, "Add")
+    }
+
+    func test_saveButtonTitle_withServer() {
+        XCTAssertEqual(editViewModel.state.saveButtonTitle, "Save")
+    }
+
+    func test_canDelete_withoutServer() {
+        XCTAssertFalse(addViewModel.state.canDelete)
+    }
+
+    func test_canDelete_withServer() {
+        XCTAssertTrue(editViewModel.state.canDelete)
+    }
+
+    private func isSaveButtonEnabled(_ viewModel: DelugeSettingsViewModel) -> Bool {
+        var value: Bool!
+        _ = viewModel.state.isSaveButtonEnabled.sink {
+            value = $0
+        }
+        return value
+    }
+
+    func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
+        let viewModel = addViewModel
+        XCTAssertFalse(isSaveButtonEnabled(viewModel))
+        viewModel.state.inputs[0].value.value = "name"
+        XCTAssertFalse(isSaveButtonEnabled(viewModel))
+        viewModel.state.inputs[1].value.value = "http://example.com"
+        XCTAssertFalse(isSaveButtonEnabled(viewModel))
+        viewModel.state.inputs[2].value.value = "password"
+        XCTAssertTrue(isSaveButtonEnabled(viewModel))
+    }
+
+    func test_isSaveButtonEnabled_withInvalidServer_shouldBeFalse() {
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = "web://site"
+        viewModel.state.inputs[2].value.value = "password"
+        XCTAssertFalse(isSaveButtonEnabled(viewModel))
+    }
+
+    func test_save_shouldChangeIsLoading() {
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = "http://example.com"
+        viewModel.state.inputs[2].value.value = "password"
+
+        var values = [Bool]()
+        viewModel.state.isLoading.dropFirst().sink {
+            values.append($0)
+        }.store(in: &observers)
+
+        viewModel.handle(.save)
+        XCTAssertEqual(values, [true, false])
+    }
+
+    func test_save_shouldAuthenticate() {
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = "http://example.com"
+        viewModel.state.inputs[2].value.value = "password"
+        viewModel.handle(.save)
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(authenticate: 1))
+    }
+
+    func test_save_whenAuthenticationFail_shouldEmitError() {
+        client.errors.authenticate = true
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = "http://example.com"
+        viewModel.state.inputs[2].value.value = "password"
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handle(.save)
+        XCTAssertEqual(alert?.title, "Authentication Failed")
+        XCTAssertEqual(alert?.message, "Ensure your password is correct.")
+    }
+
+    func test_save_withoutData_shouldDoNothing() {
+        let viewModel = addViewModel
+        let expectation = self.expectation(description: "Received value")
+        expectation.isInverted = true
+        viewModel.state.isLoading.dropFirst().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
+        viewModel.handle(.save)
+        waitForExpectations(timeout: 1)
+    }
+
+    func test_save_withoutServer_shouldAddServer() throws {
+        let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
+        let keychain = DelugeKeychainData(password: "password")
+        let expectedData = try JSONEncoder().encode(settings)
+        let expectedKeychainData = try JSONEncoder().encode(keychain)
+
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = settings.url.absoluteString
+        viewModel.state.inputs[2].value.value = keychain.password
+        viewModel.handle(.save)
+        let server = preferences.getServers()[0]
+        XCTAssertEqual(server.name, "name")
+        XCTAssertEqual(server.data, expectedData)
+        XCTAssertEqual(server.keychainData, expectedKeychainData)
+    }
+
+    func test_save_withServer_shouldUpdateServer() throws {
+        let settings = DelugeServerSettings(url: URL(string: "http://example.com/new")!)
+        let keychain = DelugeKeychainData(password: "new-password")
+        let expectedData = try JSONEncoder().encode(settings)
+        let expectedKeychainData = try JSONEncoder().encode(keychain)
+
+        let viewModel = editViewModel
+        viewModel.state.inputs[0].value.value = "new name"
+        viewModel.state.inputs[1].value.value = settings.url.absoluteString
+        viewModel.state.inputs[2].value.value = keychain.password
+        viewModel.handle(.save)
+        let server = preferences.getServers()[0]
+        XCTAssertEqual(server.name, "new name")
+        XCTAssertEqual(server.data, expectedData)
+        XCTAssertEqual(server.keychainData, expectedKeychainData)
+    }
+
+    func test_save_withoutServer_shouldEmitCompleteEvent() {
+        let viewModel = addViewModel
+        viewModel.state.inputs[0].value.value = "name"
+        viewModel.state.inputs[1].value.value = "http://example.com"
+        viewModel.state.inputs[2].value.value = "password"
+
+        let expectation = self.expectation(description: "Value received")
+        viewModel.events.sink {
+            guard case .complete = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            expectation.fulfill()
+        }.store(in: &observers)
+        viewModel.handle(.save)
+        waitForExpectations(timeout: 0)
+    }
+
+    func test_save_withServer_shouldEmitCompleteEvent() {
+        let viewModel = editViewModel
+        let expectation = self.expectation(description: "Value received")
+        viewModel.events.sink {
+            guard case .complete = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            expectation.fulfill()
+        }.store(in: &observers)
+        viewModel.handle(.save)
+        waitForExpectations(timeout: 0)
+    }
+
+    func test_delete_withoutServer_shouldDoNothing() {
+        let viewModel = addViewModel
+        let expectation = self.expectation(description: "Value received")
+        expectation.isInverted = true
+        viewModel.events.first().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
+        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        waitForExpectations(timeout: 1)
+    }
+
+    func test_delete_withServer_shouldEmitAlert() {
+        let viewModel = editViewModel
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        XCTAssertNil(alert?.title)
+        XCTAssertEqual(alert?.message, "Are you sure you want to delete this server?")
+        XCTAssertEqual(alert?.actions[0].title, "Delete Server")
+        XCTAssertEqual(alert?.actions[0].style, AlertAction.Style.destructive)
+        XCTAssertEqual(alert?.actions[1].title, "Cancel")
+    }
+
+    func test_delete_whenDeleteServerSelected_shouldRemoveServer() {
+        preferences.addOrUpdate(server: server)
+        let viewModel = editViewModel
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        let delete = alert!.actions[0].handler!
+        delete()
+        XCTAssertTrue(preferences.getServers().isEmpty)
+    }
+
+    func test_delete_whenDeleteServerSelected_shouldEmitCompleteEvent() {
+        preferences.addOrUpdate(server: server)
+        let viewModel = editViewModel
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        let delete = alert!.actions[0].handler!
+
+        let expectation = self.expectation(description: "Value received")
+        viewModel.events.first().sink {
+            guard case .complete = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            expectation.fulfill()
+        }.store(in: &observers)
+        delete()
+        XCTAssertTrue(preferences.getServers().isEmpty)
+        waitForExpectations(timeout: 0)
+    }
+}
+
+private struct MockClientProvider: DelugeClientProvider {
+    let client: MockDelugeClient
+
+    func createClient(baseURL: URL, password: String) -> DelugeClient {
+        return client
+    }
+}

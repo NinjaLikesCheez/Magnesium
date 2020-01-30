@@ -10,9 +10,20 @@ import Combine
 import Foundation
 import Preferences
 
+protocol DelugeClientProvider {
+    func createClient(baseURL: URL, password: String) -> DelugeClient
+}
+
+struct DefaultDelugeClientProvider: DelugeClientProvider {
+    func createClient(baseURL: URL, password: String) -> DelugeClient {
+        return DefaultDelugeClient(baseURL: baseURL, password: password)
+    }
+}
+
 final class DelugeSettingsViewModel: ViewModel, EventProducer {
     private let preferences: Preferences
     private let server: Server?
+    private let clientProvider: DelugeClientProvider
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
@@ -26,9 +37,14 @@ final class DelugeSettingsViewModel: ViewModel, EventProducer {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences, server: Server? = nil) {
+    init(
+        preferences: Preferences,
+        server: Server? = nil,
+        clientProvider: DelugeClientProvider = DefaultDelugeClientProvider()
+    ) {
         self.preferences = preferences
         self.server = server
+        self.clientProvider = clientProvider
 
         let settings = (server?.data).flatMap { data in
             try? JSONDecoder().decode(DelugeServerSettings.self, from: data)
@@ -129,7 +145,7 @@ final class DelugeSettingsViewModel: ViewModel, EventProducer {
         }
 
         isLoadingSubject.send(true)
-        let client = DefaultDelugeClient(baseURL: url, password: password)
+        let client = clientProvider.createClient(baseURL: url, password: password)
         client.authenticate()
             .ui()
             .sink(receiveCompletion: { [weak self] completion in

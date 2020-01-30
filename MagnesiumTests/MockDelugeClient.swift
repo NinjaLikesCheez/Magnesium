@@ -12,6 +12,7 @@ import Foundation
 
 final class MockDelugeClient: DelugeClient {
     struct Requests: Equatable {
+        var authenticate = 0
         var torrents = 0
         var torrentFiles = 0
         var pause = 0
@@ -27,6 +28,7 @@ final class MockDelugeClient: DelugeClient {
     }
 
     struct Errors {
+        var authenticate = false
         var torrents = false
         var torrentFiles = false
         var pause = false
@@ -41,6 +43,11 @@ final class MockDelugeClient: DelugeClient {
     var errors = Errors()
 
     func authenticate() -> AnyPublisher<Void, DelugeError> {
+        guard !errors.authenticate else {
+            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        }
+
+        requests.authenticate += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
