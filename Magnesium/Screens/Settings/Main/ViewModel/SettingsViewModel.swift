@@ -39,12 +39,6 @@ final class SettingsViewModel: ViewModel, EventProducer {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    var sections: AnyPublisher<[SettingsSection], Never> {
-        return sectionsSubject
-            .ui()
-            .eraseToAnyPublisher()
-    }
-
     init(session: Session, preferences: Preferences) {
         self.session = session
         self.preferences = preferences
