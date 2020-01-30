@@ -5,8 +5,10 @@
 //  Created by James Hurst on 2020-01-07.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
+
 import Combine
 import UIKit
+import ViewModel
 
 struct DelugeTorrentListItemViewModel: ViewModel, Identifiable {
     let hash: String

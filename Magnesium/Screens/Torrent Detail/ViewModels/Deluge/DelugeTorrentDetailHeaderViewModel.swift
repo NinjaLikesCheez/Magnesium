@@ -8,6 +8,7 @@
 
 import Combine
 import UIKit
+import ViewModel
 
 struct DelugeTorrentDetailHeaderViewModel: ViewModel, Identifiable {
     private let hash: String

@@ -1,11 +1,3 @@
-//
-//  ViewModel.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-28.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 /// A `ViewModel` is able to handle incoming view events and has a view state.
 public protocol ViewModel {
     associatedtype ViewEvent

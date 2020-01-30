@@ -9,6 +9,7 @@
 import Combine
 import Foundation
 import Preferences
+import ViewModel
 
 final class TransmissionSettingsViewModel: ViewModel, EventProducer {
     private let preferences: Preferences

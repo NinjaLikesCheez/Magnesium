@@ -7,6 +7,7 @@
 //
 
 import Combine
+import ViewModel
 
 struct DelugeTorrentDetailFileViewModel: ViewModel, Identifiable {
     private var path: String

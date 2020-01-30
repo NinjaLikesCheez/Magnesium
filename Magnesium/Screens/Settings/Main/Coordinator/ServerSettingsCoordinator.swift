@@ -9,6 +9,7 @@
 import Combine
 import Coordinator
 import Preferences
+import ViewModel
 
 enum ServerSettingsCoordinatorEvent {
     case complete

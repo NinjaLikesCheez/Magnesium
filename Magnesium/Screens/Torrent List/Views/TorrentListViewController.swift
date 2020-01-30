@@ -10,6 +10,7 @@ import Combine
 import Coordinator
 import SwiftUI
 import UIKit
+import ViewModel
 
 final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
     where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {

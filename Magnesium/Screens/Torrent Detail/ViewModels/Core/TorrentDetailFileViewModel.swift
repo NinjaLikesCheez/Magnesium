@@ -7,6 +7,7 @@
 //
 
 import Combine
+import ViewModel
 
 typealias AnyTorrentDetailFileViewModel = AnyViewModel<Never, TorrentDetailFileViewState>
 

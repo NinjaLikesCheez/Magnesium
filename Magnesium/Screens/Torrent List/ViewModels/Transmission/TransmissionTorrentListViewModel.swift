@@ -9,6 +9,7 @@
 import Combine
 import Foundation
 import Preferences
+import ViewModel
 
 final class TransmissionTorrentListViewModel: ViewModel, EventProducer {
     private let client: DefaultTransmissionClient

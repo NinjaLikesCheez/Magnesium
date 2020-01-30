@@ -8,6 +8,7 @@
 
 import Combine
 import UIKit
+import ViewModel
 
 struct TransmissionTorrentListItemViewModel: ViewModel, Identifiable {
     let id: Int

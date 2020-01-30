@@ -7,6 +7,7 @@
 //
 
 import Combine
+import ViewModel
 
 typealias AnyTorrentListViewModel = AnyProducerViewModel<TorrentListEvent, TorrentListViewEvent, TorrentListViewState>
 

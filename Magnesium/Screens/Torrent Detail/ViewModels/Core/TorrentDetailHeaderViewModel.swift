@@ -8,6 +8,7 @@
 
 import Combine
 import UIKit
+import ViewModel
 
 typealias AnyTorrentDetailHeaderViewModel = AnyViewModel<Never, TorrentDetailHeaderViewState>
 

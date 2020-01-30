@@ -9,6 +9,7 @@
 import Combine
 import SwiftUI
 import UIKit
+import ViewModel
 
 final class SettingsViewController<VM: ViewModel>: UITableViewController
     where VM.ViewEvent == SettingsViewEvent, VM.ViewState == SettingsViewState {

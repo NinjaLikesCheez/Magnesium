@@ -7,6 +7,7 @@
 //
 
 import Combine
+import ViewModel
 
 final class EmptyTorrentListViewModel: ViewModel, EventProducer {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()

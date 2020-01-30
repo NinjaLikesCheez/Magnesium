@@ -8,6 +8,7 @@
 
 import Combine
 import UIKit
+import ViewModel
 
 typealias AnyTorrentListItemViewModel = AnyViewModel<Never, TorrentListItemViewState>
 

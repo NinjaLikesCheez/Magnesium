@@ -9,6 +9,7 @@
 import Combine
 import Foundation
 import Preferences
+import ViewModel
 
 final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefreshable {
     private let client: DelugeClient

@@ -7,6 +7,7 @@
 //
 
 import Combine
+import ViewModel
 
 enum AddServerEvent {
     case add(type: ServerType)

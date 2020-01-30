@@ -9,6 +9,7 @@
 import Coordinator
 import SwiftUI
 import UIKit
+import ViewModel
 
 final class AddServerViewController<VM: ViewModel>: PresentableTableViewController
     where VM.ViewEvent == AddServerViewEvent, VM.ViewState == AddServerViewState {

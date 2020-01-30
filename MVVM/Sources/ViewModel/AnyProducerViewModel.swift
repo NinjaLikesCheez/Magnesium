@@ -1,11 +1,3 @@
-//
-//  AnyProducerViewModel.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-29.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 
 /// A type erased wrapper for a type that is both a `ViewModel` and `EventProducer`.

@@ -9,6 +9,7 @@
 import Combine
 import Foundation
 import Preferences
+import ViewModel
 
 protocol DelugeClientProvider {
     func createClient(baseURL: URL, password: String) -> DelugeClient

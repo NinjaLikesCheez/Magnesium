@@ -10,6 +10,7 @@ import Combine
 import Coordinator
 import SwiftUI
 import UIKit
+import ViewModel
 
 final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
     where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewState == ServerSettingsViewState {

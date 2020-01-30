@@ -8,6 +8,7 @@
 
 import Combine
 import Preferences
+import ViewModel
 
 enum SettingsEvent {
     case complete

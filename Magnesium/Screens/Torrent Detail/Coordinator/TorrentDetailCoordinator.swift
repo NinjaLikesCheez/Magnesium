@@ -8,6 +8,7 @@
 
 import Combine
 import Coordinator
+import ViewModel
 
 enum TorrentDetailCoordinatorEvent {
     case complete
