@@ -11,18 +11,19 @@ import Coordinator
 import SwiftUI
 import UIKit
 
-final class ServerSettingsViewController: PresentableTableViewController {
+final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
+    where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewState == ServerSettingsViewState {
     private enum Section: Int {
         case settings
         case delete
     }
 
-    private let viewModel: ServerSettingsViewModel
+    private let viewModel: VM
     private var observers = [AnyCancellable]()
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
         return UIBarButtonItem(
-            title: viewModel.saveButtonTitle,
+            title: viewModel.state.saveButtonTitle,
             style: .done,
             target: self,
             action: #selector(performSave)
@@ -35,20 +36,20 @@ final class ServerSettingsViewController: PresentableTableViewController {
         return UIBarButtonItem(customView: activityView)
     }()
 
-    init(viewModel: ServerSettingsViewModel) {
+    init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         isModalInPresentation = true
-        navigationItem.title = viewModel.title
+        navigationItem.title = viewModel.state.title
         navigationItem.largeTitleDisplayMode = .never
 
-        viewModel.isLoading
+        viewModel.state.isLoading
             .sink { [weak self] isLoading in
                 self?.isLoadingChanged(isLoading)
             }
             .store(in: &observers)
 
-        viewModel.isSaveButtonEnabled
+        viewModel.state.isSaveButtonEnabled
             .assign(to: \.isEnabled, on: saveBarButtonItem)
             .store(in: &observers)
     }
@@ -65,13 +66,13 @@ final class ServerSettingsViewController: PresentableTableViewController {
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.canDelete ? 2 : 1
+        return viewModel.state.canDelete ? 2 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .settings:
-            return viewModel.inputs.count
+            return viewModel.state.inputs.count
         case .delete:
             return 1
         case .none:
@@ -88,10 +89,10 @@ final class ServerSettingsViewController: PresentableTableViewController {
                 return UITableViewCell()
             }
 
-            cell.configure(with: viewModel.inputs[indexPath.row])
+            cell.configure(with: viewModel.state.inputs[indexPath.row])
             cell.proceedToNextInput = { [weak self] in
                 guard let strongSelf = self else { return }
-                if indexPath.row < strongSelf.viewModel.inputs.count - 1 {
+                if indexPath.row < strongSelf.viewModel.state.inputs.count - 1 {
                     let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
                     strongSelf.tableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
                 } else {
@@ -123,13 +124,13 @@ final class ServerSettingsViewController: PresentableTableViewController {
 
         if indexPath.section == Section.delete.rawValue {
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.didSelectDelete(from: .view(cell, rect: cell.bounds))
+            viewModel.handle(.delete(source: .view(cell, rect: cell.bounds)))
         }
     }
 
     @objc
     private func performSave() {
-        viewModel.didSelectSave()
+        viewModel.handle(.save)
     }
 
     private func isLoadingChanged(_ isLoading: Bool) {

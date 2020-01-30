@@ -10,57 +10,52 @@ import Combine
 import Foundation
 import Preferences
 
-final class DelugeSettingsViewModel: ServerSettingsViewModel {
+final class DelugeSettingsViewModel: ViewModel, EventProducer {
     private let preferences: Preferences
     private let server: Server?
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
+    private let nameSubject: CurrentValueSubject<String?, Never>
+    private let serverSubject: CurrentValueSubject<String?, Never>
+    private let passwordSubject: CurrentValueSubject<String?, Never>
     private var observers = [AnyCancellable]()
+    let state: ServerSettingsViewState
 
-    private lazy var settings: DelugeServerSettings? = {
-        return (server?.data).flatMap { data in
+    var events: AnyPublisher<ServerSettingsEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
+    init(preferences: Preferences, server: Server? = nil) {
+        self.preferences = preferences
+        self.server = server
+
+        let settings = (server?.data).flatMap { data in
             try? JSONDecoder().decode(DelugeServerSettings.self, from: data)
         }
-    }()
 
-    private lazy var keychain: DelugeKeychainData? = {
-        return (server?.keychainData).flatMap { data in
+        let keychain = (server?.keychainData).flatMap { data in
             try? JSONDecoder().decode(DelugeKeychainData.self, from: data)
         }
-    }()
 
-    private lazy var nameValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(server?.name)
-    }()
+        nameSubject = CurrentValueSubject(server?.name)
+        serverSubject = CurrentValueSubject(settings?.url.absoluteString)
+        passwordSubject = CurrentValueSubject(keychain?.password)
 
-    private lazy var nameEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var nameViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let nameEnabled = CurrentValueSubject<Bool, Never>(true)
+        let nameInput = DefaultTextInputTableViewCellViewModel(
             name: "name",
             placeholder: "Deluge",
-            value: nameValue,
+            value: nameSubject,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
             returnKeyType: .next
         )
-    }()
 
-    private lazy var serverValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.url.absoluteString)
-    }()
-
-    private lazy var serverEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var serverViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let serverEnabled = CurrentValueSubject<Bool, Never>(true)
+        let serverInput = DefaultTextInputTableViewCellViewModel(
             name: "server",
             placeholder: "https://example.com",
-            value: serverValue,
+            value: serverSubject,
             isEnabled: serverEnabled.eraseToAnyPublisher(),
             keyboardType: .URL,
             returnKeyType: .next,
@@ -68,60 +63,27 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
             autocorrectionType: .no,
             textContentType: .URL
         )
-    }()
 
-    private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(keychain?.password)
-    }()
-
-    private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var passwordViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
+        let passwordInput = DefaultTextInputTableViewCellViewModel(
             name: "password",
             placeholder: "password",
-            value: passwordValue,
+            value: passwordSubject,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
             isSecure: true,
             returnKeyType: .send
         )
-    }()
 
-    var events: AnyPublisher<ServerSettingsEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
-    }
+        state = ServerSettingsViewState(
+            title: server == nil ? "Add Server" : "Edit Server",
+            saveButtonTitle: server == nil ? "Add" : "Save",
+            canDelete: server != nil,
+            isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
+            isSaveButtonEnabled: isSaveButtonEnabledSubject.eraseToAnyPublisher(),
+            inputs: [nameInput, serverInput, passwordInput])
 
-    var title: String {
-        return server == nil ? "Add Server" : "Edit Server"
-    }
-
-    var saveButtonTitle: String {
-        return server == nil ? "Add" : "Save"
-    }
-
-    var canDelete: Bool {
-        return server != nil
-    }
-
-    var isLoading: AnyPublisher<Bool, Never> {
-        return isLoadingSubject.ui().eraseToAnyPublisher()
-    }
-
-    var isSaveButtonEnabled: AnyPublisher<Bool, Never> {
-        return isSaveButtonEnabledSubject.ui().eraseToAnyPublisher()
-    }
-
-    var inputs: [TextInputTableViewCellViewModel] {
-        return [nameViewModel, serverViewModel, passwordViewModel]
-    }
-
-    init(preferences: Preferences, server: Server? = nil) {
-        self.preferences = preferences
-        self.server = server
-        nameValue
-            .combineLatest(serverValue, passwordValue)
+        nameSubject
+            .combineLatest(serverSubject, passwordSubject)
             .map { name, server, password in
                 guard
                     let name = name,
@@ -147,11 +109,20 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
         }
     }
 
-    func didSelectSave() {
+    func handle(_ event: ServerSettingsViewEvent) {
+        switch event {
+        case .save:
+            handleSave()
+        case let .delete(source):
+            handleDelete(source: source)
+        }
+    }
+
+    private func handleSave() {
         guard isSaveButtonEnabledSubject.value,
-            let name = nameValue.value,
-            let url = serverValue.value.flatMap({ URL(string: $0) }),
-            let password = passwordValue.value
+            let name = nameSubject.value,
+            let url = serverSubject.value.flatMap({ URL(string: $0) }),
+            let password = passwordSubject.value
         else {
             return
         }
@@ -198,7 +169,7 @@ final class DelugeSettingsViewModel: ServerSettingsViewModel {
         eventSubject.send(.complete)
     }
 
-    func didSelectDelete(from source: PopoverSource) {
+    private func handleDelete(source: PopoverSource) {
         guard let server = server else { return }
         var alert = Alert(title: nil, message: "Are you sure you want to delete this server?", style: .actionSheet)
         alert.addAction(AlertAction(title: "Delete Server", style: .destructive) {

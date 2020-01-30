@@ -8,19 +8,27 @@
 
 import Combine
 
+typealias AnyServerSettingsViewModel = AnyProducerViewModel<
+    ServerSettingsEvent,
+    ServerSettingsViewEvent,
+    ServerSettingsViewState
+>
+
 enum ServerSettingsEvent {
     case complete
     case alert(Alert, source: PopoverSource?)
 }
 
-protocol ServerSettingsViewModel {
-    var events: AnyPublisher<ServerSettingsEvent, Never> { get }
-    var title: String { get }
-    var saveButtonTitle: String { get }
-    var canDelete: Bool { get }
-    var isLoading: AnyPublisher<Bool, Never> { get }
-    var isSaveButtonEnabled: AnyPublisher<Bool, Never> { get }
-    var inputs: [TextInputTableViewCellViewModel] { get }
-    func didSelectSave()
-    func didSelectDelete(from source: PopoverSource)
+enum ServerSettingsViewEvent {
+    case save
+    case delete(source: PopoverSource)
+}
+
+struct ServerSettingsViewState {
+    var title: String
+    var saveButtonTitle: String
+    var canDelete: Bool
+    var isLoading: AnyPublisher<Bool, Never>
+    var isSaveButtonEnabled: AnyPublisher<Bool, Never>
+    var inputs: [TextInputTableViewCellViewModel]
 }

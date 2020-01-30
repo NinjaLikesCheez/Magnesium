@@ -10,57 +10,54 @@ import Combine
 import Foundation
 import Preferences
 
-final class TransmissionSettingsViewModel: ServerSettingsViewModel {
+final class TransmissionSettingsViewModel: ViewModel, EventProducer {
     private let preferences: Preferences
     private let server: Server?
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
+    private let nameSubject: CurrentValueSubject<String?, Never>
+    private let serverSubject: CurrentValueSubject<String?, Never>
+    private let usernameSubject: CurrentValueSubject<String?, Never>
+    private let passwordSubject: CurrentValueSubject<String?, Never>
     private var observers = [AnyCancellable]()
+    let state: ServerSettingsViewState
 
-    private lazy var settings: TransmissionServerSettings? = {
-        return (server?.data).flatMap { data in
+    var events: AnyPublisher<ServerSettingsEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
+    init(preferences: Preferences, server: Server? = nil) {
+        self.preferences = preferences
+        self.server = server
+
+        let settings = (server?.data).flatMap { data in
             try? JSONDecoder().decode(TransmissionServerSettings.self, from: data)
         }
-    }()
 
-    private lazy var keychain: TransmissionKeychainData? = {
-        return (server?.keychainData).flatMap { data in
+        let keychain = (server?.keychainData).flatMap { data in
             try? JSONDecoder().decode(TransmissionKeychainData.self, from: data)
         }
-    }()
 
-    private lazy var nameValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(server?.name)
-    }()
+        nameSubject = CurrentValueSubject(server?.name)
+        serverSubject = CurrentValueSubject(settings?.url.absoluteString)
+        usernameSubject = CurrentValueSubject(settings?.username)
+        passwordSubject = CurrentValueSubject(keychain?.password)
 
-    private lazy var nameEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var nameViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let nameEnabled = CurrentValueSubject<Bool, Never>(true)
+        let nameInput = DefaultTextInputTableViewCellViewModel(
             name: "name",
             placeholder: "Transmission",
-            value: nameValue,
+            value: nameSubject,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
             returnKeyType: .next
         )
-    }()
 
-    private lazy var serverValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.url.absoluteString)
-    }()
-
-    private lazy var serverEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var serverViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let serverEnabled = CurrentValueSubject<Bool, Never>(true)
+        let serverInput = DefaultTextInputTableViewCellViewModel(
             name: "server",
             placeholder: "https://example.com",
-            value: serverValue,
+            value: serverSubject,
             isEnabled: serverEnabled.eraseToAnyPublisher(),
             keyboardType: .URL,
             returnKeyType: .next,
@@ -68,80 +65,39 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
             autocorrectionType: .no,
             textContentType: .URL
         )
-    }()
 
-    private lazy var usernameValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(settings?.username)
-    }()
-
-    private lazy var usernameEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var usernameViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let usernameEnabled = CurrentValueSubject<Bool, Never>(true)
+        let usernameInput = DefaultTextInputTableViewCellViewModel(
             name: "username",
             placeholder: "user (optional)",
-            value: usernameValue,
+            value: usernameSubject,
             isEnabled: usernameEnabled.eraseToAnyPublisher(),
             returnKeyType: .next,
             autocapitalizationType: .none,
             autocorrectionType: .no
         )
-    }()
 
-    private lazy var passwordValue: CurrentValueSubject<String?, Never> = {
-        return CurrentValueSubject(keychain?.password)
-    }()
-
-    private lazy var passwordEnabled: CurrentValueSubject<Bool, Never> = {
-        return CurrentValueSubject(true)
-    }()
-
-    private lazy var passwordViewModel: DefaultTextInputTableViewCellViewModel = {
-        return DefaultTextInputTableViewCellViewModel(
+        let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
+        let passwordInput = DefaultTextInputTableViewCellViewModel(
             name: "password",
             placeholder: "password (optional)",
-            value: passwordValue,
+            value: passwordSubject,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
             isSecure: true,
             returnKeyType: .send
         )
-    }()
 
-    var events: AnyPublisher<ServerSettingsEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
-    }
+        state = ServerSettingsViewState(
+            title: server == nil ? "Add Server" : "Edit Server",
+            saveButtonTitle: server == nil ? "Add" : "Save",
+            canDelete: server != nil,
+            isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
+            isSaveButtonEnabled: isSaveButtonEnabledSubject.ui().eraseToAnyPublisher(),
+            inputs: [nameInput, serverInput, usernameInput, passwordInput]
+        )
 
-    var title: String {
-        return server == nil ? "Add Server" : "Edit Server"
-    }
-
-    var saveButtonTitle: String {
-        return server == nil ? "Add" : "Save"
-    }
-
-    var canDelete: Bool {
-        return server != nil
-    }
-
-    var isLoading: AnyPublisher<Bool, Never> {
-        return isLoadingSubject.ui().eraseToAnyPublisher()
-    }
-
-    var isSaveButtonEnabled: AnyPublisher<Bool, Never> {
-        return isSaveButtonEnabledSubject.ui().eraseToAnyPublisher()
-    }
-
-    var inputs: [TextInputTableViewCellViewModel] {
-        return [nameViewModel, serverViewModel, usernameViewModel, passwordViewModel]
-    }
-
-    init(preferences: Preferences, server: Server? = nil) {
-        self.preferences = preferences
-        self.server = server
-        nameValue
-            .combineLatest(serverValue)
+        nameSubject
+            .combineLatest(serverSubject)
             .map { name, server in
                 guard
                     let name = name,
@@ -165,16 +121,25 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         }
     }
 
-    func didSelectSave() {
+    func handle(_ event: ServerSettingsViewEvent) {
+        switch event {
+        case .save:
+            handleSave()
+        case let .delete(source):
+            handleDelete(source: source)
+        }
+    }
+
+    private func handleSave() {
         guard isSaveButtonEnabledSubject.value,
-            let name = nameValue.value,
-            let url = serverValue.value.flatMap({ URL(string: $0) })
+            let name = nameSubject.value,
+            let url = serverSubject.value.flatMap({ URL(string: $0) })
         else {
             return
         }
 
-        let username = usernameValue.value
-        let password = passwordValue.value
+        let username = nameSubject.value
+        let password = passwordSubject.value
 
         isLoadingSubject.send(true)
         let client = DefaultTransmissionClient(baseURL: url, username: username, password: password)
@@ -222,7 +187,7 @@ final class TransmissionSettingsViewModel: ServerSettingsViewModel {
         eventSubject.send(.complete)
     }
 
-    func didSelectDelete(from source: PopoverSource) {
+    private func handleDelete(source: PopoverSource) {
         guard let server = server else { return }
         var alert = Alert(title: nil, message: "Are you sure you want to delete this server?", style: .actionSheet)
         alert.addAction(AlertAction(title: "Delete Server", style: .destructive) {

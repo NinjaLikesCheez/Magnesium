@@ -119,13 +119,13 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
         case .refresh:
             handleRefresh()
         case let .moreOptions(source):
-            handleMoreOptions(from: source)
+            handleMoreOptions(source: source)
         case .pause:
             handlePause()
         case .resume:
             handleResume()
         case let .remove(source):
-            handleRemove(from: source)
+            handleRemove(source: source)
         }
     }
 
@@ -164,7 +164,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
             .store(in: &observers)
     }
 
-    private func handleMoreOptions(from source: PopoverSource) {
+    private func handleMoreOptions(source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
             self.recheck()
@@ -221,7 +221,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
             .store(in: &observers)
     }
 
-    private func handleRemove(from source: PopoverSource) {
+    private func handleRemove(source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: "Keep Data", style: .default) {
             self.remove(removeData: false)

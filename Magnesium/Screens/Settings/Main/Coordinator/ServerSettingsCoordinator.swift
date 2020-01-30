@@ -15,7 +15,7 @@ enum ServerSettingsCoordinatorEvent {
 }
 
 final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
-    private let viewController: ServerSettingsViewController
+    private let viewController: ServerSettingsViewController<AnyServerSettingsViewModel>
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
     let received: AnyPublisher<ServerSettingsEvent, Never>
     var observers = [AnyCancellable]()
@@ -30,12 +30,12 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     }
 
     init(server: Server, preferences: Preferences) {
-        let viewModel: ServerSettingsViewModel
+        let viewModel: AnyServerSettingsViewModel
         switch server.type {
         case .deluge:
-            viewModel = DelugeSettingsViewModel(preferences: preferences, server: server)
+            viewModel = AnyProducerViewModel(DelugeSettingsViewModel(preferences: preferences, server: server))
         case .transmission:
-            viewModel = TransmissionSettingsViewModel(preferences: preferences, server: server)
+            viewModel = AnyProducerViewModel(TransmissionSettingsViewModel(preferences: preferences, server: server))
         }
 
         viewController = ServerSettingsViewController(viewModel: viewModel)
@@ -43,12 +43,12 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     }
 
     init(type: ServerType, preferences: Preferences) {
-        let viewModel: ServerSettingsViewModel
+        let viewModel: AnyServerSettingsViewModel
         switch type {
         case .deluge:
-            viewModel = DelugeSettingsViewModel(preferences: preferences)
+            viewModel = AnyProducerViewModel(DelugeSettingsViewModel(preferences: preferences))
         case .transmission:
-            viewModel = TransmissionSettingsViewModel(preferences: preferences)
+            viewModel = AnyProducerViewModel(TransmissionSettingsViewModel(preferences: preferences))
         }
 
         received = viewModel.events
