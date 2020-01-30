@@ -10,7 +10,7 @@
 import XCTest
 
 class DelugeTorrentTests: XCTestCase {
-    func testCommonState() {
+    func test_commonState() {
         let pairs: [(DelugeTorrent.State, TorrentState)] = [
             (.downloading, .downloading),
             (.seeding, .seeding),

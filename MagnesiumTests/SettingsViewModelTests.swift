@@ -16,7 +16,7 @@ class SettingsViewModelTests: XCTestCase {
     private lazy var session = DefaultSession(preferences: preferences)
     private lazy var viewModel = SettingsViewModel(session: session, preferences: preferences)
 
-    func testSectionsUpdatedOnServersChanged() {
+    func test_sections_whenServersChanged_shouldEmit() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
@@ -25,7 +25,7 @@ class SettingsViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testSectionsUpdatedOnCurrentServerChanged() {
+    func test_sections_whenCurrentServerChanged_shouldEmit() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
@@ -34,7 +34,7 @@ class SettingsViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testCloseEmitsCompleteEvent() {
+    func test_close_shouldEmitCompleteEvent() {
         let expectation = self.expectation(description: "Value received")
         viewModel.events.first().sink {
             guard case .complete = $0 else {
@@ -47,7 +47,7 @@ class SettingsViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testChangeServerAlert() {
+    func test_changeServer_shouldEmitAlert() {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
@@ -67,7 +67,7 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
-    func testChangeServerUpdatesSession() {
+    func test_changeServer_whenServerSelected_shouldUpdateSession() {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
@@ -90,7 +90,7 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertNotEqual(session.server!.id, previousID)
     }
 
-    func testSelectServerEmitsEditEvent() {
+    func test_selectServer_shouldEmitEditEvent() {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
@@ -108,7 +108,7 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(server.id, server2.id)
     }
 
-    func testAddServerEmitsAddServerEvent() {
+    func test_addServer_shouldEmitAddServerEvent() {
         let expectation = self.expectation(description: "Value received")
         viewModel.events.first().sink {
             guard case .addServer = $0 else {

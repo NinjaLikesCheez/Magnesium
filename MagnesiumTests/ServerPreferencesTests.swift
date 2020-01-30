@@ -31,49 +31,45 @@ class ServerPreferencesTests: XCTestCase {
         SecItemDelete(query as CFDictionary)
     }
 
-    func testAddServer() {
+    func test_addOrUpdate_withNewServer() {
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         XCTAssertEqual(preferences.getServers()[0], server)
     }
 
-    func testRemoveServer() {
+    func test_removeServer() {
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         preferences.remove(server: server)
         XCTAssertEqual(preferences.getServers().count, 0)
     }
 
-    func testRemoveServers() {
+    func test_removeServers() {
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         preferences.removeServers()
         XCTAssertEqual(preferences.getServers().count, 0)
     }
 
-    func testServerIsNotDuplicated() {
+    func test_addOrUpdate_withExistingServer_shouldNotDuplicate() {
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(preferences.getServers().count, 1)
     }
 
-    func testServerUpdatedPublisher() {
+    func test_serverUpdatePublisher_withNewServer_shouldEmit() {
         let expectation = self.expectation(description: "Value received")
-        preferences.serverUpdatedPublisher(for: server)
-            .first()
-            .sink { updated in
-                XCTAssertEqual(updated, self.server)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        preferences.serverUpdatedPublisher(for: server).first().sink { updated in
+            XCTAssertEqual(updated, self.server)
+            expectation.fulfill()
+        }.store(in: &observers)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 0)
     }
 
-    func testServerUpdatedPublisherEmitsUpdatedServer() {
+    func test_serverUpdatedPublisher_withExistingServer_shouldEmitUpdatedServer() {
         preferences.addOrUpdate(server: server)
-
         let expectation = self.expectation(description: "Value received")
         preferences.serverUpdatedPublisher(for: server)
             .first()
@@ -89,30 +85,24 @@ class ServerPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testServerUpdatedPublisherNoValueWithSameServer() {
+    func test_serverUpdatedPublisher_withSameServer_shouldNotEmit() {
         preferences.addOrUpdate(server: server)
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
-        preferences.serverUpdatedPublisher(for: server)
-            .first()
-            .sink { _ in
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        preferences.serverUpdatedPublisher(for: server).first().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 0)
     }
 
-    func testServerUpdatedPublisherNilValueWithDeletedServer() {
+    func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() {
         preferences.addOrUpdate(server: server)
         let expectation = self.expectation(description: "Value received")
-        preferences.serverUpdatedPublisher(for: server)
-            .first()
-            .sink { updated in
-                XCTAssertNil(updated)
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        preferences.serverUpdatedPublisher(for: server).first().sink { updated in
+            XCTAssertNil(updated)
+            expectation.fulfill()
+        }.store(in: &observers)
         preferences.remove(server: server)
         waitForExpectations(timeout: 0)
     }
@@ -146,7 +136,7 @@ class ServerPreferencesTests: XCTestCase {
         return items.count
     }
 
-    func testKeychainPersistance() {
+    func test_addOrUpdate_withKeychainData_shouldPersistToKeychain() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
         let fetched = preferences.getServers().first!
@@ -154,7 +144,7 @@ class ServerPreferencesTests: XCTestCase {
         XCTAssertEqual(fetched.keychainData, server.keychainData)
     }
 
-    func testRemovesKeychainData() {
+    func test_removeServer_withKeychainData_shouldRemoveFromKeychain() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(getKeychainCount(), 1)
@@ -162,7 +152,7 @@ class ServerPreferencesTests: XCTestCase {
         XCTAssertEqual(getKeychainCount(), 0)
     }
 
-    func testRemoveServersRemovesKeychainData() {
+    func test_removeServers_shouldRemoveKeychainData() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(getKeychainCount(), 1)

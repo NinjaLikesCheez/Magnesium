@@ -156,7 +156,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             expectation.fulfill()
         }.store(in: &observers)
         viewModel.handle(.save)
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func test_save_withoutServer_shouldAddServer() throws {
@@ -233,7 +233,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             expectation.fulfill()
         }.store(in: &observers)
         viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 0)
     }
 
     func test_delete_withServer_shouldEmitAlert() {

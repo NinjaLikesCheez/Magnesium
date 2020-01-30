@@ -12,7 +12,7 @@ import CryptoKit
 import XCTest
 
 class TorrentSortTests: XCTestCase {
-    func testSortByName() {
+    func test_sort_withName() {
         let torrents = [
             MockTorrent(name: "B", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
             MockTorrent(name: "A", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
@@ -40,7 +40,7 @@ class TorrentSortTests: XCTestCase {
         XCTAssertEqual(sortedDescending, expectedDescending)
     }
 
-    func testSortByDateAdded() {
+    func test_sort_withDateAdded() {
         let date = Date()
         let torrents = [
             MockTorrent(name: "B", dateAdded: date.addingTimeInterval(1), downloadRate: 0, uploadRate: 0),
@@ -71,7 +71,7 @@ class TorrentSortTests: XCTestCase {
         XCTAssertEqual(sortedDescending, expectedDescending)
     }
 
-    func testSortByDownloadSpeed() {
+    func test_sort_withDownloadSpeed() {
         let torrents = [
             MockTorrent(name: "B", dateAdded: Date(), downloadRate: 1, uploadRate: 0),
             MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
@@ -101,7 +101,7 @@ class TorrentSortTests: XCTestCase {
         XCTAssertEqual(sortedDescending, expectedDescending)
     }
 
-    func testSortByUploadSpeed() {
+    func test_sort_withUploadSpeed() {
         let torrents = [
             MockTorrent(name: "B", dateAdded: Date(), downloadRate: 0, uploadRate: 1),
             MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),

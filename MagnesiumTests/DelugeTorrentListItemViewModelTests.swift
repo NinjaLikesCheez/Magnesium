@@ -15,7 +15,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
     private lazy var viewModel = DelugeTorrentListItemViewModel(subject: subject)
 
-    func testIdentity() {
+    func test_identity_shouldBeEqualToHash() {
         var torrent1 = DelugeTorrent.mock()
         torrent1.hash = "A"
 
@@ -34,7 +34,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         )
     }
 
-    func testName() {
+    func test_name() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.name.sink {
             XCTAssertEqual($0, "archlinux-2020.01.01-x86_64.iso")
@@ -43,7 +43,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testProgress() {
+    func test_progress() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.progress.sink {
             XCTAssertEqual($0, 0.189838)
@@ -52,7 +52,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testProgressColor() {
+    func test_progressColor() {
         let pairs: [(DelugeTorrent.State, UIColor)] = [
             (.downloading, TorrentState.downloading.displayColor),
             (.seeding, TorrentState.seeding.displayColor),
@@ -75,7 +75,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testState() {
+    func test_state() {
         let pairs: [(DelugeTorrent.State, String)] = [
             (.downloading, "Downloading"),
             (.seeding, "Seeding"),
@@ -98,26 +98,31 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testSpeed() {
+    func test_speed_whenDownloading_shouldContainDownloadAndUploadRate() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.speed.first().sink {
             XCTAssertEqual($0, "↓ 1.5 MB/s ↑ 454.3 KB/s")
             expectation.fulfill()
         }.store(in: &observers)
         waitForExpectations(timeout: 0)
+    }
 
-        let seedingExpectation = self.expectation(description: "Value received")
-        viewModel.state.speed.dropFirst().first().sink {
-            XCTAssertEqual($0, "↑ 454.3 KB/s")
-            seedingExpectation.fulfill()
-        }.store(in: &observers)
+    func test_speed_whenSeeding_shouldContainOnlyUploadRate() {
         var torrent = subject.value
         torrent.state = .seeding
         subject.send(torrent)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.speed.first().sink {
+            XCTAssertEqual($0, "↑ 454.3 KB/s")
+            expectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
+    }
 
-        let emptyStates: [DelugeTorrent.State] = [.paused, .checking, .queued, .error]
-        for state in emptyStates {
+    func test_speed_whenInactive_shouldBeEmpty() {
+        var torrent = subject.value
+        let state: [DelugeTorrent.State] = [.paused, .checking, .queued, .error]
+        for state in state {
             let expectation = self.expectation(description: "Value received")
             viewModel.state.speed.dropFirst().first().sink {
                 XCTAssertTrue($0.isEmpty)
@@ -129,7 +134,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testProgressString() {
+    func test_progressString() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.progressString.sink {
             XCTAssertEqual($0, "124.5 MB / 656.0 MB (19%)")
@@ -140,7 +145,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
 
     let ratioStates = [DelugeTorrent.State.seeding, .paused, .checking, .queued, .error]
 
-    func testRatio() {
+    func test_ratio() {
         var torrent = subject.value
         for state in ratioStates {
             let expectation = self.expectation(description: "Value received")
@@ -154,7 +159,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testInfiniteRatio() {
+    func test_ratio_whenInfinite_shouldFormatProperly() {
         var torrent = subject.value
         torrent.downloaded = 0
         for state in ratioStates {
@@ -169,7 +174,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testNanRatio() {
+    func test_ratio_whenNaN_shouldFormatProperly() {
         var torrent = subject.value
         torrent.downloaded = 0
         torrent.uploaded = 0
@@ -185,7 +190,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
     }
 
-    func testETA() {
+    func test_eta() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.ratioOrETA.first().sink {
             XCTAssertEqual($0, "6m 1s")
@@ -193,15 +198,17 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         }
         .store(in: &observers)
         waitForExpectations(timeout: 0)
+    }
 
-        let infiniteExpectation = self.expectation(description: "Value received")
-        viewModel.state.ratioOrETA.dropFirst().first().sink {
-            XCTAssertEqual($0, "∞")
-            infiniteExpectation.fulfill()
-        }.store(in: &observers)
+    func test_eta_whenZero_shouldFormatProperly() {
         var torrent = subject.value
         torrent.eta = 0
         subject.send(torrent)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.ratioOrETA.dropFirst().first().sink {
+            XCTAssertEqual($0, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
     }
 }

@@ -16,17 +16,15 @@ class DefaultSessionTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private lazy var session: Session = DefaultSession(preferences: preferences)
 
-    func testServerPublisherHasInitialValue() {
+    func test_serverPublisher_shouldHaveInitialValue() {
         let expectation = self.expectation(description: "Value received")
-        session.serverPublisher
-            .sink { _ in
-                expectation.fulfill()
-            }
-            .store(in: &observers)
+        session.serverPublisher.sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
         waitForExpectations(timeout: 0)
     }
 
-    func testServerPublisherEmitsOnAddFirstServer() {
+    func test_serverPublisher_whenFirstServerAdded_shouldEmit() {
         let server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         let expectation = self.expectation(description: "Value received")
         session.serverPublisher.dropFirst().sink { new in
@@ -38,7 +36,7 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testServerPublisherEmitsOnUpdateServer() {
+    func test_serverPublisher_whenServerUpdated_shouldEmit() {
         var server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server)
 
@@ -54,7 +52,7 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testServerPublisherEmitsNextServerOnDelete() {
+    func test_serverPublisher_whenServerDeleted_shouldEmitNextServer() {
         let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
@@ -71,7 +69,7 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testServerPublisherDoesNotEmitOnPreferenceChange() throws {
+    func test_serverPublisher_whenPreferencesChanged_shouldNotEmit() throws {
         let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
@@ -88,7 +86,7 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testServerPublisherEmitsOnServerChange() throws {
+    func test_serverPublisher_whenServerChanged_shouldEmit() throws {
         let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)

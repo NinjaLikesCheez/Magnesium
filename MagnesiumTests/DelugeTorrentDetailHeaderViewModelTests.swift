@@ -15,7 +15,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
     private lazy var viewModel = DelugeTorrentDetailHeaderViewModel(subject: subject)
 
-    func testName() {
+    func test_name() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.name.sink {
             XCTAssertEqual($0, "archlinux-2020.01.01-x86_64.iso")
@@ -24,7 +24,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testActiveStates() {
+    func test_isActive_withActiveStates_shouldBeTrue() {
         var torrent = subject.value
         for state in [DelugeTorrent.State.downloading, .seeding] {
             var isActive: Bool!
@@ -35,7 +35,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         }
     }
 
-    func testInactiveStates() {
+    func test_isActive_withInactiveState_shouldBeFalse() {
         var torrent = subject.value
         for state in [DelugeTorrent.State.paused, .checking, .queued, .error] {
             var isActive: Bool!
@@ -46,7 +46,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         }
     }
 
-    func testProgress() {
+    func test_progress() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.progress.sink {
             XCTAssertEqual($0, 0.189838)
@@ -55,7 +55,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testProgressColor() {
+    func test_progressColor() {
         let pairs: [(DelugeTorrent.State, UIColor)] = [
             (.downloading, TorrentState.downloading.displayColor),
             (.seeding, TorrentState.seeding.displayColor),
@@ -78,7 +78,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         }
     }
 
-    func testStatus() {
+    func test_status() {
         let pairs: [(DelugeTorrent.State, String)] = [
             (.downloading, "Downloading"),
             (.seeding, "Seeding"),

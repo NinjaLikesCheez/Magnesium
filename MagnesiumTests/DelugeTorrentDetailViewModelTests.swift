@@ -29,10 +29,10 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         )
     }
 
-    func testNoAutoUpdateIfNotDidAppear() throws {
+    func test_autoUpdate_whenNotAppeared_shouldNotFire() throws {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
-        let expectation = self.expectation(description: "Update")
+        let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
             expectation.fulfill()
@@ -40,53 +40,46 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1.2)
     }
 
-    func testAutoUpdate() throws {
+    func test_autoUpdate_whenAppeared_shouldFire() throws {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
-
-        let firstCheck = expectation(description: "First check")
+        let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
-            firstCheck.fulfill()
+            expectation.fulfill()
         }
-        waitForExpectations(timeout: 1.1)
+        waitForExpectations(timeout: 1.2)
+    }
 
+    func test_autoUpdate_whenDisappeared_shouldNotFire() throws {
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        client.requests.reset()
+        viewModel.handle(.appear)
         viewModel.handle(.disappear)
-
-        let secondCheck = expectation(description: "Second check")
+        let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
-            secondCheck.fulfill()
+            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
+            expectation.fulfill()
         }
         waitForExpectations(timeout: 1.2)
     }
 
-    func testAutoUpdateStopsWhenDisabled() throws {
+    func test_autoUpdate_whenPreferenceDisabled_shouldNotFire() throws {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
-
-        let firstCheck = expectation(description: "First check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
-            firstCheck.fulfill()
-        }
-        waitForExpectations(timeout: 1.2)
-
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
-
-        let secondCheck = expectation(description: "Second check")
+        let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
-            secondCheck.fulfill()
+            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
+            expectation.fulfill()
         }
         waitForExpectations(timeout: 1.2)
     }
 
-    func testRefreshError() {
+    func test_refresh_whenFails_shouldShowError() {
         client.errors.torrentFiles = true
-
         var alert: Alert?
         viewModel.events.first().sink {
             guard case let .alert(inner, source: _) = $0 else {
@@ -95,12 +88,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-
         viewModel.handle(.refresh)
         XCTAssertEqual(alert?.title, "Update Failed")
     }
 
-    func testHasHeader() {
+    func test_sections_shouldHaveHeader() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let section = sections[0]
@@ -131,7 +123,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }
     }
 
-    func testInfoRows() {
+    func test_sections_shouldHaveInfoRows() {
         let expected: [(String, String)] = [
             ("Size", "656.0 MB"),
             ("Download Speed", "1.5 MB/s"),
@@ -153,7 +145,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func testInfiniteETA() {
+    func test_eta_whenZero_shouldFormatProperly() {
         var torrent = subject.value
         torrent.eta = 0
         subject.send(torrent)
@@ -167,7 +159,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func testInfiniteRatio() {
+    func test_ratio_whenInfinite_shouldFormatProperly() {
         var torrent = subject.value
         torrent.downloaded = 0
         subject.send(torrent)
@@ -181,7 +173,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func testNanRatio() {
+    func test_ratio_whenNaN_shouldFormatProperly() {
         var torrent = subject.value
         torrent.downloaded = 0
         torrent.uploaded = 0
@@ -196,7 +188,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func testTrackers() {
+    func test_sections_shouldHaveTrackers() {
         let expected = ["udp://tracker.archlinux.org:6969", "http://tracker.archlinux.org:6969/announce"]
 
         let expectation = self.expectation(description: "Value received")
@@ -220,7 +212,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func testFilesSorted() {
+    func test_files_shouldBeSorted() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let section = sections[3]
@@ -241,7 +233,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func testMoreOptionsAlert() {
+    func test_moreOptions_shouldEmitAlert() {
         var alert: Alert?
         viewModel.events.first().sink {
             guard case let .alert(inner, source: _) = $0 else {
@@ -250,15 +242,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let expected = ["Force Recheck", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
-    func testForceRecheck() {
+    func test_forceRecheck_shouldPerformRequestAndRefresh() {
         client.requests.reset()
-
         var alert: Alert?
         viewModel.events.first().sink {
             guard case let .alert(inner, source: _) = $0 else {
@@ -267,14 +257,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             alert = inner
         }.store(in: &observers)
-
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let recheck = alert!.actions[0].handler!
         recheck()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
     }
 
-    func testForceRecheckError() {
+    func test_forceRecheck_whenFails_shouldEmitAlert() {
         client.errors.recheck = true
         client.requests.reset()
 
@@ -302,13 +291,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
 
-    func testPause() {
+    func test_pause_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.pause)
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, pause: 1))
     }
 
-    func testPauseError() {
+    func test_pause_whenFails_shouldEmitAlert() {
         client.errors.pause = true
         client.requests.reset()
 
@@ -326,13 +315,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
 
-    func testResume() {
+    func test_resume_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.resume)
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, resume: 1))
     }
 
-    func testResumeError() {
+    func test_resume_whenFails_shouldPerformRequest() {
         client.errors.resume = true
         client.requests.reset()
 
@@ -350,7 +339,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
 
-    func testRemoveAlert() {
+    func test_remove_shouldEmitAlert() {
         client.requests.reset()
 
         var alert: Alert?
@@ -367,7 +356,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
-    func testRemoveKeepData() {
+    func test_removeKeepData_shouldPerformRequestAndRefresh() {
         client.requests.reset()
 
         var alert: Alert?
@@ -394,7 +383,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }
     }
 
-    func testRemoveKeepDataError() {
+    func test_removeKeepData_whenFails_shouldEmitAlert() {
         client.errors.removeKeepData = true
         client.requests.reset()
 
@@ -422,7 +411,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests())
     }
 
-    func testRemoveWithData() {
+    func test_removeWithData_shouldPerformRequestAndRefresh() {
         client.requests.reset()
 
         var alert: Alert?
@@ -440,7 +429,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
     }
 
-    func testRemoveWithDataError() {
+    func test_removeWithData_whenFails_shouldEmitAlert() {
         client.errors.removeWithData = true
         client.requests.reset()
 

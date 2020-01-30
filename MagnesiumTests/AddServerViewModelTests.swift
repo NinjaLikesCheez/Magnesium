@@ -14,11 +14,11 @@ class AddServerViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private let viewModel = AddServerViewModel()
 
-    func testTypes() {
+    func test_types() {
         XCTAssertEqual(viewModel.state.types, ["Deluge", "Transmission"])
     }
 
-    func testSelectDelugeEvent() {
+    func test_select_withDeluge_shouldEmitDelugeSelectType() {
         var type: ServerType!
         viewModel.events.first().sink {
             guard case let .add(inner) = $0 else {
@@ -31,7 +31,7 @@ class AddServerViewModelTests: XCTestCase {
         XCTAssertEqual(type, ServerType.deluge)
     }
 
-    func testSelectTransmissionEvent() {
+    func test_select_withTransmission_shouldEmitTransmissionSelectType() {
         var type: ServerType!
         viewModel.events.first().sink {
             guard case let .add(inner) = $0 else {
