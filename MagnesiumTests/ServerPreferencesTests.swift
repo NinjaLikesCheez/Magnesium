@@ -18,12 +18,17 @@ class ServerPreferencesTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        preferences.removeServers()
+        clearKeychain()
     }
 
     override func tearDown() {
         super.tearDown()
-        preferences.removeServers()
+        clearKeychain()
+    }
+
+    private func clearKeychain() {
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword]
+        SecItemDelete(query as CFDictionary)
     }
 
     func testAddServer() {

@@ -167,7 +167,7 @@ extension Preferences {
     func removeServers() {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "servers" as String,
+            kSecAttrService as String: "servers",
         ]
         let status = SecItemDelete(query as CFDictionary)
         if status != errSecSuccess, status != errSecItemNotFound {
