@@ -205,7 +205,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
         torrent.eta = 0
         subject.send(torrent)
         let expectation = self.expectation(description: "Value received")
-        viewModel.state.ratioOrETA.dropFirst().first().sink {
+        viewModel.state.ratioOrETA.first().sink {
             XCTAssertEqual($0, "∞")
             expectation.fulfill()
         }.store(in: &observers)
