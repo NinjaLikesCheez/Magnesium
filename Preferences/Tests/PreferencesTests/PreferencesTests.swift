@@ -79,7 +79,7 @@ class UserDefaultPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_valuePublisher_shouldEmitNewValues() {
+    func test_valuePublisher_shouldEmitNewValues() throws {
         let expectation = self.expectation(description: "Value received")
         preferenceManager.valuePublisher(for: key).dropFirst().first().sink { value in
             XCTAssertEqual(value, "New")

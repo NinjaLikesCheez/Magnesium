@@ -60,35 +60,30 @@ final class DelugeSettingsViewModel: ViewModel, EventProducer {
         passwordSubject = CurrentValueSubject(keychain?.password)
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
-        let nameInput = DefaultTextInputTableViewCellViewModel(
+        let nameInput = TextInputTableViewCellViewState(
             name: "name",
             placeholder: "Deluge",
             value: nameSubject,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
-            returnKeyType: .next
+            configuration: TextInputConfiguration.default.withReturnKeyType(.next)
         )
 
         let serverEnabled = CurrentValueSubject<Bool, Never>(true)
-        let serverInput = DefaultTextInputTableViewCellViewModel(
+        let serverInput = TextInputTableViewCellViewState(
             name: "server",
             placeholder: "https://example.com",
             value: serverSubject,
             isEnabled: serverEnabled.eraseToAnyPublisher(),
-            keyboardType: .URL,
-            returnKeyType: .next,
-            autocapitalizationType: .none,
-            autocorrectionType: .no,
-            textContentType: .URL
+            configuration: TextInputConfiguration.url.withReturnKeyType(.next)
         )
 
         let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
-        let passwordInput = DefaultTextInputTableViewCellViewModel(
+        let passwordInput = TextInputTableViewCellViewState(
             name: "password",
             placeholder: "password",
             value: passwordSubject,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
-            isSecure: true,
-            returnKeyType: .send
+            configuration: TextInputConfiguration.password.withReturnKeyType(.send)
         )
 
         state = ServerSettingsViewState(

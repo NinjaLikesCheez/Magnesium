@@ -31,5 +31,5 @@ struct ServerSettingsViewState {
     var canDelete: Bool
     var isLoading: AnyPublisher<Bool, Never>
     var isSaveButtonEnabled: AnyPublisher<Bool, Never>
-    var inputs: [TextInputTableViewCellViewModel]
+    var inputs: [TextInputTableViewCellViewState]
 }

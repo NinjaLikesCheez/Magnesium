@@ -9,28 +9,46 @@
 import Combine
 import UIKit
 
-protocol TextInputTableViewCellViewModel {
-    var name: String { get }
-    var placeholder: String { get }
-    var value: CurrentValueSubject<String?, Never> { get }
-    var isEnabled: AnyPublisher<Bool, Never> { get }
-    var isSecure: Bool { get }
-    var keyboardType: UIKeyboardType { get }
-    var returnKeyType: UIReturnKeyType { get }
-    var autocapitalizationType: UITextAutocapitalizationType { get }
-    var autocorrectionType: UITextAutocorrectionType { get }
-    var textContentType: UITextContentType? { get }
-}
-
-struct DefaultTextInputTableViewCellViewModel: TextInputTableViewCellViewModel {
+struct TextInputTableViewCellViewState {
     var name: String
     var placeholder: String
     var value: CurrentValueSubject<String?, Never>
     var isEnabled: AnyPublisher<Bool, Never> = Just(true).eraseToAnyPublisher()
+    var configuration: TextInputConfiguration
+}
+
+struct TextInputConfiguration {
     var isSecure: Bool = false
     var keyboardType: UIKeyboardType = .default
     var returnKeyType: UIReturnKeyType = .default
     var autocapitalizationType: UITextAutocapitalizationType = .sentences
     var autocorrectionType: UITextAutocorrectionType = .default
     var textContentType: UITextContentType?
+
+    static let `default` = TextInputConfiguration()
+
+    static let url = TextInputConfiguration(
+        keyboardType: .URL,
+        autocapitalizationType: .none,
+        autocorrectionType: .no,
+        textContentType: .URL
+    )
+
+    static let username = TextInputConfiguration(
+        returnKeyType: .next,
+        autocapitalizationType: .none,
+        autocorrectionType: .no,
+        textContentType: .username
+    )
+
+    static let password = TextInputConfiguration(
+        isSecure: true,
+        textContentType: .password
+    )
+
+    func withReturnKeyType(_ returnKeyType: UIReturnKeyType) -> TextInputConfiguration {
+        var configuration = self
+        configuration.returnKeyType = returnKeyType
+        return configuration
+    }
 }

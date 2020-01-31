@@ -78,23 +78,27 @@ final class TextInputTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with viewModel: TextInputTableViewCellViewModel) {
-        nameLabel.text = viewModel.name
-        textField.placeholder = viewModel.placeholder
-        textField.isSecureTextEntry = viewModel.isSecure
-        textField.keyboardType = viewModel.keyboardType
-        textField.returnKeyType = viewModel.returnKeyType
-        textField.autocapitalizationType = viewModel.autocapitalizationType
-        textField.autocorrectionType = viewModel.autocorrectionType
-        textField.textContentType = viewModel.textContentType
-        viewModel.value
+    func configure(with state: TextInputTableViewCellViewState) {
+        nameLabel.text = state.name
+        textField.placeholder = state.placeholder
+        apply(configuration: state.configuration)
+        state.value
             .filter { [weak textField] in textField?.text != $0 }
             .assign(to: \.text, on: textField)
             .store(in: &observers)
-        valueSubject = viewModel.value
-        viewModel.isEnabled
+        valueSubject = state.value
+        state.isEnabled
             .assign(to: \.isEnabled, on: textField)
             .store(in: &observers)
+    }
+
+    private func apply(configuration: TextInputConfiguration) {
+        textField.isSecureTextEntry = configuration.isSecure
+        textField.keyboardType = configuration.keyboardType
+        textField.returnKeyType = configuration.returnKeyType
+        textField.autocapitalizationType = configuration.autocapitalizationType
+        textField.autocorrectionType = configuration.autocorrectionType
+        textField.textContentType = configuration.textContentType
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -121,7 +125,7 @@ extension TextInputTableViewCell: UITextFieldDelegate {
 #if DEBUG
     struct TextInputTableViewCell_Previews: PreviewProvider {
         private struct Container: UIViewRepresentable {
-            let viewModel: TextInputTableViewCellViewModel
+            let state: TextInputTableViewCellViewState
 
             func makeUIView(
                 context: UIViewRepresentableContext<Container>
@@ -135,51 +139,44 @@ extension TextInputTableViewCell: UITextFieldDelegate {
             ) {
                 uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
                 uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: viewModel)
+                uiView.inner.configure(with: state)
             }
         }
 
         static var previews: some View {
-            let emptyViewModel = DefaultTextInputTableViewCellViewModel(
+            let emptyState = TextInputTableViewCellViewState(
                 name: "server",
                 placeholder: "https://example.com",
                 value: CurrentValueSubject(nil),
-                isSecure: false
+                configuration: .url
             )
-            let textViewModel = DefaultTextInputTableViewCellViewModel(
+            let textState = TextInputTableViewCellViewState(
                 name: "server",
                 placeholder: "https://example.com",
                 value: CurrentValueSubject("https://example.com"),
-                isSecure: false
+                configuration: .url
             )
-            let secureViewModel = DefaultTextInputTableViewCellViewModel(
+            let secureState = TextInputTableViewCellViewState(
                 name: "password",
                 placeholder: "password",
                 value: CurrentValueSubject("password"),
-                isSecure: true
+                configuration: .password
             )
-            return Group {
-                Container(viewModel: emptyViewModel)
-                    .previewDisplayName("Light - No Text")
-                    .previewLayout(.sizeThatFits)
-                Container(viewModel: textViewModel)
-                    .previewDisplayName("Light - Text")
-                    .previewLayout(.sizeThatFits)
-                Container(viewModel: secureViewModel)
-                    .previewDisplayName("Light - Secure")
-                    .previewLayout(.sizeThatFits)
-                Container(viewModel: emptyViewModel)
-                    .previewDisplayName("Dark - No Text")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
-                Container(viewModel: textViewModel)
-                    .previewDisplayName("Dark - Text")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
-                Container(viewModel: secureViewModel)
-                    .previewDisplayName("Dark - Secure")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
+            return ForEach(ColorScheme.allCases, id: \.self) { colorScheme in
+                Group {
+                    Container(state: emptyState)
+                        .previewDisplayName("Empty")
+                        .previewLayout(.sizeThatFits)
+                        .environment(\.colorScheme, colorScheme)
+                    Container(state: textState)
+                        .previewDisplayName("Text")
+                        .previewLayout(.sizeThatFits)
+                        .environment(\.colorScheme, colorScheme)
+                    Container(state: secureState)
+                        .previewDisplayName("Secure")
+                        .previewLayout(.sizeThatFits)
+                        .environment(\.colorScheme, colorScheme)
+                }
             }
         }
     }
