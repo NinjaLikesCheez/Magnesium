@@ -68,9 +68,16 @@ extension Preferences {
     }
 
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
-        return valueUpdatedPublisher(for: PreferenceKeys.servers)
-            .map { servers -> Server? in
-                servers?.first { $0.id == server.id }
+        return preferenceChanged
+            .filter { $0.key.value == PreferenceKeys.servers.value }
+            .map { change -> Server? in
+                switch change.type {
+                case let .updated(value):
+                    let servers = value as? [Server]
+                    return servers?.first { $0.id == server.id }
+                case .deleted:
+                    return nil
+                }
             }
             .prepend(getServers().first { $0.id == server.id })
             .removeDuplicates()

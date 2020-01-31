@@ -11,7 +11,7 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class DelugeTorrentDetailViewModel: ViewModel, EventProducer {
+final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     private let client: DelugeClient
     private let preferences: Preferences
     private let refresher: DelugeRefreshable

@@ -81,9 +81,8 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 
     func configure(name: String, value: AnyPublisher<String, Never>, isLastRow: Bool) {
         nameLabel.text = name
-        // swiftlint:disable:next array_init
         value
-            .map { text -> String? in text }
+            .asOptional()
             .assign(to: \.text, on: valueLabel)
             .store(in: &observers)
         separatorView.isHidden = isLastRow

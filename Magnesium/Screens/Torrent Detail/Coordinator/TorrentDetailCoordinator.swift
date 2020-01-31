@@ -14,7 +14,7 @@ enum TorrentDetailCoordinatorEvent {
     case complete
 }
 
-final class TorrentDetailCoordinator<VM: ViewModel & EventProducer>: Coordinator, AlertPresenter
+final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator, AlertPresenter
     where
     VM.Event == TorrentDetailEvent,
     VM.ViewEvent == TorrentDetailViewEvent,

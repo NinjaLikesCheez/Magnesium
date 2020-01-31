@@ -13,17 +13,12 @@ import UIKit
 
 final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
+    private let preferences = UserDefaultsPreferences()
     private lazy var session: Session = DefaultSession(preferences: preferences)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
-
-    private var preferences: Preferences = {
-        let preferences = UserDefaultsPreferences()
-        _ = try? preferences.registerDefault(2, for: PreferenceKeys.autoRefreshInterval)
-        return preferences
-    }()
 
     private lazy var splitViewController: PresentableSplitViewController = {
         let splitViewController = PresentableSplitViewController()

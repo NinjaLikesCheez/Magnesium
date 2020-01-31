@@ -3,18 +3,12 @@ import Combine
 /// A type that is able to store preferences.
 public protocol Preferences {
     /// A publisher which emits values when a preference is changed.
-    var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> { get }
-
-    /// Registers a default value for a preference.
-    /// - Parameters:
-    ///   - value: The default value for the preference.
-    ///   - key: The preference key.
-    func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws
+    var preferenceChanged: AnyPublisher<PreferenceChange, Never> { get }
 
     /// Retrieves the value for a preference.
     /// - Parameter key: The preference key.
     /// - Returns: The preference's value.
-    func value<T>(for key: PreferenceKey<T>) throws -> T?
+    func value<T>(for key: PreferenceKey<T>) throws -> T
 
     /// Sets a preference's value.
     /// - Parameters:
@@ -35,19 +29,36 @@ public protocol Preferences {
 public extension Preferences {
     /// Returns a publisher that emits values when a preference is changed.
     /// - Parameter key: The preference key to observe.
-    func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
-        return valueUpdated
-            .filter { $0.0.value == key.value }
-            .map { $0.1 as? T }
+    func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T, Never> {
+        let preferenceChanged = self.preferenceChanged
+            .filter { $0.key.value == key.value }
+            .share()
+        let deleted = preferenceChanged.first {
+            if case .deleted = $0.type {
+                return true
+            } else {
+                return false
+            }
+        }
+        return preferenceChanged
+            .prefix(untilOutputFrom: deleted)
+            .compactMap {
+                switch $0.type {
+                case let .updated(value):
+                    return value as? T ?? key.defaultValue
+                case .deleted:
+                    return nil
+                }
+            }
             .eraseToAnyPublisher()
     }
 
     /// Returns a publisher that emits the current preference value and new values when the preference is
     /// changed.
     /// - Parameter key: The preference key to observe.
-    func valuePublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T?, Never> {
+    func valuePublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T, Never> {
         return valueUpdatedPublisher(for: key)
-            .prepend(try? value(for: key))
+            .prepend((try? value(for: key)) ?? key.defaultValue)
             .eraseToAnyPublisher()
     }
 }

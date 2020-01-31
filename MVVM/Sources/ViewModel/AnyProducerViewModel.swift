@@ -1,7 +1,7 @@
 import Combine
 
-/// A type erased wrapper for a type that is both a `ViewModel` and `EventProducer`.
-public class AnyProducerViewModel<Event, ViewEvent, ViewState>: ViewModel, EventProducer {
+/// A type erased wrapper for a type that is both a `ViewModel` and `EventEmitter`.
+public class AnyEmitterViewModel<Event, ViewEvent, ViewState>: ViewModel, EventEmitter {
     private let _events: () -> AnyPublisher<Event, Never>
     private let _state: () -> ViewState
     private let _handle: (ViewEvent) -> Void
@@ -9,7 +9,7 @@ public class AnyProducerViewModel<Event, ViewEvent, ViewState>: ViewModel, Event
     public var state: ViewState { _state() }
     public var events: AnyPublisher<Event, Never> { _events() }
 
-    public init<Base: ViewModel & EventProducer>(
+    public init<Base: ViewModel & EventEmitter>(
         _ base: Base
     ) where Base.Event == Event, Base.ViewEvent == ViewEvent, Base.ViewState == ViewState {
         self.base = base

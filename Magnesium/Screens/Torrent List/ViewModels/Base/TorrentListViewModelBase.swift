@@ -9,20 +9,22 @@
 import Combine
 import ViewModel
 
-typealias AnyTorrentListViewModel = AnyProducerViewModel<TorrentListEvent, TorrentListViewEvent, TorrentListViewState>
+typealias AnyTorrentListViewModel = AnyEmitterViewModel<TorrentListEvent, TorrentListViewEvent, TorrentListViewState>
 
 enum TorrentListEvent {
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
+    case filter(source: PopoverSource)
     case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
     case alert(Alert, source: PopoverSource?)
 }
 
 enum TorrentListViewEvent {
-    case add(source: PopoverSource)
     case refresh
-    case selectItem(index: Int)
-    case settings
+    case addSelected(source: PopoverSource)
+    case filterSelected(source: PopoverSource)
+    case itemSelected(index: Int)
+    case settingsSelected
 }
 
 struct TorrentListViewState {

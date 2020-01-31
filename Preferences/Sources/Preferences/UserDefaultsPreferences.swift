@@ -4,9 +4,9 @@ import Foundation
 /// A `Preferences` implementation that uses `UserDefaults`.
 public final class UserDefaultsPreferences: Preferences {
     private let userDefaults: UserDefaults
-    private let valueUpdatedSubject = PassthroughSubject<(AnyPreferenceKey, Any?), Never>()
+    private let valueUpdatedSubject = PassthroughSubject<PreferenceChange, Never>()
 
-    public var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
+    public var preferenceChanged: AnyPublisher<PreferenceChange, Never> {
         return valueUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -33,22 +33,18 @@ public final class UserDefaultsPreferences: Preferences {
         return try PropertyListEncoder().encode(value)
     }
 
-    public func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) throws {
-        userDefaults.register(defaults: [key.value: try encode(value)])
-    }
-
-    public func value<T>(for key: PreferenceKey<T>) throws -> T? {
+    public func value<T>(for key: PreferenceKey<T>) throws -> T {
         if isNativeType(T.self) {
-            return userDefaults.value(forKey: key.value) as? T
+            return userDefaults.value(forKey: key.value) as? T ?? key.defaultValue
         } else {
-            guard let data = userDefaults.data(forKey: key.value) else { return nil }
+            guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
             return try PropertyListDecoder().decode(T.self, from: data)
         }
     }
 
     public func set<T>(_ value: T, for key: PreferenceKey<T>) throws {
         userDefaults.set(try encode(value), forKey: key.value)
-        valueUpdatedSubject.send((AnyPreferenceKey(key.value), value))
+        valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .updated(value)))
     }
 
     public func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
@@ -57,6 +53,6 @@ public final class UserDefaultsPreferences: Preferences {
 
     public func removeValue<T>(for key: PreferenceKey<T>) {
         userDefaults.removeObject(forKey: key.value)
-        valueUpdatedSubject.send((AnyPreferenceKey(key.value), nil))
+        valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .deleted))
     }
 }

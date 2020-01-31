@@ -4,8 +4,7 @@ import XCTest
 
 class UserDefaultPreferencesTests: XCTestCase {
     private let preferenceManager = UserDefaultsPreferences()
-    private let key = PreferenceKey<String>("_test")
-    private let keyWithDefault = PreferenceKey<String>("_testDefault")
+    private let key = PreferenceKey<String>("_test", defaultValue: "Default")
     private var observers = [AnyCancellable]()
 
     override func setUp() {
@@ -18,15 +17,8 @@ class UserDefaultPreferencesTests: XCTestCase {
         preferenceManager.removeValue(for: key)
     }
 
-    func test_registerDefault_shouldRegisterDefaultValue() throws {
-        try preferenceManager.registerDefault("Value", for: keyWithDefault)
-        XCTAssertEqual(try preferenceManager.value(for: keyWithDefault), "Value")
-    }
-
-    func tests_registerDefault_withCodable_shouldRegisterDefaultValue() throws {
-        let keyWithDefault = PreferenceKey<MockCodable>(self.keyWithDefault.value)
-        try preferenceManager.registerDefault(MockCodable(name: "Codable"), for: keyWithDefault)
-        XCTAssertEqual(try preferenceManager.value(for: keyWithDefault)?.name, "Codable")
+    func test_value_shouldReturnDefault() throws {
+        XCTAssertEqual(try preferenceManager.value(for: key), "Default")
     }
 
     func test_set_shouldPersistValue() throws {
@@ -36,11 +28,15 @@ class UserDefaultPreferencesTests: XCTestCase {
         XCTAssertEqual(try newPreferenceManager.value(for: key), "Value")
     }
 
-    func test_valueUpdated_whenValueChanged_shouldEmitNewValue() throws {
+    func test_preferenceChanged_whenPreferenceChanged_shouldEmitNewValue() throws {
         let expectation = self.expectation(description: "Value received")
-        preferenceManager.valueUpdated.sink { anyKey, value in
-            XCTAssertEqual(anyKey.value, self.key.value)
-            XCTAssertEqual(value as? String, "Value")
+        preferenceManager.preferenceChanged.first().sink { change in
+            XCTAssertEqual(change.key.value, self.key.value)
+            if case let .updated(value) = change.type {
+                XCTAssertEqual(value as? String, "Value")
+            } else {
+                XCTFail("Expected change")
+            }
             expectation.fulfill()
         }.store(in: &observers)
         try preferenceManager.set("Value", for: key)
@@ -57,13 +53,12 @@ class UserDefaultPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_valueUpdatedPublisher_whenValueRemoved_shouldEmitNil() throws {
+    func test_valueUpdatedPublisher_whenValueRemoved_shouldEmitCompletion() throws {
         let expectation = self.expectation(description: "Value received")
         preferenceManager.valueUpdatedPublisher(for: key)
-            .sink { value in
-                XCTAssertNil(value)
+            .sink(receiveCompletion: { _ in
                 expectation.fulfill()
-            }
+            }, receiveValue: { _ in })
             .store(in: &observers)
         preferenceManager.removeValue(for: key)
         waitForExpectations(timeout: 0)
@@ -100,13 +95,13 @@ class UserDefaultPreferencesTests: XCTestCase {
         try preferenceManager.set("Value", for: key)
         XCTAssertEqual(try preferenceManager.value(for: key), "Value")
         preferenceManager.removeValue(for: key)
-        XCTAssertNil(try preferenceManager.value(for: key))
+        XCTAssertEqual(try preferenceManager.value(for: key), "Default")
     }
 
     func test_set_withCodable_shouldPersist() throws {
-        let key = PreferenceKey<MockCodable>(self.key.value)
+        let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: ""))
         try preferenceManager.set(MockCodable(name: "Codable"), for: key)
-        XCTAssertEqual(try preferenceManager.value(for: key)?.name, "Codable")
+        XCTAssertEqual(try preferenceManager.value(for: key).name, "Codable")
     }
 }
 

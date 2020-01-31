@@ -63,7 +63,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     func test_add_shouldEmitAddEvent() {
         var event: TorrentListEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.add(source: .view(UIView(), rect: .zero)))
+        viewModel.handle(.addSelected(source: .view(UIView(), rect: .zero)))
         guard case .add = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -114,7 +114,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     func test_selectItem_shouldEmitDetailEvent() {
         var event: TorrentListEvent!
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.selectItem(index: 0))
+        viewModel.handle(.itemSelected(index: 0))
         guard case .detail = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

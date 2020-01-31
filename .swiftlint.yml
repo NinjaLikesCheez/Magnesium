@@ -1,7 +1,7 @@
 included:
   - Magnesium
   - MagnesiumTests
-  - Coordinator
+  - MVVM
   - Preferences
   - Deluge
   - Transmission

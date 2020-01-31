@@ -55,13 +55,7 @@ public extension Coordinator {
     /// Adds a child coordinator and automatically removes it when its presentable is dismissed.
     /// - Parameter coordinator: The child coordinator to add.
     func addChildCoordinator<C: Coordinator>(_ coordinator: C) where C.Event == Never {
-        childCoordinators[ObjectIdentifier(coordinator)] = AnyCoordinator(coordinator)
-        coordinator.presentable.didDismiss
-            .sink(receiveCompletion: { [weak self, weak coordinator] _ in
-                guard let coordinator = coordinator else { return }
-                self?.removeChildCoordinator(coordinator)
-            }, receiveValue: { _ in })
-            .store(in: &observers)
+        addChildCoordinator(coordinator, eventHandler: { _, _ in })
     }
 
     /// Removes a child coordinator.

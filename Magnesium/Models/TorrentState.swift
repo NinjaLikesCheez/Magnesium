@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum TorrentState: Equatable, CaseIterable {
+enum TorrentState: String, Codable, Equatable, CaseIterable {
     case downloading
     case seeding
     case paused

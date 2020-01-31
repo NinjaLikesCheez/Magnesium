@@ -179,9 +179,8 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     func configure(with state: TorrentDetailHeaderViewState) {
-        // swiftlint:disable array_init
         state.name
-            .map { text -> String? in text }
+            .asOptional()
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
@@ -194,15 +193,14 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &observers)
 
         state.progressColor
-            .map { color -> UIColor? in color }
+            .asOptional()
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
         state.status
-            .map { text -> String? in text }
+            .asOptional()
             .assign(to: \.text, on: statusLabel)
             .store(in: &observers)
-        // swiftlint:enable array_init
     }
 
     @objc

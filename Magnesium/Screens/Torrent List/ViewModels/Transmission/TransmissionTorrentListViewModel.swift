@@ -11,10 +11,10 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class TransmissionTorrentListViewModel: ViewModel, EventProducer {
+final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
     private let client: DefaultTransmissionClient
     private let preferences: Preferences
-    private let torrents = TorrentSubjectMapManager<Int, TransmissionTorrent>()
+    private let torrents: TorrentSubjectMapManager<Int, TransmissionTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
@@ -28,6 +28,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventProducer {
     init(client: DefaultTransmissionClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
+        torrents = TorrentSubjectMapManager(preferences: preferences)
 
         let items = torrents.sorted
             .map { $0.map { AnyViewModel(TransmissionTorrentListItemViewModel(subject: $0)) } }
@@ -53,13 +54,6 @@ final class TransmissionTorrentListViewModel: ViewModel, EventProducer {
 
     func handle(_ event: TorrentListViewEvent) {
         switch event {
-        case let .add(source):
-            let linkSubject = PassthroughSubject<String, Never>()
-            linkSubject
-                .sink { [weak self] in self?.addLink($0) }
-                .store(in: &observers)
-            eventSubject.send(.add(source: source, linkSubject: linkSubject))
-
         case .refresh:
             guard !isLoadingSubject.value else { return }
             isLoadingSubject.send(true)
@@ -69,11 +63,21 @@ final class TransmissionTorrentListViewModel: ViewModel, EventProducer {
                     }, receiveValue: { _ in })
                 .store(in: &observers)
 
-        case .selectItem:
+        case let .addSelected(source):
+            let linkSubject = PassthroughSubject<String, Never>()
+            linkSubject
+                .sink { [weak self] in self?.addLink($0) }
+                .store(in: &observers)
+            eventSubject.send(.add(source: source, linkSubject: linkSubject))
+
+        case let .filterSelected(source: source):
+            eventSubject.send(.filter(source: source))
+
+        case .itemSelected:
             // TODO:
             break
 
-        case .settings:
+        case .settingsSelected:
             eventSubject.send(.settings)
         }
     }

@@ -11,7 +11,7 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class TransmissionSettingsViewModel: ViewModel, EventProducer {
+final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
     private let preferences: Preferences
     private let server: Server?
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()

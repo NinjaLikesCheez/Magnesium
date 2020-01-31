@@ -18,17 +18,17 @@ enum SettingsEvent {
 }
 
 enum SettingsViewEvent {
-    case close
-    case changeServer(source: PopoverSource)
-    case selectServer(index: Int)
-    case addServer
+    case doneSelected
+    case changeServerSelected(source: PopoverSource)
+    case serverSelected(index: Int)
+    case addServerSelected
 }
 
 struct SettingsViewState {
     var sections: AnyPublisher<[SettingsSection], Never>
 }
 
-final class SettingsViewModel: ViewModel, EventProducer {
+final class SettingsViewModel: ViewModel, EventEmitter {
     private let session: Session
     private let preferences: Preferences
     private var observers = [AnyCancellable]()
@@ -63,10 +63,10 @@ final class SettingsViewModel: ViewModel, EventProducer {
 
     func handle(_ event: SettingsViewEvent) {
         switch event {
-        case .close:
+        case .doneSelected:
             eventSubject.send(.complete)
 
-        case let .changeServer(source):
+        case let .changeServerSelected(source):
             let servers = preferences.getServers()
             var alert = Alert(title: nil, message: nil, style: .actionSheet)
             for server in servers {
@@ -77,11 +77,11 @@ final class SettingsViewModel: ViewModel, EventProducer {
             alert.addAction(AlertAction(title: "Cancel", style: .cancel))
             eventSubject.send(.alert(alert, source: source))
 
-        case let .selectServer(index):
+        case let .serverSelected(index):
             let server = preferences.getServers()[index]
             eventSubject.send(.edit(server: server))
 
-        case .addServer:
+        case .addServerSelected:
             eventSubject.send(.addServer)
         }
     }

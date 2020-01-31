@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Preferences
 
 class CurrentValueSubjectMapManager<K: Hashable, V> {
     typealias CurrentValueArray<T> = [CurrentValueSubject<T, Never>]
@@ -51,10 +52,8 @@ class CurrentValueSubjectMapManager<K: Hashable, V> {
 }
 
 final class TorrentSubjectMapManager<K: Hashable, V: SortableTorrent>: CurrentValueSubjectMapManager<K, V> {
-    let sort = CurrentValueSubject<SortOption, Never>(SortOption(property: .name))
-
-    init() {
-        let sortFunction = sort
+    init(preferences: Preferences) {
+        let sortFunction = preferences.valuePublisher(for: PreferenceKeys.sortOption)
             .map { sort -> ((CurrentValueArray<V>) -> CurrentValueArray<V>) in
                 return { TorrentSortUtil.sort($0, using: sort) }
             }

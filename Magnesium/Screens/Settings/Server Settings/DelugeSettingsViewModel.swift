@@ -21,7 +21,7 @@ struct DefaultDelugeClientProvider: DelugeClientProvider {
     }
 }
 
-final class DelugeSettingsViewModel: ViewModel, EventProducer {
+final class DelugeSettingsViewModel: ViewModel, EventEmitter {
     private let preferences: Preferences
     private let server: Server?
     private let clientProvider: DelugeClientProvider

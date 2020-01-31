@@ -47,14 +47,22 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             action: #selector(settingsButtonTapped(_:))
         )
 
+        var rightButtons = [UIBarButtonItem]()
         if viewModel.state.showAddButton {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(
+            rightButtons.append(UIBarButtonItem(
                 image: UIImage(systemName: "plus"),
                 style: .plain,
                 target: self,
                 action: #selector(addButtonTapped(_:))
-            )
+            ))
         }
+        rightButtons.append(UIBarButtonItem(
+            image: UIImage(systemName: "line.horizontal.3.decrease.circle"),
+            style: .plain,
+            target: self,
+            action: #selector(filterButtonTapped(_:))
+        ))
+        navigationItem.rightBarButtonItems = rightButtons
 
         viewModel.state.isLoading
             .sink { [weak self] isLoading in
@@ -119,12 +127,17 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.settings)
+        viewModel.handle(.settingsSelected)
+    }
+
+    @objc
+    private func filterButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.handle(.filterSelected(source: .barButton(sender)))
     }
 
     @objc
     private func addButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.add(source: .barButton(sender)))
+        viewModel.handle(.addSelected(source: .barButton(sender)))
     }
 
     @objc
@@ -135,43 +148,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     // MARK: UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.handle(.selectItem(index: indexPath.row))
+        viewModel.handle(.itemSelected(index: indexPath.row))
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
 }
-
-#if DEBUG
-    struct TorrentListViewController_Previews: PreviewProvider {
-        private struct Container<VM: ViewModel>: UIViewControllerRepresentable
-            where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
-            let viewModel: VM
-
-            func makeUIViewController(
-                context: UIViewControllerRepresentableContext<Container>
-            ) -> TorrentListViewController<VM> {
-                let viewController = TorrentListViewController(viewModel: viewModel)
-                viewController.applySnapshotInBackground = false
-                return viewController
-            }
-
-            func updateUIViewController(
-                _ uiViewController: TorrentListViewController<VM>,
-                context: UIViewControllerRepresentableContext<Container>
-            ) {}
-        }
-
-        static var previews: some View {
-            let viewModel = EmptyTorrentListViewModel()
-            return Group {
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Light")
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Dark")
-                    .environment(\.colorScheme, .dark)
-            }
-        }
-    }
-#endif

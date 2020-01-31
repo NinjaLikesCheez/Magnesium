@@ -49,7 +49,7 @@ final class DefaultSession: Session {
         guard let server = server else {
             serverObserver = preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
                 .sink(receiveValue: { [weak self] servers in
-                    self?._setServer(servers?.first)
+                    self?._setServer(servers.first)
                 })
             return
         }

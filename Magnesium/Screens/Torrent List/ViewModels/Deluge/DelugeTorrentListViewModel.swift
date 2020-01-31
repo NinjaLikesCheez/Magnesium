@@ -11,10 +11,10 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefreshable {
+final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshable {
     private let client: DelugeClient
     private let preferences: Preferences
-    private let torrents = TorrentSubjectMapManager<String, DelugeTorrent>()
+    private let torrents: TorrentSubjectMapManager<String, DelugeTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
@@ -28,6 +28,7 @@ final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefresha
     init(client: DelugeClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
+        torrents = TorrentSubjectMapManager(preferences: preferences)
 
         let items = torrents.sorted
             .map { $0.map { AnyViewModel(DelugeTorrentListItemViewModel(subject: $0)) } }
@@ -53,13 +54,6 @@ final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefresha
 
     func handle(_ event: TorrentListViewEvent) {
         switch event {
-        case let .add(source):
-            let linkSubject = PassthroughSubject<String, Never>()
-            linkSubject
-                .sink { [weak self] in self?.addLink($0) }
-                .store(in: &observers)
-            eventSubject.send(.add(source: source, linkSubject: linkSubject))
-
         case .refresh:
             guard !isLoadingSubject.value else { return }
             isLoadingSubject.send(false)
@@ -69,7 +63,17 @@ final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefresha
                     }, receiveValue: { _ in })
                 .store(in: &observers)
 
-        case let .selectItem(index):
+        case let .addSelected(source):
+            let linkSubject = PassthroughSubject<String, Never>()
+            linkSubject
+                .sink { [weak self] in self?.addLink($0) }
+                .store(in: &observers)
+            eventSubject.send(.add(source: source, linkSubject: linkSubject))
+
+        case let .filterSelected(source: source):
+            eventSubject.send(.filter(source: source))
+
+        case let .itemSelected(index):
             let subject = torrents.subject(at: index)
             let viewModel = DelugeTorrentDetailViewModel(
                 subject: subject,
@@ -77,9 +81,9 @@ final class DelugeTorrentListViewModel: ViewModel, EventProducer, DelugeRefresha
                 preferences: preferences,
                 refresher: self
             )
-            eventSubject.send(.detail(viewModel: AnyProducerViewModel(viewModel)))
+            eventSubject.send(.detail(viewModel: AnyEmitterViewModel(viewModel)))
 
-        case .settings:
+        case .settingsSelected:
             eventSubject.send(.settings)
         }
     }

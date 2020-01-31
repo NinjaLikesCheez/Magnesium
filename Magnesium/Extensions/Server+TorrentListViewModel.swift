@@ -25,7 +25,7 @@ extension Server {
                 baseURL: settings.url,
                 password: keychain.password
             )
-            return AnyProducerViewModel(DelugeTorrentListViewModel(client: client, preferences: preferences))
+            return AnyEmitterViewModel(DelugeTorrentListViewModel(client: client, preferences: preferences))
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: data),
@@ -39,7 +39,7 @@ extension Server {
                 username: settings.username,
                 password: keychain.password
             )
-            return AnyProducerViewModel(TransmissionTorrentListViewModel(client: client, preferences: preferences))
+            return AnyEmitterViewModel(TransmissionTorrentListViewModel(client: client, preferences: preferences))
         }
     }
 }

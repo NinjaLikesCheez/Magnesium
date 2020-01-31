@@ -11,16 +11,13 @@ import Preferences
 
 #if DEBUG
     struct PreviewPreferences: Preferences {
-        var valueUpdated: AnyPublisher<(AnyPreferenceKey, Any?), Never> {
-            return Empty().eraseToAnyPublisher()
-        }
+        let preferenceChanged: AnyPublisher<PreferenceChange, Never> = Empty().eraseToAnyPublisher()
 
-        func registerDefault<T>(_ value: T, for key: PreferenceKey<T>) {}
         func set<T>(_ value: T, for key: PreferenceKey<T>) {}
         func removeValue<T>(for key: PreferenceKey<T>) {}
 
-        func value<T>(for key: PreferenceKey<T>) throws -> T? {
-            return nil
+        func value<T>(for key: PreferenceKey<T>) throws -> T {
+            return key.defaultValue
         }
 
         func containsValue<T>(for key: PreferenceKey<T>) -> Bool {

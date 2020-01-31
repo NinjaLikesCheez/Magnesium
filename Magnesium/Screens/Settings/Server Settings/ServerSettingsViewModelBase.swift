@@ -9,7 +9,7 @@
 import Combine
 import ViewModel
 
-typealias AnyServerSettingsViewModel = AnyProducerViewModel<
+typealias AnyServerSettingsViewModel = AnyEmitterViewModel<
     ServerSettingsEvent,
     ServerSettingsViewEvent,
     ServerSettingsViewState

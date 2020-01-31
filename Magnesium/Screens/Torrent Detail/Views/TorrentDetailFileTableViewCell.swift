@@ -98,17 +98,15 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         nameLabel.text = state.name
         separatorView.isHidden = isLastRow
 
-        // swiftlint:disable array_init
         state.size
-            .map { text -> String? in text }
+            .asOptional()
             .assign(to: \.text, on: sizeLabel)
             .store(in: &observers)
 
         state.progress
-            .map { text -> String? in text }
+            .asOptional()
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
-        // swiftlint:enable array_init
     }
 }
 

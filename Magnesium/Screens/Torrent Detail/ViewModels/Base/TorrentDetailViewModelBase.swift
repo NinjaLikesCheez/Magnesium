@@ -9,7 +9,7 @@
 import Combine
 import ViewModel
 
-typealias AnyTorrentDetailViewModel = AnyProducerViewModel<
+typealias AnyTorrentDetailViewModel = AnyEmitterViewModel<
     TorrentDetailEvent,
     TorrentDetailViewEvent,
     TorrentDetailViewState

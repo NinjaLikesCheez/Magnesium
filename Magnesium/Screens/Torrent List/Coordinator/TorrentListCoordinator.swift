@@ -36,7 +36,7 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
 
     init(server: Server?, session: Session, preferences: Preferences) {
         let viewModel = server?.listViewModel(preferences: preferences)
-            ?? AnyProducerViewModel(EmptyTorrentListViewModel())
+            ?? AnyEmitterViewModel(EmptyTorrentListViewModel())
         self.session = session
         self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
@@ -47,6 +47,8 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         switch event {
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
+        case let .filter(source: source):
+            showFilter(from: source)
         case let .detail(viewModel: viewModel):
             eventSubject.send(.detail(viewModel: viewModel))
         case .settings:
@@ -56,7 +58,7 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         }
     }
 
-    func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
+    private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
         var alert = Alert(title: "Add Torrent", message: "How would you like to add the torrent?", style: .actionSheet)
         alert.addAction(AlertAction(title: "Add Link", style: .default) {
             self.showAddLink(subject: linkSubject)
@@ -84,5 +86,28 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         })
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
+    }
+
+    private func showFilter(from source: PopoverSource) {
+        let coordinator = FilterCoordinator(preferences: preferences)
+        addChildCoordinator(coordinator) { coordinator, event in
+            switch event {
+            case .complete:
+                coordinator.presentable.viewController.dismiss(animated: true)
+            }
+        }
+
+        let viewController = coordinator.presentable.viewController
+        viewController.modalPresentationStyle = .popover
+
+        switch source {
+        case let .barButton(barButton):
+            viewController.popoverPresentationController?.barButtonItem = barButton
+        case let .view(view, rect: rect):
+            viewController.popoverPresentationController?.sourceView = view
+            viewController.popoverPresentationController?.sourceRect = rect
+        }
+
+        self.viewController.present(viewController, animated: true)
     }
 }

@@ -9,7 +9,7 @@
 import Combine
 import ViewModel
 
-final class EmptyTorrentListViewModel: ViewModel, EventProducer {
+final class EmptyTorrentListViewModel: ViewModel, EventEmitter {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private let isLoadingSubject = PassthroughSubject<Bool, Never>()
 
@@ -25,12 +25,14 @@ final class EmptyTorrentListViewModel: ViewModel, EventProducer {
 
     func handle(_ event: TorrentListViewEvent) {
         switch event {
-        case .add, .selectItem:
-            break
         case .refresh:
             isLoadingSubject.send(false)
-        case .settings:
+        case let .filterSelected(source: source):
+            eventSubject.send(.filter(source: source))
+        case .settingsSelected:
             eventSubject.send(.settings)
+        case .addSelected, .itemSelected:
+            break
         }
     }
 }

@@ -37,7 +37,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             title: "Done",
             style: .done,
             target: self,
-            action: #selector(closeButtonTapped(_:))
+            action: #selector(doneButtonTapped(_:))
         )
     }
 
@@ -94,8 +94,8 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     }
 
     @objc
-    private func closeButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.close)
+    private func doneButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.handle(.doneSelected)
     }
 
     // MARK: UITableViewDelegate
@@ -105,11 +105,11 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
         case .changeServer:
             tableView.deselectRow(at: indexPath, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.handle(.changeServer(source: .view(cell, rect: cell.bounds)))
+            viewModel.handle(.changeServerSelected(source: .view(cell, rect: cell.bounds)))
         case .server:
-            viewModel.handle(.selectServer(index: indexPath.row))
+            viewModel.handle(.serverSelected(index: indexPath.row))
         case .addServer:
-            viewModel.handle(.addServer)
+            viewModel.handle(.addServerSelected)
         case .none:
             break
         }

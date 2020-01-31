@@ -1,0 +1,45 @@
+//
+//  FilterCoordinator.swift
+//  Magnesium
+//
+//  Created by James Hurst on 2020-01-30.
+//  Copyright © 2020 James Hurst. All rights reserved.
+//
+
+import Combine
+import Coordinator
+import Preferences
+
+enum FilterCoordinatorEvent {
+    case complete
+}
+
+final class FilterCoordinator: Coordinator {
+    private let navigationController: PresentableNavigationController
+    private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()
+    let received: AnyPublisher<FilterEvent, Never>
+    var childCoordinators = [AnyHashable: AnyCoordinator]()
+    var observers = [AnyCancellable]()
+
+    var presentable: Presentable {
+        return navigationController
+    }
+
+    var events: AnyPublisher<FilterCoordinatorEvent, Never> {
+        return eventSubject.eraseToAnyPublisher()
+    }
+
+    init(preferences: Preferences) {
+        let viewModel = FilterViewModel(preferences: preferences)
+        let viewController = FilterViewController(viewModel: viewModel)
+        navigationController = PresentableNavigationController(rootViewController: viewController)
+        received = viewModel.events
+    }
+
+    func handle(_ event: FilterEvent) {
+        switch event {
+        case .complete:
+            eventSubject.send(.complete)
+        }
+    }
+}
