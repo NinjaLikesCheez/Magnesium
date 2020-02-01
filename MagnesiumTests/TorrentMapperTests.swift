@@ -1,5 +1,5 @@
 //
-//  TorrentSortTests.swift
+//  TorrentMapperTests.swift
 //  MagnesiumTests
 //
 //  Created by James Hurst on 2020-01-18.
@@ -11,7 +11,15 @@ import CryptoKit
 @testable import Magnesium
 import XCTest
 
-class TorrentSortTests: XCTestCase {
+class TorrentMapperTests: XCTestCase {
+    private let preferences = MockPreferences()
+
+    private func getValues(from mapper: TorrentMapper<Int, MockTorrent>) -> [MockTorrent] {
+        var values: [MockTorrent]?
+        _ = mapper.values.sink { values = $0.map { $0.value } }
+        return values!
+    }
+
     func test_sort_withName() {
         let torrents = [
             MockTorrent(name: "B", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
@@ -19,25 +27,19 @@ class TorrentSortTests: XCTestCase {
             MockTorrent(name: "a", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
             MockTorrent(name: "C", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
         ]
-        let subjects = torrents.map { CurrentValueSubject<MockTorrent, Never>($0) }
         let expectedAscending: [String] = [torrents[1].hash, torrents[2].hash].sorted()
             + [torrents[0].hash, torrents[3].hash]
         let expectedDescending: [String] = [torrents[3].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[2].hash].sorted()
 
-        let sortedAscendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .name, direction: .ascending)
-        )
-        let sortedAscending = sortedAscendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedAscending, expectedAscending)
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
 
-        let sortedDescendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .name, direction: .descending)
-        )
-        let sortedDescending = sortedDescendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedDescending, expectedDescending)
+        preferences.set(SortOption(property: .name, direction: .ascending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
+
+        preferences.set(SortOption(property: .name, direction: .descending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
     func test_sort_withDateAdded() {
@@ -49,26 +51,20 @@ class TorrentSortTests: XCTestCase {
             MockTorrent(name: "A1", dateAdded: date, downloadRate: 0, uploadRate: 0),
             MockTorrent(name: "C", dateAdded: date.addingTimeInterval(2), downloadRate: 0, uploadRate: 0),
         ]
-        let subjects = torrents.map { CurrentValueSubject<MockTorrent, Never>($0) }
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
         let expectedDescending = [torrents[4].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let sortedAscendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .dateAdded, direction: .ascending)
-        )
-        let sortedAscending = sortedAscendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedAscending, expectedAscending)
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
 
-        let sortedDescendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .dateAdded, direction: .descending)
-        )
-        let sortedDescending = sortedDescendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedDescending, expectedDescending)
+        preferences.set(SortOption(property: .dateAdded, direction: .ascending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
+
+        preferences.set(SortOption(property: .dateAdded, direction: .descending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
     func test_sort_withDownloadSpeed() {
@@ -79,26 +75,20 @@ class TorrentSortTests: XCTestCase {
             MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
             MockTorrent(name: "C", dateAdded: Date(), downloadRate: 2, uploadRate: 0),
         ]
-        let subjects = torrents.map { CurrentValueSubject<MockTorrent, Never>($0) }
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
         let expectedDescending = [torrents[4].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let sortedAscendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .downloadSpeed, direction: .ascending)
-        )
-        let sortedAscending = sortedAscendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedAscending, expectedAscending)
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
 
-        let sortedDescendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .downloadSpeed, direction: .descending)
-        )
-        let sortedDescending = sortedDescendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedDescending, expectedDescending)
+        preferences.set(SortOption(property: .downloadSpeed, direction: .ascending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
+
+        preferences.set(SortOption(property: .downloadSpeed, direction: .descending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
     func test_sort_withUploadSpeed() {
@@ -109,38 +99,49 @@ class TorrentSortTests: XCTestCase {
             MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
             MockTorrent(name: "C", dateAdded: Date(), downloadRate: 0, uploadRate: 2),
         ]
-        let subjects = torrents.map { CurrentValueSubject<MockTorrent, Never>($0) }
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
         let expectedDescending = [torrents[4].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let sortedAscendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .uploadSpeed, direction: .ascending)
-        )
-        let sortedAscending = sortedAscendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedAscending, expectedAscending)
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
 
-        let sortedDescendingSubjects = TorrentSortUtil.sort(
-            subjects,
-            using: SortOption(property: .uploadSpeed, direction: .descending)
-        )
-        let sortedDescending = sortedDescendingSubjects.map { $0.value.hash }
-        XCTAssertEqual(sortedDescending, expectedDescending)
+        preferences.set(SortOption(property: .uploadSpeed, direction: .ascending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
+
+        preferences.set(SortOption(property: .uploadSpeed, direction: .descending), for: PreferenceKeys.sortOption)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
+    }
+
+    func test_filter_withState() {
+        let torrents = [
+            MockTorrent(name: "A", commonState: .downloading),
+            MockTorrent(name: "B", commonState: .seeding),
+            MockTorrent(name: "C", commonState: .error),
+            MockTorrent(name: "D", commonState: .downloading),
+        ]
+        let expected = [torrents[0].hash, torrents[3].hash]
+
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
+
+        preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expected)
     }
 }
 
-private struct MockTorrent: SortableTorrent {
+private struct MockTorrent: FilterableTorrent {
     let hash: String = {
         let data = UUID().uuidString.data(using: .utf8)!
         let hashed = Insecure.SHA1.hash(data: data)
         return hashed.compactMap { String(format: "%02x", $0) }.joined()
     }()
 
-    let name: String
-    let dateAdded: Date
-    let downloadRate: Int64
-    let uploadRate: Int64
+    var name = ""
+    var dateAdded = Date()
+    var downloadRate: Int64 = 0
+    var uploadRate: Int64 = 0
+    var commonState: TorrentState = .downloading
 }

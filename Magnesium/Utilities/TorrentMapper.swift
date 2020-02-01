@@ -1,5 +1,5 @@
 //
-//  TorrentSortUtil.swift
+//  TorrentMapper.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-17.
@@ -8,21 +8,43 @@
 
 import Combine
 import Foundation
+import Preferences
 
-protocol SortableTorrent {
+protocol FilterableTorrent {
     var hash: String { get }
     var name: String { get }
     var dateAdded: Date { get }
     var downloadRate: Int64 { get }
     var uploadRate: Int64 { get }
+    var commonState: TorrentState { get }
 }
 
-enum TorrentSortUtil {
-    static func sort<T: SortableTorrent>(
+final class TorrentMapper<K: Hashable, V: FilterableTorrent>: ValueMapper<K, V> {
+    init(preferences: Preferences) {
+        let filter = preferences.valuePublisher(for: PreferenceKeys.sortOption)
+            .combineLatest(preferences.valuePublisher(for: PreferenceKeys.filterOptions))
+            .map { sort, filter -> FilterFunction in
+                return { subjects in
+                    var filtered = subjects
+
+                    if let state = filter.state {
+                        filtered = filtered.filter { subject in
+                            return subject.value.commonState == state
+                        }
+                    }
+
+                    return Self.sort(filtered, using: sort)
+                }
+            }
+            .eraseToAnyPublisher()
+        super.init(filter: filter)
+    }
+
+    private static func sort<T: FilterableTorrent>(
         _ torrents: [CurrentValueSubject<T, Never>],
         using sortOption: SortOption
     ) -> [CurrentValueSubject<T, Never>] {
-        let compare: (SortableTorrent, SortableTorrent) -> ComparisonResult
+        let compare: (FilterableTorrent, FilterableTorrent) -> ComparisonResult
         switch sortOption.property {
         case .name:
             compare = { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) }

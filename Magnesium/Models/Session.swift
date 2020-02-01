@@ -41,7 +41,7 @@ final class DefaultSession: Session {
         setupServerObserver()
         serverSubject.send(server)
         if let server = server {
-            _ = try? preferences.set(server.id, for: PreferenceKeys.selectedServerID)
+            preferences.set(server.id, for: PreferenceKeys.selectedServerID)
         }
     }
 

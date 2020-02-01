@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import os
 
 /// A `Preferences` implementation that uses `UserDefaults`.
 public final class UserDefaultsPreferences: Preferences {
@@ -33,18 +34,27 @@ public final class UserDefaultsPreferences: Preferences {
         return try PropertyListEncoder().encode(value)
     }
 
-    public func value<T>(for key: PreferenceKey<T>) throws -> T {
+    public func value<T>(for key: PreferenceKey<T>) -> T {
         if isNativeType(T.self) {
             return userDefaults.value(forKey: key.value) as? T ?? key.defaultValue
         } else {
-            guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
-            return try PropertyListDecoder().decode(T.self, from: data)
+            do {
+                guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
+                return try PropertyListDecoder().decode(T.self, from: data)
+            } catch {
+                os_log("[UserDefaultsPreferences] Failed to decode value: %@", String(describing: error))
+                return key.defaultValue
+            }
         }
     }
 
-    public func set<T>(_ value: T, for key: PreferenceKey<T>) throws {
-        userDefaults.set(try encode(value), forKey: key.value)
-        valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .updated(value)))
+    public func set<T>(_ value: T, for key: PreferenceKey<T>) {
+        do {
+            userDefaults.set(try encode(value), forKey: key.value)
+            valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .updated(value)))
+        } catch {
+            os_log("[UserDefaultsPreferences] Failed to encode value: %@", String(describing: error))
+        }
     }
 
     public func containsValue<T>(for key: PreferenceKey<T>) -> Bool {

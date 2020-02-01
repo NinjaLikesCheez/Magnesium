@@ -14,7 +14,7 @@ import ViewModel
 final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
     private let client: DefaultTransmissionClient
     private let preferences: Preferences
-    private let torrents: TorrentSubjectMapManager<Int, TransmissionTorrent>
+    private let torrents: TorrentMapper<Int, TransmissionTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
@@ -28,9 +28,9 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
     init(client: DefaultTransmissionClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
-        torrents = TorrentSubjectMapManager(preferences: preferences)
+        torrents = TorrentMapper(preferences: preferences)
 
-        let items = torrents.sorted
+        let items = torrents.values
             .map { $0.map { AnyViewModel(TransmissionTorrentListItemViewModel(subject: $0)) } }
             .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
             .ui()

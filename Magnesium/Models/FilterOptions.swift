@@ -6,6 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-struct FilterOptions: Codable {
+struct FilterOptions: Codable, Equatable {
     var state: TorrentState?
 }

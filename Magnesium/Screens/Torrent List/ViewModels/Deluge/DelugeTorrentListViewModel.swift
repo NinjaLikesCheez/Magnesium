@@ -14,7 +14,7 @@ import ViewModel
 final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshable {
     private let client: DelugeClient
     private let preferences: Preferences
-    private let torrents: TorrentSubjectMapManager<String, DelugeTorrent>
+    private let torrents: TorrentMapper<String, DelugeTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private var autoUpdateTimer: Timer?
@@ -28,9 +28,9 @@ final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshab
     init(client: DelugeClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
-        torrents = TorrentSubjectMapManager(preferences: preferences)
+        torrents = TorrentMapper(preferences: preferences)
 
-        let items = torrents.sorted
+        let items = torrents.values
             .map { $0.map { AnyViewModel(DelugeTorrentListItemViewModel(subject: $0)) } }
             .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
             .ui()

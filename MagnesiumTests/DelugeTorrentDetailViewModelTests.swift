@@ -29,7 +29,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         )
     }
 
-    func test_autoUpdate_whenNotAppeared_shouldNotFire() throws {
+    func test_autoUpdate_whenNotAppeared_shouldNotFire() {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         let expectation = self.expectation(description: "Check")
@@ -40,7 +40,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1.2)
     }
 
-    func test_autoUpdate_whenAppeared_shouldFire() throws {
+    func test_autoUpdate_whenAppeared_shouldFire() {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
@@ -52,7 +52,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1.2)
     }
 
-    func test_autoUpdate_whenDisappeared_shouldNotFire() throws {
+    func test_autoUpdate_whenDisappeared_shouldNotFire() {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
@@ -65,7 +65,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1.2)
     }
 
-    func test_autoUpdate_whenPreferenceDisabled_shouldNotFire() throws {
+    func test_autoUpdate_whenPreferenceDisabled_shouldNotFire() {
         preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)

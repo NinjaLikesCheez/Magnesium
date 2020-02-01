@@ -35,4 +35,4 @@ extension TransmissionTorrent: TorrentExt {
     }
 }
 
-extension TransmissionTorrent: SortableTorrent {}
+extension TransmissionTorrent: FilterableTorrent {}

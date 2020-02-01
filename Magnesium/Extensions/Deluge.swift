@@ -50,4 +50,4 @@ extension DelugeTorrent: TorrentExt {
     }
 }
 
-extension DelugeTorrent: SortableTorrent {}
+extension DelugeTorrent: FilterableTorrent {}

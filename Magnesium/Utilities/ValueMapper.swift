@@ -1,34 +1,35 @@
 //
-//  CurrentValueSubjectMapManager.swift
+//  ValueMapper.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2020-01-17.
+//  Created by James Hurst on 2020-01-31.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import Combine
 import Preferences
 
-class CurrentValueSubjectMapManager<K: Hashable, V> {
+class ValueMapper<K: Hashable, V> {
     typealias CurrentValueArray<T> = [CurrentValueSubject<T, Never>]
     typealias CurrentValueArraySubject<T> = CurrentValueSubject<CurrentValueArray<T>, Never>
     typealias CurrentValueMap<K: Hashable, V> = [K: CurrentValueSubject<V, Never>]
     typealias CurrentValueMapSubject<K: Hashable, V> = CurrentValueSubject<CurrentValueMap<K, V>, Never>
+    typealias FilterFunction = (CurrentValueArray<V>) -> CurrentValueArray<V>
 
     private var observers = [AnyCancellable]()
     private let mapSubject = CurrentValueMapSubject<K, V>([:])
-    private let sortedSubject = CurrentValueArraySubject<V>([])
+    private let valuesSubject = CurrentValueArraySubject<V>([])
 
-    var sorted: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
-        return sortedSubject.eraseToAnyPublisher()
+    var values: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
+        return valuesSubject.eraseToAnyPublisher()
     }
 
-    init(sort: AnyPublisher<(CurrentValueArray<V>) -> CurrentValueArray<V>, Never>) {
+    init(filter: AnyPublisher<FilterFunction, Never>) {
         mapSubject
             .map { Array($0.values) }
-            .combineLatest(sort)
+            .combineLatest(filter)
             .map { $0.1($0.0) }
-            .sink { [weak self] in self?.sortedSubject.value = $0 }
+            .sink { [weak self] in self?.valuesSubject.value = $0 }
             .store(in: &observers)
     }
 
@@ -47,17 +48,6 @@ class CurrentValueSubjectMapManager<K: Hashable, V> {
     }
 
     func subject(at index: Int) -> CurrentValueSubject<V, Never> {
-        return sortedSubject.value[index]
-    }
-}
-
-final class TorrentSubjectMapManager<K: Hashable, V: SortableTorrent>: CurrentValueSubjectMapManager<K, V> {
-    init(preferences: Preferences) {
-        let sortFunction = preferences.valuePublisher(for: PreferenceKeys.sortOption)
-            .map { sort -> ((CurrentValueArray<V>) -> CurrentValueArray<V>) in
-                return { TorrentSortUtil.sort($0, using: sort) }
-            }
-            .eraseToAnyPublisher()
-        super.init(sort: sortFunction)
+        return valuesSubject.value[index]
     }
 }

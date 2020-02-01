@@ -21,12 +21,12 @@ enum FilterEvent {
 enum FilterViewEvent {
     case doneSelected
     case sortSelected(source: PopoverSource)
-    case stateSelected(source: PopoverSource)
+    case filterStateSelected(source: PopoverSource)
 }
 
 struct FilterViewState {
     var sortOption: AnyPublisher<String, Never>
-    var state: AnyPublisher<String, Never>
+    var filterState: AnyPublisher<String, Never>
 }
 
 final class FilterViewModel: ViewModel, EventEmitter {
@@ -44,12 +44,12 @@ final class FilterViewModel: ViewModel, EventEmitter {
             .map(\.displayString)
             .ui()
             .eraseToAnyPublisher()
-        let state = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
+        let filterState = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
             .map(\.state)
             .map { $0?.displayString ?? "All" }
             .ui()
             .eraseToAnyPublisher()
-        self.state = FilterViewState(sortOption: sortOption, state: state)
+        state = FilterViewState(sortOption: sortOption, filterState: filterState)
     }
 
     func handle(_ event: FilterViewEvent) {
@@ -57,28 +57,44 @@ final class FilterViewModel: ViewModel, EventEmitter {
         case .doneSelected:
             eventSubject.send(.complete)
         case let .sortSelected(source: source):
-            guard let currentSort = try? preferences.value(for: PreferenceKeys.sortOption) else {
-                return
-            }
-
-            var alert = Alert(title: nil, message: nil, style: .actionSheet)
-
-            for property in SortOption.Property.allCases {
-                alert.addAction(AlertAction(title: property.displayString, style: .default) {
-                    if property == currentSort.property {
-                        let sortOption = currentSort.withOppositeDirection()
-                        _ = try? self.preferences.set(sortOption, for: PreferenceKeys.sortOption)
-                    } else {
-                        _ = try? self.preferences.set(SortOption(property: property), for: PreferenceKeys.sortOption)
-                    }
-                })
-            }
-
-            alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-            eventSubject.send(.alert(alert, source: source))
-        case .stateSelected:
-            // TODO:
-            break
+            handleSortSelected(from: source)
+        case let .filterStateSelected(source: source):
+            handleFilterStateSelected(from: source)
         }
+    }
+
+    private func handleSortSelected(from source: PopoverSource) {
+        let currentSort = preferences.value(for: PreferenceKeys.sortOption)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+
+        for property in SortOption.Property.allCases {
+            alert.addAction(AlertAction(title: property.displayString, style: .default) {
+                if property == currentSort.property {
+                    let sortOption = currentSort.withOppositeDirection()
+                    self.preferences.set(sortOption, for: PreferenceKeys.sortOption)
+                } else {
+                    self.preferences.set(SortOption(property: property), for: PreferenceKeys.sortOption)
+                }
+            })
+        }
+
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
+    }
+
+    private func handleFilterStateSelected(from source: PopoverSource) {
+        var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        let states: [TorrentState?] = [nil] + TorrentState.allCases
+
+        for state in states {
+            alert.addAction(AlertAction(title: state?.displayString ?? "All", style: .default) {
+                filterOptions.state = state
+                self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+            })
+        }
+
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
     }
 }

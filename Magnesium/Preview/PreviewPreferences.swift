@@ -16,7 +16,7 @@ import Preferences
         func set<T>(_ value: T, for key: PreferenceKey<T>) {}
         func removeValue<T>(for key: PreferenceKey<T>) {}
 
-        func value<T>(for key: PreferenceKey<T>) throws -> T {
+        func value<T>(for key: PreferenceKey<T>) -> T {
             return key.defaultValue
         }
 

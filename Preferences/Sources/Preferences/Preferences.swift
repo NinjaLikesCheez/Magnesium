@@ -8,13 +8,13 @@ public protocol Preferences {
     /// Retrieves the value for a preference.
     /// - Parameter key: The preference key.
     /// - Returns: The preference's value.
-    func value<T>(for key: PreferenceKey<T>) throws -> T
+    func value<T>(for key: PreferenceKey<T>) -> T
 
     /// Sets a preference's value.
     /// - Parameters:
     ///   - value: The value to set.
     ///   - key: The preference key.
-    func set<T>(_ value: T, for key: PreferenceKey<T>) throws
+    func set<T>(_ value: T, for key: PreferenceKey<T>)
 
     /// Checks if the preferences contains a value for a specific preference.
     /// - Parameter key: The preference key.
@@ -58,7 +58,7 @@ public extension Preferences {
     /// - Parameter key: The preference key to observe.
     func valuePublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T, Never> {
         return valueUpdatedPublisher(for: key)
-            .prepend((try? value(for: key)) ?? key.defaultValue)
+            .prepend(value(for: key))
             .eraseToAnyPublisher()
     }
 }

@@ -36,7 +36,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
         cell.accessoryType = .disclosureIndicator
 
         if let textLabel = cell.detailTextLabel {
-            viewModel.state.state
+            viewModel.state.filterState
                 .asOptional()
                 .assign(to: \.text, on: textLabel)
                 .store(in: &observers)
@@ -95,7 +95,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
         case 0:
             viewModel.handle(.sortSelected(source: .view(cell, rect: cell.bounds)))
         case 1:
-            viewModel.handle(.stateSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.handle(.filterStateSelected(source: .view(cell, rect: cell.bounds)))
         default:
             break
         }

@@ -23,8 +23,8 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     private var timerIntervalObserver: AnyCancellable?
     let state: TorrentDetailViewState
 
-    private let files: CurrentValueSubjectMapManager<String, DelugeTorrentFile> = {
-        CurrentValueSubjectMapManager(sort: Just {
+    private let files: ValueMapper<String, DelugeTorrentFile> = {
+        ValueMapper(filter: Just {
             $0.sorted {
                 $0.value.path.compare(
                     $1.value.path,
@@ -50,7 +50,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
         self.refresher = refresher
 
         let sections = subject
-            .combineLatest(files.sorted)
+            .combineLatest(files.values)
             .map { torrent, files in
                 DelugeTorrentDetailViewModel.createSections(
                     subject: subject,

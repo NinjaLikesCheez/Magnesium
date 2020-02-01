@@ -44,11 +44,11 @@ class DelugeSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(editViewModel.state.inputs[0].value.value, "Server")
     }
 
-    func test_serverURL_withServer_shouldUseExisting() throws {
+    func test_serverURL_withServer_shouldUseExisting() {
         XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://example.com")
     }
 
-    func test_password_withServer_shouldUseExisting() throws {
+    func test_password_withServer_shouldUseExisting() {
         XCTAssertEqual(editViewModel.state.inputs[2].value.value, "password")
     }
 

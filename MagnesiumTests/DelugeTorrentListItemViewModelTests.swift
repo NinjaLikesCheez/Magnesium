@@ -139,7 +139,7 @@ class DelugeTorrentListItemViewModelTests: XCTestCase {
 
     func test_ratio() {
         for state in ratioStates {
-            subject.send(.mock(state: state, downloaded: 10_000, uploaded: 4254))
+            subject.send(.mock(state: state, downloaded: 10000, uploaded: 4254))
             let expectation = self.expectation(description: "Value received")
             viewModel.state.ratioOrETA.first().sink {
                 XCTAssertEqual($0, "Ratio: 0.4")

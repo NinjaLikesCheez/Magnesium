@@ -69,7 +69,7 @@ class DefaultSessionTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_serverPublisher_whenPreferencesChanged_shouldNotEmit() throws {
+    func test_serverPublisher_whenPreferencesChanged_shouldNotEmit() {
         let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
@@ -81,12 +81,12 @@ class DefaultSessionTests: XCTestCase {
             expectation.fulfill()
         }.store(in: &observers)
         XCTAssertEqual(session.server, firstServer)
-        try preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
+        preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
         XCTAssertEqual(session.server, firstServer)
         waitForExpectations(timeout: 0)
     }
 
-    func test_serverPublisher_whenServerChanged_shouldEmit() throws {
+    func test_serverPublisher_whenServerChanged_shouldEmit() {
         let firstServer = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let secondServer = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: firstServer)
