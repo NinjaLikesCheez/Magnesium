@@ -16,7 +16,8 @@ platform :ios do
       scheme: "Preferences",
       clean: true,
       code_coverage: true,
-      derived_data_path: DERIVED_DATA_PATH
+      derived_data_path: DERIVED_DATA_PATH,
+      prelaunch_simulator: true,
     )
     slather(
       proj: "Magnesium.xcodeproj",
@@ -33,7 +34,8 @@ platform :ios do
       scheme: "Magnesium",
       clean: true,
       code_coverage: true,
-      derived_data_path: DERIVED_DATA_PATH
+      derived_data_path: DERIVED_DATA_PATH,
+      prelaunch_simulator: true,
     )
     slather(
       proj: "Magnesium.xcodeproj",
