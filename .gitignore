@@ -84,3 +84,5 @@ iOSInjectionProject/
 # End of https://www.gitignore.io/api/swift
 
 xcov_report
+vendor
+.bundle
