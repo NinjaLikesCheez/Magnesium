@@ -22,4 +22,14 @@ pipeline {
             }
         }
     }
+    post {
+        failure {
+            step([
+                $class: 'Mailer', 
+                notifyEveryUnstableBuild: true, 
+                recipients: 'james@jameshurst.ca', 
+                sendToIndividuals: false
+                ])
+        }
+    }
 }
