@@ -9,19 +9,18 @@
 import Combine
 import Preferences
 
-#if DEBUG
-    struct PreviewPreferences: Preferences {
-        let preferenceChanged: AnyPublisher<PreferenceChange, Never> = Empty().eraseToAnyPublisher()
+struct PreviewPreferences: Preferences {
+    let preferencesChanged: AnyPublisher<PreferenceChange, Never> = Empty().eraseToAnyPublisher()
 
-        func set<T>(_ value: T, for key: PreferenceKey<T>) {}
-        func removeValue<T>(for key: PreferenceKey<T>) {}
+    func set<T>(_ value: T, for key: PreferenceKey<T>) {}
+    func removeValue<T>(for key: PreferenceKey<T>) {}
+    func reset() {}
 
-        func value<T>(for key: PreferenceKey<T>) -> T {
-            return key.defaultValue
-        }
-
-        func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
-            return false
-        }
+    func value<T>(for key: PreferenceKey<T>) -> T {
+        return key.defaultValue
     }
-#endif
+
+    func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
+        return false
+    }
+}

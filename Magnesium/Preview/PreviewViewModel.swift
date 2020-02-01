@@ -8,14 +8,12 @@
 
 import ViewModel
 
-#if DEBUG
-    final class PreviewViewModel<ViewEvent, ViewState>: ViewModel {
-        let state: ViewState
+final class PreviewViewModel<ViewEvent, ViewState>: ViewModel {
+    let state: ViewState
 
-        init(state: ViewState) {
-            self.state = state
-        }
-
-        func handle(_ event: ViewEvent) {}
+    init(state: ViewState) {
+        self.state = state
     }
-#endif
+
+    func handle(_ event: ViewEvent) {}
+}

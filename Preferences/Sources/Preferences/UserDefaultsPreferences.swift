@@ -7,7 +7,7 @@ public final class UserDefaultsPreferences: Preferences {
     private let userDefaults: UserDefaults
     private let valueUpdatedSubject = PassthroughSubject<PreferenceChange, Never>()
 
-    public var preferenceChanged: AnyPublisher<PreferenceChange, Never> {
+    public var preferencesChanged: AnyPublisher<PreferenceChange, Never> {
         return valueUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -51,7 +51,7 @@ public final class UserDefaultsPreferences: Preferences {
     public func set<T>(_ value: T, for key: PreferenceKey<T>) {
         do {
             userDefaults.set(try encode(value), forKey: key.value)
-            valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .updated(value)))
+            valueUpdatedSubject.send(.updated(AnyPreferenceKey(key), value))
         } catch {
             os_log("[UserDefaultsPreferences] Failed to encode value: %@", String(describing: error))
         }
@@ -63,6 +63,12 @@ public final class UserDefaultsPreferences: Preferences {
 
     public func removeValue<T>(for key: PreferenceKey<T>) {
         userDefaults.removeObject(forKey: key.value)
-        valueUpdatedSubject.send(PreferenceChange(key: AnyPreferenceKey(key.value), type: .deleted))
+        valueUpdatedSubject.send(.deleted(AnyPreferenceKey(key)))
+    }
+
+    public func reset() {
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
+        userDefaults.removePersistentDomain(forName: bundleIdentifier)
+        valueUpdatedSubject.send(.reset)
     }
 }

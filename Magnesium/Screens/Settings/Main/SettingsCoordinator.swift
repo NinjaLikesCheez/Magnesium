@@ -9,6 +9,7 @@
 import Combine
 import Coordinator
 import Preferences
+import SwiftUI
 import UIKit
 
 enum SettingsCoordinatorEvent {
@@ -49,6 +50,10 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
             showAddServer()
         case let .alert(alert, source: source):
             showAlert(alert, from: source)
+        case .advancedSettings:
+            let viewModel = AdvancedSettingsViewModel(preferences: preferences)
+            let viewController = UIHostingController(rootView: AdvancedSettingsView(viewModel: viewModel))
+            navigationController.pushViewController(viewController, animated: true)
         }
     }
 

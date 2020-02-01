@@ -122,62 +122,60 @@ extension TextInputTableViewCell: UITextFieldDelegate {
     }
 }
 
-#if DEBUG
-    struct TextInputTableViewCell_Previews: PreviewProvider {
-        private struct Container: UIViewRepresentable {
-            let state: TextInputTableViewCellViewState
+struct TextInputTableViewCell_Previews: PreviewProvider {
+    private struct Container: UIViewRepresentable {
+        let state: TextInputTableViewCellViewState
 
-            func makeUIView(
-                context: UIViewRepresentableContext<Container>
-            ) -> PreviewViewContainer<TextInputTableViewCell> {
-                return PreviewViewContainer(TextInputTableViewCell(style: .default, reuseIdentifier: nil))
-            }
-
-            func updateUIView(
-                _ uiView: PreviewViewContainer<TextInputTableViewCell>,
-                context: UIViewRepresentableContext<Container>
-            ) {
-                uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-                uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: state)
-            }
+        func makeUIView(
+            context: UIViewRepresentableContext<Container>
+        ) -> PreviewViewContainer<TextInputTableViewCell> {
+            return PreviewViewContainer(TextInputTableViewCell(style: .default, reuseIdentifier: nil))
         }
 
-        static var previews: some View {
-            let emptyState = TextInputTableViewCellViewState(
-                name: "server",
-                placeholder: "https://example.com",
-                value: CurrentValueSubject(nil),
-                configuration: .url
-            )
-            let textState = TextInputTableViewCellViewState(
-                name: "server",
-                placeholder: "https://example.com",
-                value: CurrentValueSubject("https://example.com"),
-                configuration: .url
-            )
-            let secureState = TextInputTableViewCellViewState(
-                name: "password",
-                placeholder: "password",
-                value: CurrentValueSubject("password"),
-                configuration: .password
-            )
-            return ForEach(ColorScheme.allCases, id: \.self) { colorScheme in
-                Group {
-                    Container(state: emptyState)
-                        .previewDisplayName("Empty")
-                        .previewLayout(.sizeThatFits)
-                        .environment(\.colorScheme, colorScheme)
-                    Container(state: textState)
-                        .previewDisplayName("Text")
-                        .previewLayout(.sizeThatFits)
-                        .environment(\.colorScheme, colorScheme)
-                    Container(state: secureState)
-                        .previewDisplayName("Secure")
-                        .previewLayout(.sizeThatFits)
-                        .environment(\.colorScheme, colorScheme)
-                }
+        func updateUIView(
+            _ uiView: PreviewViewContainer<TextInputTableViewCell>,
+            context: UIViewRepresentableContext<Container>
+        ) {
+            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            uiView.inner.configure(with: state)
+        }
+    }
+
+    static var previews: some View {
+        let emptyState = TextInputTableViewCellViewState(
+            name: "server",
+            placeholder: "https://example.com",
+            value: CurrentValueSubject(nil),
+            configuration: .url
+        )
+        let textState = TextInputTableViewCellViewState(
+            name: "server",
+            placeholder: "https://example.com",
+            value: CurrentValueSubject("https://example.com"),
+            configuration: .url
+        )
+        let secureState = TextInputTableViewCellViewState(
+            name: "password",
+            placeholder: "password",
+            value: CurrentValueSubject("password"),
+            configuration: .password
+        )
+        return ForEach(ColorScheme.allCases, id: \.self) { colorScheme in
+            Group {
+                Container(state: emptyState)
+                    .previewDisplayName("Empty")
+                    .previewLayout(.sizeThatFits)
+                    .environment(\.colorScheme, colorScheme)
+                Container(state: textState)
+                    .previewDisplayName("Text")
+                    .previewLayout(.sizeThatFits)
+                    .environment(\.colorScheme, colorScheme)
+                Container(state: secureState)
+                    .previewDisplayName("Secure")
+                    .previewLayout(.sizeThatFits)
+                    .environment(\.colorScheme, colorScheme)
             }
         }
     }
-#endif
+}

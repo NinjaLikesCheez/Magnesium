@@ -132,7 +132,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
             return
         }
 
-        let username = nameSubject.value
+        let username = usernameSubject.value
         let password = passwordSubject.value
 
         isLoadingSubject.send(true)

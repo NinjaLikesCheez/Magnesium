@@ -20,6 +20,8 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 return nil
             case .servers:
                 return "Servers"
+            case .advancedSettings:
+                return "Advanced"
             }
         }
     }
@@ -68,6 +70,11 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 cell.textLabel?.text = "Add Server"
                 cell.accessoryType = .disclosureIndicator
                 return cell
+            case .advancedSettings:
+                let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
+                cell.textLabel?.text = "Advanced Settings"
+                cell.accessoryType = .disclosureIndicator
+                return cell
             }
         }
 
@@ -110,43 +117,10 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             viewModel.handle(.serverSelected(index: indexPath.row))
         case .addServer:
             viewModel.handle(.addServerSelected)
+        case .advancedSettings:
+            viewModel.handle(.advancedSettingsSelected)
         case .none:
             break
         }
     }
 }
-
-#if DEBUG
-    struct SettingsViewController_Previews: PreviewProvider {
-        private struct Container: UIViewControllerRepresentable {
-            let viewModel: SettingsViewModel
-
-            func makeUIViewController(
-                context: UIViewControllerRepresentableContext<Container>
-            ) -> UINavigationController {
-                let viewController = SettingsViewController(viewModel: viewModel)
-                return UINavigationController(rootViewController: viewController)
-            }
-
-            func updateUIViewController(
-                _ uiViewController: UINavigationController,
-                context: UIViewControllerRepresentableContext<Container>
-            ) {}
-        }
-
-        static var previews: some View {
-            let preferences = PreviewPreferences()
-            let viewModel = SettingsViewModel(
-                session: DefaultSession(preferences: preferences),
-                preferences: preferences
-            )
-            return Group {
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Light")
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Dark")
-                    .environment(\.colorScheme, .dark)
-            }
-        }
-    }
-#endif

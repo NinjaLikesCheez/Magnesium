@@ -172,46 +172,44 @@ final class TorrentTableViewCell: UITableViewCell {
     }
 }
 
-#if DEBUG
-    struct TorrentTableViewCell_Previews: PreviewProvider {
-        private struct Container: UIViewRepresentable {
-            let state: TorrentListItemViewState
+struct TorrentTableViewCell_Previews: PreviewProvider {
+    private struct Container: UIViewRepresentable {
+        let state: TorrentListItemViewState
 
-            func makeUIView(
-                context: UIViewRepresentableContext<Container>
-            ) -> PreviewViewContainer<TorrentTableViewCell> {
-                return PreviewViewContainer(TorrentTableViewCell(style: .default, reuseIdentifier: nil))
-            }
-
-            func updateUIView(
-                _ uiView: PreviewViewContainer<TorrentTableViewCell>,
-                context: UIViewRepresentableContext<Container>
-            ) {
-                uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-                uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: state)
-            }
+        func makeUIView(
+            context: UIViewRepresentableContext<Container>
+        ) -> PreviewViewContainer<TorrentTableViewCell> {
+            return PreviewViewContainer(TorrentTableViewCell(style: .default, reuseIdentifier: nil))
         }
 
-        static var previews: some View {
-            let state = TorrentListItemViewState(
-                name: Just("Torrent").eraseToAnyPublisher(),
-                progress: Just(1).eraseToAnyPublisher(),
-                progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-                state: Just("Seeding").eraseToAnyPublisher(),
-                speed: Just("↑ 0.0 KB/s").eraseToAnyPublisher(),
-                progressString: Just("1.0 GB / 1.0 GB").eraseToAnyPublisher(),
-                ratioOrETA: Just("Ratio: 1.0").eraseToAnyPublisher()
-            )
-            return Group {
-                Container(state: state)
-                    .previewDisplayName("Light")
-                    .previewLayout(.sizeThatFits)
-                Container(state: state)
-                    .previewDisplayName("Dark")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
-            }
+        func updateUIView(
+            _ uiView: PreviewViewContainer<TorrentTableViewCell>,
+            context: UIViewRepresentableContext<Container>
+        ) {
+            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            uiView.inner.configure(with: state)
         }
     }
-#endif
+
+    static var previews: some View {
+        let state = TorrentListItemViewState(
+            name: Just("Torrent").eraseToAnyPublisher(),
+            progress: Just(1).eraseToAnyPublisher(),
+            progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
+            state: Just("Seeding").eraseToAnyPublisher(),
+            speed: Just("↑ 0.0 KB/s").eraseToAnyPublisher(),
+            progressString: Just("1.0 GB / 1.0 GB").eraseToAnyPublisher(),
+            ratioOrETA: Just("Ratio: 1.0").eraseToAnyPublisher()
+        )
+        return Group {
+            Container(state: state)
+                .previewDisplayName("Light")
+                .previewLayout(.sizeThatFits)
+            Container(state: state)
+                .previewDisplayName("Dark")
+                .previewLayout(.sizeThatFits)
+                .environment(\.colorScheme, .dark)
+        }
+    }
+}

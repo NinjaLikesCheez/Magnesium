@@ -14,4 +14,5 @@ struct SettingsSection: Equatable {
 enum SettingsSectionType: Hashable {
     case changeServer
     case servers
+    case advancedSettings
 }

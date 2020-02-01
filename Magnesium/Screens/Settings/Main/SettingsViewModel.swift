@@ -15,6 +15,7 @@ enum SettingsEvent {
     case edit(server: Server)
     case addServer
     case alert(Alert, source: PopoverSource?)
+    case advancedSettings
 }
 
 enum SettingsViewEvent {
@@ -22,6 +23,7 @@ enum SettingsViewEvent {
     case changeServerSelected(source: PopoverSource)
     case serverSelected(index: Int)
     case addServerSelected
+    case advancedSettingsSelected
 }
 
 struct SettingsViewState {
@@ -65,25 +67,28 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)
-
         case let .changeServerSelected(source):
-            let servers = preferences.getServers()
-            var alert = Alert(title: nil, message: nil, style: .actionSheet)
-            for server in servers {
-                alert.addAction(AlertAction(title: server.name, style: .default) {
-                    self.session.setServer(server)
-                })
-            }
-            alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-            eventSubject.send(.alert(alert, source: source))
-
+            handleChangeServerSelected(from: source)
         case let .serverSelected(index):
             let server = preferences.getServers()[index]
             eventSubject.send(.edit(server: server))
-
         case .addServerSelected:
             eventSubject.send(.addServer)
+        case .advancedSettingsSelected:
+            eventSubject.send(.advancedSettings)
         }
+    }
+
+    private func handleChangeServerSelected(from source: PopoverSource) {
+        let servers = preferences.getServers()
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        for server in servers {
+            alert.addAction(AlertAction(title: server.name, style: .default) {
+                self.session.setServer(server)
+            })
+        }
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
     }
 
     private func updateSections() {
@@ -96,6 +101,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
 
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
+        sections.append(SettingsSection(type: .advancedSettings, items: [.advancedSettings]))
         sectionsSubject.send(sections)
     }
 }

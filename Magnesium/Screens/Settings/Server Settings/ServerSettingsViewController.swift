@@ -141,34 +141,3 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         tableView.isUserInteractionEnabled = !isLoading
     }
 }
-
-#if DEBUG
-    struct DelugeSettingsViewController_Previews: PreviewProvider {
-        private struct Container: UIViewControllerRepresentable {
-            let viewModel: DelugeSettingsViewModel
-
-            func makeUIViewController(
-                context: UIViewControllerRepresentableContext<Container>
-            ) -> UINavigationController {
-                let viewController = ServerSettingsViewController(viewModel: viewModel)
-                return UINavigationController(rootViewController: viewController)
-            }
-
-            func updateUIViewController(
-                _ uiViewController: UINavigationController,
-                context: UIViewControllerRepresentableContext<Container>
-            ) {}
-        }
-
-        static var previews: some View {
-            let viewModel = DelugeSettingsViewModel(preferences: PreviewPreferences())
-            return Group {
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Light")
-                Container(viewModel: viewModel)
-                    .previewDisplayName("Dark")
-                    .environment(\.colorScheme, .dark)
-            }
-        }
-    }
-#endif

@@ -218,44 +218,42 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 }
 
-#if DEBUG
-    struct TorrentDetailHeaderTableViewCell_Previews: PreviewProvider {
-        private struct Container: UIViewRepresentable {
-            let state: TorrentDetailHeaderViewState
+struct TorrentDetailHeaderTableViewCell_Previews: PreviewProvider {
+    private struct Container: UIViewRepresentable {
+        let state: TorrentDetailHeaderViewState
 
-            func makeUIView(
-                context: UIViewRepresentableContext<Container>
-            ) -> PreviewViewContainer<TorrentDetailHeaderTableViewCell> {
-                return PreviewViewContainer(TorrentDetailHeaderTableViewCell(style: .default, reuseIdentifier: nil))
-            }
-
-            func updateUIView(
-                _ uiView: PreviewViewContainer<TorrentDetailHeaderTableViewCell>,
-                context: UIViewRepresentableContext<Container>
-            ) {
-                uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-                uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: state)
-            }
+        func makeUIView(
+            context: UIViewRepresentableContext<Container>
+        ) -> PreviewViewContainer<TorrentDetailHeaderTableViewCell> {
+            return PreviewViewContainer(TorrentDetailHeaderTableViewCell(style: .default, reuseIdentifier: nil))
         }
 
-        static var previews: some View {
-            let state = TorrentDetailHeaderViewState(
-                name: Just("Torrent").eraseToAnyPublisher(),
-                isActive: Just(true).eraseToAnyPublisher(),
-                progress: Just(1).eraseToAnyPublisher(),
-                progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-                status: Just("Seeding (100%)").eraseToAnyPublisher()
-            )
-            return Group {
-                Container(state: state)
-                    .previewDisplayName("Light")
-                    .previewLayout(.sizeThatFits)
-                Container(state: state)
-                    .previewLayout(.sizeThatFits)
-                    .previewDisplayName("Dark")
-                    .environment(\.colorScheme, .dark)
-            }
+        func updateUIView(
+            _ uiView: PreviewViewContainer<TorrentDetailHeaderTableViewCell>,
+            context: UIViewRepresentableContext<Container>
+        ) {
+            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            uiView.inner.configure(with: state)
         }
     }
-#endif
+
+    static var previews: some View {
+        let state = TorrentDetailHeaderViewState(
+            name: Just("Torrent").eraseToAnyPublisher(),
+            isActive: Just(true).eraseToAnyPublisher(),
+            progress: Just(1).eraseToAnyPublisher(),
+            progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
+            status: Just("Seeding (100%)").eraseToAnyPublisher()
+        )
+        return Group {
+            Container(state: state)
+                .previewDisplayName("Light")
+                .previewLayout(.sizeThatFits)
+            Container(state: state)
+                .previewLayout(.sizeThatFits)
+                .previewDisplayName("Dark")
+                .environment(\.colorScheme, .dark)
+        }
+    }
+}

@@ -110,42 +110,40 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 }
 
-#if DEBUG
-    struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
-        private struct Container: UIViewRepresentable {
-            let state: TorrentDetailFileViewState
+struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
+    private struct Container: UIViewRepresentable {
+        let state: TorrentDetailFileViewState
 
-            func makeUIView(
-                context: UIViewRepresentableContext<Container>
-            ) -> PreviewViewContainer<TorrentDetailFileTableViewCell> {
-                return PreviewViewContainer(TorrentDetailFileTableViewCell(style: .default, reuseIdentifier: nil))
-            }
-
-            func updateUIView(
-                _ uiView: PreviewViewContainer<TorrentDetailFileTableViewCell>,
-                context: UIViewRepresentableContext<Container>
-            ) {
-                uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-                uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(with: state, isLastRow: false)
-            }
+        func makeUIView(
+            context: UIViewRepresentableContext<Container>
+        ) -> PreviewViewContainer<TorrentDetailFileTableViewCell> {
+            return PreviewViewContainer(TorrentDetailFileTableViewCell(style: .default, reuseIdentifier: nil))
         }
 
-        static var previews: some View {
-            let state = TorrentDetailFileViewState(
-                name: "file.rar",
-                size: Just("50.0 MB").eraseToAnyPublisher(),
-                progress: Just("100%").eraseToAnyPublisher()
-            )
-            return Group {
-                Container(state: state)
-                    .previewDisplayName("Light")
-                    .previewLayout(.sizeThatFits)
-                Container(state: state)
-                    .previewLayout(.sizeThatFits)
-                    .previewDisplayName("Dark")
-                    .environment(\.colorScheme, .dark)
-            }
+        func updateUIView(
+            _ uiView: PreviewViewContainer<TorrentDetailFileTableViewCell>,
+            context: UIViewRepresentableContext<Container>
+        ) {
+            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            uiView.inner.configure(with: state, isLastRow: false)
         }
     }
-#endif
+
+    static var previews: some View {
+        let state = TorrentDetailFileViewState(
+            name: "file.rar",
+            size: Just("50.0 MB").eraseToAnyPublisher(),
+            progress: Just("100%").eraseToAnyPublisher()
+        )
+        return Group {
+            Container(state: state)
+                .previewDisplayName("Light")
+                .previewLayout(.sizeThatFits)
+            Container(state: state)
+                .previewLayout(.sizeThatFits)
+                .previewDisplayName("Dark")
+                .environment(\.colorScheme, .dark)
+        }
+    }
+}

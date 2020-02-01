@@ -2,8 +2,8 @@ import Combine
 
 /// A type that is able to store preferences.
 public protocol Preferences {
-    /// A publisher which emits values when a preference is changed.
-    var preferenceChanged: AnyPublisher<PreferenceChange, Never> { get }
+    /// A publisher which emits values when preferences change.
+    var preferencesChanged: AnyPublisher<PreferenceChange, Never> { get }
 
     /// Retrieves the value for a preference.
     /// - Parameter key: The preference key.
@@ -24,30 +24,36 @@ public protocol Preferences {
     /// Removes a preference's value.
     /// - Parameter key: The preference key.
     func removeValue<T>(for key: PreferenceKey<T>)
+
+    /// Reset all preferences to their default values and removes values from storage.
+    func reset()
 }
 
 public extension Preferences {
     /// Returns a publisher that emits values when a preference is changed.
     /// - Parameter key: The preference key to observe.
     func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T, Never> {
-        let preferenceChanged = self.preferenceChanged
-            .filter { $0.key.value == key.value }
+        let preferenceChanged = preferencesChanged
+            .filter { $0.isRelevant(to: key) }
             .share()
-        let deleted = preferenceChanged.first {
-            if case .deleted = $0.type {
-                return true
-            } else {
-                return false
+        let deleted = preferenceChanged
+            .first {
+                if case .deleted = $0 {
+                    return true
+                } else {
+                    return false
+                }
             }
-        }
         return preferenceChanged
             .prefix(untilOutputFrom: deleted)
             .compactMap {
-                switch $0.type {
-                case let .updated(value):
+                switch $0 {
+                case let .updated(_, value):
                     return value as? T ?? key.defaultValue
                 case .deleted:
                     return nil
+                case .reset:
+                    return key.defaultValue
                 }
             }
             .eraseToAnyPublisher()

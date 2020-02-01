@@ -103,53 +103,51 @@ final class ButtonTableViewCell: UITableViewCell {
     }
 }
 
-#if DEBUG
-    struct ButtonTableViewCell_Previews: PreviewProvider {
-        private struct Container: UIViewRepresentable {
-            let text: String
-            let configuration: ButtonTableViewCell.Configuration
+struct ButtonTableViewCell_Previews: PreviewProvider {
+    private struct Container: UIViewRepresentable {
+        let text: String
+        let configuration: ButtonTableViewCell.Configuration
 
-            func makeUIView(
-                context: UIViewRepresentableContext<Container>
-            ) -> PreviewViewContainer<ButtonTableViewCell> {
-                return PreviewViewContainer(ButtonTableViewCell(style: .default, reuseIdentifier: nil))
-            }
-
-            func updateUIView(
-                _ uiView: PreviewViewContainer<ButtonTableViewCell>,
-                context: UIViewRepresentableContext<Container>
-            ) {
-                uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-                uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-                uiView.inner.configure(text: text, configuration: configuration)
-            }
+        func makeUIView(
+            context: UIViewRepresentableContext<Container>
+        ) -> PreviewViewContainer<ButtonTableViewCell> {
+            return PreviewViewContainer(ButtonTableViewCell(style: .default, reuseIdentifier: nil))
         }
 
-        static var previews: some View {
-            return Group {
-                Container(text: "Clear Cache", configuration: .init())
-                    .previewDisplayName("Light - Default")
-                    .previewLayout(.sizeThatFits)
-                Container(text: "Delete", configuration: .init(
-                    style: .destructive,
-                    fontWeight: .semibold,
-                    alignment: .center
-                ))
-                    .previewDisplayName("Light - Destructive")
-                    .previewLayout(.sizeThatFits)
-                Container(text: "Clear Cache", configuration: .init())
-                    .previewDisplayName("Dark - Default")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
-                Container(text: "Delete", configuration: .init(
-                    style: .destructive,
-                    fontWeight: .semibold,
-                    alignment: .center
-                ))
-                    .previewDisplayName("Dark - Destructive")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, .dark)
-            }
+        func updateUIView(
+            _ uiView: PreviewViewContainer<ButtonTableViewCell>,
+            context: UIViewRepresentableContext<Container>
+        ) {
+            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+            uiView.inner.configure(text: text, configuration: configuration)
         }
     }
-#endif
+
+    static var previews: some View {
+        return Group {
+            Container(text: "Clear Cache", configuration: .init())
+                .previewDisplayName("Light - Default")
+                .previewLayout(.sizeThatFits)
+            Container(text: "Delete", configuration: .init(
+                style: .destructive,
+                fontWeight: .semibold,
+                alignment: .center
+            ))
+                .previewDisplayName("Light - Destructive")
+                .previewLayout(.sizeThatFits)
+            Container(text: "Clear Cache", configuration: .init())
+                .previewDisplayName("Dark - Default")
+                .previewLayout(.sizeThatFits)
+                .environment(\.colorScheme, .dark)
+            Container(text: "Delete", configuration: .init(
+                style: .destructive,
+                fontWeight: .semibold,
+                alignment: .center
+            ))
+                .previewDisplayName("Dark - Destructive")
+                .previewLayout(.sizeThatFits)
+                .environment(\.colorScheme, .dark)
+        }
+    }
+}
