@@ -14,7 +14,7 @@ enum FilterCoordinatorEvent {
     case complete
 }
 
-final class FilterCoordinator: Coordinator {
+final class FilterCoordinator: Coordinator, AlertPresenter {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()
     let received: AnyPublisher<FilterEvent, Never>
@@ -40,6 +40,8 @@ final class FilterCoordinator: Coordinator {
         switch event {
         case .complete:
             eventSubject.send(.complete)
+        case let .alert(alert, source):
+            showAlert(alert, from: source)
         }
     }
 }

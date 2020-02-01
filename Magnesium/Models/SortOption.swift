@@ -11,27 +11,15 @@ struct SortOption: Codable {
     var direction: Direction
 
     var displayString: String {
-        var string = ""
-
+        let directionString: String
         switch direction {
         case .ascending:
-            string += "↑ "
+            directionString = "↑"
         case .descending:
-            string += "↓ "
+            directionString = "↓ "
         }
 
-        switch property {
-        case .name:
-            string += "Name"
-        case .dateAdded:
-            string += "Date Added"
-        case .downloadSpeed:
-            string += "Download Speed"
-        case .uploadSpeed:
-            string += "Upload Speed"
-        }
-
-        return string
+        return "\(directionString) \(property.displayString)"
     }
 
     init(property: Property) {
@@ -45,15 +33,9 @@ struct SortOption: Codable {
     }
 
     func withOppositeDirection() -> SortOption {
-        let newDirection: Direction
-        switch direction {
-        case .ascending:
-            newDirection = .descending
-        case .descending:
-            newDirection = .ascending
-        }
-
-        return SortOption(property: property, direction: newDirection)
+        var sortOption = self
+        sortOption.direction = sortOption.direction.opposite
+        return sortOption
     }
 }
 
@@ -72,6 +54,19 @@ extension SortOption {
                 return .descending
             }
         }
+
+        var displayString: String {
+            switch self {
+            case .name:
+                return "Name"
+            case .dateAdded:
+                return "Date Added"
+            case .downloadSpeed:
+                return "Download Speed"
+            case .uploadSpeed:
+                return "Upload Speed"
+            }
+        }
     }
 }
 
@@ -79,5 +74,14 @@ extension SortOption {
     enum Direction: String, Codable {
         case ascending
         case descending
+
+        var opposite: Direction {
+            switch self {
+            case .ascending:
+                return .descending
+            case .descending:
+                return .ascending
+            }
+        }
     }
 }

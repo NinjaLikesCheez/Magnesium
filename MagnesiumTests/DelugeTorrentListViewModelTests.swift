@@ -60,6 +60,15 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.title, "Update Failed")
     }
 
+    func test_refresh_isLoading_shouldEmitTrueThenFalse() {
+        var values = [Bool]()
+        viewModel.state.isLoading.dropFirst().sink {
+            values.append($0)
+        }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(values, [true, false])
+    }
+
     func test_add_shouldEmitAddEvent() {
         var event: TorrentListEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
@@ -119,5 +128,36 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
+    }
+
+    func test_items_shouldEmitInitialValue() {
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.items.first().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
+        waitForExpectations(timeout: 0)
+    }
+
+    func test_items_shouldRemoveDuplicates() {
+        client.requests.reset()
+        var count = 0
+        viewModel.state.items.dropFirst().sink { _ in
+            count += 1
+        }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(client.requests.torrents, 1)
+        XCTAssertEqual(count, 0)
+    }
+
+    func test_items_shouldEmitNewValues() {
+        client.requests.reset()
+        var count = 0
+        viewModel.state.items.dropFirst().sink { _ in
+            count += 1
+        }.store(in: &observers)
+        client.torrents.append(DelugeTorrent.randomMock())
+        viewModel.handle(.refresh)
+        XCTAssertEqual(client.requests.torrents, 1)
+        XCTAssertEqual(count, 1)
     }
 }

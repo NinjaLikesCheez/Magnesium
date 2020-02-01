@@ -6,29 +6,76 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
+import CryptoKit
 import Foundation
 @testable import Magnesium
 
 extension DelugeTorrent {
-    static func mock() -> DelugeTorrent {
+    static func mock(
+        hash: String = "",
+        name: String = "",
+        state: State = .downloading,
+        dateAdded: Date = Date(),
+        downloadRate: Int64 = 0,
+        uploadRate: Int64 = 0,
+        eta: TimeInterval = 0,
+        progress: Float = 0,
+        downloaded: Int64 = 0,
+        uploaded: Int64 = 0,
+        size: Int64 = 0,
+        seeds: Int = 0,
+        totalSeeds: Int = 0,
+        peers: Int = 0,
+        totalPeers: Int = 0,
+        trackers: [String] = [],
+        label: String = ""
+    ) -> DelugeTorrent {
         return DelugeTorrent(
-            hash: "3f70b98c6162c02924194447e1f23e749edf7a1f",
-            name: "archlinux-2020.01.01-x86_64.iso",
+            hash: hash,
+            name: name,
+            state: state,
+            dateAdded: dateAdded,
+            downloadRate: downloadRate,
+            uploadRate: uploadRate,
+            eta: eta,
+            progress: progress,
+            downloaded: downloaded,
+            uploaded: uploaded,
+            size: size,
+            seeds: seeds,
+            totalSeeds: totalSeeds,
+            peers: peers,
+            totalPeers: totalPeers,
+            trackers: trackers,
+            label: label
+        )
+    }
+
+    static func randomMock() -> DelugeTorrent {
+        let uuid = UUID().uuidString
+        let hash: String = {
+            let hashed = Insecure.SHA1.hash(data: uuid.data(using: .utf8)!)
+            return hashed.compactMap { String(format: "%02x", $0) }.joined()
+        }()
+
+        return DelugeTorrent(
+            hash: hash,
+            name: uuid,
             state: .downloading,
             dateAdded: Date(),
-            downloadRate: 1_540_527,
-            uploadRate: 465_158,
-            eta: 361,
-            progress: 0.189838,
-            downloaded: 130_583_716,
-            uploaded: 56_455_257,
-            size: 687_865_856,
-            seeds: 70,
-            totalSeeds: 832,
-            peers: 2,
-            totalPeers: 35,
-            trackers: ["udp://tracker.archlinux.org:6969", "http://tracker.archlinux.org:6969/announce"],
-            label: "Linux"
+            downloadRate: 0,
+            uploadRate: 0,
+            eta: 0,
+            progress: 0,
+            downloaded: 0,
+            uploaded: 0,
+            size: 0,
+            seeds: 0,
+            totalSeeds: 0,
+            peers: 0,
+            totalPeers: 0,
+            trackers: [],
+            label: ""
         )
     }
 }

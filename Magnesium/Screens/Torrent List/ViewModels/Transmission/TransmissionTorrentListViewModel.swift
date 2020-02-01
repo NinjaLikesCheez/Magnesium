@@ -32,7 +32,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
 
         let items = torrents.sorted
             .map { $0.map { AnyViewModel(TransmissionTorrentListItemViewModel(subject: $0)) } }
-            .removeDuplicates { $0.map { $0.id } != $1.map { $0.id } }
+            .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
             .ui()
             .eraseToAnyPublisher()
         state = TorrentListViewState(items: items, isLoading: isLoadingSubject.eraseToAnyPublisher())

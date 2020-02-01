@@ -15,12 +15,13 @@ import ViewModel
 
 enum FilterEvent {
     case complete
+    case alert(Alert, source: PopoverSource)
 }
 
 enum FilterViewEvent {
     case doneSelected
-    case sortSelected
-    case stateSelected
+    case sortSelected(source: PopoverSource)
+    case stateSelected(source: PopoverSource)
 }
 
 struct FilterViewState {
@@ -55,9 +56,26 @@ final class FilterViewModel: ViewModel, EventEmitter {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)
-        case .sortSelected:
-            // TODO:
-            break
+        case let .sortSelected(source: source):
+            guard let currentSort = try? preferences.value(for: PreferenceKeys.sortOption) else {
+                return
+            }
+
+            var alert = Alert(title: nil, message: nil, style: .actionSheet)
+
+            for property in SortOption.Property.allCases {
+                alert.addAction(AlertAction(title: property.displayString, style: .default) {
+                    if property == currentSort.property {
+                        let sortOption = currentSort.withOppositeDirection()
+                        _ = try? self.preferences.set(sortOption, for: PreferenceKeys.sortOption)
+                    } else {
+                        _ = try? self.preferences.set(SortOption(property: property), for: PreferenceKeys.sortOption)
+                    }
+                })
+            }
+
+            alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+            eventSubject.send(.alert(alert, source: source))
         case .stateSelected:
             // TODO:
             break

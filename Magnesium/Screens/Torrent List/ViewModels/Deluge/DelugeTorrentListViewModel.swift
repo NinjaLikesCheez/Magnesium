@@ -32,7 +32,7 @@ final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshab
 
         let items = torrents.sorted
             .map { $0.map { AnyViewModel(DelugeTorrentListItemViewModel(subject: $0)) } }
-            .removeDuplicates { $0.map { $0.id } != $1.map { $0.id } }
+            .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
             .ui()
             .eraseToAnyPublisher()
         state = TorrentListViewState(items: items, isLoading: isLoadingSubject.eraseToAnyPublisher())
@@ -56,7 +56,7 @@ final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshab
         switch event {
         case .refresh:
             guard !isLoadingSubject.value else { return }
-            isLoadingSubject.send(false)
+            isLoadingSubject.send(true)
             refresh()
                 .sink(receiveCompletion: { [weak self] _ in
                     self?.isLoadingSubject.send(false)

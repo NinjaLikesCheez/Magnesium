@@ -92,6 +92,15 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.title, "Update Failed")
     }
 
+    func test_refresh_isLoading_shouldEmitTrueThenFalse() {
+        var values = [Bool]()
+        viewModel.state.isLoading.dropFirst().sink {
+            values.append($0)
+        }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(values, [true, false])
+    }
+
     func test_sections_shouldHaveHeader() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
@@ -125,31 +134,30 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
     func test_sections_shouldHaveInfoRows() {
         let expected: [(String, String)] = [
-            ("Size", "656.0 MB"),
-            ("Download Speed", "1.5 MB/s"),
-            ("Upload Speed", "454.3 KB/s"),
-            ("Downloaded", "124.5 MB"),
-            ("Uploaded", "53.8 MB"),
-            ("ETA", "6m 1s"),
-            ("Ratio", "0.432"),
-            ("Peers", "2 (35)"),
-            ("Seeds", "70 (832)"),
+            ("Size", "0.0 KB"),
+            ("Download Speed", "0.0 KB/s"),
+            ("Upload Speed", "0.0 KB/s"),
+            ("Downloaded", "0.0 KB"),
+            ("Uploaded", "0.0 KB"),
+            ("ETA", "∞"),
+            ("Ratio", "∞"),
+            ("Peers", "0 (0)"),
+            ("Seeds", "0 (0)"),
         ]
 
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let rows = self.getInfoRows(in: sections[1])
-            XCTAssertEqual(rows.map { "\($0.0): \($0.1)" }, expected.map { "\($0.0): \($0.1)" })
+            for (row, expected) in zip(rows, expected) {
+                XCTAssertEqual(row.0, expected.0)
+                XCTAssertEqual(row.1, expected.1, row.0)
+            }
             expectation.fulfill()
         }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
     }
 
     func test_eta_whenZero_shouldFormatProperly() {
-        var torrent = subject.value
-        torrent.eta = 0
-        subject.send(torrent)
-
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
@@ -160,10 +168,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_ratio_whenInfinite_shouldFormatProperly() {
-        var torrent = subject.value
-        torrent.downloaded = 0
-        subject.send(torrent)
-
+        subject.send(.mock(uploaded: 1))
+        XCTAssertTrue(subject.value.ratio.isInfinite)
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
@@ -174,11 +180,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_ratio_whenNaN_shouldFormatProperly() {
-        var torrent = subject.value
-        torrent.downloaded = 0
-        torrent.uploaded = 0
-        subject.send(torrent)
-
+        XCTAssertTrue(subject.value.ratio.isNaN)
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
@@ -189,14 +191,15 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_sections_shouldHaveTrackers() {
-        let expected = ["udp://tracker.archlinux.org:6969", "http://tracker.archlinux.org:6969/announce"]
+        let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
+        subject.send(.mock(trackers: trackers))
 
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let section = sections[2]
             XCTAssertEqual(section.type, .trackers)
 
-            let trackers = section.items.compactMap { item -> String? in
+            let inner = section.items.compactMap { item -> String? in
                 switch item {
                 case let .tracker(tracker):
                     return tracker
@@ -206,7 +209,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
                 }
             }
 
-            XCTAssertEqual(trackers, expected)
+            XCTAssertEqual(inner, trackers)
             expectation.fulfill()
         }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
@@ -215,7 +218,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     func test_files_shouldBeSorted() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
-            let section = sections[3]
+            let section = sections[2]
             XCTAssertEqual(section.type, .files)
 
             let files = section.items.compactMap { item -> String? in

@@ -83,4 +83,21 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
             return UITableViewCell()
         }
     }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+
+        guard let cell = tableView.cellForRow(at: indexPath) else {
+            return
+        }
+
+        switch indexPath.section {
+        case 0:
+            viewModel.handle(.sortSelected(source: .view(cell, rect: cell.bounds)))
+        case 1:
+            viewModel.handle(.stateSelected(source: .view(cell, rect: cell.bounds)))
+        default:
+            break
+        }
+    }
 }

@@ -41,6 +41,7 @@ final class MockDelugeClient: DelugeClient {
 
     var requests = Requests()
     var errors = Errors()
+    var torrents = [DelugeTorrent.mock()]
 
     func authenticate() -> AnyPublisher<Void, DelugeError> {
         guard !errors.authenticate else {
@@ -57,7 +58,7 @@ final class MockDelugeClient: DelugeClient {
         }
 
         requests.torrents += 1
-        return Just([DelugeTorrent.mock()])
+        return Just(torrents)
             .setFailureType(to: DelugeError.self)
             .eraseToAnyPublisher()
     }

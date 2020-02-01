@@ -16,37 +16,35 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     private lazy var viewModel = DelugeTorrentDetailHeaderViewModel(subject: subject)
 
     func test_name() {
+        subject.send(.mock(name: "name"))
         let expectation = self.expectation(description: "Value received")
         viewModel.state.name.sink {
-            XCTAssertEqual($0, "archlinux-2020.01.01-x86_64.iso")
+            XCTAssertEqual($0, "name")
             expectation.fulfill()
         }.store(in: &observers)
         waitForExpectations(timeout: 0)
     }
 
     func test_isActive_withActiveStates_shouldBeTrue() {
-        var torrent = subject.value
         for state in [DelugeTorrent.State.downloading, .seeding] {
+            subject.send(.mock(state: state))
             var isActive: Bool!
-            viewModel.state.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
-            torrent.state = state
-            subject.send(torrent)
+            viewModel.state.isActive.first().sink { isActive = $0 }.store(in: &observers)
             XCTAssertTrue(isActive)
         }
     }
 
     func test_isActive_withInactiveState_shouldBeFalse() {
-        var torrent = subject.value
         for state in [DelugeTorrent.State.paused, .checking, .queued, .error] {
+            subject.send(.mock(state: state))
             var isActive: Bool!
-            viewModel.state.isActive.dropFirst().first().sink { isActive = $0 }.store(in: &observers)
-            torrent.state = state
-            subject.send(torrent)
+            viewModel.state.isActive.first().sink { isActive = $0 }.store(in: &observers)
             XCTAssertFalse(isActive)
         }
     }
 
     func test_progress() {
+        subject.send(.mock(progress: 0.189838))
         let expectation = self.expectation(description: "Value received")
         viewModel.state.progress.sink {
             XCTAssertEqual($0, 0.189838)
@@ -71,9 +69,7 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
                 XCTAssertEqual($0, result)
                 expectation.fulfill()
             }.store(in: &observers)
-            var torrent = subject.value
-            torrent.state = state
-            subject.send(torrent)
+            subject.send(.mock(state: state))
             waitForExpectations(timeout: 0)
         }
     }
@@ -91,12 +87,10 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         for (state, string) in pairs {
             let expectation = self.expectation(description: "Value received")
             viewModel.state.status.dropFirst().first().sink {
-                XCTAssertEqual($0, "\(string) (18.98%)")
+                XCTAssertEqual($0, "\(string) (0.00%)")
                 expectation.fulfill()
             }.store(in: &observers)
-            var torrent = subject.value
-            torrent.state = state
-            subject.send(torrent)
+            subject.send(.mock(state: state))
             waitForExpectations(timeout: 0)
         }
     }
