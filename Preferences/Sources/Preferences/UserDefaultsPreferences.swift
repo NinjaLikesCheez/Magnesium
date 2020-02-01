@@ -31,7 +31,7 @@ public final class UserDefaultsPreferences: Preferences {
             return value
         }
 
-        return try PropertyListEncoder().encode(value)
+        return try JSONEncoder().encode(value)
     }
 
     public func value<T>(for key: PreferenceKey<T>) -> T {
@@ -40,7 +40,7 @@ public final class UserDefaultsPreferences: Preferences {
         } else {
             do {
                 guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
-                return try PropertyListDecoder().decode(T.self, from: data)
+                return try JSONDecoder().decode(T.self, from: data)
             } catch {
                 os_log("[UserDefaultsPreferences] Failed to decode value: %@", String(describing: error))
                 return key.defaultValue

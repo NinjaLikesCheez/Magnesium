@@ -65,7 +65,11 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
     private func handleSortSelected(from source: PopoverSource) {
         let currentSort = preferences.value(for: PreferenceKeys.sortOption)
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(
+            title: "Sort by",
+            message: "Select the current sort option to sort in the opposite direction.",
+            style: .actionSheet
+        )
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.displayString, style: .default) {
@@ -84,7 +88,11 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
     private func handleFilterStateSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(
+            title: "Filter by State",
+            message: "Only display torrents with the selected state.",
+            style: .actionSheet
+        )
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
         for state in states {
