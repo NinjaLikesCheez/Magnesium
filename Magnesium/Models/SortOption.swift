@@ -6,7 +6,7 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-struct SortOption: Codable {
+struct SortOption: Codable, Equatable {
     var property: Property
     var direction: Direction
 
@@ -16,7 +16,7 @@ struct SortOption: Codable {
         case .ascending:
             directionString = "↑"
         case .descending:
-            directionString = "↓ "
+            directionString = "↓"
         }
 
         return "\(directionString) \(property.displayString)"
@@ -40,7 +40,7 @@ struct SortOption: Codable {
 }
 
 extension SortOption {
-    enum Property: String, Codable, CaseIterable {
+    enum Property: String, Codable, Equatable, CaseIterable {
         case name
         case dateAdded
         case downloadSpeed
@@ -71,7 +71,7 @@ extension SortOption {
 }
 
 extension SortOption {
-    enum Direction: String, Codable {
+    enum Direction: String, Codable, Equatable {
         case ascending
         case descending
 
