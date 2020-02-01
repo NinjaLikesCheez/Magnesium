@@ -23,6 +23,9 @@ pipeline {
         }
     }
     post {
+        success {
+            archiveArtifacts 'fastlane/build_output/*.ipa'
+        }
         failure {
             step([
                 $class: 'Mailer', 

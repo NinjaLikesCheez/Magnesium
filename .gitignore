@@ -15,6 +15,7 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 fastlane/coverage_report
+fastlane/build_output
 
 .bundle
 vendor

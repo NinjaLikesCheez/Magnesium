@@ -12,12 +12,12 @@ platform :ios do
 
   desc "Runs Preferences tests"
   lane :test_preferences do
-    scan(
+    run_tests(
       scheme: "Preferences",
       clean: true,
       code_coverage: true,
       derived_data_path: DERIVED_DATA_PATH,
-      prelaunch_simulator: true,
+      prelaunch_simulator: true
     )
     slather(
       proj: "Magnesium.xcodeproj",
@@ -30,12 +30,12 @@ platform :ios do
 
   desc "Runs Magnesium tests"
   lane :test_magnesium do
-    scan(
+    run_tests(
       scheme: "Magnesium",
       clean: true,
       code_coverage: true,
       derived_data_path: DERIVED_DATA_PATH,
-      prelaunch_simulator: true,
+      prelaunch_simulator: true
     )
     slather(
       proj: "Magnesium.xcodeproj",
@@ -44,6 +44,18 @@ platform :ios do
       html: true,
       output_directory: "fastlane/coverage_report/Magnesium",
       ignore: ["MVVM/*", "Preferences/*", "Deluge/*", "Transmission/*"]
+    )
+  end
+
+  desc "Creates a release build"
+  lane :build do
+    build_app(
+      scheme: "Magnesium",
+      configuration: "Release",
+      clean: true,
+      derived_data_path: DERIVED_DATA_PATH,
+      output_directory: "fastlane/build_output",
+      export_method: "development"
     )
   end
 end
