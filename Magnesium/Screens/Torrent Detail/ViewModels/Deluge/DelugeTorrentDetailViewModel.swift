@@ -19,7 +19,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
-    private var autoUpdateTimer: Timer?
+    private var autoRefreshTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
     let state: TorrentDetailViewState
 
@@ -69,7 +69,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     deinit {
-        autoUpdateTimer?.invalidate()
+        autoRefreshTimer?.invalidate()
     }
 
     private static func createSections(
@@ -131,18 +131,18 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func handleAppear() {
-        if let timer = autoUpdateTimer, timer.isValid {
+        if let timer = autoRefreshTimer, timer.isValid {
             return
         }
 
         timerIntervalObserver = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureAutoUpdateTimer(interval: value)
+                self?.configureAutoRefreshTimer(interval: value)
             })
     }
 
     private func handleDisappear() {
-        autoUpdateTimer?.invalidate()
+        autoRefreshTimer?.invalidate()
         timerIntervalObserver?.cancel()
     }
 
@@ -254,17 +254,17 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
             .store(in: &observers)
     }
 
-    private func configureAutoUpdateTimer(interval: TimeInterval?) {
-        autoUpdateTimer?.invalidate()
+    private func configureAutoRefreshTimer(interval: TimeInterval?) {
+        autoRefreshTimer?.invalidate()
         guard let interval = interval, interval > 0 else { return }
         let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
-            self?.updateTimerFired($0)
+            self?.refreshTimerFired($0)
         }
         RunLoop.main.add(timer, forMode: .common)
-        autoUpdateTimer = timer
+        autoRefreshTimer = timer
     }
 
-    private func updateTimerFired(_ timer: Timer) {
+    private func refreshTimerFired(_ timer: Timer) {
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)

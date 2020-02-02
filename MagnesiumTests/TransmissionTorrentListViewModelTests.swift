@@ -23,7 +23,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         viewModel = TransmissionTorrentListViewModel(client: client, preferences: preferences)
     }
 
-    func test_autoUpdate_shouldFire() {
+    func test_autoRefresh_shouldFire() {
         client.requests.reset()
         preferences.set(0.1, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
@@ -34,7 +34,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0.12)
     }
 
-    func test_autoUpdate_whenPreferenceDisabled_shouldNotFire() {
+    func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
         client.requests.reset()
         preferences.set(0.1, for: PreferenceKeys.autoRefreshInterval)
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)

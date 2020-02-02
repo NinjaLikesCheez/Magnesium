@@ -17,7 +17,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
     private let torrents: TorrentMapper<Int, TransmissionTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
-    private var autoUpdateTimer: Timer?
+    private var autoRefreshTimer: Timer?
     let state: TorrentListViewState
     var observers = [AnyCancellable]()
 
@@ -43,13 +43,13 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
 
         preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureAutoUpdateTimer(interval: value)
+                self?.configureAutoRefreshTimer(interval: value)
             })
             .store(in: &observers)
     }
 
     deinit {
-        autoUpdateTimer?.invalidate()
+        autoRefreshTimer?.invalidate()
     }
 
     func handle(_ event: TorrentListViewEvent) {
@@ -82,17 +82,17 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
         }
     }
 
-    private func configureAutoUpdateTimer(interval: TimeInterval?) {
-        autoUpdateTimer?.invalidate()
+    private func configureAutoRefreshTimer(interval: TimeInterval?) {
+        autoRefreshTimer?.invalidate()
         guard let interval = interval, interval > 0 else { return }
         let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
-            self?.updateTimerFired($0)
+            self?.refreshTimerFired($0)
         }
         RunLoop.main.add(timer, forMode: .common)
-        autoUpdateTimer = timer
+        autoRefreshTimer = timer
     }
 
-    private func updateTimerFired(_ timer: Timer) {
+    private func refreshTimerFired(_ timer: Timer) {
         refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
