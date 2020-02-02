@@ -199,30 +199,28 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
 
-        let expectation = self.expectation(description: "Value received")
+        var event: ServerSettingsEvent?
         viewModel.events.sink {
-            guard case .complete = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+            event = $0
         }.store(in: &observers)
         viewModel.handle(.save)
-        waitForExpectations(timeout: 0)
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 
     func test_save_withServer_shouldEmitCompleteEvent() {
         let viewModel = editViewModel
-        let expectation = self.expectation(description: "Value received")
+        var event: ServerSettingsEvent?
         viewModel.events.sink {
-            guard case .complete = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+            event = $0
         }.store(in: &observers)
         viewModel.handle(.save)
-        waitForExpectations(timeout: 0)
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 
     func test_delete_withoutServer_shouldDoNothing() {
@@ -286,17 +284,16 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
         let delete = alert!.actions[0].handler!
 
-        let expectation = self.expectation(description: "Value received")
+        var event: ServerSettingsEvent?
         viewModel.events.first().sink {
-            guard case .complete = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+            event = $0
         }.store(in: &observers)
         delete()
         XCTAssertTrue(preferences.getServers().isEmpty)
-        waitForExpectations(timeout: 0)
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 }
 

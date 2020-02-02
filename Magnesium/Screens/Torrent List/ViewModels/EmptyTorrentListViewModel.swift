@@ -11,7 +11,7 @@ import ViewModel
 
 final class EmptyTorrentListViewModel: ViewModel, EventEmitter {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
-    private let isLoadingSubject = PassthroughSubject<Bool, Never>()
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
 
     lazy var state = TorrentListViewState(
         showAddButton: false,

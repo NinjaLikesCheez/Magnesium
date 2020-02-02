@@ -35,16 +35,15 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() {
-        let expectation = self.expectation(description: "Value received")
+        var event: SettingsEvent?
         viewModel.events.first().sink {
-            guard case .complete = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+            event = $0
         }.store(in: &observers)
         viewModel.handle(.doneSelected)
-        waitForExpectations(timeout: 0)
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 
     func test_changeServerSelected_shouldEmitAlert() {
@@ -109,15 +108,14 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_addServerSelected_shouldEmitAddServerEvent() {
-        let expectation = self.expectation(description: "Value received")
+        var event: SettingsEvent?
         viewModel.events.first().sink {
-            guard case .addServer = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+            event = $0
         }.store(in: &observers)
         viewModel.handle(.addServerSelected)
-        waitForExpectations(timeout: 0)
+        guard case .addServer = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 }

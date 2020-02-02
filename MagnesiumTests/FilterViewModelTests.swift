@@ -54,16 +54,15 @@ class FilterViewModelTests: XCTestCase {
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() {
-        let expectation = self.expectation(description: "Value received")
-        viewModel.events.first().sink { event in
-            guard case .complete = event else {
-                XCTFail("Unexpected event")
-                return
-            }
-            expectation.fulfill()
+        var event: FilterEvent?
+        viewModel.events.first().sink {
+            event = $0
         }.store(in: &observers)
         viewModel.handle(.doneSelected)
-        waitForExpectations(timeout: 0)
+        guard case .complete = event else {
+            XCTFail("Unexpected event")
+            return
+        }
     }
 
     func test_sortSelected_shouldEmitAlert() {

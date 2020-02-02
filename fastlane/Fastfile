@@ -46,7 +46,7 @@ platform :ios do
       build_directory: DERIVED_DATA_PATH,
       html: true,
       output_directory: "fastlane/coverage_report/Magnesium",
-      ignore: ["MVVM/*", "Preferences/*", "Deluge/*", "Transmission/*"]
+      ignore: ["MVVM/*", "Preferences/*", "Deluge/*", "Transmission/*", "**/Preview*.swift"]
     )
   end
 
