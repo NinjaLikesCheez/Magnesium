@@ -86,7 +86,7 @@ public final class Client {
 
         return session.dataTaskPublisher(for: request)
             .mapError { .request($0) }
-            .flatMap { [weak self] data, response -> AnyPublisher<[String: Any], Error> in
+            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
                 if let response = response as? HTTPURLResponse {
                     switch response.statusCode {
                     case 200 ..< 300:
@@ -100,12 +100,8 @@ public final class Client {
                             return Fail(error: .noSessionID).eraseToAnyPublisher()
                         }
 
-                        guard let strongSelf = self else {
-                            return Empty(completeImmediately: true).eraseToAnyPublisher()
-                        }
-
-                        strongSelf.sessionID = sessionID
-                        return strongSelf.request(method: method, args: args, handleSessionID: false)
+                        self.sessionID = sessionID
+                        return self.request(method: method, args: args, handleSessionID: false)
                     default:
                         return Fail(error: .statusCode(response.statusCode)).eraseToAnyPublisher()
                     }
