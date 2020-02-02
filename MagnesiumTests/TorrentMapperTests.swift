@@ -117,10 +117,10 @@ class TorrentMapperTests: XCTestCase {
 
     func test_filter_withState() {
         let torrents = [
-            MockTorrent(name: "A", commonState: .downloading),
-            MockTorrent(name: "B", commonState: .seeding),
-            MockTorrent(name: "C", commonState: .error),
-            MockTorrent(name: "D", commonState: .downloading),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: 0), commonState: .downloading),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -1), commonState: .seeding),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -2), commonState: .error),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -3), commonState: .downloading),
         ]
         let expected = [torrents[0].hash, torrents[3].hash]
 

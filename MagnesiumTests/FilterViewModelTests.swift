@@ -15,10 +15,10 @@ class FilterViewModelTests: XCTestCase {
     private lazy var viewModel = FilterViewModel(preferences: preferences)
     private var observers = [AnyCancellable]()
 
-    func test_sortOption_shouldBeFormattedCorrectly() {
+    func test_sortOption_shouldEmitDefaultValue() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sortOption.first().sink { value in
-            XCTAssertEqual(value, "↑ Name")
+            XCTAssertEqual(value, "↓ Date Added")
             expectation.fulfill()
         }.store(in: &observers)
         waitForExpectations(timeout: 0)
@@ -27,10 +27,10 @@ class FilterViewModelTests: XCTestCase {
     func test_sortOption_whenChanged_shouldEmitNewValue() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sortOption.dropFirst().first().sink { value in
-            XCTAssertEqual(value, "↓ Date Added")
+            XCTAssertEqual(value, "↑ Name")
             expectation.fulfill()
         }.store(in: &observers)
-        preferences.set(SortOption(property: .dateAdded), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .name), for: PreferenceKeys.sortOption)
         waitForExpectations(timeout: 0)
     }
 
@@ -66,7 +66,7 @@ class FilterViewModelTests: XCTestCase {
     }
 
     func test_sortSelected_shouldEmitAlert() {
-        let expected = ["Name", "Date Added", "Download Speed", "Upload Speed", "Cancel"]
+        let expected = ["Date Added", "Name", "Download Speed", "Upload Speed", "Cancel"]
         var alert: Alert?
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
@@ -84,7 +84,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         let previousOption = preferences.value(for: PreferenceKeys.sortOption)
-        alert?.actions.first { $0.title == "Name" }?.handler?()
+        alert?.actions.first { $0.title == previousOption.property.displayString }?.handler?()
         let newOption = preferences.value(for: PreferenceKeys.sortOption)
         XCTAssertEqual(newOption, previousOption.withOppositeDirection())
     }
@@ -96,9 +96,9 @@ class FilterViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
-        alert?.actions.first { $0.title == "Date Added" }?.handler?()
+        alert?.actions.first { $0.title == "Name" }?.handler?()
         let newOption = preferences.value(for: PreferenceKeys.sortOption)
-        XCTAssertEqual(newOption, SortOption(property: .dateAdded))
+        XCTAssertEqual(newOption, SortOption(property: .name))
     }
 
     func test_filterStateSelected_shouldEmitAlert() {

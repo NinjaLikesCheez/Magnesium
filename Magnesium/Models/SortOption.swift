@@ -41,8 +41,8 @@ struct SortOption: Codable, Equatable {
 
 extension SortOption {
     enum Property: String, Codable, Equatable, CaseIterable {
-        case name
         case dateAdded
+        case name
         case downloadSpeed
         case uploadSpeed
 
@@ -57,10 +57,10 @@ extension SortOption {
 
         var displayString: String {
             switch self {
-            case .name:
-                return "Name"
             case .dateAdded:
                 return "Date Added"
+            case .name:
+                return "Name"
             case .downloadSpeed:
                 return "Download Speed"
             case .uploadSpeed:
