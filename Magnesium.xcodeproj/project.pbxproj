@@ -323,6 +323,33 @@
 			path = Transmission;
 			sourceTree = "<group>";
 		};
+		E917B4BE23E775870090D490 /* Deluge */ = {
+			isa = PBXGroup;
+			children = (
+				E9AE9E5723D695BD0018D180 /* Deluge+Mocks.swift */,
+				E9091D3723E2698B0034C353 /* DelugeSettingsViewModelTests.swift */,
+				E9F4002323DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift */,
+				E9E411B423D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift */,
+				E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */,
+				E9E411B623D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift */,
+				E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */,
+				E95127FB23D7F3C7000EF582 /* MockDelugeClient.swift */,
+				E9472CA923DCCE1D00D5CCDD /* MockDelugeRefresher.swift */,
+			);
+			path = Deluge;
+			sourceTree = "<group>";
+		};
+		E917B4BF23E7759D0090D490 /* Transmission */ = {
+			isa = PBXGroup;
+			children = (
+				E9847C5323E64EE600B05D3A /* MockTransmissionClient.swift */,
+				E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */,
+				E9847C5723E6605900B05D3A /* TransmissionSettingsViewModelTests.swift */,
+				E9847C4F23E645B800B05D3A /* TransmissionTorrentListViewModelTests.swift */,
+			);
+			path = Transmission;
+			sourceTree = "<group>";
+		};
 		E93A3D5923AC52DF007BBD63 /* Preview */ = {
 			isa = PBXGroup;
 			children = (
@@ -634,28 +661,17 @@
 		E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */ = {
 			isa = PBXGroup;
 			children = (
+				E917B4BE23E775870090D490 /* Deluge */,
+				E917B4BF23E7759D0090D490 /* Transmission */,
 				E9091D3523E268310034C353 /* AddServerViewModelTests.swift */,
 				E9624D2C23D204AA0051EA99 /* DefaultSessionTests.swift */,
-				E9AE9E5723D695BD0018D180 /* Deluge+Mocks.swift */,
-				E9091D3723E2698B0034C353 /* DelugeSettingsViewModelTests.swift */,
-				E9F4002323DE92490016B9C3 /* DelugeTorrentDetailHeaderViewModelTests.swift */,
-				E9E411B423D932EE00A7EFED /* DelugeTorrentDetailViewModelTests.swift */,
-				E9DF151323D4085500FB9F4D /* DelugeTorrentListItemViewModelTests.swift */,
-				E9E411B623D933AD00A7EFED /* DelugeTorrentListViewModelTests.swift */,
-				E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */,
 				E9CC160D23AD5CD400EA1B4C /* Info.plist */,
-				E95127FB23D7F3C7000EF582 /* MockDelugeClient.swift */,
-				E9472CA923DCCE1D00D5CCDD /* MockDelugeRefresher.swift */,
 				E98D935E23D2474B0013A1E1 /* MockPreferences.swift */,
 				E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */,
 				E9091D3323E25F580034C353 /* SettingsViewModelTests.swift */,
 				E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */,
 				E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */,
-				E9847C4F23E645B800B05D3A /* TransmissionTorrentListViewModelTests.swift */,
-				E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */,
-				E9847C5323E64EE600B05D3A /* MockTransmissionClient.swift */,
 				E9847C5523E6589C00B05D3A /* EmptyTorrentListViewModelTests.swift */,
-				E9847C5723E6605900B05D3A /* TransmissionSettingsViewModelTests.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
