@@ -1,8 +1,8 @@
 //
-//  DelugeSettingsViewModelTests.swift
+//  TransmissionSettingsViewModelTests.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2020-01-29.
+//  Created by James Hurst on 2020-02-01.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
@@ -10,23 +10,23 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class DelugeSettingsViewModelTests: XCTestCase {
-    private let client = MockDelugeClient()
+class TransmissionSettingsViewModelTests: XCTestCase {
+    private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
     private var observers = [AnyCancellable]()
     private lazy var clientProvider = MockClientProvider(client: client)
-    private lazy var addViewModel = DelugeSettingsViewModel(
+    private lazy var addViewModel = TransmissionSettingsViewModel(
         preferences: preferences,
         clientProvider: clientProvider
     )
-    private lazy var editViewModel = DelugeSettingsViewModel(
+    private lazy var editViewModel = TransmissionSettingsViewModel(
         preferences: preferences,
         server: server,
         clientProvider: clientProvider
     )
     private lazy var server: Server = {
-        let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
-        let keychain = DelugeKeychainData(password: "password")
+        let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
+        let keychain = TransmissionKeychainData(password: "password")
         let encoder = JSONEncoder()
         return Server(
             name: "Server",
@@ -37,7 +37,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }()
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "password"])
+        XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "username", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {
@@ -48,8 +48,12 @@ class DelugeSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://example.com")
     }
 
+    func test_username_withServer_shouldUseExisting() {
+        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "username")
+    }
+
     func test_password_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "password")
+        XCTAssertEqual(editViewModel.state.inputs[3].value.value, "password")
     }
 
     func test_title_withoutServer() {
@@ -76,7 +80,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         XCTAssertTrue(editViewModel.state.canDelete)
     }
 
-    private func isSaveButtonEnabled(_ viewModel: DelugeSettingsViewModel) -> Bool {
+    private func isSaveButtonEnabled(_ viewModel: TransmissionSettingsViewModel) -> Bool {
         var value: Bool!
         _ = viewModel.state.isSaveButtonEnabled.sink {
             value = $0
@@ -90,8 +94,6 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
         viewModel.state.inputs[1].value.value = "http://example.com"
-        XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.state.inputs[2].value.value = "password"
         XCTAssertTrue(isSaveButtonEnabled(viewModel))
     }
 
@@ -99,7 +101,6 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "web://site"
-        viewModel.state.inputs[2].value.value = "password"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
     }
 
@@ -107,7 +108,6 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
 
         var values = [Bool]()
         viewModel.state.isLoading.dropFirst().sink {
@@ -122,9 +122,8 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
         viewModel.handle(.save)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(authenticate: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(authenticate: 1))
     }
 
     func test_save_whenAuthenticationFail_shouldEmitError() {
@@ -132,7 +131,6 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
 
         var alert: Alert?
         viewModel.events.first().sink {
@@ -145,7 +143,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
         viewModel.handle(.save)
         XCTAssertEqual(alert?.title, "Authentication Failed")
-        XCTAssertEqual(alert?.message, "Ensure your password is correct.")
+        XCTAssertEqual(alert?.message, "Ensure your username and password are correct.")
     }
 
     func test_save_withoutData_shouldDoNothing() {
@@ -160,15 +158,16 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_save_withoutServer_shouldAddServer() throws {
-        let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
-        let keychain = DelugeKeychainData(password: "password")
+        let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
+        let keychain = TransmissionKeychainData(password: "password")
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
-        viewModel.state.inputs[2].value.value = keychain.password
+        viewModel.state.inputs[2].value.value = settings.username
+        viewModel.state.inputs[3].value.value = keychain.password
         viewModel.handle(.save)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
@@ -177,15 +176,16 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_save_withServer_shouldUpdateServer() throws {
-        let settings = DelugeServerSettings(url: URL(string: "http://example.com/new")!)
-        let keychain = DelugeKeychainData(password: "new-password")
+        let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
+        let keychain = TransmissionKeychainData(password: "new-password")
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = editViewModel
         viewModel.state.inputs[0].value.value = "new name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
-        viewModel.state.inputs[2].value.value = keychain.password
+        viewModel.state.inputs[2].value.value = settings.username
+        viewModel.state.inputs[3].value.value = keychain.password
         viewModel.handle(.save)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
@@ -297,10 +297,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 }
 
-private struct MockClientProvider: DelugeClientProvider {
-    let client: DelugeClient
+private struct MockClientProvider: TransmissionClientProvider {
+    let client: TransmissionClient
 
-    func createClient(baseURL: URL, password: String) -> DelugeClient {
+    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
         return client
     }
 }

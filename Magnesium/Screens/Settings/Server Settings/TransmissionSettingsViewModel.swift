@@ -11,9 +11,20 @@ import Foundation
 import Preferences
 import ViewModel
 
+protocol TransmissionClientProvider {
+    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient
+}
+
+struct DefaultTransmissionClientProvider: TransmissionClientProvider {
+    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
+        return DefaultTransmissionClient(baseURL: baseURL, username: username, password: password)
+    }
+}
+
 final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
     private let preferences: Preferences
     private let server: Server?
+    private let clientProvider: TransmissionClientProvider
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
@@ -28,9 +39,14 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences, server: Server? = nil) {
+    init(
+        preferences: Preferences,
+        server: Server? = nil,
+        clientProvider: TransmissionClientProvider = DefaultTransmissionClientProvider()
+    ) {
         self.preferences = preferences
         self.server = server
+        self.clientProvider = clientProvider
 
         let settings = (server?.data).flatMap { data in
             try? JSONDecoder().decode(TransmissionServerSettings.self, from: data)
@@ -136,7 +152,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         let password = passwordSubject.value
 
         isLoadingSubject.send(true)
-        let client = DefaultTransmissionClient(baseURL: url, username: username, password: password)
+        let client = clientProvider.createClient(baseURL: url, username: username, password: password)
         client.authenticate()
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
