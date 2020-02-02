@@ -2,6 +2,7 @@ skip_docs
 default_platform(:ios)
 
 DERIVED_DATA_PATH = "fastlane/build"
+TEST_DEVICE = "iPhone 8"
 
 platform :ios do
   desc "Runs tests"
@@ -17,7 +18,8 @@ platform :ios do
       clean: true,
       code_coverage: true,
       derived_data_path: DERIVED_DATA_PATH,
-      prelaunch_simulator: true
+      prelaunch_simulator: true,
+      device: TEST_DEVICE
     )
     slather(
       proj: "Magnesium.xcodeproj",
@@ -35,7 +37,8 @@ platform :ios do
       clean: true,
       code_coverage: true,
       derived_data_path: DERIVED_DATA_PATH,
-      prelaunch_simulator: true
+      prelaunch_simulator: true,
+      device: TEST_DEVICE
     )
     slather(
       proj: "Magnesium.xcodeproj",

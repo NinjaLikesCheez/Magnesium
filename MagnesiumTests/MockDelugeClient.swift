@@ -69,7 +69,7 @@ final class MockDelugeClient: DelugeClient {
 
     func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
         guard !errors.torrentFiles else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.torrentFiles += 1
@@ -82,7 +82,7 @@ final class MockDelugeClient: DelugeClient {
 
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
         guard !errors.pause else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.pause += 1
@@ -91,7 +91,7 @@ final class MockDelugeClient: DelugeClient {
 
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
         guard !errors.resume else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.resume += 1
@@ -100,7 +100,7 @@ final class MockDelugeClient: DelugeClient {
 
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
         guard !(removeData && errors.removeWithData), !(!removeData && errors.removeKeepData) else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.remove.append(removeData)
@@ -109,7 +109,7 @@ final class MockDelugeClient: DelugeClient {
 
     func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
         guard !errors.recheck else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.recheck += 1
@@ -118,7 +118,7 @@ final class MockDelugeClient: DelugeClient {
 
     func add(url: URL) -> AnyPublisher<Void, DelugeError> {
         guard !errors.addURL else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.addURL += 1

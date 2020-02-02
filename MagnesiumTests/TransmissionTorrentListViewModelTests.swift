@@ -1,9 +1,9 @@
 //
-//  DelugeTorrentListViewModelTests.swift
+//  TransmissionTorrentListViewModelTests.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2019-12-20.
-//  Copyright © 2019 James Hurst. All rights reserved.
+//  Created by James Hurst on 2020-02-01.
+//  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import Combine
@@ -12,15 +12,15 @@ import Coordinator
 import Preferences
 import XCTest
 
-final class DelugeTorrentListViewModelTests: XCTestCase {
-    private let client = MockDelugeClient()
+final class TransmissionTorrentListViewModelTests: XCTestCase {
+    private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
-    private var viewModel: DelugeTorrentListViewModel!
+    private var viewModel: TransmissionTorrentListViewModel!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
+        viewModel = TransmissionTorrentListViewModel(client: client, preferences: preferences)
     }
 
     func test_autoUpdate_shouldFire() {
@@ -28,7 +28,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         preferences.set(0.1, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 1))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrents: 1))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -40,7 +40,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 0))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrents: 0))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -92,18 +92,18 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.message, "That link doesn't appear to be valid.")
     }
 
-    func test_addLink_withMagnetLink_shouldPerformAddMagnetURLRequest() {
+    func test_addLink_withMagnetLink_shouldPerformAddURLRequest() {
         client.requests.reset()
         let url = "magnet:?"
         viewModel.addLink(url)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(addMagnetURL: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(addURL: 1))
     }
 
     func test_addLink_withWebLink_shouldPerformAddURLRequest() {
         client.requests.reset()
         let url = "https://example.com"
         viewModel.addLink(url)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(addURL: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(addURL: 1))
     }
 
     func test_addLink_whenFails_shouldEmitAlert() {
@@ -120,15 +120,16 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.title, "Failed to Add Torrent")
     }
 
-    func test_selectItem_shouldEmitDetailEvent() {
-        var event: TorrentListEvent!
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.itemSelected(index: 0))
-        guard case .detail = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
-    }
+    // TODO: re-enable once detail is added
+//    func test_selectItem_shouldEmitDetailEvent() {
+//        var event: TorrentListEvent!
+//        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+//        viewModel.handle(.itemSelected(index: 0))
+//        guard case .detail = event else {
+//            XCTFail("Unexpected event: \(String(describing: event))")
+//            return
+//        }
+//    }
 
     func test_items_shouldEmitInitialValue() {
         let expectation = self.expectation(description: "Value received")

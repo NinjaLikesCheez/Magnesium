@@ -12,7 +12,7 @@ import Preferences
 import ViewModel
 
 final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
-    private let client: DefaultTransmissionClient
+    private let client: TransmissionClient
     private let preferences: Preferences
     private let torrents: TorrentMapper<Int, TransmissionTorrent>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
@@ -25,7 +25,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(client: DefaultTransmissionClient, preferences: Preferences) {
+    init(client: TransmissionClient, preferences: Preferences) {
         self.client = client
         self.preferences = preferences
         torrents = TorrentMapper(preferences: preferences)
@@ -118,7 +118,8 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
             .eraseToAnyPublisher()
     }
 
-    private func addLink(_ url: String) {
+    // internal for testing
+    func addLink(_ url: String) {
         guard let url = URL(string: url) else {
             showError(title: "Unable to Add Link", message: "That link doesn't appear to be valid.")
             return
