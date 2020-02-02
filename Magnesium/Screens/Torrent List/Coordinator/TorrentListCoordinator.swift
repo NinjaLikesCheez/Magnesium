@@ -17,11 +17,12 @@ enum TorrentListCoordinatorEvent {
     case settings
 }
 
-final class TorrentListCoordinator: Coordinator, AlertPresenter {
+final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private let session: Session
     private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
+    private lazy var addFileFlow = AddFileFlow(viewController: viewController, session: session)
     let received: AnyPublisher<TorrentListEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
@@ -64,7 +65,7 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
             self.showAddLink(subject: linkSubject)
         })
         alert.addAction(AlertAction(title: "Add File", style: .default) {
-            // TODO:
+            self.showAddFile()
         })
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         showAlert(alert, from: source)
@@ -88,6 +89,12 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         viewController.present(alertController, animated: true, completion: nil)
     }
 
+    private func showAddFile() {
+        let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.torrent"], in: .open)
+        documentPicker.delegate = self
+        viewController.present(documentPicker, animated: true, completion: nil)
+    }
+
     private func showFilter(from source: PopoverSource) {
         let coordinator = FilterCoordinator(preferences: preferences)
         addChildCoordinator(coordinator) { coordinator, event in
@@ -109,5 +116,12 @@ final class TorrentListCoordinator: Coordinator, AlertPresenter {
         }
 
         self.viewController.present(viewController, animated: true)
+    }
+}
+
+extension TorrentListCoordinator: UIDocumentPickerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first else { return }
+        addFileFlow.addFile(at: url)
     }
 }

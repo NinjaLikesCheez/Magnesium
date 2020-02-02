@@ -18,6 +18,7 @@
 		E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */; };
 		E913FD8623DFD65E008179F1 /* DelugeKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */; };
 		E913FD8A23DFD683008179F1 /* TransmissionKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */; };
+		E917B4BD23E764DA0090D490 /* AddFileFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E917B4BC23E764DA0090D490 /* AddFileFlow.swift */; };
 		E9282C8923CC170900776CD3 /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E9282C8823CC170900776CD3 /* Preferences */; };
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
@@ -138,6 +139,7 @@
 		E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeKeychainData.swift; sourceTree = "<group>"; };
 		E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionKeychainData.swift; sourceTree = "<group>"; };
+		E917B4BC23E764DA0090D490 /* AddFileFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFileFlow.swift; sourceTree = "<group>"; };
 		E9282C8723CC16FF00776CD3 /* Preferences */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Preferences; sourceTree = "<group>"; };
 		E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewController.swift; sourceTree = "<group>"; };
 		E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputTableViewCell.swift; sourceTree = "<group>"; };
@@ -464,6 +466,7 @@
 				E98D936023D2845D0013A1E1 /* TorrentMapper.swift */,
 				E9CE4C3323B453BE001D1C63 /* DateFormatters.swift */,
 				E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */,
+				E917B4BC23E764DA0090D490 /* AddFileFlow.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -848,6 +851,7 @@
 				E93F5D6323BA85CC00B0FFA4 /* UIImage+Color.swift in Sources */,
 				E9C39AE023CC27A800BB3556 /* TextInputTableViewCellViewModel.swift in Sources */,
 				E9B40EA223B4057C009E30AE /* TorrentDetailInfoTableViewCell.swift in Sources */,
+				E917B4BD23E764DA0090D490 /* AddFileFlow.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
 				E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */,
 				E93F5D6D23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift in Sources */,
