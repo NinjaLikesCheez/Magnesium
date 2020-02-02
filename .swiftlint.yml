@@ -89,6 +89,7 @@ identifier_name:
     - id
     - ID
     - ui
+  max_length: 60
 
 line_length:
   warning: 120

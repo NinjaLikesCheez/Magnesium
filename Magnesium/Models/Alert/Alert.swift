@@ -28,10 +28,12 @@ public struct Alert {
     ///   - title: The alert's title.
     ///   - message: The alert's message.
     ///   - style: The alert's style.
-    public init(title: String?, message: String?, style: Style) {
+    ///   - actions: The alert's actions.
+    public init(title: String?, message: String?, style: Style, actions: [AlertAction] = []) {
         self.title = title
         self.message = message
         self.style = style
+        self.actions = actions
     }
 
     mutating func addAction(_ action: AlertAction) {

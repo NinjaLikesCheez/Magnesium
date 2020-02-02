@@ -13,6 +13,10 @@ import Preferences
 import ViewModel
 
 enum AdvancedSettingsViewEvent {
+    case clearDocumentsSelected
+    case clearTempDirectorySelected
+    case clearCacheSelected
+    case clearLaunchScreenCacheSelected
     case resetDataSelected
 }
 
@@ -28,14 +32,127 @@ final class AdvancedSettingsViewModel: ViewModel {
 
     func handle(_ event: AdvancedSettingsViewEvent) {
         switch event {
+        case .clearDocumentsSelected:
+            handleClearDocumentsSelected()
+        case .clearTempDirectorySelected:
+            handleClearTempDirectorySelected()
+        case .clearCacheSelected:
+            handleClearCacheSelected()
+        case .clearLaunchScreenCacheSelected:
+            handleClearLaunchScreenCacheSelected()
         case .resetDataSelected:
             handleResetDataSelected()
+        }
+    }
+
+    private func handleClearDocumentsSelected() {
+        guard let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        let contents: [URL]
+        do {
+            contents = try FileManager.default.contentsOfDirectory(
+                at: documentsURL,
+                includingPropertiesForKeys: nil,
+                options: []
+            )
+        } catch {
+            os_log("%@: Failed to read Documents directory: %@", #function, String(describing: error))
+            return
+        }
+
+        for url in contents {
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                os_log("%@: Failed to remove Documents item: %@", #function, String(describing: error))
+            }
+        }
+    }
+
+    private func handleClearTempDirectorySelected() {
+        let tempURL = FileManager.default.temporaryDirectory
+        let contents: [URL]
+        do {
+            contents = try FileManager.default.contentsOfDirectory(
+                at: tempURL,
+                includingPropertiesForKeys: nil,
+                options: []
+            )
+        } catch {
+            os_log("%@: Failed to read temp directory: %@", #function, String(describing: error))
+            return
+        }
+
+        for url in contents {
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                os_log("%@: Failed to remove temp item: %@", #function, String(describing: error))
+            }
+        }
+    }
+
+    private func handleClearCacheSelected() {
+        guard let cacheURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        let contents: [URL]
+        do {
+            contents = try FileManager.default.contentsOfDirectory(
+                at: cacheURL,
+                includingPropertiesForKeys: nil,
+                options: []
+            )
+        } catch {
+            os_log("%@: Failed to read Caches directory: %@", #function, String(describing: error))
+            return
+        }
+
+        for url in contents {
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                os_log("%@: Failed to remove Caches item: %@", #function, String(describing: error))
+            }
+        }
+    }
+
+    private func handleClearLaunchScreenCacheSelected() {
+        guard let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        let contents: [URL]
+        do {
+            contents = try FileManager.default.contentsOfDirectory(
+                at: libraryURL.appendingPathComponent("SplashBoard"),
+                includingPropertiesForKeys: nil,
+                options: []
+            )
+        } catch {
+            os_log("%@: Failed to read SplashBoard directory: %@", #function, String(describing: error))
+            return
+        }
+
+        for url in contents {
+            do {
+                try FileManager.default.removeItem(at: url)
+            } catch {
+                os_log("%@: Failed to remove SplashBoard item: %@", #function, String(describing: error))
+            }
         }
     }
 
     private func handleResetDataSelected() {
         preferences.reset()
         resetKeychain()
+        handleClearDocumentsSelected()
+        handleClearTempDirectorySelected()
+        handleClearCacheSelected()
+        handleClearLaunchScreenCacheSelected()
     }
 
     private func resetKeychain() {
