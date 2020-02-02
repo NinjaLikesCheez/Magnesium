@@ -7,7 +7,6 @@
 //
 
 import Coordinator
-import SwiftUI
 import UIKit
 import ViewModel
 
@@ -44,34 +43,5 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.handle(.selectType(index: indexPath.row))
-    }
-}
-
-struct AddServerViewController_Previews: PreviewProvider {
-    private struct Container: UIViewControllerRepresentable {
-        let viewModel: AddServerViewModel
-
-        func makeUIViewController(
-            context: UIViewControllerRepresentableContext<Container>
-        ) -> UINavigationController {
-            let viewController = AddServerViewController(viewModel: viewModel)
-            return UINavigationController(rootViewController: viewController)
-        }
-
-        func updateUIViewController(
-            _ uiViewController: UINavigationController,
-            context: UIViewControllerRepresentableContext<Container>
-        ) {}
-    }
-
-    static var previews: some View {
-        let viewModel = AddServerViewModel()
-        return Group {
-            Container(viewModel: viewModel)
-                .previewDisplayName("Light")
-            Container(viewModel: viewModel)
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
-        }
     }
 }
