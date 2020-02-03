@@ -120,16 +120,15 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.title, "Failed to Add Torrent")
     }
 
-    // TODO: re-enable once detail is added
-//    func test_selectItem_shouldEmitDetailEvent() {
-//        var event: TorrentListEvent!
-//        viewModel.events.first().sink { event = $0 }.store(in: &observers)
-//        viewModel.handle(.itemSelected(index: 0))
-//        guard case .detail = event else {
-//            XCTFail("Unexpected event: \(String(describing: event))")
-//            return
-//        }
-//    }
+    func test_selectItem_shouldEmitDetailEvent() {
+        var event: TorrentListEvent!
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.itemSelected(index: 0))
+        guard case .detail = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
 
     func test_items_shouldEmitInitialValue() {
         let expectation = self.expectation(description: "Value received")

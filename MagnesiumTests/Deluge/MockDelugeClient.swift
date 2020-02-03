@@ -52,7 +52,7 @@ final class MockDelugeClient: DelugeClient {
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
+    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
         guard !errors.torrents else {
             return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         }
@@ -63,20 +63,20 @@ final class MockDelugeClient: DelugeClient {
             .eraseToAnyPublisher()
     }
 
-    func fetchLabels() -> AnyPublisher<[String], DelugeError> {
+    func getLabels() -> AnyPublisher<[String], DelugeError> {
         return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
+    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
         guard !errors.torrentFiles else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
         requests.torrentFiles += 1
         return Just([
-            DelugeTorrentFile.mock(name: "file.rar"),
-            DelugeTorrentFile.mock(name: "file.r00"),
-            DelugeTorrentFile.mock(name: "file.r01"),
+            DelugeTorrentFile.mock(index: 0, name: "file.rar"),
+            DelugeTorrentFile.mock(index: 1, name: "file.r00"),
+            DelugeTorrentFile.mock(index: 2, name: "file.r01"),
         ]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 

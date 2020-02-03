@@ -17,9 +17,9 @@ typealias DelugeTorrentFile = Deluge.TorrentFile
 
 protocol DelugeClient {
     func authenticate() -> AnyPublisher<Void, DelugeError>
-    func fetchTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError>
-    func fetchLabels() -> AnyPublisher<[String], DelugeError>
-    func fetchTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError>
+    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError>
+    func getLabels() -> AnyPublisher<[String], DelugeError>
+    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError>
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError>
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError>
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError>

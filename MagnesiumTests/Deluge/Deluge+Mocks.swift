@@ -81,11 +81,11 @@ extension DelugeTorrent {
 }
 
 extension DelugeTorrentFile {
-    static func mock(name: String = "") -> DelugeTorrentFile {
+    static func mock(index: Int, name: String) -> DelugeTorrentFile {
         return DelugeTorrentFile(
+            index: index,
             name: name,
-            index: 0,
-            path: "/\(name)",
+            path: "",
             size: 100_000_000,
             progress: 85.29,
             priority: .normal

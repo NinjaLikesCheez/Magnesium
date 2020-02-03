@@ -1,21 +1,20 @@
 //
-//  DelugeTorrentDetailViewModel.swift
+//  TransmissionTorrentDetailViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2020-01-07.
+//  Created by James Hurst on 2020-02-02.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
-
 import Combine
 import Foundation
 import Preferences
 import ViewModel
 
-final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
-    private let client: DelugeClient
+final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
+    private let client: TransmissionClient
     private let preferences: Preferences
-    private let refresher: DelugeRefreshable
-    private let subject: CurrentValueSubject<DelugeTorrent, Never>
+    private let refresher: TransmissionRefreshable
+    private let subject: CurrentValueSubject<TransmissionTorrent, Never>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
@@ -23,7 +22,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     private var timerIntervalObserver: AnyCancellable?
     let state: TorrentDetailViewState
 
-    private let files: ValueMapper<Int, DelugeTorrentFile> = {
+    private let files: ValueMapper<Int, TransmissionTorrentFile> = {
         ValueMapper(filter: Just {
             $0.sorted {
                 let result = $0.value.name.compare(
@@ -47,10 +46,10 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     init(
-        subject: CurrentValueSubject<DelugeTorrent, Never>,
-        client: DelugeClient,
+        subject: CurrentValueSubject<TransmissionTorrent, Never>,
+        client: TransmissionClient,
         preferences: Preferences,
-        refresher: DelugeRefreshable
+        refresher: TransmissionRefreshable
     ) {
         self.subject = subject
         self.preferences = preferences
@@ -81,13 +80,13 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private static func createSections(
-        subject: CurrentValueSubject<DelugeTorrent, Never>,
-        torrent: DelugeTorrent,
-        files: [CurrentValueSubject<DelugeTorrentFile, Never>]
+        subject: CurrentValueSubject<TransmissionTorrent, Never>,
+        torrent: TransmissionTorrent,
+        files: [CurrentValueSubject<TransmissionTorrentFile, Never>]
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
-            .header(AnyViewModel(DelugeTorrentDetailHeaderViewModel(subject: subject))),
+            .header(AnyViewModel(TransmissionTorrentDetailHeaderViewModel(subject: subject))),
         ]))
         let ui = subject.ui()
         sections.append(TorrentDetailSection(type: .info, items: [
@@ -107,12 +106,12 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
         ]))
 
         if !torrent.trackers.isEmpty {
-            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
+            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0.host) }))
         }
 
         if !files.isEmpty {
             sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(AnyViewModel(DelugeTorrentDetailFileViewModel(subject: $0)))
+                .file(AnyViewModel(TransmissionTorrentDetailFileViewModel(subject: $0)))
             }))
         }
 
@@ -157,7 +156,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     private func handleRefresh() {
         guard !isLoadingSubject.value else { return }
         isLoadingSubject.send(true)
-        refresher.refreshDeluge()
+        refresher.refreshTransmission()
             .mapError { $0 as Error }
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
                 guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
@@ -183,10 +182,10 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func recheck() {
-        client.recheck(hashes: [subject.value.hash])
+        client.verify(ids: [subject.value.id])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshDeluge()
+                strongSelf.refresher.refreshTransmission()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -194,15 +193,15 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: "Failed to Recheck", message: error.localizedDescription)
-            }, receiveValue: { _ in })
+                }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     private func handlePause() {
-        client.pause(hashes: [subject.value.hash])
+        client.stop(ids: [subject.value.id])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshDeluge()
+                strongSelf.refresher.refreshTransmission()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -210,15 +209,15 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: "Failed to Pause", message: error.localizedDescription)
-            }, receiveValue: { _ in })
+                }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     private func handleResume() {
-        client.resume(hashes: [subject.value.hash])
+        client.start(ids: [subject.value.id])
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshDeluge()
+                strongSelf.refresher.refreshTransmission()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -226,7 +225,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: "Failed to Resume", message: error.localizedDescription)
-            }, receiveValue: { _ in })
+                }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -243,10 +242,10 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func remove(removeData: Bool) {
-        client.remove(hashes: [subject.value.hash], removeData: removeData)
+        client.remove(ids: [subject.value.id], removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshDeluge()
+                strongSelf.refresher.refreshTransmission()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -258,7 +257,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
                 case let .failure(error):
                     self?.showError(title: "Failed to Remove", message: error.localizedDescription)
                 }
-            }, receiveValue: { _ in })
+                }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -279,7 +278,7 @@ final class DelugeTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return client.getTorrentFiles(hash: subject.value.hash)
+        return client.getTorrentFiles(id: subject.value.id)
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.files.update(with: new.map { ($0.index, $0) })
             })

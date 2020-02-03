@@ -13,10 +13,16 @@ import Transmission
 typealias TransmissionError = Transmission.Client.Error
 typealias DefaultTransmissionClient = Transmission.Client
 typealias TransmissionTorrent = Transmission.Torrent
+typealias TransmissionTorrentFile = Transmission.TorrentFile
 
 protocol TransmissionClient {
     func authenticate() -> AnyPublisher<Void, TransmissionError>
-    func fetchTorrents() -> AnyPublisher<[Torrent], TransmissionError>
+    func getTorrents() -> AnyPublisher<[Torrent], TransmissionError>
+    func getTorrentFiles(id: Int) -> AnyPublisher<[TransmissionTorrentFile], TransmissionError>
+    func start(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
+    func stop(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
+    func remove(ids: [Int], removeData: Bool) -> AnyPublisher<Void, TransmissionError>
+    func verify(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
     func add(url: URL) -> AnyPublisher<Void, TransmissionError>
     func add(fileURL: URL) -> AnyPublisher<Void, TransmissionError>
 }

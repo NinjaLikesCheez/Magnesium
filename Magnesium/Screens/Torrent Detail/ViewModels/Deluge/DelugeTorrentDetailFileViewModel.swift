@@ -1,5 +1,5 @@
 //
-//  DelugeTorrentFileViewModel.swift
+//  DelugeTorrentDetailFileViewModel.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-08.
@@ -10,15 +10,11 @@ import Combine
 import ViewModel
 
 struct DelugeTorrentDetailFileViewModel: ViewModel, Identifiable {
-    private var path: String
+    let id: Int
     let state: TorrentDetailFileViewState
 
-    var id: String {
-        return path
-    }
-
     init(subject: CurrentValueSubject<DelugeTorrentFile, Never>) {
-        path = subject.value.path
+        id = subject.value.index
         let ui = subject.ui()
         state = TorrentDetailFileViewState(
             name: subject.value.name,

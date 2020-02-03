@@ -133,8 +133,8 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Fetches the list of torrents from the server.
-    public func fetchTorrents() -> AnyPublisher<[Torrent], Error> {
+    /// Retrieves the list of torrents from the server.
+    public func getTorrents() -> AnyPublisher<[Torrent], Error> {
         let keys = [
             "name",
             "state",
@@ -169,8 +169,8 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Fetches the list labels from the server.
-    public func fetchLabels() -> AnyPublisher<[String], Error> {
+    /// Retrieves the list of labels from the server.
+    public func getLabels() -> AnyPublisher<[String], Error> {
         return request(method: "label.get_labels", params: [])
             .flatMap { response -> AnyPublisher<[String], Error> in
                 guard let result = response["result"] as? [String] else {
@@ -213,9 +213,9 @@ public final class Client {
         return .success(parseDirectory(contents))
     }
 
-    /// Fetches the files for a torrent.
-    /// - Parameter hash: The hash of the torrent to request files for.
-    public func fetchTorrentFiles(hash: String) -> AnyPublisher<[TorrentFile], Error> {
+    /// Retrieves the list of files for a torrent.
+    /// - Parameter hash: The hash of the torrent whose files should be retrieved.
+    public func getTorrentFiles(hash: String) -> AnyPublisher<[TorrentFile], Error> {
         return request(method: "web.get_torrent_files", params: [hash])
             .flatMap { response -> AnyPublisher<[TorrentFile], Error> in
                 switch Client.parseTorrentFileResponse(response) {
@@ -228,18 +228,18 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Pauses torrents.
-    /// - Parameter hashes: The hashes of the torrents to pause.
-    public func pause(hashes: [String]) -> AnyPublisher<Void, Error> {
-        return request(method: "core.pause_torrent", params: [hashes])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
     /// Resumes torrents.
     /// - Parameter hashes: The hashes of the torrents to resume.
     public func resume(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.resume_torrent", params: [hashes])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Pauses torrents.
+    /// - Parameter hashes: The hashes of the torrents to pause.
+    public func pause(hashes: [String]) -> AnyPublisher<Void, Error> {
+        return request(method: "core.pause_torrent", params: [hashes])
             .map { _ in () }
             .eraseToAnyPublisher()
     }
@@ -254,7 +254,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Rechecks torrents.
+    /// Rechecks torrents' data.
     /// - Parameter hashes: The hashes of the torrents to recheck.
     public func recheck(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.force_recheck", params: [hashes])

@@ -38,6 +38,14 @@ public struct Torrent {
     public var uploaded: Int64
     /// The size of the torrent in bytes.
     public var size: Int64
+    /// The number of connected seeds.
+    public var seeds: Int
+    /// The total number of seeds.
+    public var totalSeeds: Int
+    /// The number of connected peers.
+    public var peers: Int
+    /// The total number of peers.
+    public var totalPeers: Int
     /// THe torrent's trackers.
     public var trackers: [Tracker]
 
@@ -54,6 +62,10 @@ public struct Torrent {
         downloaded: Int64,
         uploaded: Int64,
         size: Int64,
+        seeds: Int,
+        totalSeeds: Int,
+        peers: Int,
+        totalPeers: Int,
         trackers: [Tracker]
     ) {
         self.id = id
@@ -68,6 +80,10 @@ public struct Torrent {
         self.downloaded = downloaded
         self.uploaded = uploaded
         self.size = size
+        self.seeds = seeds
+        self.totalSeeds = totalSeeds
+        self.peers = peers
+        self.totalPeers = totalPeers
         self.trackers = trackers
     }
 }
@@ -87,8 +103,10 @@ extension Torrent {
             let downloaded = dictionary["downloadedEver"] as? Int64,
             let uploaded = dictionary["uploadedEver"] as? Int64,
             let size = dictionary["totalSize"] as? Int64,
-            let trackers = (dictionary["trackerStats"] as? [[String: Any]])?
-            .compactMap({ Tracker(dictionary: $0) })
+            let seeds = dictionary["peersSendingToUs"] as? Int,
+            let peers = dictionary["peersGettingFromUs"] as? Int,
+            let peersConnected = dictionary["peersConnected"] as? Int,
+            let trackers = (dictionary["trackerStats"] as? [[String: Any]])?.compactMap({ Tracker(dictionary: $0) })
         else {
             return nil
         }
@@ -105,6 +123,10 @@ extension Torrent {
         self.downloaded = downloaded
         self.uploaded = uploaded
         self.size = size
+        self.seeds = seeds
+        totalSeeds = peersConnected
+        self.peers = peers
+        totalPeers = peersConnected
         self.trackers = trackers
     }
 }

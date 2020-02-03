@@ -34,13 +34,13 @@ public struct Torrent {
     public var uploaded: Int64
     /// The size of the torrent in bytes.
     public var size: Int64
-    /// The number of seeds currently connected to.
+    /// The number of connected seeds.
     public var seeds: Int
-    /// The total number of seeds currently available.
+    /// The total number of seeds.
     public var totalSeeds: Int
-    /// The number of peers currently connected to.
+    /// The number of connected peers.
     public var peers: Int
-    /// The total number of peers currently available.
+    /// The total number of peers.
     public var totalPeers: Int
     /// The torrent's trackers.
     public var trackers: [String]

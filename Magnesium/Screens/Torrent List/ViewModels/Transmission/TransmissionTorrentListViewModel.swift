@@ -11,7 +11,7 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
+final class TransmissionTorrentListViewModel: ViewModel, EventEmitter, TransmissionRefreshable {
     private let client: TransmissionClient
     private let preferences: Preferences
     private let torrents: TorrentMapper<Int, TransmissionTorrent>
@@ -63,7 +63,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
                     }, receiveValue: { _ in })
                 .store(in: &observers)
 
-        case let .addSelected(source):
+        case let .addSelected(source: source):
             let linkSubject = PassthroughSubject<String, Never>()
             linkSubject
                 .sink { [weak self] in self?.addLink($0) }
@@ -73,13 +73,23 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
         case let .filterSelected(source: source):
             eventSubject.send(.filter(source: source))
 
-        case .itemSelected:
-            // TODO:
-            break
+        case let .itemSelected(index: index):
+            let subject = torrents.subject(at: index)
+            let viewModel = TransmissionTorrentDetailViewModel(
+                subject: subject,
+                client: client,
+                preferences: preferences,
+                refresher: self
+            )
+            eventSubject.send(.detail(viewModel: AnyEmitterViewModel(viewModel)))
 
         case .settingsSelected:
             eventSubject.send(.settings)
         }
+    }
+
+    func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {
+        return refreshTorrents()
     }
 
     private func configureAutoRefreshTimer(interval: TimeInterval?) {
@@ -110,7 +120,7 @@ final class TransmissionTorrentListViewModel: ViewModel, EventEmitter {
     }
 
     private func refreshTorrents() -> AnyPublisher<Void, TransmissionError> {
-        return client.fetchTorrents()
+        return client.getTorrents()
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.torrents.update(with: new.map { ($0.id, $0) })
             })

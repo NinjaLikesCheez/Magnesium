@@ -25,6 +25,10 @@ extension TransmissionTorrent {
         downloaded: Int64 = 0,
         uploaded: Int64 = 0,
         size: Int64 = 0,
+        seeds: Int = 0,
+        totalSeeds: Int = 0,
+        peers: Int = 0,
+        totalPeers: Int = 0,
         trackers: [Transmission.Tracker] = []
     ) -> TransmissionTorrent {
         return TransmissionTorrent(
@@ -40,6 +44,10 @@ extension TransmissionTorrent {
             downloaded: downloaded,
             uploaded: uploaded,
             size: size,
+            seeds: seeds,
+            totalSeeds: totalSeeds,
+            peers: peers,
+            totalPeers: totalPeers,
             trackers: trackers
         )
     }
@@ -64,7 +72,24 @@ extension TransmissionTorrent {
             downloaded: 0,
             uploaded: 0,
             size: 0,
+            seeds: 0,
+            totalSeeds: 0,
+            peers: 0,
+            totalPeers: 0,
             trackers: []
+        )
+    }
+}
+
+extension TransmissionTorrentFile {
+    static func mock(index: Int, name: String) -> TransmissionTorrentFile {
+        return TransmissionTorrentFile(
+            index: index,
+            name: name,
+            size: 100_000_000,
+            downloaded: 50_000_000,
+            priority: .normal,
+            isWanted: true
         )
     }
 }

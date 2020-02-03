@@ -151,8 +151,8 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Fetches the list of torrents from the server.
-    public func fetchTorrents() -> AnyPublisher<[Torrent], Error> {
+    /// Retrieves the list of torrents from the server.
+    public func getTorrents() -> AnyPublisher<[Torrent], Error> {
         let fields = [
             "id",
             "hashString",
@@ -166,6 +166,9 @@ public final class Client {
             "downloadedEver",
             "uploadedEver",
             "totalSize",
+            "peersSendingToUs",
+            "peersGettingFromUs",
+            "peersConnected",
             "trackerStats",
         ]
 
@@ -181,6 +184,65 @@ public final class Client {
                     .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             }
+            .eraseToAnyPublisher()
+    }
+
+    /// Retrieves the list of files for a torrent.
+    /// - Parameter id: The ID of the torrent whose files should be retrieved.
+    public func getTorrentFiles(id: Int) -> AnyPublisher<[TorrentFile], Error> {
+        let fields = ["files", "fileStats"]
+        return request(method: "torrent-get", args: ["ids": [id], "fields": fields])
+            .flatMap { response -> AnyPublisher<[TorrentFile], Error> in
+                guard let arguments = response["arguments"] as? [String: Any],
+                    let torrents = arguments["torrents"] as? [[String: Any]],
+                    !torrents.isEmpty,
+                    let filesDict = torrents[0]["files"] as? [[String: Any]],
+                    let statsDict = torrents[0]["fileStats"] as? [[String: Any]]
+                else {
+                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
+                }
+
+                let files = zip(filesDict, statsDict).enumerated().compactMap { index, element in
+                    TorrentFile(index: index, file: element.0, stats: element.1)
+                }
+                return Just(files)
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+
+    /// Starts torrents.
+    /// - Parameter ids: The IDs of the torrents to resume.
+    public func start(ids: [Int]) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-start", args: ["ids": ids])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Stops torrents.
+    /// - Parameter ids: The IDs of the torrents to pause.
+    public func stop(ids: [Int]) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-stop", args: ["ids": ids])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Removes torrents from the server.
+    /// - Parameters:
+    ///   - ids: The IDs of the torrents to remove.
+    ///   - removeData: If the torrents' data should be removed.
+    public func remove(ids: [Int], removeData: Bool) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-remove", args: ["ids": ids, "delete-local-data": removeData])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Verifies torrents' data.
+    /// - Parameter ids: The IDs of the torrents to verify.
+    public func verify(ids: [Int]) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-verify", args: ["ids": ids])
+            .map { _ in () }
             .eraseToAnyPublisher()
     }
 

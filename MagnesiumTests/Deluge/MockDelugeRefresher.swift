@@ -16,7 +16,7 @@ final class MockDelugeRefresher: DelugeRefreshable {
         self.client = client
     }
 
-    func refreshTorrents() -> AnyPublisher<Void, DelugeError> {
-        return client.fetchTorrents().map { _ in () }.eraseToAnyPublisher()
+    func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
+        return client.getTorrents().map { _ in () }.eraseToAnyPublisher()
     }
 }

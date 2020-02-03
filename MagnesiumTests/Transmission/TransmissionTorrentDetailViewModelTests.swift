@@ -1,8 +1,8 @@
 //
-//  DelugeTorrentDetailViewModelTests.swift
+//  TransmissionTorrentDetailViewModelTests.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2020-01-22.
+//  Created by James Hurst on 2020-02-02.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
@@ -10,22 +10,23 @@ import Combine
 import Coordinator
 @testable import Magnesium
 import Preferences
+import Transmission
 import XCTest
 
-final class DelugeTorrentDetailViewModelTests: XCTestCase {
-    private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
-    private let client = MockDelugeClient()
+final class TransmissionTorrentDetailViewModelTests: XCTestCase {
+    private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
+    private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
-    private var viewModel: DelugeTorrentDetailViewModel!
+    private var viewModel: TransmissionTorrentDetailViewModel!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = DelugeTorrentDetailViewModel(
+        viewModel = TransmissionTorrentDetailViewModel(
             subject: subject,
             client: client,
             preferences: preferences,
-            refresher: MockDelugeRefresher(client: client)
+            refresher: MockTransmissionRefresher(client: client)
         )
     }
 
@@ -34,7 +35,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         client.requests.reset()
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -46,7 +47,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.appear)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 1))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 1))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -59,7 +60,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.disappear)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -72,7 +73,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrentFiles: 0))
+            XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 0.12)
@@ -191,7 +192,10 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_sections_shouldHaveTrackers() {
-        let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
+        let trackers = [
+            Tracker(id: 0, host: "udp://tracker.example.com:9000"),
+            Tracker(id: 1, host: "http://tracker.example.com:9000/announce"),
+        ]
         subject.send(.mock(trackers: trackers))
 
         let expectation = self.expectation(description: "Value received")
@@ -209,7 +213,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
                 }
             }
 
-            XCTAssertEqual(inner, trackers)
+            XCTAssertEqual(inner, trackers.map { $0.host })
             expectation.fulfill()
         }.store(in: &observers)
         wait(for: [expectation], timeout: 0)
@@ -263,11 +267,11 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let recheck = alert!.actions[0].handler!
         recheck()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, verify: 1))
     }
 
     func test_forceRecheck_whenFails_shouldEmitAlert() {
-        client.errors.recheck = true
+        client.errors.verify = true
         client.requests.reset()
 
         var optionsAlert: Alert?
@@ -291,17 +295,17 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         recheck()
         XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
     }
 
     func test_pause_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.pause)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, pause: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, stop: 1))
     }
 
     func test_pause_whenFails_shouldEmitAlert() {
-        client.errors.pause = true
+        client.errors.stop = true
         client.requests.reset()
 
         var errorAlert: Alert?
@@ -315,17 +319,17 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.pause)
         XCTAssertEqual(errorAlert?.title, "Failed to Pause")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
     }
 
     func test_resume_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.resume)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, resume: 1))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, start: 1))
     }
 
     func test_resume_whenFails_shouldPerformRequest() {
-        client.errors.resume = true
+        client.errors.start = true
         client.requests.reset()
 
         var errorAlert: Alert?
@@ -339,7 +343,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.resume)
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
     }
 
     func test_remove_shouldEmitAlert() {
@@ -378,7 +382,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             event = inner
         }.store(in: &observers)
         remove()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [false]))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, remove: [false]))
 
         guard case .complete = event else {
             XCTFail("Unexpected event")
@@ -411,7 +415,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
     }
 
     func test_removeWithData_shouldPerformRequestAndRefresh() {
@@ -429,7 +433,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = alert!.actions[1].handler!
         remove()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, remove: [true]))
     }
 
     func test_removeWithData_whenFails_shouldEmitAlert() {
@@ -457,7 +461,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
     }
 }
 
