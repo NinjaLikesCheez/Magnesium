@@ -34,11 +34,11 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         preferences.set(0.1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 0.12)
+        waitForExpectations(timeout: 0.14)
     }
 
     func test_autoRefresh_whenAppeared_shouldFire() {
@@ -46,11 +46,11 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         client.requests.reset()
         viewModel.handle(.appear)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 1))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 0.12)
+        waitForExpectations(timeout: 0.14)
     }
 
     func test_autoRefresh_whenDisappeared_shouldNotFire() {
@@ -59,11 +59,11 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.appear)
         viewModel.handle(.disappear)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 0.12)
+        waitForExpectations(timeout: 0.14)
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
@@ -72,11 +72,11 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.appear)
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.11) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 0.12)
+        waitForExpectations(timeout: 0.14)
     }
 
     func test_refresh_whenFails_shouldShowError() {
