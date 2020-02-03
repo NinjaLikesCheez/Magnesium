@@ -43,7 +43,7 @@ final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshab
 
         preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.autoRefreshTimerFired(interval: value)
+                self?.configureAutoRefreshTimer(interval: value)
             })
             .store(in: &observers)
     }
@@ -92,7 +92,7 @@ final class DelugeTorrentListViewModel: ViewModel, EventEmitter, DelugeRefreshab
         return refreshTorrents()
     }
 
-    private func autoRefreshTimerFired(interval: TimeInterval?) {
+    private func configureAutoRefreshTimer(interval: TimeInterval?) {
         autoRefreshTimer?.invalidate()
         guard let interval = interval, interval > 0 else { return }
         let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
