@@ -358,11 +358,11 @@
 			children = (
 				E988EDE923E7D0550011A733 /* Mocks */,
 				E9847C5723E6605900B05D3A /* TransmissionSettingsViewModelTests.swift */,
-				E988EDD923E7ACE80011A733 /* TransmissionTorrentDetailViewModelTests.swift */,
-				E9847C4F23E645B800B05D3A /* TransmissionTorrentListViewModelTests.swift */,
-				E988EDDF23E7C6A00011A733 /* TransmissionTorrentListItemViewModelTests.swift */,
-				E988EDE323E7CA1C0011A733 /* TransmissionTorrentDetailHeaderViewModelTests.swift */,
 				E988EDE523E7CC720011A733 /* TransmissionTorrentDetailFileViewModelTests.swift */,
+				E988EDE323E7CA1C0011A733 /* TransmissionTorrentDetailHeaderViewModelTests.swift */,
+				E988EDD923E7ACE80011A733 /* TransmissionTorrentDetailViewModelTests.swift */,
+				E988EDDF23E7C6A00011A733 /* TransmissionTorrentListItemViewModelTests.swift */,
+				E9847C4F23E645B800B05D3A /* TransmissionTorrentListViewModelTests.swift */,
 				E988EDEB23E7D0710011A733 /* TransmissionTorrentTests.swift */,
 			);
 			path = Transmission;
