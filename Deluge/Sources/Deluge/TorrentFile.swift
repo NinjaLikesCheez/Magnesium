@@ -1,17 +1,17 @@
 /// A Deluge torrent file.
 public struct TorrentFile {
     /// The file's index.
-    public let index: Int
+    public var index: Int
     /// The file name.
-    public let name: String
+    public var name: String
     /// The file's path.
-    public let path: String
+    public var path: String
     /// The file's size in bytes.
-    public let size: Int64
+    public var size: Int64
     /// The file's current progress.
-    public let progress: Float
+    public var progress: Float
     /// The file's download priority.
-    public let priority: Priority
+    public var priority: Priority
 
     public init(index: Int, name: String, path: String, size: Int64, progress: Float, priority: Priority) {
         self.index = index

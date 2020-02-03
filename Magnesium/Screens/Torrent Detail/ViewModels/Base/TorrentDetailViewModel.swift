@@ -1,20 +1,69 @@
 //
-//  TransmissionTorrentDetailViewModel.swift
+//  TorrentDetailViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2020-02-02.
-//  Copyright © 2020 James Hurst. All rights reserved.
+//  Created by James Hurst on 2019-11-16.
+//  Copyright © 2019 James Hurst. All rights reserved.
 //
+
 import Combine
 import Foundation
 import Preferences
 import ViewModel
 
-final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
-    private let client: TransmissionClient
+typealias AnyTorrentDetailViewModel = AnyEmitterViewModel<
+    TorrentDetailEvent,
+    TorrentDetailViewEvent,
+    TorrentDetailViewState
+>
+
+enum TorrentDetailEvent {
+    case complete
+    case alert(Alert, source: PopoverSource?)
+}
+
+enum TorrentDetailViewEvent {
+    case appear
+    case disappear
+    case refresh
+    case moreOptions(source: PopoverSource)
+    case pause
+    case resume
+    case remove(source: PopoverSource)
+}
+
+struct TorrentDetailViewState {
+    var sections: AnyPublisher<[TorrentDetailSection], Never>
+    var isLoading: AnyPublisher<Bool, Never>
+}
+
+protocol StandardDetailTorrent: StandardTorrent {
+    var trackers: [String] { get }
+}
+
+protocol StandardDetailTorrentFile {
+    var index: Int { get }
+    var name: String { get }
+    var size: Int64 { get }
+    var progress: Float { get }
+}
+
+protocol StandardTorrentDetailViewModelImplementation {
+    func refresh() -> AnyPublisher<Void, Error>
+    func pause() -> AnyPublisher<Void, Error>
+    func resume() -> AnyPublisher<Void, Error>
+    func remove(removeData: Bool) -> AnyPublisher<Void, Error>
+    func recheck() -> AnyPublisher<Void, Error>
+    func updateFiles() -> AnyPublisher<Void, Error>
+}
+
+class StandardTorrentDetailViewModel<
+    Torrent: StandardDetailTorrent,
+    File: StandardDetailTorrentFile
+>: ViewModel, EventEmitter {
+    private var implementation: StandardTorrentDetailViewModelImplementation!
     private let preferences: Preferences
-    private let refresher: TransmissionRefreshable
-    private let subject: CurrentValueSubject<TransmissionTorrent, Never>
+    private let subject: CurrentValueSubject<Torrent, Never>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
@@ -22,7 +71,7 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     private var timerIntervalObserver: AnyCancellable?
     let state: TorrentDetailViewState
 
-    private let files: ValueMapper<Int, TransmissionTorrentFile> = {
+    let files: ValueMapper<Int, File> = {
         ValueMapper(filter: Just {
             $0.sorted {
                 let result = $0.value.name.compare(
@@ -45,16 +94,9 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(
-        subject: CurrentValueSubject<TransmissionTorrent, Never>,
-        client: TransmissionClient,
-        preferences: Preferences,
-        refresher: TransmissionRefreshable
-    ) {
+    init(subject: CurrentValueSubject<Torrent, Never>, preferences: Preferences) {
         self.subject = subject
         self.preferences = preferences
-        self.client = client
-        self.refresher = refresher
 
         let sections = subject
             .combineLatest(files.values)
@@ -69,7 +111,10 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
             .ui()
             .eraseToAnyPublisher()
         state = TorrentDetailViewState(sections: sections, isLoading: isLoadingSubject.eraseToAnyPublisher())
+    }
 
+    func setup(with implementation: StandardTorrentDetailViewModelImplementation) {
+        self.implementation = implementation
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
@@ -80,13 +125,13 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private static func createSections(
-        subject: CurrentValueSubject<TransmissionTorrent, Never>,
-        torrent: TransmissionTorrent,
-        files: [CurrentValueSubject<TransmissionTorrentFile, Never>]
+        subject: CurrentValueSubject<Torrent, Never>,
+        torrent: Torrent,
+        files: [CurrentValueSubject<File, Never>]
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
-            .header(AnyViewModel(TransmissionTorrentDetailHeaderViewModel(subject: subject))),
+            .header(AnyViewModel(StandardTorrentDetailHeaderViewModel(subject: subject))),
         ]))
         let ui = subject.ui()
         sections.append(TorrentDetailSection(type: .info, items: [
@@ -106,12 +151,12 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
         ]))
 
         if !torrent.trackers.isEmpty {
-            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0.host) }))
+            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
         }
 
         if !files.isEmpty {
             sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(AnyViewModel(TransmissionTorrentDetailFileViewModel(subject: $0)))
+                .file(AnyViewModel(StandardTorrentDetailFileViewModel(subject: $0)))
             }))
         }
 
@@ -156,7 +201,7 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     private func handleRefresh() {
         guard !isLoadingSubject.value else { return }
         isLoadingSubject.send(true)
-        refresher.refreshTransmission()
+        implementation.refresh()
             .mapError { $0 as Error }
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
                 guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
@@ -182,10 +227,10 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func recheck() {
-        client.verify(ids: [subject.value.id])
+        implementation.recheck()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshTransmission()
+                strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -198,10 +243,10 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func handlePause() {
-        client.stop(ids: [subject.value.id])
+        implementation.pause()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshTransmission()
+                strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -214,10 +259,10 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func handleResume() {
-        client.start(ids: [subject.value.id])
+        implementation.resume()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshTransmission()
+                strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -242,10 +287,10 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func remove(removeData: Bool) {
-        client.remove(ids: [subject.value.id], removeData: removeData)
+        implementation.remove(removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.refresher.refreshTransmission()
+                strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                     .store(in: &strongSelf.observers)
             })
@@ -278,10 +323,7 @@ final class TransmissionTorrentDetailViewModel: ViewModel, EventEmitter {
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return client.getTorrentFiles(id: subject.value.id)
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.files.update(with: new.map { ($0.index, $0) })
-            })
+        return implementation.updateFiles()
             .mapError { $0 as Error }
             .map { _ in () }
             .eraseToAnyPublisher()

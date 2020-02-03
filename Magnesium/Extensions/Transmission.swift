@@ -29,8 +29,8 @@ protocol TransmissionClient {
 
 extension DefaultTransmissionClient: TransmissionClient {}
 
-extension TransmissionTorrent: TorrentExt {
-    var commonState: TorrentState {
+extension TransmissionTorrent: StandardTorrent {
+    var standardState: TorrentState {
         switch status {
         case .paused:
             return .paused
@@ -51,5 +51,3 @@ extension TransmissionTorrent: TorrentExt {
         }
     }
 }
-
-extension TransmissionTorrent: FilterableTorrent {}

@@ -1,8 +1,8 @@
 //
-//  DelugeTorrentDetailHeaderViewModelTests.swift
+//  TransmissionTorrentDetailHeaderViewModelTests.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2020-01-26.
+//  Created by James Hurst on 2020-02-02.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
@@ -10,10 +10,17 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
+class TransmissionTorrentDetailHeaderViewModelTests: XCTestCase {
+    typealias Torrent = TransmissionTorrentDetailViewModel.Torrent
     private var observers = [AnyCancellable]()
-    private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
-    private lazy var viewModel = StandardTorrentDetailHeaderViewModel(subject: subject)
+    private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
+    private lazy var mappedSubject = CurrentValueSubject<Torrent, Never>(Torrent(subject.value))
+    private lazy var viewModel = StandardTorrentDetailHeaderViewModel(subject: mappedSubject)
+
+    override func setUp() {
+        super.setUp()
+        subject.sink { [weak self] in self?.mappedSubject.send(Torrent($0)) }.store(in: &observers)
+    }
 
     func test_name() {
         subject.send(.mock(name: "name"))
@@ -26,8 +33,8 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     }
 
     func test_isActive_withActiveStates_shouldBeTrue() {
-        for state in [DelugeTorrent.State.downloading, .seeding] {
-            subject.send(.mock(state: state))
+        for status in [TransmissionTorrent.Status.downloading, .seeding] {
+            subject.send(.mock(status: status))
             var isActive: Bool!
             viewModel.state.isActive.first().sink { isActive = $0 }.store(in: &observers)
             XCTAssertTrue(isActive)
@@ -35,8 +42,17 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     }
 
     func test_isActive_withInactiveState_shouldBeFalse() {
-        for state in [DelugeTorrent.State.paused, .checking, .queued, .error] {
-            subject.send(.mock(state: state))
+        let statuses: [TransmissionTorrent.Status] = [
+            .paused,
+            .checking,
+            .checkQueued,
+            .downloadQueued,
+            .seedQueued,
+            .isolated,
+        ]
+
+        for status in statuses {
+            subject.send(.mock(status: status))
             var isActive: Bool!
             viewModel.state.isActive.first().sink { isActive = $0 }.store(in: &observers)
             XCTAssertFalse(isActive)
@@ -54,43 +70,47 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
     }
 
     func test_progressColor() {
-        let pairs: [(DelugeTorrent.State, UIColor)] = [
+        let pairs: [(TransmissionTorrent.Status, UIColor)] = [
             (.downloading, TorrentState.downloading.displayColor),
             (.seeding, TorrentState.seeding.displayColor),
             (.paused, TorrentState.paused.displayColor),
             (.checking, TorrentState.checking.displayColor),
-            (.queued, TorrentState.queued.displayColor),
-            (.error, TorrentState.error.displayColor),
+            (.checkQueued, TorrentState.queued.displayColor),
+            (.downloadQueued, TorrentState.queued.displayColor),
+            (.seedQueued, TorrentState.queued.displayColor),
+            (.isolated, TorrentState.error.displayColor),
         ]
 
-        for (state, result) in pairs {
+        for (status, result) in pairs {
             let expectation = self.expectation(description: "Value received")
             viewModel.state.progressColor.dropFirst().first().sink {
                 XCTAssertEqual($0, result)
                 expectation.fulfill()
             }.store(in: &observers)
-            subject.send(.mock(state: state))
+            subject.send(.mock(status: status))
             waitForExpectations(timeout: 0)
         }
     }
 
     func test_status() {
-        let pairs: [(DelugeTorrent.State, String)] = [
+        let pairs: [(TransmissionTorrent.Status, String)] = [
             (.downloading, "Downloading"),
             (.seeding, "Seeding"),
             (.paused, "Paused"),
             (.checking, "Checking"),
-            (.queued, "Queued"),
-            (.error, "Error"),
+            (.checkQueued, "Queued"),
+            (.downloadQueued, "Queued"),
+            (.seedQueued, "Queued"),
+            (.isolated, "Error"),
         ]
 
-        for (state, string) in pairs {
+        for (status, string) in pairs {
             let expectation = self.expectation(description: "Value received")
             viewModel.state.status.dropFirst().first().sink {
                 XCTAssertEqual($0, "\(string) (0.00%)")
                 expectation.fulfill()
             }.store(in: &observers)
-            subject.send(.mock(state: state))
+            subject.send(.mock(status: status))
             waitForExpectations(timeout: 0)
         }
     }

@@ -95,8 +95,10 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 
     func configure(with state: TorrentDetailFileViewState, isLastRow: Bool) {
-        nameLabel.text = state.name
-        separatorView.isHidden = isLastRow
+        state.name
+            .asOptional()
+            .assign(to: \.text, on: nameLabel)
+            .store(in: &observers)
 
         state.size
             .asOptional()
@@ -107,6 +109,8 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             .asOptional()
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
+
+        separatorView.isHidden = isLastRow
     }
 }
 
@@ -132,7 +136,7 @@ struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
 
     static var previews: some View {
         let state = TorrentDetailFileViewState(
-            name: "file.rar",
+            name: Just("file.rar").eraseToAnyPublisher(),
             size: Just("50.0 MB").eraseToAnyPublisher(),
             progress: Just("100%").eraseToAnyPublisher()
         )

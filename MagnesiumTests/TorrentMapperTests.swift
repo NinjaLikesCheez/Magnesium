@@ -117,10 +117,10 @@ class TorrentMapperTests: XCTestCase {
 
     func test_filter_withState() {
         let torrents = [
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: 0), commonState: .downloading),
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -1), commonState: .seeding),
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -2), commonState: .error),
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -3), commonState: .downloading),
+            MockTorrent(standardState: .downloading, dateAdded: Date(timeIntervalSinceNow: 0)),
+            MockTorrent(standardState: .seeding, dateAdded: Date(timeIntervalSinceNow: -1)),
+            MockTorrent(standardState: .error, dateAdded: Date(timeIntervalSinceNow: -2)),
+            MockTorrent(standardState: .downloading, dateAdded: Date(timeIntervalSinceNow: -3)),
         ]
         let expected = [torrents[0].hash, torrents[3].hash]
 
@@ -132,7 +132,7 @@ class TorrentMapperTests: XCTestCase {
     }
 }
 
-private struct MockTorrent: FilterableTorrent {
+private struct MockTorrent: StandardTorrent {
     let hash: String = {
         let data = UUID().uuidString.data(using: .utf8)!
         let hashed = Insecure.SHA1.hash(data: data)
@@ -140,8 +140,17 @@ private struct MockTorrent: FilterableTorrent {
     }()
 
     var name = ""
+    var standardState: TorrentState = .downloading
     var dateAdded = Date()
     var downloadRate: Int64 = 0
     var uploadRate: Int64 = 0
-    var commonState: TorrentState = .downloading
+    var eta: TimeInterval = 0
+    var progress: Float = 0
+    var downloaded: Int64 = 0
+    var uploaded: Int64 = 0
+    var size: Int64 = 0
+    var seeds: Int = 0
+    var totalSeeds: Int = 0
+    var peers: Int = 0
+    var totalPeers: Int = 0
 }

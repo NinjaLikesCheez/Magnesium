@@ -10,16 +10,7 @@ import Combine
 import Foundation
 import Preferences
 
-protocol FilterableTorrent {
-    var hash: String { get }
-    var name: String { get }
-    var dateAdded: Date { get }
-    var downloadRate: Int64 { get }
-    var uploadRate: Int64 { get }
-    var commonState: TorrentState { get }
-}
-
-final class TorrentMapper<K: Hashable, V: FilterableTorrent>: ValueMapper<K, V> {
+final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
     init(preferences: Preferences) {
         let filter = preferences.valuePublisher(for: PreferenceKeys.sortOption)
             .combineLatest(preferences.valuePublisher(for: PreferenceKeys.filterOptions))
@@ -29,7 +20,7 @@ final class TorrentMapper<K: Hashable, V: FilterableTorrent>: ValueMapper<K, V> 
 
                     if let state = filter.state {
                         filtered = filtered.filter { subject in
-                            return subject.value.commonState == state
+                            return subject.value.standardState == state
                         }
                     }
 
@@ -40,11 +31,11 @@ final class TorrentMapper<K: Hashable, V: FilterableTorrent>: ValueMapper<K, V> 
         super.init(filter: filter)
     }
 
-    private static func sort<T: FilterableTorrent>(
+    private static func sort<T: StandardTorrent>(
         _ torrents: [CurrentValueSubject<T, Never>],
         using sortOption: SortOption
     ) -> [CurrentValueSubject<T, Never>] {
-        let compare: (FilterableTorrent, FilterableTorrent) -> ComparisonResult
+        let compare: (StandardTorrent, StandardTorrent) -> ComparisonResult
         switch sortOption.property {
         case .name:
             compare = { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) }

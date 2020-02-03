@@ -31,8 +31,8 @@ protocol DelugeClient {
 
 extension DefaultDelugeClient: DelugeClient {}
 
-extension DelugeTorrent: TorrentExt {
-    var commonState: TorrentState {
+extension DelugeTorrent: StandardTorrent {
+    var standardState: TorrentState {
         switch state {
         case .downloading:
             return .downloading
@@ -49,5 +49,3 @@ extension DelugeTorrent: TorrentExt {
         }
     }
 }
-
-extension DelugeTorrent: FilterableTorrent {}

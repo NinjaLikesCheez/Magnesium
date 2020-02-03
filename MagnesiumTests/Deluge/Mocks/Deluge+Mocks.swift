@@ -1,22 +1,20 @@
 //
-//  Transmission+Mocks.swift
+//  Deluge+Mocks.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2020-02-01.
+//  Created by James Hurst on 2020-01-20.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import CryptoKit
 import Foundation
 @testable import Magnesium
-import Transmission
 
-extension TransmissionTorrent {
+extension DelugeTorrent {
     static func mock(
-        id: Int = 0,
         hash: String = "",
         name: String = "",
-        status: Status = .downloading,
+        state: State = .downloading,
         dateAdded: Date = Date(),
         downloadRate: Int64 = 0,
         uploadRate: Int64 = 0,
@@ -29,13 +27,13 @@ extension TransmissionTorrent {
         totalSeeds: Int = 0,
         peers: Int = 0,
         totalPeers: Int = 0,
-        trackers: [Transmission.Tracker] = []
-    ) -> TransmissionTorrent {
-        return TransmissionTorrent(
-            id: id,
+        trackers: [String] = [],
+        label: String = ""
+    ) -> DelugeTorrent {
+        return DelugeTorrent(
             hash: hash,
             name: name,
-            status: status,
+            state: state,
             dateAdded: dateAdded,
             downloadRate: downloadRate,
             uploadRate: uploadRate,
@@ -48,22 +46,22 @@ extension TransmissionTorrent {
             totalSeeds: totalSeeds,
             peers: peers,
             totalPeers: totalPeers,
-            trackers: trackers
+            trackers: trackers,
+            label: label
         )
     }
 
-    static func randomMock() -> TransmissionTorrent {
+    static func randomMock() -> DelugeTorrent {
         let uuid = UUID().uuidString
         let hash: String = {
             let hashed = Insecure.SHA1.hash(data: uuid.data(using: .utf8)!)
             return hashed.compactMap { String(format: "%02x", $0) }.joined()
         }()
 
-        return TransmissionTorrent(
-            id: hash.hashValue,
+        return DelugeTorrent(
             hash: hash,
             name: uuid,
-            status: .downloading,
+            state: .downloading,
             dateAdded: Date(),
             downloadRate: 0,
             uploadRate: 0,
@@ -76,20 +74,21 @@ extension TransmissionTorrent {
             totalSeeds: 0,
             peers: 0,
             totalPeers: 0,
-            trackers: []
+            trackers: [],
+            label: ""
         )
     }
 }
 
-extension TransmissionTorrentFile {
-    static func mock(index: Int, name: String) -> TransmissionTorrentFile {
-        return TransmissionTorrentFile(
+extension DelugeTorrentFile {
+    static func mock(index: Int, name: String, progress: Float = 0) -> DelugeTorrentFile {
+        return DelugeTorrentFile(
             index: index,
             name: name,
+            path: "",
             size: 100_000_000,
-            downloaded: 50_000_000,
-            priority: .normal,
-            isWanted: true
+            progress: progress,
+            priority: .normal
         )
     }
 }

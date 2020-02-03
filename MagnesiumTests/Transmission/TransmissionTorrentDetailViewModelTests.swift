@@ -228,7 +228,9 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
             let files = section.items.compactMap { item -> String? in
                 switch item {
                 case let .file(viewModel):
-                    return viewModel.state.name
+                    var value: String?
+                    viewModel.state.name.sink { value = $0 }.store(in: &self.observers)
+                    return value
                 default:
                     XCTFail("Unexpected item")
                     return nil

@@ -1,5 +1,5 @@
 //
-//  TorrentExt.swift
+//  StandardTorrent.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-07.
@@ -8,33 +8,40 @@
 
 import Foundation
 
-protocol TorrentExt {
-    var commonState: TorrentState { get }
+protocol StandardTorrent {
+    var hash: String { get }
+    var name: String { get }
+    var standardState: TorrentState { get }
+    var dateAdded: Date { get }
     var downloadRate: Int64 { get }
     var uploadRate: Int64 { get }
     var eta: TimeInterval { get }
     var progress: Float { get }
-    var size: Int64 { get }
     var downloaded: Int64 { get }
     var uploaded: Int64 { get }
+    var size: Int64 { get }
+    var seeds: Int { get }
+    var totalSeeds: Int { get }
+    var peers: Int { get }
+    var totalPeers: Int { get }
 }
 
-extension TorrentExt {
+extension StandardTorrent {
     var ratio: Double {
         return Double(uploaded) / Double(downloaded)
     }
 
     var isActive: Bool {
-        return commonState == .downloading || commonState == .seeding
+        return standardState == .downloading || standardState == .seeding
     }
 
     var speedString: String {
-        if commonState == .downloading {
+        if standardState == .downloading {
             return """
             ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
             ↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s
             """
-        } else if commonState == .seeding {
+        } else if standardState == .seeding {
             return "↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s"
         } else {
             return ""
@@ -58,7 +65,7 @@ extension TorrentExt {
     }
 
     var ratioOrETAString: String {
-        if commonState == .downloading {
+        if standardState == .downloading {
             return etaString
         } else {
             return "Ratio: \(ratioString())"

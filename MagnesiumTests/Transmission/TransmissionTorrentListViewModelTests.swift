@@ -160,4 +160,34 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests.torrents, 1)
         XCTAssertEqual(count, 1)
     }
+
+    func test_filterSelected_shouldEmitFilterEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.sink {
+            event = $0
+        }.store(in: &observers)
+        viewModel.handle(.filterSelected(source: .view(UIView(), rect: .zero)))
+        guard case .filter = event else {
+            XCTFail("Unexpected event")
+            return
+        }
+    }
+
+    func test_settingsSelected_shouldEmitSettingsEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.sink {
+            event = $0
+        }.store(in: &observers)
+        viewModel.handle(.settingsSelected)
+        guard case .settings = event else {
+            XCTFail("Unexpected event")
+            return
+        }
+    }
+
+    func test_refreshTransmission_shouldRefreshTorrents() {
+        client.requests.reset()
+        viewModel.refreshTransmission().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1))
+    }
 }

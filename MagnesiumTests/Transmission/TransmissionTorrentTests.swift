@@ -1,27 +1,29 @@
 //
-//  DelugeTorrentTests.swift
+//  TransmissionTorrentTests.swift
 //  MagnesiumTests
 //
-//  Created by James Hurst on 2020-01-20.
+//  Created by James Hurst on 2020-02-02.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 @testable import Magnesium
 import XCTest
 
-class DelugeTorrentTests: XCTestCase {
+class TransmissionTorrentTests: XCTestCase {
     func test_standardState() {
-        let pairs: [(DelugeTorrent.State, TorrentState)] = [
+        let pairs: [(TransmissionTorrent.Status, TorrentState)] = [
             (.downloading, .downloading),
             (.seeding, .seeding),
             (.paused, .paused),
             (.checking, .checking),
-            (.queued, .queued),
-            (.error, .error),
+            (.checkQueued, .queued),
+            (.downloadQueued, .queued),
+            (.seedQueued, .queued),
+            (.isolated, .error),
         ]
 
         for pair in pairs {
-            let torrent = DelugeTorrent.mock(state: pair.0)
+            let torrent = TransmissionTorrent.mock(status: pair.0)
             XCTAssertEqual(torrent.standardState, pair.1)
         }
     }

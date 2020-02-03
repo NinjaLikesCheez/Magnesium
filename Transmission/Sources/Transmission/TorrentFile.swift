@@ -1,17 +1,17 @@
 /// A Transmission torrent file.
 public struct TorrentFile {
     /// The file's index.
-    public let index: Int
+    public var index: Int
     /// The file name.
-    public let name: String
+    public var name: String
     /// The file's size in bytes.
-    public let size: Int64
+    public var size: Int64
     /// The number of bytes that have been downloaded.
-    public let downloaded: Int64
+    public var downloaded: Int64
     /// The file's download priority.
-    public let priority: Priority
+    public var priority: Priority
     /// Whether the file is marked as wanted or unwanted.
-    public let isWanted: Bool
+    public var isWanted: Bool
 
     public init(index: Int, name: String, size: Int64, downloaded: Int64, priority: Priority, isWanted: Bool) {
         self.index = index
