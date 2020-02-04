@@ -118,4 +118,28 @@ class SettingsViewModelTests: XCTestCase {
             return
         }
     }
+
+    func test_refreshIntervalSelected_shouldEmitRefreshIntervalEvent() {
+        var event: SettingsEvent?
+        viewModel.events.first().sink {
+            event = $0
+        }.store(in: &observers)
+        viewModel.handle(.refreshIntervalSelected)
+        guard case .refreshInterval = event else {
+            XCTFail("Unexpected event")
+            return
+        }
+    }
+
+    func test_advancedSettingsSelected_shouldEmitAdvancedSettingsEvent() {
+        var event: SettingsEvent?
+        viewModel.events.first().sink {
+            event = $0
+        }.store(in: &observers)
+        viewModel.handle(.advancedSettingsSelected)
+        guard case .advancedSettings = event else {
+            XCTFail("Unexpected event")
+            return
+        }
+    }
 }
