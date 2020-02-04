@@ -11,10 +11,8 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class DelugeTorrentDetailViewModel: StandardTorrentDetailViewModel<
-    DelugeTorrent,
-    DelugeTorrentFile
->, StandardTorrentDetailViewModelImplementation {
+// swiftlint:disable:next line_length
+final class DelugeTorrentDetailViewModel: StandardTorrentDetailViewModel<DelugeTorrent, DelugeTorrentFile>, StandardTorrentDetailViewModelImplementation {
     private let subject: CurrentValueSubject<DelugeTorrent, Never>
     private let client: DelugeClient
     private let refresher: DelugeRefreshable

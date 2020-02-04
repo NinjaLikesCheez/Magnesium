@@ -13,14 +13,17 @@ import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {
+    typealias Implementation = DelugeTorrentListViewModelImplementation
+
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
-    private var viewModel: DelugeTorrentListViewModel!
+    private lazy var implementation = Implementation(client: client, preferences: preferences)
+    private var viewModel: StandardTorrentListViewModel<DelugeTorrent, Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = DelugeTorrentListViewModel(client: client, preferences: preferences)
+        viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
     }
 
     func test_autoRefresh_shouldFire() {
@@ -185,9 +188,20 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         }
     }
 
-    func test_refreshDeluge_shouldRefreshTorrents() {
+    func test_refreshTransmission_shouldRefreshTorrents() {
         client.requests.reset()
-        viewModel.refreshDeluge().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        client.torrents.append(.randomMock())
+
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.items.dropFirst().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
+
+        implementation.refreshDeluge()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
+
+        waitForExpectations(timeout: 0)
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1))
     }
 }

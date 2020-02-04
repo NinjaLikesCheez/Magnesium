@@ -11,10 +11,8 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class TransmissionTorrentDetailViewModel: StandardTorrentDetailViewModel<
-    TransmissionTorrentDetailViewModel.Torrent,
-    TransmissionTorrentFile
->, StandardTorrentDetailViewModelImplementation {
+// swiftlint:disable:next line_length
+final class TransmissionTorrentDetailViewModel: StandardTorrentDetailViewModel<TransmissionTorrentDetailViewModel.Torrent, TransmissionTorrentFile>, StandardTorrentDetailViewModelImplementation {
     private let subject: CurrentValueSubject<TransmissionTorrent, Never>
     private let client: TransmissionClient
     private let refresher: TransmissionRefreshable

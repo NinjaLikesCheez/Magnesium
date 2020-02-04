@@ -21,3 +21,26 @@ struct TorrentListItemViewState {
     var progressString: AnyPublisher<String, Never>
     var ratioOrETA: AnyPublisher<String, Never>
 }
+
+struct StandardTorrentListItemViewModel<T: StandardTorrent>: ViewModel, Identifiable {
+    let hash: String
+    let state: TorrentListItemViewState
+
+    var id: String {
+        return hash
+    }
+
+    init(subject: CurrentValueSubject<T, Never>) {
+        hash = subject.value.hash
+        let ui = subject.ui()
+        state = TorrentListItemViewState(
+            name: ui.map(\.name).eraseToAnyPublisher(),
+            progress: ui.map(\.progress).eraseToAnyPublisher(),
+            progressColor: ui.map(\.standardState).map(\.displayColor).eraseToAnyPublisher(),
+            state: ui.map(\.standardState).map(\.displayString).eraseToAnyPublisher(),
+            speed: ui.map(\.speedString).eraseToAnyPublisher(),
+            progressString: ui.map(\.progressString).eraseToAnyPublisher(),
+            ratioOrETA: ui.map(\.ratioOrETAString).eraseToAnyPublisher()
+        )
+    }
+}

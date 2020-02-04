@@ -13,20 +13,20 @@ import XCTest
 class DelugeTorrentListItemViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
-    private lazy var viewModel = DelugeTorrentListItemViewModel(subject: subject)
+    private lazy var viewModel = StandardTorrentListItemViewModel(subject: subject)
 
     func test_identity_shouldBeEqualToHash() {
         let torrent1 = DelugeTorrent.mock(hash: "A")
         var torrent2 = DelugeTorrent.mock(hash: "A")
         XCTAssertEqual(
-            DelugeTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
-            DelugeTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
         )
 
         torrent2.hash = "B"
         XCTAssertNotEqual(
-            DelugeTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
-            DelugeTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
         )
     }
 

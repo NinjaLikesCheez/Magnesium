@@ -13,14 +13,17 @@ import Preferences
 import XCTest
 
 final class TransmissionTorrentListViewModelTests: XCTestCase {
+    typealias Implementation = TransmissionTorrentListViewModelImplementation
+
     private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
-    private var viewModel: TransmissionTorrentListViewModel!
+    private lazy var implementation = Implementation(client: client, preferences: preferences)
+    private var viewModel: StandardTorrentListViewModel<TransmissionTorrent, Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = TransmissionTorrentListViewModel(client: client, preferences: preferences)
+        viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
     }
 
     func test_autoRefresh_shouldFire() {
@@ -187,7 +190,18 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
 
     func test_refreshTransmission_shouldRefreshTorrents() {
         client.requests.reset()
-        viewModel.refreshTransmission().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        client.torrents.append(.randomMock())
+
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.items.dropFirst().sink { _ in
+            expectation.fulfill()
+        }.store(in: &observers)
+
+        implementation.refreshTransmission()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
+
+        waitForExpectations(timeout: 0)
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1))
     }
 }

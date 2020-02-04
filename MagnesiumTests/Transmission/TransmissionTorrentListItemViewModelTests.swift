@@ -13,7 +13,7 @@ import XCTest
 class TransmissionTorrentListItemViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
-    private lazy var viewModel = TransmissionTorrentListItemViewModel(subject: subject)
+    private lazy var viewModel = StandardTorrentListItemViewModel(subject: subject)
     private let inactiveStatuses: [TransmissionTorrent.Status] = [
         .paused,
         .checking,
@@ -23,18 +23,18 @@ class TransmissionTorrentListItemViewModelTests: XCTestCase {
         .isolated,
     ]
 
-    func test_identity_shouldBeEqualToID() {
-        let torrent1 = TransmissionTorrent.mock(id: 0)
-        var torrent2 = TransmissionTorrent.mock(id: 0)
+    func test_identity_shouldBeEqualToHash() {
+        let torrent1 = TransmissionTorrent.mock(hash: "A")
+        var torrent2 = TransmissionTorrent.mock(hash: "A")
         XCTAssertEqual(
-            TransmissionTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
-            TransmissionTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
         )
 
-        torrent2.id = 1
+        torrent2.hash = "B"
         XCTAssertNotEqual(
-            TransmissionTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
-            TransmissionTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent1)).id,
+            StandardTorrentListItemViewModel(subject: CurrentValueSubject(torrent2)).id
         )
     }
 
