@@ -20,6 +20,8 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 return nil
             case .servers:
                 return "Servers"
+            case .general:
+                return "General"
             case .advancedSettings:
                 return "Advanced"
             }
@@ -56,7 +58,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 if cell == nil {
                     cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = "Selected Server"
+                cell.textLabel?.text = "Current Server"
                 cell.detailTextLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -68,6 +70,15 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             case .addServer:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
                 cell.textLabel?.text = "Add Server"
+                cell.accessoryType = .disclosureIndicator
+                return cell
+            case let .refreshInterval(current: current):
+                var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "detail")
+                if cell == nil {
+                    cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
+                }
+                cell.textLabel?.text = "Refresh Interval"
+                cell.detailTextLabel?.text = current
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case .advancedSettings:
@@ -117,6 +128,8 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             viewModel.handle(.serverSelected(index: indexPath.row))
         case .addServer:
             viewModel.handle(.addServerSelected)
+        case .refreshInterval:
+            viewModel.handle(.refreshIntervalSelected)
         case .advancedSettings:
             viewModel.handle(.advancedSettingsSelected)
         case .none:

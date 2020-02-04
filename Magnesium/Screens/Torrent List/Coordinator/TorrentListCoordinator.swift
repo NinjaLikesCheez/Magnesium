@@ -46,6 +46,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 
     func handle(_ event: TorrentListEvent) {
         switch event {
+        case let .alert(alert, source):
+            showAlert(alert, from: source)
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
         case let .filter(source: source):
@@ -54,8 +56,6 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             eventSubject.send(.detail(viewModel: viewModel))
         case .settings:
             eventSubject.send(.settings)
-        case let .alert(alert, source):
-            showAlert(alert, from: source)
         }
     }
 

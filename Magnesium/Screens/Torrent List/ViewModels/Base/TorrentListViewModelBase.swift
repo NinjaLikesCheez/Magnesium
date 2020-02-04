@@ -14,11 +14,11 @@ import ViewModel
 typealias AnyTorrentListViewModel = AnyEmitterViewModel<TorrentListEvent, TorrentListViewEvent, TorrentListViewState>
 
 enum TorrentListEvent {
+    case alert(Alert, source: PopoverSource?)
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
     case filter(source: PopoverSource)
     case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
-    case alert(Alert, source: PopoverSource?)
 }
 
 enum TorrentListViewEvent {

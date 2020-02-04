@@ -35,7 +35,6 @@ public extension Preferences {
     func valueUpdatedPublisher<T>(for key: PreferenceKey<T>) -> AnyPublisher<T, Never> {
         let preferenceChanged = preferencesChanged
             .filter { $0.isRelevant(to: key) }
-            .share()
         let deleted = preferenceChanged
             .first {
                 if case .deleted = $0 {

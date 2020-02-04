@@ -54,6 +54,9 @@
 		E9624D3E23D236130051EA99 /* TransmissionSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9624D3D23D236130051EA99 /* TransmissionSettingsViewModel.swift */; };
 		E9624D4023D2368A0051EA99 /* TransmissionServerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */; };
 		E9624D4323D23A2B0051EA99 /* ServerSettingsViewModelBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9624D4223D23A2B0051EA99 /* ServerSettingsViewModelBase.swift */; };
+		E96908FD23E9068400A95D31 /* RefreshIntervalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96908FC23E9068400A95D31 /* RefreshIntervalViewModel.swift */; };
+		E96908FF23E9092A00A95D31 /* RefreshIntervalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */; };
+		E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
@@ -180,6 +183,9 @@
 		E9624D3D23D236130051EA99 /* TransmissionSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionSettingsViewModel.swift; sourceTree = "<group>"; };
 		E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionServerSettings.swift; sourceTree = "<group>"; };
 		E9624D4223D23A2B0051EA99 /* ServerSettingsViewModelBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewModelBase.swift; sourceTree = "<group>"; };
+		E96908FC23E9068400A95D31 /* RefreshIntervalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewModel.swift; sourceTree = "<group>"; };
+		E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewController.swift; sourceTree = "<group>"; };
+		E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewModelTests.swift; sourceTree = "<group>"; };
 		E96B0061237A43740091FA71 /* Magnesium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B0064237A43740091FA71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E96B0066237A43740091FA71 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -299,6 +305,7 @@
 				E97233FA23CFF9B400038D30 /* Add Server */,
 				E9624D4123D239FF0051EA99 /* Server Settings */,
 				E951CA0D23E5148F008A7D1F /* Advanced */,
+				E96908FB23E9049200A95D31 /* Refresh Interval */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -433,6 +440,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E96908FB23E9049200A95D31 /* Refresh Interval */ = {
+			isa = PBXGroup;
+			children = (
+				E96908FC23E9068400A95D31 /* RefreshIntervalViewModel.swift */,
+				E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */,
+			);
+			path = "Refresh Interval";
 			sourceTree = "<group>";
 		};
 		E96B0058237A43740091FA71 = {
@@ -682,6 +698,7 @@
 				E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */,
 				E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */,
 				E9847C5523E6589C00B05D3A /* EmptyTorrentListViewModelTests.swift */,
+				E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -843,6 +860,7 @@
 				E94C28A623D1546B006F26D2 /* Alert+ViewController.swift in Sources */,
 				E9F24E0F23CE4ECB0089E45F /* DelugeServerSettings.swift in Sources */,
 				E9999A8323BAE1BD00E8309D /* Publishers+UI.swift in Sources */,
+				E96908FF23E9092A00A95D31 /* RefreshIntervalViewController.swift in Sources */,
 				E9CF491F23E3B18200026723 /* FilterViewModel.swift in Sources */,
 				E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */,
 				E951CA1123E51BE5008A7D1F /* AdvancedSettingsView.swift in Sources */,
@@ -852,6 +870,7 @@
 				E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModel.swift in Sources */,
 				E917B4C223E777DA0090D490 /* TransmissionTorrentListViewModelImplementation.swift in Sources */,
 				E9624D3E23D236130051EA99 /* TransmissionSettingsViewModel.swift in Sources */,
+				E96908FD23E9068400A95D31 /* RefreshIntervalViewModel.swift in Sources */,
 				E9801EF723D37FC200181FFD /* AlertPresenter.swift in Sources */,
 				E9A0BD9323D0040300AEC254 /* AddServerViewModel.swift in Sources */,
 				E9E9F0F423807044007C6D2D /* TorrentDetailViewModel.swift in Sources */,
@@ -932,6 +951,7 @@
 				E988EDDC23E7AD420011A733 /* MockTransmissionRefresher.swift in Sources */,
 				E988EDE623E7CC720011A733 /* TransmissionTorrentDetailFileViewModelTests.swift in Sources */,
 				E9091D3423E25F580034C353 /* SettingsViewModelTests.swift in Sources */,
+				E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */,
 				E9801EF223D37E1400181FFD /* TorrentMapperTests.swift in Sources */,
 				E988EDDA23E7ACE80011A733 /* TransmissionTorrentDetailViewModelTests.swift in Sources */,
 				E9847C5823E6605900B05D3A /* TransmissionSettingsViewModelTests.swift in Sources */,

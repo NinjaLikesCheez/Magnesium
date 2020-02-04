@@ -12,9 +12,10 @@ import ViewModel
 
 enum SettingsEvent {
     case complete
+    case alert(Alert, source: PopoverSource?)
     case edit(server: Server)
     case addServer
-    case alert(Alert, source: PopoverSource?)
+    case refreshInterval
     case advancedSettings
 }
 
@@ -23,6 +24,7 @@ enum SettingsViewEvent {
     case changeServerSelected(source: PopoverSource)
     case serverSelected(index: Int)
     case addServerSelected
+    case refreshIntervalSelected
     case advancedSettingsSelected
 }
 
@@ -47,14 +49,9 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         self.preferences = preferences
         state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
-            .sink { [weak self] _ in
-                self?.updateSections()
-            }
-            .store(in: &observers)
-
-        session.serverPublisher
-            .dropFirst()
+        preferences.valueUpdatedPublisher(for: PreferenceKeys.servers).map { _ in () }
+            .merge(with: session.serverPublisher.map { _ in () })
+            .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.autoRefreshInterval).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
             }
@@ -74,6 +71,8 @@ final class SettingsViewModel: ViewModel, EventEmitter {
             eventSubject.send(.edit(server: server))
         case .addServerSelected:
             eventSubject.send(.addServer)
+        case .refreshIntervalSelected:
+            eventSubject.send(.refreshInterval)
         case .advancedSettingsSelected:
             eventSubject.send(.advancedSettings)
         }
@@ -101,6 +100,11 @@ final class SettingsViewModel: ViewModel, EventEmitter {
 
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
+
+        let refreshInterval = preferences.value(for: PreferenceKeys.autoRefreshInterval)
+        let refreshDisplay = refreshInterval <= 0 ? "Never" : String(format: "%.0f seconds", refreshInterval)
+        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: refreshDisplay)]))
+
         sections.append(SettingsSection(type: .advancedSettings, items: [.advancedSettings]))
         sectionsSubject.send(sections)
     }
