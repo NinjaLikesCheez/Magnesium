@@ -48,4 +48,10 @@ extension DelugeTorrent: StandardTorrent {
             return .error
         }
     }
+
+    var trackerStrings: [String] {
+        return trackers
+    }
 }
+
+extension DelugeTorrentFile: StandardTorrentFile {}

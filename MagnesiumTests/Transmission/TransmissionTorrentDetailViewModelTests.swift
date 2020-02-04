@@ -14,19 +14,25 @@ import Transmission
 import XCTest
 
 final class TransmissionTorrentDetailViewModelTests: XCTestCase {
+    typealias Implementation = TransmissionTorrentDetailViewModelImplementation
+
     private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
     private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
-    private var viewModel: TransmissionTorrentDetailViewModel!
+    private lazy var implementation = Implementation(
+        subject: subject,
+        client: client,
+        refresher: MockTransmissionRefresher(client: client)
+    )
+    private var viewModel: StandardTorrentDetailViewModel<Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = TransmissionTorrentDetailViewModel(
+        viewModel = StandardTorrentDetailViewModel(
+            implementation: implementation,
             subject: subject,
-            client: client,
-            preferences: preferences,
-            refresher: MockTransmissionRefresher(client: client)
+            preferences: preferences
         )
     }
 

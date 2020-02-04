@@ -16,10 +16,10 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
 
     private let client: DelugeClient
     private let preferences: Preferences
-    private let torrentsUpdatedSubject = PassthroughSubject<[Torrent], Never>()
+    private let torrentsUpdatedSubject = PassthroughSubject<[DelugeTorrent], Never>()
     private var observers = [AnyCancellable]()
 
-    var torrentsUpdated: AnyPublisher<[Torrent], Never> {
+    var torrentsUpdated: AnyPublisher<[DelugeTorrent], Never> {
         return torrentsUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -28,16 +28,20 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         self.preferences = preferences
     }
 
-    func refresh() -> AnyPublisher<[Torrent], Error> {
+    func refresh() -> AnyPublisher<[DelugeTorrent], Error> {
         return client.getTorrents().mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
-    func detailViewModel(for subject: CurrentValueSubject<Torrent, Never>) -> AnyTorrentDetailViewModel {
-        let viewModel = DelugeTorrentDetailViewModel(
+    func detailViewModel(for subject: CurrentValueSubject<DelugeTorrent, Never>) -> AnyTorrentDetailViewModel {
+        let implementation = DelugeTorrentDetailViewModelImplementation(
             subject: subject,
             client: client,
-            preferences: preferences,
             refresher: self
+        )
+        let viewModel = StandardTorrentDetailViewModel(
+            implementation: implementation,
+            subject: subject,
+            preferences: preferences
         )
         return AnyEmitterViewModel(viewModel)
     }

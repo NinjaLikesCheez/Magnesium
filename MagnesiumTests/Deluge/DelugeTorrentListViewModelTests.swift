@@ -18,7 +18,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
     private lazy var implementation = Implementation(client: client, preferences: preferences)
-    private var viewModel: StandardTorrentListViewModel<DelugeTorrent, Implementation>!
+    private var viewModel: StandardTorrentListViewModel<Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {

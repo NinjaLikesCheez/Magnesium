@@ -37,31 +37,23 @@ struct TorrentDetailViewState {
     var isLoading: AnyPublisher<Bool, Never>
 }
 
-protocol StandardDetailTorrent: StandardTorrent {
-    var trackers: [String] { get }
-}
-
-protocol StandardDetailTorrentFile {
-    var index: Int { get }
-    var name: String { get }
-    var size: Int64 { get }
-    var progress: Float { get }
-}
-
 protocol StandardTorrentDetailViewModelImplementation {
+    associatedtype Torrent: StandardTorrent
+    associatedtype File: StandardTorrentFile
     func refresh() -> AnyPublisher<Void, Error>
-    func pause() -> AnyPublisher<Void, Error>
-    func resume() -> AnyPublisher<Void, Error>
-    func remove(removeData: Bool) -> AnyPublisher<Void, Error>
-    func recheck() -> AnyPublisher<Void, Error>
-    func updateFiles() -> AnyPublisher<Void, Error>
+    func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
+    func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
+    func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
+    func recheck(_ torrent: Torrent) -> AnyPublisher<Void, Error>
+    func updateFiles(_ torrent: Torrent) -> AnyPublisher<[File], Error>
 }
 
-class StandardTorrentDetailViewModel<
-    Torrent: StandardDetailTorrent,
-    File: StandardDetailTorrentFile
->: ViewModel, EventEmitter {
-    private var implementation: StandardTorrentDetailViewModelImplementation!
+// swiftlint:disable:next line_length
+final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetailViewModelImplementation>: ViewModel, EventEmitter {
+    typealias Torrent = Implementation.Torrent
+    typealias File = Implementation.File
+
+    private let implementation: Implementation
     private let preferences: Preferences
     private let subject: CurrentValueSubject<Torrent, Never>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
@@ -94,9 +86,10 @@ class StandardTorrentDetailViewModel<
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(subject: CurrentValueSubject<Torrent, Never>, preferences: Preferences) {
+    init(implementation: Implementation, subject: CurrentValueSubject<Torrent, Never>, preferences: Preferences) {
         self.subject = subject
         self.preferences = preferences
+        self.implementation = implementation
 
         let sections = subject
             .combineLatest(files.values)
@@ -111,10 +104,7 @@ class StandardTorrentDetailViewModel<
             .ui()
             .eraseToAnyPublisher()
         state = TorrentDetailViewState(sections: sections, isLoading: isLoadingSubject.eraseToAnyPublisher())
-    }
 
-    func setup(with implementation: StandardTorrentDetailViewModelImplementation) {
-        self.implementation = implementation
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
@@ -150,8 +140,8 @@ class StandardTorrentDetailViewModel<
             .info("Seeds", ui.map { "\($0.seeds) (\($0.totalSeeds))" }.eraseToAnyPublisher()),
         ]))
 
-        if !torrent.trackers.isEmpty {
-            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
+        if !torrent.trackerStrings.isEmpty {
+            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackerStrings.map { .tracker($0) }))
         }
 
         if !files.isEmpty {
@@ -227,7 +217,7 @@ class StandardTorrentDetailViewModel<
     }
 
     private func recheck() {
-        implementation.recheck()
+        implementation.recheck(subject.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -243,7 +233,7 @@ class StandardTorrentDetailViewModel<
     }
 
     private func handlePause() {
-        implementation.pause()
+        implementation.pause(subject.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -259,7 +249,7 @@ class StandardTorrentDetailViewModel<
     }
 
     private func handleResume() {
-        implementation.resume()
+        implementation.resume(subject.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -287,7 +277,7 @@ class StandardTorrentDetailViewModel<
     }
 
     private func remove(removeData: Bool) {
-        implementation.remove(removeData: removeData)
+        implementation.remove(subject.value, removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -323,8 +313,10 @@ class StandardTorrentDetailViewModel<
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return implementation.updateFiles()
-            .mapError { $0 as Error }
+        return implementation.updateFiles(subject.value)
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.files.update(with: new.map { ($0.index, $0) })
+            })
             .map { _ in () }
             .eraseToAnyPublisher()
     }

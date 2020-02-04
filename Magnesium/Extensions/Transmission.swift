@@ -50,4 +50,14 @@ extension TransmissionTorrent: StandardTorrent {
             return .error
         }
     }
+
+    var trackerStrings: [String] {
+        return trackers.map { $0.host }
+    }
+}
+
+extension TransmissionTorrentFile: StandardTorrentFile {
+    var progress: Float {
+        return Float(downloaded) / Float(size)
+    }
 }

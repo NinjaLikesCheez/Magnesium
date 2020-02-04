@@ -11,16 +11,9 @@ import Combine
 import XCTest
 
 class TransmissionTorrentDetailHeaderViewModelTests: XCTestCase {
-    typealias Torrent = TransmissionTorrentDetailViewModel.Torrent
     private var observers = [AnyCancellable]()
     private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
-    private lazy var mappedSubject = CurrentValueSubject<Torrent, Never>(Torrent(subject.value))
-    private lazy var viewModel = StandardTorrentDetailHeaderViewModel(subject: mappedSubject)
-
-    override func setUp() {
-        super.setUp()
-        subject.sink { [weak self] in self?.mappedSubject.send(Torrent($0)) }.store(in: &observers)
-    }
+    private lazy var viewModel = StandardTorrentDetailHeaderViewModel(subject: subject)
 
     func test_name() {
         subject.send(.mock(name: "name"))

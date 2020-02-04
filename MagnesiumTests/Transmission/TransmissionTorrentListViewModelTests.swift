@@ -18,7 +18,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
     private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
     private lazy var implementation = Implementation(client: client, preferences: preferences)
-    private var viewModel: StandardTorrentListViewModel<TransmissionTorrent, Implementation>!
+    private var viewModel: StandardTorrentListViewModel<Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {

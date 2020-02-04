@@ -17,7 +17,7 @@ struct TorrentDetailFileViewState {
     var progress: AnyPublisher<String, Never>
 }
 
-struct StandardTorrentDetailFileViewModel<T: StandardDetailTorrentFile>: ViewModel, Identifiable {
+struct StandardTorrentDetailFileViewModel<T: StandardTorrentFile>: ViewModel, Identifiable {
     let id: Int
     let state: TorrentDetailFileViewState
 

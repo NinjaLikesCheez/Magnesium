@@ -13,19 +13,25 @@ import Preferences
 import XCTest
 
 final class DelugeTorrentDetailViewModelTests: XCTestCase {
+    typealias Implementation = DelugeTorrentDetailViewModelImplementation
+
     private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
-    private var viewModel: DelugeTorrentDetailViewModel!
+    private lazy var implementation = Implementation(
+        subject: subject,
+        client: client,
+        refresher: MockDelugeRefresher(client: client)
+    )
+    private var viewModel: StandardTorrentDetailViewModel<Implementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        viewModel = DelugeTorrentDetailViewModel(
+        viewModel = StandardTorrentDetailViewModel(
+            implementation: implementation,
             subject: subject,
-            client: client,
-            preferences: preferences,
-            refresher: MockDelugeRefresher(client: client)
+            preferences: preferences
         )
     }
 

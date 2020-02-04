@@ -43,10 +43,10 @@ protocol StandardTorrentListViewModelImplementation {
     func addLink(_ url: String) -> AnyPublisher<(String, String), Never>
 }
 
-class StandardTorrentListViewModel<
-    Torrent,
-    Implementation: StandardTorrentListViewModelImplementation
->: ViewModel, EventEmitter where Torrent == Implementation.Torrent {
+// swiftlint:disable:next line_length
+final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, EventEmitter {
+    typealias Torrent = Implementation.Torrent
+
     private let implementation: Implementation
     private let preferences: Preferences
     private let torrents: TorrentMapper<String, Torrent>

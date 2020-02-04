@@ -24,6 +24,7 @@ protocol StandardTorrent {
     var totalSeeds: Int { get }
     var peers: Int { get }
     var totalPeers: Int { get }
+    var trackerStrings: [String] { get }
 }
 
 extension StandardTorrent {

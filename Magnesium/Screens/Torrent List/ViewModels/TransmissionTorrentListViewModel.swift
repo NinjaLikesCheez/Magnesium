@@ -1,5 +1,5 @@
 //
-//  TransmissionTorrentListViewModel.swift
+//  TransmissionTorrentListViewModelImplementation.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-14.
@@ -17,10 +17,10 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
 
     private let client: TransmissionClient
     private let preferences: Preferences
-    private let torrentsUpdatedSubject = PassthroughSubject<[Torrent], Never>()
+    private let torrentsUpdatedSubject = PassthroughSubject<[TransmissionTorrent], Never>()
     private var observers = [AnyCancellable]()
 
-    var torrentsUpdated: AnyPublisher<[Torrent], Never> {
+    var torrentsUpdated: AnyPublisher<[TransmissionTorrent], Never> {
         return torrentsUpdatedSubject.eraseToAnyPublisher()
     }
 
@@ -29,16 +29,20 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
         self.preferences = preferences
     }
 
-    func refresh() -> AnyPublisher<[Torrent], Error> {
+    func refresh() -> AnyPublisher<[TransmissionTorrent], Error> {
         return client.getTorrents().mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
-    func detailViewModel(for subject: CurrentValueSubject<Torrent, Never>) -> AnyTorrentDetailViewModel {
-        let viewModel = TransmissionTorrentDetailViewModel(
+    func detailViewModel(for subject: CurrentValueSubject<TransmissionTorrent, Never>) -> AnyTorrentDetailViewModel {
+        let implementation = TransmissionTorrentDetailViewModelImplementation(
             subject: subject,
             client: client,
-            preferences: preferences,
             refresher: self
+        )
+        let viewModel = StandardTorrentDetailViewModel(
+            implementation: implementation,
+            subject: subject,
+            preferences: preferences
         )
         return AnyEmitterViewModel(viewModel)
     }

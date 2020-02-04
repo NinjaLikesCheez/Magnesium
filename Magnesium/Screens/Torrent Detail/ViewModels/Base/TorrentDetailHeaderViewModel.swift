@@ -20,7 +20,7 @@ struct TorrentDetailHeaderViewState {
     var status: AnyPublisher<String, Never>
 }
 
-struct StandardTorrentDetailHeaderViewModel<T: StandardDetailTorrent>: ViewModel, Identifiable {
+struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Identifiable {
     let id: String
     let state: TorrentDetailHeaderViewState
 
