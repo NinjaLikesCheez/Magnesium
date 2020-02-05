@@ -33,6 +33,14 @@ class TorrentListCoordinatorTests: XCTestCase {
         window.makeKeyAndVisible()
     }
 
+    func test_presentable_shouldBeTorrentListViewController() {
+        let viewController = coordinator.presentable.viewController
+        guard type(of: viewController) === TorrentListViewController<AnyTorrentListViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: self))")
+            return
+        }
+    }
+
     func test_showAddLink_shouldPresentAlertController() {
         coordinator.showAddLink(subject: .init())
         let viewController = coordinator.presentable.viewController
@@ -48,7 +56,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     // MARK: handle - TorrentListEvent
 
     func test_viewModel_alertEvent_shouldPresentAlertController() {
-        viewModel.eventSubject.send(.alert(Alert(title: "Alert", message: nil, style: .alert), source: nil))
+        viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert), source: nil))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
         guard type(of: presentedViewController!) === UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
