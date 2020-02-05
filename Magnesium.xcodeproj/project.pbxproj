@@ -57,6 +57,7 @@
 		E96908FD23E9068400A95D31 /* RefreshIntervalViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96908FC23E9068400A95D31 /* RefreshIntervalViewModel.swift */; };
 		E96908FF23E9092A00A95D31 /* RefreshIntervalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */; };
 		E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */; };
+		E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090223E9135900A95D31 /* AppCoordinatorTests.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
@@ -186,6 +187,7 @@
 		E96908FC23E9068400A95D31 /* RefreshIntervalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewModel.swift; sourceTree = "<group>"; };
 		E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewController.swift; sourceTree = "<group>"; };
 		E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewModelTests.swift; sourceTree = "<group>"; };
+		E969090223E9135900A95D31 /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
 		E96B0061237A43740091FA71 /* Magnesium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B0064237A43740091FA71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E96B0066237A43740091FA71 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -699,6 +701,7 @@
 				E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */,
 				E9847C5523E6589C00B05D3A /* EmptyTorrentListViewModelTests.swift */,
 				E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */,
+				E969090223E9135900A95D31 /* AppCoordinatorTests.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -950,6 +953,7 @@
 				E95127FC23D7F3C7000EF582 /* MockDelugeClient.swift in Sources */,
 				E988EDDC23E7AD420011A733 /* MockTransmissionRefresher.swift in Sources */,
 				E988EDE623E7CC720011A733 /* TransmissionTorrentDetailFileViewModelTests.swift in Sources */,
+				E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */,
 				E9091D3423E25F580034C353 /* SettingsViewModelTests.swift in Sources */,
 				E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */,
 				E9801EF223D37E1400181FFD /* TorrentMapperTests.swift in Sources */,

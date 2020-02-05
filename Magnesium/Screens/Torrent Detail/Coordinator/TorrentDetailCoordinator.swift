@@ -19,14 +19,14 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
     VM.Event == TorrentDetailEvent,
     VM.ViewEvent == TorrentDetailViewEvent,
     VM.ViewState == TorrentDetailViewState {
-    private let navigationController: PresentableNavigationController
+    private let viewController: TorrentDetailViewController<VM>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     let received: AnyPublisher<TorrentDetailEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return navigationController
+        return viewController
     }
 
     var events: AnyPublisher<TorrentDetailCoordinatorEvent, Never> {
@@ -34,8 +34,7 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
     }
 
     init(viewModel: VM) {
-        let viewController = TorrentDetailViewController(viewModel: viewModel)
-        navigationController = PresentableNavigationController(rootViewController: viewController)
+        viewController = TorrentDetailViewController(viewModel: viewModel)
         received = viewModel.events
     }
 

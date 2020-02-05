@@ -13,20 +13,14 @@ import UIKit
 
 final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
-    private let preferences = UserDefaultsPreferences()
-    private lazy var session: Session = DefaultSession(preferences: preferences)
+    private let preferences: Preferences
+    private let session: Session
+    private let splitViewController: PresentableSplitViewController
     private lazy var addFileFlow = AddFileFlow(viewController: splitViewController, session: session)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
-
-    private lazy var splitViewController: PresentableSplitViewController = {
-        let splitViewController = PresentableSplitViewController()
-        splitViewController.delegate = self
-        splitViewController.preferredDisplayMode = .allVisible
-        return splitViewController
-    }()
 
     private var masterNavigationController: PresentableNavigationController = {
         let navigationController = PresentableNavigationController()
@@ -38,11 +32,24 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         return splitViewController
     }
 
-    init(window: UIWindow) {
+    init(
+        window: UIWindow,
+        preferences: Preferences = UserDefaultsPreferences(),
+        session: Session? = nil,
+        splitViewController: PresentableSplitViewController = PresentableSplitViewController()
+    ) {
         self.window = window
-        session.serverPublisher
+        self.preferences = preferences
+        self.session = session ?? DefaultSession(preferences: preferences)
+        self.splitViewController = splitViewController
+
+        self.splitViewController.delegate = self
+        self.splitViewController.preferredDisplayMode = .allVisible
+
+        self.session.serverPublisher
             .sink { [weak self] in self?.show(server: $0) }
             .store(in: &observers)
+
         window.rootViewController = splitViewController
         window.makeKeyAndVisible()
     }
@@ -50,12 +57,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     private func show(server: Server?) {
         let listCoordinator = TorrentListCoordinator(server: server, session: session, preferences: preferences)
         addChildCoordinator(listCoordinator) { [weak self] _, event in
-            switch event {
-            case .settings:
-                self?.showSettings()
-            case let .detail(viewModel: viewModel):
-                self?.showTorrentDetail(viewModel: viewModel)
-            }
+            self?.handle(event)
         }
         masterNavigationController.setViewControllers([listCoordinator.presentable.viewController], animated: false)
         let detailViewController = UIViewController()
@@ -64,28 +66,49 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
     }
 
+    // internal for testing
+    func handle(_ event: TorrentListCoordinatorEvent) {
+        switch event {
+        case .settings:
+            showSettings()
+        case let .detail(viewModel: viewModel):
+            showTorrentDetail(viewModel: viewModel)
+        }
+    }
+
     private func showSettings() {
         let coordinator = SettingsCoordinator(session: session, preferences: preferences)
-        addChildCoordinator(coordinator) { coordinator, event in
-            switch event {
-            case .complete:
-                coordinator.presentable.viewController.dismiss(animated: true)
-            }
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            self?.handle(event, from: coordinator)
         }
         let viewController = coordinator.presentable.viewController
         viewController.modalPresentationStyle = .formSheet
         splitViewController.present(viewController, animated: true, completion: nil)
     }
 
+    // internal for testing
+    func handle<C: Coordinator>(_ event: SettingsCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            coordinator.presentable.viewController.dismiss(animated: true)
+        }
+    }
+
     private func showTorrentDetail(viewModel: AnyTorrentDetailViewModel) {
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
-            switch event {
-            case .complete:
-                self?.dismissDetailViewController(coordinator.presentable.viewController)
-            }
+            self?.handle(event, from: coordinator)
         }
-        splitViewController.showDetailViewController(coordinator.presentable.viewController, sender: nil)
+        let navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
+        splitViewController.showDetailViewController(navigationController, sender: nil)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: TorrentDetailCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            dismissDetailViewController(coordinator.presentable.viewController)
+        }
     }
 
     private func dismissDetailViewController(_ viewController: UIViewController) {

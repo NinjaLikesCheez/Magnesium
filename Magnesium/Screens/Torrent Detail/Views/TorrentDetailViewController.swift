@@ -7,12 +7,13 @@
 //
 
 import Combine
+import Coordinator
 import UIKit
 import ViewModel
 
 protocol TorrentDetailViewControllerIdentifiable {}
 
-final class TorrentDetailViewController<VM: ViewModel>: UITableViewController, TorrentDetailViewControllerIdentifiable
+final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable
     where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
     private var observers = [AnyCancellable]()
