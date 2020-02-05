@@ -13,6 +13,7 @@ import ViewModel
 
 protocol TorrentDetailViewControllerIdentifiable {}
 
+// swiftlint:disable:next line_length
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable
     where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM

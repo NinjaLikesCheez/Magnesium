@@ -18,6 +18,7 @@ enum TorrentListCoordinatorEvent {
 }
 
 final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
+    private let viewModel: AnyTorrentListViewModel
     private let session: Session
     private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
@@ -35,9 +36,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(server: Server?, session: Session, preferences: Preferences) {
-        let viewModel = server?.listViewModel(preferences: preferences)
-            ?? AnyEmitterViewModel(EmptyTorrentListViewModel())
+    init(viewModel: AnyTorrentListViewModel, session: Session, preferences: Preferences) {
+        self.viewModel = viewModel
         self.session = session
         self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
@@ -71,7 +71,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         showAlert(alert, from: source)
     }
 
-    private func showAddLink(subject: PassthroughSubject<String, Never>) {
+    // internal for testing
+    func showAddLink(subject: PassthroughSubject<String, Never>) {
         let alertController = UIAlertController(
             title: "Enter a URL",
             message: "This can be either a link to a torrent or a magnet link.",
@@ -97,11 +98,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 
     private func showFilter(from source: PopoverSource) {
         let coordinator = FilterCoordinator(preferences: preferences)
-        addChildCoordinator(coordinator) { coordinator, event in
-            switch event {
-            case .complete:
-                coordinator.presentable.viewController.dismiss(animated: true)
-            }
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            self?.handle(event, from: coordinator)
         }
 
         let viewController = coordinator.presentable.viewController
@@ -116,6 +114,14 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         }
 
         self.viewController.present(viewController, animated: true)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: FilterCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            coordinator.presentable.viewController.dismiss(animated: true)
+        }
     }
 }
 

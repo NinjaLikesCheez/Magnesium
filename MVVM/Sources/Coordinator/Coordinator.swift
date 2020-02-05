@@ -21,7 +21,8 @@ public protocol Coordinator: AnyObject {
     /// A publisher that emits events to be received by this coordinator.
     var received: AnyPublisher<Received, Never> { get }
 
-    /// Handle a received event.
+    /// Handle a received event. This function will automatically be called if this coordinator was added to a parent
+    /// coordinator using `addChildCoordinator`.
     /// - Parameter event: The event to handle.
     func handle(_ event: Received)
 }

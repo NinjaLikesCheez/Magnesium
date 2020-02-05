@@ -46,7 +46,7 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_masterViewController_whenServerChanged_shouldBeChanged() throws {
-        // swiftlint:disable force_cast
+        // swiftlint:disable:next force_cast
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
         session.setServer(try createServer())
         let firstViewController = masterNavigationController.viewControllers[0]
@@ -58,6 +58,7 @@ class AppCoordinatorTests: XCTestCase {
     func test_addTorrentFile_shouldPresentAlertController() throws {
         session.setServer(try createServer())
         coordinator.addTorrentFile(at: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
+        // swiftlint:disable:next force_cast
         let alertController = splitViewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Add Torrent")
         XCTAssertEqual(alertController.message, "Add file.torrent to Server?")
@@ -67,8 +68,8 @@ class AppCoordinatorTests: XCTestCase {
     // MARK: handle - TorrentListCoordinatorEvent
 
     func test_listCoordinator_settingsEvent_shouldShowSettings() throws {
-        // swiftlint:disable force_cast
         coordinator.handle(.settings)
+        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
@@ -78,8 +79,8 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_listCoordinator_detailEvent_shouldShowDetail() throws {
-        // swiftlint:disable force_cast
         coordinator.handle(.detail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
+        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.detailViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
@@ -109,39 +110,6 @@ class AppCoordinatorTests: XCTestCase {
 }
 
 // MARK: - Mocks
-
-private final class MockCoordinator: Coordinator {
-    let viewController = MockViewController()
-    let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    var observers = [AnyCancellable]()
-    var childCoordinators = [AnyHashable: AnyCoordinator]()
-    var presentable: Presentable { viewController }
-}
-
-private final class MockViewController: PresentableViewController {
-    private(set) var presentCallCount = 0
-    private(set) var presentParamViewController = [UIViewController]()
-    private(set) var presentParamAnimated = [Bool]()
-    override func present(
-        _ viewControllerToPresent: UIViewController,
-        animated flag: Bool,
-        completion: (() -> Void)? = nil
-    ) {
-        super.present(viewController, animated: flag, completion: completion)
-        presentCallCount += 1
-        presentParamViewController.append(viewControllerToPresent)
-        presentParamAnimated.append(flag)
-    }
-
-    private(set) var dismissCallCount = 0
-    private(set) var dismissParamAnimated = [Bool]()
-    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
-        super.dismiss(animated: flag, completion: completion)
-        dismissCallCount += 1
-        dismissParamAnimated.append(flag)
-    }
-}
 
 private final class MockSplitViewController: PresentableSplitViewController {
     private(set) var detailViewController: UIViewController?

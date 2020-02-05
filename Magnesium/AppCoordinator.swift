@@ -10,6 +10,7 @@ import Combine
 import Coordinator
 import Preferences
 import UIKit
+import ViewModel
 
 final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
@@ -32,6 +33,8 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         return splitViewController
     }
 
+    // splitViewController needs to be injected for testing because the detail view controller is difficult to obtain
+    // for testing
     init(
         window: UIWindow,
         preferences: Preferences = UserDefaultsPreferences(),
@@ -55,7 +58,9 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func show(server: Server?) {
-        let listCoordinator = TorrentListCoordinator(server: server, session: session, preferences: preferences)
+        let viewModel = server?.listViewModel(preferences: preferences)
+            ?? AnyEmitterViewModel(EmptyTorrentListViewModel())
+        let listCoordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
         addChildCoordinator(listCoordinator) { [weak self] _, event in
             self?.handle(event)
         }
