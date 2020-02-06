@@ -108,6 +108,7 @@
 		E9AC4FB723EB9F2200E6BC65 /* Server+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AC4FB623EB9F2200E6BC65 /* Server+Mocks.swift */; };
 		E9AC4FB923EBA95600E6BC65 /* FilterCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AC4FB823EBA95600E6BC65 /* FilterCoordinatorTests.swift */; };
 		E9AC4FBE23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AC4FBD23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift */; };
+		E9AC4FC023EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */; };
 		E9AE9E5623D695120018D180 /* DelugeTorrentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */; };
 		E9AE9E5823D695BD0018D180 /* Deluge+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AE9E5723D695BD0018D180 /* Deluge+Mocks.swift */; };
 		E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */; };
@@ -250,6 +251,7 @@
 		E9AC4FB623EB9F2200E6BC65 /* Server+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Server+Mocks.swift"; sourceTree = "<group>"; };
 		E9AC4FB823EBA95600E6BC65 /* FilterCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCoordinatorTests.swift; sourceTree = "<group>"; };
 		E9AC4FBD23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerCoordinatorTests.swift; sourceTree = "<group>"; };
+		E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsCoordinatorTests.swift; sourceTree = "<group>"; };
 		E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentTests.swift; sourceTree = "<group>"; };
 		E9AE9E5723D695BD0018D180 /* Deluge+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Deluge+Mocks.swift"; sourceTree = "<group>"; };
 		E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerPreferencesTests.swift; sourceTree = "<group>"; };
@@ -641,6 +643,7 @@
 				E9AC4FB423EB945800E6BC65 /* SettingsCoordinatorTests.swift */,
 				E9AC4FB823EBA95600E6BC65 /* FilterCoordinatorTests.swift */,
 				E9AC4FBD23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift */,
+				E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */,
 			);
 			path = Coordinators;
 			sourceTree = "<group>";
@@ -1014,6 +1017,7 @@
 				E9847C5823E6605900B05D3A /* TransmissionSettingsViewModelTests.swift in Sources */,
 				E988EDEC23E7D0710011A733 /* TransmissionTorrentTests.swift in Sources */,
 				E95AB87723EA610700827A94 /* MockPresentableViewController.swift in Sources */,
+				E9AC4FC023EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift in Sources */,
 				E95AB87B23EA6A1100827A94 /* TorrentDetailCoordinatorTests.swift in Sources */,
 				E9624D2D23D204AA0051EA99 /* Session.swift in Sources */,
 				E9091D3623E268310034C353 /* AddServerViewModelTests.swift in Sources */,
