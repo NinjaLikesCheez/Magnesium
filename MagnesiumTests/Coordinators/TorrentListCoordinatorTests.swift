@@ -135,10 +135,10 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &observers)
-        let viewController = coordinator.previewForItem(at: 0)!
+        XCTAssertNotNil(coordinator.previewForItem(at: 0))
         let childCoordinator = coordinator.childCoordinators.values.first?.base
             as! TorrentDetailCoordinator<AnyTorrentDetailViewModel> // swiftlint:disable:this force_cast
-        coordinator.commitPreview(for: viewController)
+        coordinator.commitPreviewForItem(at: 0)
         guard case let .commitDetail(committedCoordinator) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -146,13 +146,23 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertTrue(childCoordinator === committedCoordinator)
     }
 
-    func test_commitPreviews_shouldRemoveChildCoordinator() {
-        let viewController = coordinator.previewForItem(at: 0)
-        XCTAssertNotNil(viewController)
+    func test_commitPreviewForItem_shouldRemoveChildCoordinator() {
+        XCTAssertNotNil(coordinator.previewForItem(at: 0))
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
-        var childCoordinator = coordinator.childCoordinators.values.first!
-        coordinator.commitPreview(for: viewController!)
+        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
+        coordinator.commitPreviewForItem(at: 0)
         XCTAssertTrue(coordinator.childCoordinators.isEmpty)
+        XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
+    }
+
+    func test_cleanupPreviewForItem_shouldRemovePreviewCoordinatorFromCache() {
+        XCTAssertNotNil(coordinator.previewForItem(at: 0))
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
+        // remove the child coordinator so the only reference should be the preview cache
+        coordinator.childCoordinators.removeAll()
+        XCTAssertFalse(isKnownUniquelyReferenced(&childCoordinator))
+        coordinator.cleanupPreviewForItem(at: 0)
         XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
     }
 }

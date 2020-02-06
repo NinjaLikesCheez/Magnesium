@@ -11,9 +11,16 @@ import Coordinator
 import UIKit
 import ViewModel
 
+/// A type that is able to provide previews for a `TorrentListViewController`.
 protocol TorrentListPreviewProvider: AnyObject {
+    /// The user has requested a preview for the item at the provided index.
+    /// - Parameter index: The item index to create a preview for.
     func previewForItem(at index: Int) -> UIViewController?
-    func commitPreview(for viewController: UIViewController)
+    /// The user has selected the preview indicating that it should be committed.
+    /// - Parameter index: The item index whose preview is being committed.
+    func commitPreviewForItem(at index: Int)
+    /// Called when a preview is dismissed. Use this opportunity to release any cached state related to the preview.
+    func cleanupPreviewForItem(at index: Int)
 }
 
 final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
@@ -165,7 +172,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(
-            identifier: nil,
+            identifier: indexPath as NSCopying,
             previewProvider: { [weak self] in
                 self?.previewProvider?.previewForItem(at: indexPath.row)
             },
@@ -178,9 +185,18 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionCommitAnimating
     ) {
-        guard let viewController = animator.previewViewController else { return }
+        guard let indexPath = configuration.identifier as? IndexPath else { return }
         animator.addAnimations {
-            self.previewProvider?.commitPreview(for: viewController)
+            self.previewProvider?.commitPreviewForItem(at: indexPath.row)
         }
+    }
+
+    override func tableView(
+        _ tableView: UITableView,
+        previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+    ) -> UITargetedPreview? {
+        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
+        previewProvider?.cleanupPreviewForItem(at: indexPath.row)
+        return nil
     }
 }
