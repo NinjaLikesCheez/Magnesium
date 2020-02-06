@@ -1,5 +1,5 @@
 //
-//  DefaultSessionTests.swift
+//  SessionTests.swift
 //  MagnesiumTests
 //
 //  Created by James Hurst on 2020-01-17.
@@ -11,10 +11,10 @@ import Combine
 import Preferences
 import XCTest
 
-class DefaultSessionTests: XCTestCase {
+class SessionTests: XCTestCase {
     private let preferences: Preferences = MockPreferences()
     private var observers = [AnyCancellable]()
-    private lazy var session: Session = DefaultSession(preferences: preferences)
+    private lazy var session = Session(preferences: preferences)
 
     func test_serverPublisher_shouldHaveInitialValue() {
         let expectation = self.expectation(description: "Value received")

@@ -13,7 +13,7 @@ import XCTest
 class SettingsViewModelTests: XCTestCase {
     private let preferences = MockPreferences()
     private var observers = [AnyCancellable]()
-    private lazy var session = DefaultSession(preferences: preferences)
+    private lazy var session = Session(preferences: preferences)
     private lazy var viewModel = SettingsViewModel(session: session, preferences: preferences)
 
     func test_sections_whenServersChanged_shouldEmit() {

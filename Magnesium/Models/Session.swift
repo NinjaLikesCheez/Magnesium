@@ -9,13 +9,7 @@
 import Combine
 import Preferences
 
-protocol Session: AnyObject {
-    var serverPublisher: AnyPublisher<Server?, Never> { get }
-    var server: Server? { get }
-    func setServer(_ server: Server)
-}
-
-final class DefaultSession: Session {
+final class Session {
     private let preferences: Preferences
     private let serverSubject = CurrentValueSubject<Server?, Never>(nil)
     private var serverObserver: AnyCancellable?

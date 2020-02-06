@@ -64,23 +64,33 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     private func showSettings(for server: Server) {
         let coordinator = ServerSettingsCoordinator(server: server, preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
-            switch event {
-            case .complete:
-                self?.popToPreviousViewController(coordinator.presentable.viewController)
-            }
+            self?.handle(event, from: coordinator)
         }
         navigationController.pushViewController(coordinator.presentable.viewController, animated: true)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: ServerSettingsCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            popToPreviousViewController(coordinator.presentable.viewController)
+        }
     }
 
     private func showAddServer() {
         let coordinator = AddServerCoordinator(preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
-            switch event {
-            case .complete:
-                self?.popToPreviousViewController(coordinator.presentable.viewController)
-            }
+            self?.handle(event, from: coordinator)
         }
         navigationController.pushViewController(coordinator.presentable.viewController, animated: true)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: AddServerCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            popToPreviousViewController(coordinator.presentable.viewController)
+        }
     }
 
     private func popToPreviousViewController(_ viewController: UIViewController?) {

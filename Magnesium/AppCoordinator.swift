@@ -43,7 +43,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     ) {
         self.window = window
         self.preferences = preferences
-        self.session = session ?? DefaultSession(preferences: preferences)
+        self.session = session ?? Session(preferences: preferences)
         self.splitViewController = splitViewController
 
         self.splitViewController.delegate = self

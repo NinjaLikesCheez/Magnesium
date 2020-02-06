@@ -15,7 +15,7 @@ import XCTest
 class AppCoordinatorTests: XCTestCase {
     private let window = UIWindow()
     private let preferences = MockPreferences()
-    private lazy var session = DefaultSession(preferences: preferences)
+    private lazy var session = Session(preferences: preferences)
     private let splitViewController = MockSplitViewController()
     private var coordinator: AppCoordinator!
 
@@ -33,30 +33,18 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(splitViewController, coordinator.presentable.viewController)
     }
 
-    private func createServer(name: String = "Server") throws -> Server {
-        return Server(
-            name: name,
-            type: .transmission,
-            data: try JSONEncoder().encode(TransmissionServerSettings(
-                url: URL(string: "http://localhost")!,
-                username: nil
-            )),
-            keychainData: try JSONEncoder().encode(TransmissionKeychainData())
-        )
-    }
-
-    func test_masterViewController_whenServerChanged_shouldBeChanged() throws {
+    func test_masterViewController_whenServerChanged_shouldBeChanged() {
         // swiftlint:disable:next force_cast
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
-        session.setServer(try createServer())
+        session.setServer(.transmissionMock())
         let firstViewController = masterNavigationController.viewControllers[0]
-        session.setServer(try createServer())
+        session.setServer(.transmissionMock())
         let secondViewController = masterNavigationController.viewControllers[0]
         XCTAssertNotEqual(firstViewController, secondViewController)
     }
 
-    func test_addTorrentFile_shouldPresentAlertController() throws {
-        session.setServer(try createServer())
+    func test_addTorrentFile_shouldPresentAlertController() {
+        session.setServer(.transmissionMock())
         coordinator.addTorrentFile(at: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
         // swiftlint:disable:next force_cast
         let alertController = splitViewController.presentedViewController as! UIAlertController
@@ -92,10 +80,10 @@ class AppCoordinatorTests: XCTestCase {
     // MARK: handle - SettingsCoordinatorEvent
 
     func test_settingsCoordinator_completeEvent_shouldDismiss() {
-        let settingsCoordinator = MockCoordinator()
-        coordinator.handle(SettingsCoordinatorEvent.complete, from: settingsCoordinator)
-        XCTAssertEqual(settingsCoordinator.viewController.dismissCallCount, 1)
-        XCTAssertEqual(settingsCoordinator.viewController.dismissParamAnimated, [true])
+        let viewController = MockPresentableViewController()
+        coordinator.handle(SettingsCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
+        XCTAssertEqual(viewController.dismissCallCount, 1)
+        XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
 
     // MARK: handle - TorrentDetailCoordinatorEvent
@@ -103,7 +91,10 @@ class AppCoordinatorTests: XCTestCase {
     func test_detailCoordinator_completeEvent_shouldDismiss() {
         let previousDetailViewController = splitViewController.detailViewController
         XCTAssertNotNil(previousDetailViewController)
-        coordinator.handle(TorrentDetailCoordinatorEvent.complete, from: MockCoordinator())
+        coordinator.handle(
+            TorrentDetailCoordinatorEvent.complete,
+            from: MockCoordinator(viewController: MockPresentableViewController())
+        )
         XCTAssertNotEqual(splitViewController.detailViewController, previousDetailViewController)
         // unfortunately not much else we can test here :(
     }

@@ -15,7 +15,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     private let window = UIWindow()
     private let viewModel = MockViewModel()
     private let preferences = MockPreferences()
-    private lazy var session = DefaultSession(preferences: preferences)
+    private lazy var session = Session(preferences: preferences)
     private var coordinator: TorrentListCoordinator!
     private var observers = [AnyCancellable]()
 
@@ -36,7 +36,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_presentable_shouldBeTorrentListViewController() {
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController) === TorrentListViewController<AnyTorrentListViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: self))")
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
             return
         }
     }
@@ -113,10 +113,10 @@ class TorrentListCoordinatorTests: XCTestCase {
     // MARK: handle - FilterCoordinatorEvent
 
     func test_filterCoordinator_completeEvent_shouldDismiss() {
-        let mockCoordinator = MockCoordinator()
-        coordinator.handle(FilterCoordinatorEvent.complete, from: mockCoordinator)
-        XCTAssertEqual(mockCoordinator.viewController.dismissCallCount, 1)
-        XCTAssertEqual(mockCoordinator.viewController.dismissParamAnimated, [true])
+        let viewController = MockPresentableViewController()
+        coordinator.handle(FilterCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
+        XCTAssertEqual(viewController.dismissCallCount, 1)
+        XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
 }
 
