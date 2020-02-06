@@ -48,11 +48,16 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
     private func showServerSettings(for type: ServerType) {
         let coordinator = ServerSettingsCoordinator(type: type, preferences: preferences)
         addChildCoordinator(coordinator) { [weak self] _, event in
-            switch event {
-            case .complete:
-                self?.eventSubject.send(.complete)
-            }
+            self?.handle(event)
         }
         viewController.navigationController?.pushViewController(coordinator.presentable.viewController, animated: true)
+    }
+
+    // internal for testing
+    func handle(_ event: ServerSettingsCoordinatorEvent) {
+        switch event {
+        case .complete:
+            eventSubject.send(.complete)
+        }
     }
 }

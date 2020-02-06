@@ -7,9 +7,7 @@
 //
 
 import Combine
-import Coordinator
 @testable import Magnesium
-import SwiftUI
 import XCTest
 
 class FilterCoordinatorCoordinator: XCTestCase {
