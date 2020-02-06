@@ -59,7 +59,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     private func show(server: Server?) {
         let viewModel = server?.listViewModel(preferences: preferences)
-            ?? AnyEmitterViewModel(EmptyTorrentListViewModel())
+            ?? AnyTorrentListViewModel(EmptyTorrentListViewModel())
         let listCoordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
         addChildCoordinator(listCoordinator) { [weak self] _, event in
             self?.handle(event)
@@ -74,10 +74,12 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     // internal for testing
     func handle(_ event: TorrentListCoordinatorEvent) {
         switch event {
-        case .settings:
+        case .showSettings:
             showSettings()
-        case let .detail(viewModel: viewModel):
-            showTorrentDetail(viewModel: viewModel)
+        case let .showDetail(viewModel):
+            showTorrentDetail(for: viewModel)
+        case let .commitDetail(coordinator):
+            commitTorrentDetail(for: coordinator)
         }
     }
 
@@ -99,8 +101,16 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         }
     }
 
-    private func showTorrentDetail(viewModel: AnyTorrentDetailViewModel) {
+    private func showTorrentDetail(for viewModel: AnyTorrentDetailViewModel) {
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            self?.handle(event, from: coordinator)
+        }
+        let navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
+        splitViewController.showDetailViewController(navigationController, sender: nil)
+    }
+
+    private func commitTorrentDetail(for coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>) {
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }

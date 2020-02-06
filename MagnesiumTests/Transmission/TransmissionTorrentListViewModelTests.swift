@@ -26,6 +26,8 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
     }
 
+    // MARK: autoRefresh
+
     func test_autoRefresh_shouldFire() {
         client.requests.reset()
         preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
@@ -49,38 +51,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
-    func test_refresh_whenFails_shouldShowError() {
-        client.errors.torrents = true
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-        viewModel.handle(.refresh)
-        XCTAssertEqual(alert?.title, "Update Failed")
-    }
-
-    func test_refresh_isLoading_shouldEmitTrueThenFalse() {
-        var values = [Bool]()
-        viewModel.state.isLoading.dropFirst().sink {
-            values.append($0)
-        }.store(in: &observers)
-        viewModel.handle(.refresh)
-        XCTAssertEqual(values, [true, false])
-    }
-
-    func test_add_shouldEmitAddEvent() {
-        var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.addSelected(source: .view(UIView(), rect: .zero)))
-        guard case .add = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
-    }
+    // MARK: addLink
 
     func test_addLink_withInvalidInput_shouldEmitAlert() {
         var alert: Alert?
@@ -123,15 +94,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.title, "Failed to Add Torrent")
     }
 
-    func test_selectItem_shouldEmitDetailEvent() {
-        var event: TorrentListEvent!
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.itemSelected(index: 0))
-        guard case .detail = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
-    }
+    // MARK: items
 
     func test_items_shouldEmitInitialValue() {
         let expectation = self.expectation(description: "Value received")
@@ -164,6 +127,41 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(count, 1)
     }
 
+    // MARK: handle
+
+    func test_refresh_whenFails_shouldShowError() {
+        client.errors.torrents = true
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(alert?.title, "Update Failed")
+    }
+
+    func test_refresh_isLoading_shouldEmitTrueThenFalse() {
+        var values = [Bool]()
+        viewModel.state.isLoading.dropFirst().sink {
+            values.append($0)
+        }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(values, [true, false])
+    }
+
+    func test_addSelected_shouldEmitAddEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.addSelected(source: .view(UIView(), rect: .zero)))
+        guard case .add = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
     func test_filterSelected_shouldEmitFilterEvent() {
         var event: TorrentListEvent?
         viewModel.events.sink {
@@ -188,6 +186,18 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         }
     }
 
+    func test_selectItem_shouldEmitDetailEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.itemSelected(index: 0))
+        guard case .detail = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
+    // MARK: TransmissionRefreshable
+
     func test_refreshTransmission_shouldRefreshTorrents() {
         client.requests.reset()
         client.torrents.append(.randomMock())
@@ -203,5 +213,16 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
 
         waitForExpectations(timeout: 0)
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1))
+    }
+
+    // MARK: TorrentDetailViewModelProvider
+
+    func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
+        typealias Implementation = TransmissionTorrentDetailViewModelImplementation // swiftlint:disable:this nesting
+        let detailViewModel = viewModel.detailViewModelForItem(at: 0)!.base as AnyObject
+        guard type(of: detailViewModel) === StandardTorrentDetailViewModel<Implementation>.self else {
+            XCTFail("Unexpected view model: \(String(describing: viewModel))")
+            return
+        }
     }
 }

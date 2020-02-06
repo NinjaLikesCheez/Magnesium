@@ -22,7 +22,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     override func setUp() {
         super.setUp()
         coordinator = TorrentListCoordinator(
-            viewModel: AnyEmitterViewModel(viewModel),
+            viewModel: AnyTorrentListViewModel(viewModel),
             session: session,
             preferences: preferences
         )
@@ -88,23 +88,23 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_viewModel_detailEvent_shouldEmitDetailEvent() {
+    func test_viewModel_detailEvent_shouldEmitShowDetailEvent() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &observers)
         let detailViewModel = AnyEmitterViewModel(MockDetailViewModel())
         viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
-        guard case let .detail(viewModel) = event else {
+        guard case let .showDetail(viewModel) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
         XCTAssertTrue(detailViewModel === viewModel)
     }
 
-    func test_viewModel_settingsEvent_shouldEmitDetailEvent() {
+    func test_viewModel_settingsEvent_shouldEmitShowSettingsEvent() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &observers)
         viewModel.eventSubject.send(.settings)
-        guard case .settings = event else {
+        guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
@@ -118,11 +118,43 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(viewController.dismissCallCount, 1)
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
+
+    // MARK: TorrentListPreviewProvider
+
+    func test_previewForItem_shouldAddDetailChildCoordinator() {
+        let viewController = coordinator.previewForItem(at: 0)
+        XCTAssertNotNil(viewController)
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        let childCoordinator = Array(coordinator.childCoordinators.values)[0].base as AnyObject
+        guard type(of: childCoordinator) === TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self else {
+            XCTFail("Unexpected coordinator: \(String(describing: coordinator))")
+            return
+        }
+    }
+
+    func test_commitPreviews_shouldEmitCommitDetailEvent() {
+        var event: TorrentListCoordinatorEvent?
+        coordinator.events.sink { event = $0 }.store(in: &observers)
+        let viewController = coordinator.previewForItem(at: 0)!
+        coordinator.commitPreview(for: viewController)
+        guard case .commitDetail = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
+    func test_commitPreviews_shouldRemoveChildCoordinator() {
+        let viewController = coordinator.previewForItem(at: 0)
+        XCTAssertNotNil(viewController)
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        coordinator.commitPreview(for: viewController!)
+        XCTAssertTrue(coordinator.childCoordinators.isEmpty)
+    }
 }
 
 // MARK: - Mocks
 
-private final class MockViewModel: ViewModel, EventEmitter {
+private final class MockViewModel: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
     let state = TorrentListViewState(
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher()
@@ -130,6 +162,24 @@ private final class MockViewModel: ViewModel, EventEmitter {
     let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     var events: AnyPublisher<TorrentListEvent, Never> { eventSubject.eraseToAnyPublisher() }
     func handle(_ event: TorrentListViewEvent) {}
+
+    private(set) var previewViewModels = [AnyTorrentDetailViewModel]()
+    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
+        let subject = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
+        let preferences = MockPreferences()
+        let client = MockDelugeClient()
+        let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
+            implementation: DelugeTorrentDetailViewModelImplementation(
+                subject: subject,
+                client: client,
+                refresher: MockDelugeRefresher(client: client)
+            ),
+            subject: subject,
+            preferences: preferences
+        ))
+        previewViewModels.append(viewModel)
+        return viewModel
+    }
 }
 
 private final class MockDetailViewModel: ViewModel, EventEmitter {

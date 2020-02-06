@@ -12,9 +12,14 @@ import Preferences
 import UIKit
 import ViewModel
 
+protocol TorrentDetailViewModelProvider: AnyObject {
+    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel?
+}
+
 enum TorrentListCoordinatorEvent {
-    case detail(viewModel: AnyTorrentDetailViewModel)
-    case settings
+    case showDetail(viewModel: AnyTorrentDetailViewModel)
+    case commitDetail(coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>)
+    case showSettings
 }
 
 final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
@@ -23,6 +28,10 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
+    private let previewCoordinatorMap = NSMapTable<
+        UIViewController,
+        TorrentDetailCoordinator<AnyTorrentDetailViewModel>
+    >.weakToStrongObjects()
     private lazy var addFileFlow = AddFileFlow(viewController: viewController, session: session)
     let received: AnyPublisher<TorrentListEvent, Never>
     var observers = [AnyCancellable]()
@@ -42,6 +51,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
         received = viewModel.events
+        super.init()
+        viewController.previewProvider = self
     }
 
     func handle(_ event: TorrentListEvent) {
@@ -53,9 +64,9 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         case let .filter(source: source):
             showFilter(from: source)
         case let .detail(viewModel: viewModel):
-            eventSubject.send(.detail(viewModel: viewModel))
+            eventSubject.send(.showDetail(viewModel: viewModel))
         case .settings:
-            eventSubject.send(.settings)
+            eventSubject.send(.showSettings)
         }
     }
 
@@ -129,5 +140,21 @@ extension TorrentListCoordinator: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let url = urls.first else { return }
         addFileFlow.addFile(at: url)
+    }
+}
+
+extension TorrentListCoordinator: TorrentListPreviewProvider {
+    func previewForItem(at index: Int) -> UIViewController? {
+        guard let viewModel = viewModel.detailViewModelForItem(at: index) else { return nil }
+        let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
+        addChildCoordinator(coordinator) { _, _ in }
+        previewCoordinatorMap.setObject(coordinator, forKey: coordinator.presentable.viewController)
+        return coordinator.presentable.viewController
+    }
+
+    func commitPreview(for viewController: UIViewController) {
+        guard let coordinator = previewCoordinatorMap.object(forKey: viewController) else { return }
+        eventSubject.send(.commitDetail(coordinator: coordinator))
+        removeChildCoordinator(coordinator)
     }
 }

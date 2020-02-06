@@ -68,4 +68,8 @@ class EmptyTorrentListViewModelTests: XCTestCase {
         viewModel.handle(.itemSelected(index: 0))
         XCTAssertNil(event)
     }
+
+    func test_detailViewModelForItem_shouldReturnNil() {
+        XCTAssertNil(viewModel.detailViewModelForItem(at: 0))
+    }
 }

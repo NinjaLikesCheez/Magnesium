@@ -27,7 +27,7 @@ extension Server {
             )
             let implementation = DelugeTorrentListViewModelImplementation(client: client, preferences: preferences)
             let viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
-            return AnyEmitterViewModel(viewModel)
+            return AnyTorrentListViewModel(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: data),
@@ -46,7 +46,7 @@ extension Server {
                 preferences: preferences
             )
             let viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
-            return AnyEmitterViewModel(viewModel)
+            return AnyTorrentListViewModel(viewModel)
         }
     }
 }

@@ -55,8 +55,8 @@ class AppCoordinatorTests: XCTestCase {
 
     // MARK: handle - TorrentListCoordinatorEvent
 
-    func test_listCoordinator_settingsEvent_shouldShowSettings() throws {
-        coordinator.handle(.settings)
+    func test_listCoordinator_showSettingsEvent_shouldShowSettings() throws {
+        coordinator.handle(.showSettings)
         // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
@@ -66,8 +66,21 @@ class AppCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_listCoordinator_detailEvent_shouldShowDetail() throws {
-        coordinator.handle(.detail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
+    func test_listCoordinator_showDetailEvent_shouldShowDetail() throws {
+        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.detailViewController as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
+    func test_listCoordinator_commitDetail_shouldCommitDetail() throws {
+        let viewModel = AnyTorrentDetailViewModel(MockTorrentDetailViewModel())
+        let detailCoordinator = TorrentDetailCoordinator(viewModel: viewModel)
+        coordinator.handle(TorrentListCoordinatorEvent.commitDetail(coordinator: detailCoordinator))
         // swiftlint:disable:next force_cast
         let navigationController = splitViewController.detailViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]

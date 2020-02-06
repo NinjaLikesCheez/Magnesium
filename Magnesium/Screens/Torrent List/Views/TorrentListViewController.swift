@@ -11,6 +11,11 @@ import Coordinator
 import UIKit
 import ViewModel
 
+protocol TorrentListPreviewProvider: AnyObject {
+    func previewForItem(at index: Int) -> UIViewController?
+    func commitPreview(for viewController: UIViewController)
+}
+
 final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
     where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
     private enum Section {
@@ -33,6 +38,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private var observers = [AnyCancellable]()
     private var dataSource: UITableViewDiffableDataSource<Section, Item>!
     fileprivate var applySnapshotInBackground = true
+    weak var previewProvider: TorrentListPreviewProvider?
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -151,5 +157,30 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
+    }
+
+    override func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: { [weak self] in
+                self?.previewProvider?.previewForItem(at: indexPath.row)
+            },
+            actionProvider: nil
+        )
+    }
+
+    override func tableView(
+        _ tableView: UITableView,
+        willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionCommitAnimating
+    ) {
+        guard let viewController = animator.previewViewController else { return }
+        animator.addAnimations {
+            self.previewProvider?.commitPreview(for: viewController)
+        }
     }
 }

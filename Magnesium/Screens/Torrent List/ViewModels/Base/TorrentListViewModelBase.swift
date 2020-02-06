@@ -11,7 +11,38 @@ import Foundation
 import Preferences
 import ViewModel
 
-typealias AnyTorrentListViewModel = AnyEmitterViewModel<TorrentListEvent, TorrentListViewEvent, TorrentListViewState>
+final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
+    private let _events: () -> AnyPublisher<Event, Never>
+    private let _state: () -> ViewState
+    private let _handle: (ViewEvent) -> Void
+    private let _viewModelForItem: (Int) -> AnyTorrentDetailViewModel?
+    let base: Any
+
+    var state: TorrentListViewState { _state() }
+    var events: AnyPublisher<TorrentListEvent, Never> { _events() }
+
+    init<Base>(_ base: Base) where
+        Base: ViewModel,
+        Base: EventEmitter,
+        Base: TorrentDetailViewModelProvider,
+        Base.Event == Event,
+        Base.ViewEvent == ViewEvent,
+        Base.ViewState == ViewState {
+        self.base = base
+        _events = { base.events }
+        _state = { base.state }
+        _handle = { base.handle($0) }
+        _viewModelForItem = { base.detailViewModelForItem(at: $0) }
+    }
+
+    func handle(_ event: TorrentListViewEvent) {
+        _handle(event)
+    }
+
+    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
+        return _viewModelForItem(index)
+    }
+}
 
 enum TorrentListEvent {
     case alert(Alert, source: PopoverSource?)
@@ -44,7 +75,7 @@ protocol StandardTorrentListViewModelImplementation {
 }
 
 // swiftlint:disable:next line_length
-final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, EventEmitter {
+final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
     typealias Torrent = Implementation.Torrent
 
     private let implementation: Implementation
@@ -178,5 +209,12 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         )
         alert.addAction(AlertAction(title: "OK", style: .default))
         eventSubject.send(.alert(alert, source: nil))
+    }
+
+    // MARK: TorrentDetailViewModelProvider
+
+    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
+        let subject = torrents.subject(at: index)
+        return implementation.detailViewModel(for: subject)
     }
 }
