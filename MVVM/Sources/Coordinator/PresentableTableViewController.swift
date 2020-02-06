@@ -16,7 +16,6 @@ open class PresentableTableViewController: UITableViewController, Presentable {
         super.viewDidDisappear(animated)
         if shouldSendDismiss {
             didDismissSubject.send(())
-            didDismissSubject.send(completion: .finished)
         }
     }
 }

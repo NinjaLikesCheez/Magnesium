@@ -28,10 +28,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
-    private let previewCoordinatorMap = NSMapTable<
-        UIViewController,
-        TorrentDetailCoordinator<AnyTorrentDetailViewModel>
-    >.weakToStrongObjects()
+    private var previewCoordinatorMap = [UIViewController: TorrentDetailCoordinator<AnyTorrentDetailViewModel>]()
     private lazy var addFileFlow = AddFileFlow(viewController: viewController, session: session)
     let received: AnyPublisher<TorrentListEvent, Never>
     var observers = [AnyCancellable]()
@@ -148,12 +145,13 @@ extension TorrentListCoordinator: TorrentListPreviewProvider {
         guard let viewModel = viewModel.detailViewModelForItem(at: index) else { return nil }
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { _, _ in }
-        previewCoordinatorMap.setObject(coordinator, forKey: coordinator.presentable.viewController)
+        previewCoordinatorMap[coordinator.presentable.viewController] = coordinator
         return coordinator.presentable.viewController
     }
 
     func commitPreview(for viewController: UIViewController) {
-        guard let coordinator = previewCoordinatorMap.object(forKey: viewController) else { return }
+        guard let coordinator = previewCoordinatorMap[viewController] else { return }
+        previewCoordinatorMap.removeValue(forKey: viewController)
         eventSubject.send(.commitDetail(coordinator: coordinator))
         removeChildCoordinator(coordinator)
     }

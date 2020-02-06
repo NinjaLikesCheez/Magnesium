@@ -35,10 +35,10 @@ public extension Coordinator {
     func addChildCoordinator<C: Coordinator>(_ coordinator: C, eventHandler: @escaping (C, C.Event) -> Void) {
         childCoordinators[ObjectIdentifier(coordinator)] = AnyCoordinator(coordinator)
         coordinator.presentable.didDismiss
-            .sink(receiveCompletion: { [weak self, weak coordinator] _ in
+            .sink { [weak self, weak coordinator] _ in
                 guard let coordinator = coordinator else { return }
                 self?.removeChildCoordinator(coordinator)
-            }, receiveValue: { _ in })
+            }
             .store(in: &observers)
         coordinator.events
             .sink { [weak coordinator] event in

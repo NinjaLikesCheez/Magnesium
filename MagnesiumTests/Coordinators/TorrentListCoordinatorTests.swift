@@ -125,30 +125,35 @@ class TorrentListCoordinatorTests: XCTestCase {
         let viewController = coordinator.previewForItem(at: 0)
         XCTAssertNotNil(viewController)
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
-        let childCoordinator = Array(coordinator.childCoordinators.values)[0].base as AnyObject
+        let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
         guard type(of: childCoordinator) === TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self else {
             XCTFail("Unexpected coordinator: \(String(describing: coordinator))")
             return
         }
     }
 
-    func test_commitPreviews_shouldEmitCommitDetailEvent() {
+    func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &observers)
         let viewController = coordinator.previewForItem(at: 0)!
+        let childCoordinator = coordinator.childCoordinators.values.first?.base
+            as! TorrentDetailCoordinator<AnyTorrentDetailViewModel> // swiftlint:disable:this force_cast
         coordinator.commitPreview(for: viewController)
-        guard case .commitDetail = event else {
+        guard case let .commitDetail(committedCoordinator) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
+        XCTAssertTrue(childCoordinator === committedCoordinator)
     }
 
     func test_commitPreviews_shouldRemoveChildCoordinator() {
         let viewController = coordinator.previewForItem(at: 0)
         XCTAssertNotNil(viewController)
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        var childCoordinator = coordinator.childCoordinators.values.first!
         coordinator.commitPreview(for: viewController!)
         XCTAssertTrue(coordinator.childCoordinators.isEmpty)
+        XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
     }
 }
 

@@ -2,6 +2,10 @@ import UIKit
 
 extension UIViewController {
     var shouldSendDismiss: Bool {
+        if let parentViewController = parent, parentViewController.shouldSendDismiss {
+            return true
+        }
+
         return isBeingDismissed || isMovingFromParent || !isInViewHierarchy
     }
 
