@@ -18,7 +18,6 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
     private var observers = [AnyCancellable]()
-    private var refreshObserver: AnyCancellable?
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
 

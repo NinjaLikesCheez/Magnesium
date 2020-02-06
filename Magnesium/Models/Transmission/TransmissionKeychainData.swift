@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 struct TransmissionKeychainData: Codable {
     var password: String?
 }

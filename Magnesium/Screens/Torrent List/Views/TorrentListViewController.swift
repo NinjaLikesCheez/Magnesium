@@ -31,7 +31,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     private let viewModel: VM
     private var observers = [AnyCancellable]()
-    private var refreshObserver: AnyCancellable?
     private var dataSource: UITableViewDiffableDataSource<Section, Item>!
     fileprivate var applySnapshotInBackground = true
 

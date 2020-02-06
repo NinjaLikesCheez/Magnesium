@@ -7,9 +7,6 @@
 //
 
 import Combine
-import Foundation
-import Preferences
-import ViewModel
 
 final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = DelugeTorrent
@@ -18,7 +15,6 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     private let subject: CurrentValueSubject<DelugeTorrent, Never>
     private let client: DelugeClient
     private let refresher: DelugeRefreshable
-    private var observers = [AnyCancellable]()
 
     init(
         subject: CurrentValueSubject<DelugeTorrent, Never>,

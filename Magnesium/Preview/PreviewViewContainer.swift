@@ -8,7 +8,6 @@
 
 import SwiftUI
 import UIKit
-import ViewModel
 
 class PreviewViewContainer<T: UIView>: UIView {
     let inner: T

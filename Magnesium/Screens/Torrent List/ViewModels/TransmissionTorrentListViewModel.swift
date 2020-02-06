@@ -18,7 +18,6 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
     private let client: TransmissionClient
     private let preferences: Preferences
     private let torrentsUpdatedSubject = PassthroughSubject<[TransmissionTorrent], Never>()
-    private var observers = [AnyCancellable]()
 
     var torrentsUpdated: AnyPublisher<[TransmissionTorrent], Never> {
         return torrentsUpdatedSubject.eraseToAnyPublisher()

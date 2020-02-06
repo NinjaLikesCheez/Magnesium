@@ -7,10 +7,7 @@
 //
 
 import Combine
-import Coordinator
 import Preferences
-import SwiftUI
-import UIKit
 import ViewModel
 
 enum FilterEvent {

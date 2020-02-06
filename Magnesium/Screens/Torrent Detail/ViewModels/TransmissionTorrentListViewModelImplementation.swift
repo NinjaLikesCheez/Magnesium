@@ -7,9 +7,6 @@
 //
 
 import Combine
-import Foundation
-import Preferences
-import ViewModel
 
 final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = TransmissionTorrent
@@ -18,7 +15,6 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
     private let subject: CurrentValueSubject<TransmissionTorrent, Never>
     private let client: TransmissionClient
     private let refresher: TransmissionRefreshable
-    private var observers = [AnyCancellable]()
 
     init(
         subject: CurrentValueSubject<TransmissionTorrent, Never>,

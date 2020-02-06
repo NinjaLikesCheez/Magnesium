@@ -1,5 +1,3 @@
-import Combine
-
 /// A type erased wrapper for a `ViewModel`.
 public class AnyViewModel<ViewEvent, ViewState>: ViewModel, Identifiable {
     private let _state: () -> ViewState

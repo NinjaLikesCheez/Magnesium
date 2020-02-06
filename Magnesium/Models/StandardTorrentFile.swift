@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 protocol StandardTorrentFile {
     var index: Int { get }
     var name: String { get }

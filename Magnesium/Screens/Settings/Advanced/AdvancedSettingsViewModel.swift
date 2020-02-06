@@ -6,7 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Combine
 import Foundation
 import os
 import Preferences
