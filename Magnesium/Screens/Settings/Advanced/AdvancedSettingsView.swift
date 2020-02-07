@@ -75,7 +75,7 @@ struct AdvancedSettingsView<VM: ViewModel>: View
 
                 Button(
                     action: { self.isShowingClearLaunchScreenCacheConfirmation = true },
-                    label: { Text("Reset Launch Screen Cache").foregroundColor(.accentColor) }
+                    label: { Text("Clear Launch Screen Cache").foregroundColor(.accentColor) }
                 )
                 .actionSheet(isPresented: $isShowingClearLaunchScreenCacheConfirmation) {
                     ActionSheet(
