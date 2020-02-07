@@ -9,18 +9,17 @@
 import Combine
 import Foundation
 import Preferences
+import UIKit
 import ViewModel
 
 final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, DelugeRefreshable {
-    typealias Torrent = DelugeTorrent
-
     private let client: DelugeClient
     private let preferences: Preferences
-    private let torrentsUpdatedSubject = PassthroughSubject<[DelugeTorrent], Never>()
+    private let updatedSubject = PassthroughSubject<([DelugeTorrent], [DelugeLabel]), Never>()
     private var observers = [AnyCancellable]()
 
-    var torrentsUpdated: AnyPublisher<[DelugeTorrent], Never> {
-        return torrentsUpdatedSubject.eraseToAnyPublisher()
+    var updated: AnyPublisher<([DelugeTorrent], [DelugeLabel]), Never> {
+        return updatedSubject.eraseToAnyPublisher()
     }
 
     init(client: DelugeClient, preferences: Preferences) {
@@ -28,8 +27,10 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         self.preferences = preferences
     }
 
-    func refresh() -> AnyPublisher<[DelugeTorrent], Error> {
-        return client.getTorrents().mapError { $0 as Error }.eraseToAnyPublisher()
+    func refresh() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
+        return client.getCurrentState()
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
     }
 
     func detailViewModel(for subject: CurrentValueSubject<DelugeTorrent, Never>) -> AnyTorrentDetailViewModel {
@@ -68,10 +69,25 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
             .eraseToAnyPublisher()
     }
 
+    func pause(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+        return client.pause(hashes: [torrent.hash]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func resume(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+        return client.resume(hashes: [torrent.hash]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func remove(_ torrent: DelugeTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
+        return client.remove(hashes: [torrent.hash], removeData: removeData)
+            .map { _ in () }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
-        return client.getTorrents()
-            .handleEvents(receiveOutput: { [weak self] torrents in
-                self?.torrentsUpdatedSubject.send(torrents)
+        return client.getCurrentState()
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.updatedSubject.send($0)
             })
             .map { _ in () }
             .eraseToAnyPublisher()

@@ -9,13 +9,15 @@
 import Combine
 import Foundation
 import Preferences
+import UIKit.UIMenu
 import ViewModel
 
-final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
+final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
     private let _events: () -> AnyPublisher<Event, Never>
     private let _state: () -> ViewState
     private let _handle: (ViewEvent) -> Void
     private let _viewModelForItem: (Int) -> AnyTorrentDetailViewModel?
+    private let _contextMenuForItem: (Int) -> UIMenu?
     let base: Any
 
     var state: TorrentListViewState { _state() }
@@ -24,7 +26,7 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewM
     init<Base>(_ base: Base) where
         Base: ViewModel,
         Base: EventEmitter,
-        Base: TorrentDetailViewModelProvider,
+        Base: TorrentListPreviewProvider,
         Base.Event == Event,
         Base.ViewEvent == ViewEvent,
         Base.ViewState == ViewState {
@@ -33,6 +35,7 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewM
         _state = { base.state }
         _handle = { base.handle($0) }
         _viewModelForItem = { base.detailViewModelForItem(at: $0) }
+        _contextMenuForItem = { base.contextMenuForItem(at: $0) }
     }
 
     func handle(_ event: TorrentListViewEvent) {
@@ -42,6 +45,15 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewM
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
         return _viewModelForItem(index)
     }
+
+    func contextMenuForItem(at index: Int) -> UIMenu? {
+        return _contextMenuForItem(index)
+    }
+}
+
+protocol TorrentListPreviewProvider: AnyObject {
+    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel?
+    func contextMenuForItem(at index: Int) -> UIMenu?
 }
 
 enum TorrentListEvent {
@@ -64,157 +76,4 @@ struct TorrentListViewState {
     var showAddButton: Bool = true
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
     var isLoading: AnyPublisher<Bool, Never>
-}
-
-protocol StandardTorrentListViewModelImplementation {
-    associatedtype Torrent: StandardTorrent
-    var torrentsUpdated: AnyPublisher<[Torrent], Never> { get }
-    func refresh() -> AnyPublisher<[Torrent], Error>
-    func detailViewModel(for subject: CurrentValueSubject<Torrent, Never>) -> AnyTorrentDetailViewModel
-    func addLink(_ url: String) -> AnyPublisher<(String, String), Never>
-}
-
-// swiftlint:disable:next line_length
-final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
-    typealias Torrent = Implementation.Torrent
-
-    private let implementation: Implementation
-    private let preferences: Preferences
-    private let torrents: TorrentMapper<String, Torrent>
-    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
-    private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
-    private var autoRefreshTimer: Timer?
-    let state: TorrentListViewState
-    var observers = [AnyCancellable]()
-
-    var events: AnyPublisher<TorrentListEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
-    }
-
-    init(implementation: Implementation, preferences: Preferences) {
-        self.preferences = preferences
-        torrents = TorrentMapper(preferences: preferences)
-        self.implementation = implementation
-
-        let items = torrents.values
-            .map { $0.map { AnyViewModel(StandardTorrentListItemViewModel(subject: $0)) } }
-            .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
-            .ui()
-            .eraseToAnyPublisher()
-        state = TorrentListViewState(items: items, isLoading: isLoadingSubject.eraseToAnyPublisher())
-
-        refresh()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
-
-        preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureAutoRefreshTimer(interval: value)
-            })
-            .store(in: &observers)
-
-        implementation.torrentsUpdated
-            .sink { [weak self] torrents in
-                self?.torrents.update(with: torrents.map { ($0.hash, $0) })
-            }
-            .store(in: &observers)
-    }
-
-    deinit {
-        autoRefreshTimer?.invalidate()
-    }
-
-    func handle(_ event: TorrentListViewEvent) {
-        switch event {
-        case .refresh:
-            guard !isLoadingSubject.value else { return }
-            isLoadingSubject.send(true)
-            refresh()
-                .sink(receiveCompletion: { [weak self] _ in
-                    self?.isLoadingSubject.send(false)
-                    }, receiveValue: { _ in })
-                .store(in: &observers)
-
-        case let .addSelected(source: source):
-            let linkSubject = PassthroughSubject<String, Never>()
-            linkSubject
-                .sink { [weak self] in self?.addLink($0) }
-                .store(in: &observers)
-            eventSubject.send(.add(source: source, linkSubject: linkSubject))
-
-        case let .filterSelected(source: source):
-            eventSubject.send(.filter(source: source))
-
-        case let .itemSelected(index: index):
-            let subject = torrents.subject(at: index)
-            let viewModel = implementation.detailViewModel(for: subject)
-            eventSubject.send(.detail(viewModel: viewModel))
-
-        case .settingsSelected:
-            eventSubject.send(.settings)
-        }
-    }
-
-    // internal for testing
-    func addLink(_ url: String) {
-        implementation.addLink(url)
-            .ui()
-            .sink { [weak self] title, message in
-                self?.showError(title: title, message: message)
-            }
-            .store(in: &observers)
-    }
-
-    private func configureAutoRefreshTimer(interval: TimeInterval?) {
-        autoRefreshTimer?.invalidate()
-        guard let interval = interval, interval > 0 else { return }
-        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
-            self?.refreshTimerFired($0)
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        autoRefreshTimer = timer
-    }
-
-    private func refreshTimerFired(_ timer: Timer) {
-        refreshTorrents()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func refresh() -> AnyPublisher<Void, Error> {
-        return refreshTorrents()
-            .mapError { $0 as Error }
-            .ui()
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Update Failed", message: error.localizedDescription)
-            })
-            .eraseToAnyPublisher()
-    }
-
-    private func refreshTorrents() -> AnyPublisher<Void, Error> {
-        return implementation.refresh()
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.torrents.update(with: new.map { ($0.hash, $0) })
-            })
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(AlertAction(title: "OK", style: .default))
-        eventSubject.send(.alert(alert, source: nil))
-    }
-
-    // MARK: TorrentDetailViewModelProvider
-
-    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        let subject = torrents.subject(at: index)
-        return implementation.detailViewModel(for: subject)
-    }
 }

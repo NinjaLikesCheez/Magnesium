@@ -303,7 +303,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         recheck()
         XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
-        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(verify: 1))
     }
 
     func test_pause_shouldPerformRequest() {
@@ -327,7 +327,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.pause)
         XCTAssertEqual(errorAlert?.title, "Failed to Pause")
-        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(stop: 1))
     }
 
     func test_resume_shouldPerformRequest() {
@@ -351,7 +351,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.resume)
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
-        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(start: 1))
     }
 
     func test_remove_shouldEmitAlert() {
@@ -423,7 +423,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(remove: [false]))
     }
 
     func test_removeWithData_shouldPerformRequestAndRefresh() {
@@ -469,7 +469,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockTransmissionClient.Requests())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(remove: [true]))
     }
 }
 

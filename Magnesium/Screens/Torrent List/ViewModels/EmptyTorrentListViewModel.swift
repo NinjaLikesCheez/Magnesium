@@ -7,9 +7,10 @@
 //
 
 import Combine
+import UIKit
 import ViewModel
 
-final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
+final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
 
@@ -37,6 +38,10 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentDetailVie
     }
 
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
+        return nil
+    }
+
+    func contextMenuForItem(at index: Int) -> UIMenu? {
         return nil
     }
 }

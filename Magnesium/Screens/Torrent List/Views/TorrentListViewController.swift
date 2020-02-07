@@ -12,10 +12,13 @@ import UIKit
 import ViewModel
 
 /// A type that is able to provide previews for a `TorrentListViewController`.
-protocol TorrentListPreviewProvider: AnyObject {
+protocol TorrentListViewPreviewProvider: AnyObject {
     /// The user has requested a preview for the item at the provided index.
     /// - Parameter index: The item index to create a preview for.
     func previewForItem(at index: Int) -> UIViewController?
+    /// The user has requested a preview for the item at the provided index.
+    /// - Parameter index: The item index to return actions for.
+    func contextMenuForItem(at index: Int) -> UIMenu?
     /// The user has selected the preview indicating that it should be committed.
     /// - Parameter index: The item index whose preview is being committed.
     func commitPreviewForItem(at index: Int)
@@ -45,7 +48,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private var observers = [AnyCancellable]()
     private var dataSource: UITableViewDiffableDataSource<Section, Item>!
     fileprivate var applySnapshotInBackground = true
-    weak var previewProvider: TorrentListPreviewProvider?
+    weak var previewProvider: TorrentListViewPreviewProvider?
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -176,7 +179,9 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             previewProvider: { [weak self] in
                 self?.previewProvider?.previewForItem(at: indexPath.row)
             },
-            actionProvider: nil
+            actionProvider: { [weak self] _ in
+                self?.previewProvider?.contextMenuForItem(at: indexPath.row)
+            }
         )
     }
 

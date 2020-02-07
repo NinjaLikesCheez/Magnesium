@@ -33,7 +33,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 1))
+            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(currentState: 1))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -45,7 +45,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(torrents: 0))
+            XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(currentState: 0))
             expectation.fulfill()
         }
         waitForExpectations(timeout: 1)
@@ -111,7 +111,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             count += 1
         }.store(in: &observers)
         viewModel.handle(.refresh)
-        XCTAssertEqual(client.requests.torrents, 1)
+        XCTAssertEqual(client.requests.currentState, 1)
         XCTAssertEqual(count, 0)
     }
 
@@ -123,14 +123,14 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         }.store(in: &observers)
         client.torrents.append(.randomMock())
         viewModel.handle(.refresh)
-        XCTAssertEqual(client.requests.torrents, 1)
+        XCTAssertEqual(client.requests.currentState, 1)
         XCTAssertEqual(count, 1)
     }
 
     // MARK: handle
 
     func test_refresh_whenFails_shouldShowError() {
-        client.errors.torrents = true
+        client.errors.currentState = true
         var alert: Alert?
         viewModel.events.first().sink {
             guard case let .alert(inner, source: _) = $0 else {
@@ -212,7 +212,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             .store(in: &observers)
 
         waitForExpectations(timeout: 0)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1))
     }
 
     // MARK: TorrentDetailViewModelProvider
@@ -224,5 +224,160 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             XCTFail("Unexpected view model: \(String(describing: viewModel))")
             return
         }
+    }
+
+    func test_contextMenuForItem_shouldReturnExpectedMenu() {
+        let menu = viewModel.contextMenuForItem(at: 0)!
+        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
+            var output = String(repeating: " ", count: level * 2)
+            output += "\(menu.title)\n"
+            if let menu = menu as? UIMenu {
+                output += menu.children
+                    .map { menuString($0, level: level + 1) }
+                    .joined()
+            }
+            return output
+        }
+        // swiftformat:disable all
+        let expected = """
+
+              Set Label
+                None
+                Label
+              Pause
+              Remove
+                Keep Data
+                Remove Data
+
+            """
+        // swiftformat:enable all
+        XCTAssertEqual(menuString(menu), expected)
+    }
+
+    func test_contextMenuForItem_withInactiveTorrent_shouldReturnExpectedMenu() {
+        client.torrents = [.mock(state: .paused)]
+        viewModel.handle(.refresh)
+
+        let menu = viewModel.contextMenuForItem(at: 0)!
+        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
+            var output = String(repeating: " ", count: level * 2)
+            output += "\(menu.title)\n"
+            if let menu = menu as? UIMenu {
+                output += menu.children
+                    .map { menuString($0, level: level + 1) }
+                    .joined()
+            }
+            return output
+        }
+        // swiftformat:disable all
+        let expected = """
+
+              Set Label
+                None
+                Label
+              Resume
+              Remove
+                Keep Data
+                Remove Data
+
+            """
+        // swiftformat:enable all
+        XCTAssertEqual(menuString(menu), expected)
+    }
+
+    func test_handlePauseAction_shouldPauseAndRefresh() {
+        client.requests.reset()
+        viewModel.handlePauseAction(for: .mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, pause: 1))
+    }
+
+    func test_handlePauseAction_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.pause = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handlePauseAction(for: .mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Pause \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
+    }
+
+    func test_handleResumeAction_shouldResumeAndRefresh() {
+        client.requests.reset()
+        viewModel.handleResumeAction(for: .mock(name: "Torrent"))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, resume: 1))
+    }
+
+    func test_handleResumeAction_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.resume = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handleResumeAction(for: .mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Resume \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
+    }
+
+    func test_handleRemoveAction_withRemoveData_shouldRemoveAndRefresh() {
+        client.requests.reset()
+        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: true)
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [true]))
+    }
+
+    func test_handleRemoveAction_withRemoveData_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.removeWithData = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: true)
+        XCTAssertEqual(alert?.title, "Failed to Remove \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
+    }
+
+    func test_handleRemoveAction_withKeepData_shouldRemoveAndRefresh() {
+        client.requests.reset()
+        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: false)
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [false]))
+    }
+
+    func test_handleRemoveAction_withKeepData_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.removeKeepData = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: false)
+        XCTAssertEqual(alert?.title, "Failed to Remove \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
     }
 }

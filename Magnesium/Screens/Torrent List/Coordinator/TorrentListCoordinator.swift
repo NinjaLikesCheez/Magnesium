@@ -12,10 +12,6 @@ import Preferences
 import UIKit
 import ViewModel
 
-protocol TorrentDetailViewModelProvider: AnyObject {
-    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel?
-}
-
 enum TorrentListCoordinatorEvent {
     case showDetail(viewModel: AnyTorrentDetailViewModel)
     case commitDetail(coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>)
@@ -140,13 +136,17 @@ extension TorrentListCoordinator: UIDocumentPickerDelegate {
     }
 }
 
-extension TorrentListCoordinator: TorrentListPreviewProvider {
+extension TorrentListCoordinator: TorrentListViewPreviewProvider {
     func previewForItem(at index: Int) -> UIViewController? {
         guard let viewModel = viewModel.detailViewModelForItem(at: index) else { return nil }
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { _, _ in }
         previewCoordinatorMap[index] = coordinator
         return coordinator.presentable.viewController
+    }
+
+    func contextMenuForItem(at index: Int) -> UIMenu? {
+        return viewModel.contextMenuForItem(at: index)
     }
 
     func commitPreviewForItem(at index: Int) {

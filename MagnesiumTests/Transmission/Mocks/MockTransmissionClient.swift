@@ -43,31 +43,31 @@ final class MockTransmissionClient: TransmissionClient {
     var torrents = [TransmissionTorrent.mock()]
 
     func authenticate() -> AnyPublisher<Void, TransmissionError> {
+        requests.authenticate += 1
         guard !errors.authenticate else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.authenticate += 1
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 
     func getTorrents() -> AnyPublisher<[TransmissionTorrent], TransmissionError> {
+        requests.torrents += 1
         guard !errors.torrents else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.torrents += 1
         return Just(torrents)
             .setFailureType(to: TransmissionError.self)
             .eraseToAnyPublisher()
     }
 
     func getTorrentFiles(id: Int) -> AnyPublisher<[TransmissionTorrentFile], TransmissionError> {
+        requests.torrentFiles += 1
         guard !errors.torrentFiles else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.torrentFiles += 1
         return Just([
             TransmissionTorrentFile.mock(index: 0, name: "file.rar"),
             TransmissionTorrentFile.mock(index: 1, name: "file.r00"),
@@ -76,47 +76,47 @@ final class MockTransmissionClient: TransmissionClient {
     }
 
     func start(ids: [Int]) -> AnyPublisher<Void, TransmissionError> {
+        requests.start += 1
         guard !errors.start else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.start += 1
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 
     func stop(ids: [Int]) -> AnyPublisher<Void, TransmissionError> {
+        requests.stop += 1
         guard !errors.stop else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.stop += 1
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 
     func remove(ids: [Int], removeData: Bool) -> AnyPublisher<Void, TransmissionError> {
+        requests.remove.append(removeData)
         guard !(removeData && errors.removeWithData), !(!removeData && errors.removeKeepData) else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.remove.append(removeData)
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 
     func verify(ids: [Int]) -> AnyPublisher<Void, TransmissionError> {
+        requests.verify += 1
         guard !errors.verify else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.verify += 1
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 
     func add(url: URL) -> AnyPublisher<Void, TransmissionError> {
+        requests.addURL += 1
         guard !errors.addURL else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.addURL += 1
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 

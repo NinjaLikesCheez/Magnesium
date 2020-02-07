@@ -271,7 +271,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         let recheck = alert!.actions[0].handler!
         recheck()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, recheck: 1))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
     }
 
     func test_forceRecheck_whenFails_shouldEmitAlert() {
@@ -299,13 +299,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         recheck()
         XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
     }
 
     func test_pause_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.pause)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, pause: 1))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, pause: 1))
     }
 
     func test_pause_whenFails_shouldEmitAlert() {
@@ -323,13 +323,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.pause)
         XCTAssertEqual(errorAlert?.title, "Failed to Pause")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
     }
 
     func test_resume_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.resume)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, resume: 1))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, resume: 1))
     }
 
     func test_resume_whenFails_shouldPerformRequest() {
@@ -347,7 +347,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
 
         viewModel.handle(.resume)
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
     }
 
     func test_remove_shouldEmitAlert() {
@@ -386,7 +386,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             event = inner
         }.store(in: &observers)
         remove()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [false]))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [false]))
 
         guard case .complete = event else {
             XCTFail("Unexpected event")
@@ -419,7 +419,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
     }
 
     func test_removeWithData_shouldPerformRequestAndRefresh() {
@@ -437,7 +437,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.remove(source: .view(UIView(), rect: .zero)))
         let remove = alert!.actions[1].handler!
         remove()
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(torrents: 1, remove: [true]))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [true]))
     }
 
     func test_removeWithData_whenFails_shouldEmitAlert() {
@@ -465,7 +465,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         }.store(in: &observers)
         remove()
         XCTAssertEqual(errorAlert?.title, "Failed to Remove")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
     }
 }
 

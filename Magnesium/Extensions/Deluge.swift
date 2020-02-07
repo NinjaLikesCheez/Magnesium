@@ -14,11 +14,11 @@ typealias DelugeError = Deluge.Client.Error
 typealias DefaultDelugeClient = Deluge.Client
 typealias DelugeTorrent = Deluge.Torrent
 typealias DelugeTorrentFile = Deluge.TorrentFile
+typealias DelugeLabel = Deluge.Label
 
 protocol DelugeClient {
     func authenticate() -> AnyPublisher<Void, DelugeError>
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError>
-    func getLabels() -> AnyPublisher<[String], DelugeError>
+    func getCurrentState() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), DelugeError>
     func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError>
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError>
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError>
@@ -55,3 +55,4 @@ extension DelugeTorrent: StandardTorrent {
 }
 
 extension DelugeTorrentFile: StandardTorrentFile {}
+extension DelugeLabel: StandardLabel {}

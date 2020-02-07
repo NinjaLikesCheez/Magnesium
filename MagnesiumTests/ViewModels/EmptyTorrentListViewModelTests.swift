@@ -72,4 +72,8 @@ class EmptyTorrentListViewModelTests: XCTestCase {
     func test_detailViewModelForItem_shouldReturnNil() {
         XCTAssertNil(viewModel.detailViewModelForItem(at: 0))
     }
+
+    func test_contextMenuForItem_shouldReturnNil() {
+        XCTAssertNil(viewModel.contextMenuForItem(at: 0))
+    }
 }

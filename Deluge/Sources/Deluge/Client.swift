@@ -133,8 +133,24 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Retrieves the list of torrents from the server.
-    public func getTorrents() -> AnyPublisher<[Torrent], Error> {
+    private static func parseLabels(from response: [String: Any]) -> [Label] {
+        guard let filters = response["filters"] as? [String: Any],
+            let labels = filters["label"] as? [[AnyObject]]
+        else {
+            return []
+        }
+
+        return labels.compactMap { pair in
+            guard pair.count == 2, let name = pair[0] as? String, name != "All", let count = pair[1] as? Int else {
+                return nil
+            }
+
+            return Label(name: name, count: count)
+        }
+    }
+
+    /// Retrieves the list of torrents and labels from the server.
+    public func getCurrentState() -> AnyPublisher<([Torrent], [Label]), Error> {
         let keys = [
             "name",
             "state",
@@ -155,29 +171,17 @@ public final class Client {
         ]
 
         return request(method: "web.update_ui", params: [keys, []])
-            .flatMap { response -> AnyPublisher<[Torrent], Error> in
+            .flatMap { response -> AnyPublisher<([Torrent], [Label]), Error> in
                 guard let results = response["result"] as? [String: Any],
                     let torrents = results["torrents"] as? [String: [String: Any]]
                 else {
                     return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
                 }
 
-                return Just(torrents.compactMap { Torrent(hash: $0.key, dictionary: $0.value) })
+                let labels = Self.parseLabels(from: results)
+                return Just((torrents.compactMap { Torrent(hash: $0.key, dictionary: $0.value) }, labels))
                     .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
-    }
-
-    /// Retrieves the list of labels from the server.
-    public func getLabels() -> AnyPublisher<[String], Error> {
-        return request(method: "label.get_labels", params: [])
-            .flatMap { response -> AnyPublisher<[String], Error> in
-                guard let result = response["result"] as? [String] else {
-                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
-                }
-
-                return Just(result).setFailureType(to: Error.self).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }

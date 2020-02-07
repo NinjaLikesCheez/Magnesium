@@ -132,6 +132,11 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
+    func test_contextMenuForItem_shouldReturnExpectedMenu() {
+        let menu = coordinator.contextMenuForItem(at: 0)
+        XCTAssertEqual(menu?.identifier.rawValue, "mock")
+    }
+
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &observers)
@@ -169,7 +174,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
 // MARK: - Mocks
 
-private final class MockViewModel: ViewModel, EventEmitter, TorrentDetailViewModelProvider {
+private final class MockViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
     let state = TorrentListViewState(
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher()
@@ -194,6 +199,10 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentDetailViewMod
         ))
         previewViewModels.append(viewModel)
         return viewModel
+    }
+
+    func contextMenuForItem(at index: Int) -> UIMenu? {
+        return UIMenu(title: "Menu", identifier: UIMenu.Identifier(rawValue: "mock"))
     }
 }
 

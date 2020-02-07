@@ -38,7 +38,7 @@ class AppCoordinatorTests: XCTestCase {
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
         session.setServer(.transmissionMock())
         let firstViewController = masterNavigationController.viewControllers[0]
-        session.setServer(.transmissionMock())
+        session.setServer(.delugeMock())
         let secondViewController = masterNavigationController.viewControllers[0]
         XCTAssertNotEqual(firstViewController, secondViewController)
     }

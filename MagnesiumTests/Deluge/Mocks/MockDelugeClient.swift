@@ -13,7 +13,7 @@ import Foundation
 final class MockDelugeClient: DelugeClient {
     struct Requests: Equatable {
         var authenticate = 0
-        var torrents = 0
+        var currentState = 0
         var torrentFiles = 0
         var pause = 0
         var resume = 0
@@ -29,7 +29,7 @@ final class MockDelugeClient: DelugeClient {
 
     struct Errors {
         var authenticate = false
-        var torrents = false
+        var currentState = false
         var torrentFiles = false
         var pause = false
         var resume = false
@@ -44,21 +44,22 @@ final class MockDelugeClient: DelugeClient {
     var torrents = [DelugeTorrent.mock()]
 
     func authenticate() -> AnyPublisher<Void, DelugeError> {
+        requests.authenticate += 1
         guard !errors.authenticate else {
             return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.authenticate += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
-    func getTorrents() -> AnyPublisher<[DelugeTorrent], DelugeError> {
-        guard !errors.torrents else {
+    func getCurrentState() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), DelugeError> {
+        requests.currentState += 1
+        guard !errors.currentState else {
             return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.torrents += 1
-        return Just(torrents)
+        let labels = [DelugeLabel(name: "", count: 0), DelugeLabel(name: "Label", count: 0)]
+        return Just((torrents, labels))
             .setFailureType(to: DelugeError.self)
             .eraseToAnyPublisher()
     }
@@ -68,11 +69,11 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
+        requests.torrentFiles += 1
         guard !errors.torrentFiles else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.torrentFiles += 1
         return Just([
             DelugeTorrentFile.mock(index: 0, name: "file.rar"),
             DelugeTorrentFile.mock(index: 1, name: "file.r00"),
@@ -81,47 +82,47 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.pause += 1
         guard !errors.pause else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.pause += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.resume += 1
         guard !errors.resume else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.resume += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
+        requests.remove.append(removeData)
         guard !(removeData && errors.removeWithData), !(!removeData && errors.removeKeepData) else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.remove.append(removeData)
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.recheck += 1
         guard !errors.recheck else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.recheck += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func add(url: URL) -> AnyPublisher<Void, DelugeError> {
+        requests.addURL += 1
         guard !errors.addURL else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 
-        requests.addURL += 1
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
