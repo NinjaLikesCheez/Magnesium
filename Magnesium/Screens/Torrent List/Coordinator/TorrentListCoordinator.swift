@@ -156,7 +156,7 @@ extension TorrentListCoordinator: TorrentListPreviewProvider {
         removeChildCoordinator(coordinator)
     }
 
-    func cleanupPreviewForItem(at index: Int) {
+    func didDismissPreviewForItem(at index: Int) {
         previewCoordinatorMap.removeValue(forKey: index)
     }
 }

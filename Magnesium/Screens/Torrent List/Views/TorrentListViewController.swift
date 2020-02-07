@@ -20,7 +20,7 @@ protocol TorrentListPreviewProvider: AnyObject {
     /// - Parameter index: The item index whose preview is being committed.
     func commitPreviewForItem(at index: Int)
     /// Called when a preview is dismissed. Use this opportunity to release any cached state related to the preview.
-    func cleanupPreviewForItem(at index: Int)
+    func didDismissPreviewForItem(at index: Int)
 }
 
 final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
@@ -196,7 +196,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
-        previewProvider?.cleanupPreviewForItem(at: indexPath.row)
+        previewProvider?.didDismissPreviewForItem(at: indexPath.row)
         return nil
     }
 }

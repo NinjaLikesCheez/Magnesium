@@ -162,7 +162,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         // remove the child coordinator so the only reference should be the preview cache
         coordinator.childCoordinators.removeAll()
         XCTAssertFalse(isKnownUniquelyReferenced(&childCoordinator))
-        coordinator.cleanupPreviewForItem(at: 0)
+        coordinator.didDismissPreviewForItem(at: 0)
         XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
     }
 }
