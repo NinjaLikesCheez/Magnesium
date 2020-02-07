@@ -317,11 +317,11 @@
 				E9786AF523D38D5600E4157E /* Deluge.swift */,
 				E90366E123AAC45600C6AB46 /* NSLayoutConstraint+Priority.swift */,
 				E951873323C80FC00060636A /* Preferences+Servers.swift */,
+				E95C4D9423E3CD9600202CAA /* Publishers+AsOptional.swift */,
 				E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */,
 				E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */,
 				E96B724E23D39368005E8E89 /* Transmission.swift */,
 				E93F5D6223BA85CC00B0FFA4 /* UIImage+Color.swift */,
-				E95C4D9423E3CD9600202CAA /* Publishers+AsOptional.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";

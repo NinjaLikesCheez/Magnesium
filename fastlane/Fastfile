@@ -53,7 +53,22 @@ platform :ios do
       build_directory: DERIVED_DATA_PATH,
       html: true,
       output_directory: "fastlane/coverage_report/Magnesium",
-      ignore: ["MVVM/*", "Preferences/*", "Deluge/*", "Transmission/*", "**/Preview*.swift"]
+      ignore: [
+        "MVVM/*", 
+        "Preferences/*", 
+        "Deluge/*", 
+        "Transmission/*", 
+        "**/Preview*.swift",
+        "Magnesium/Models/*", 
+        "**/*ViewController.swift",
+        "**/*View.swift",
+        "**ViewCell.swift",
+        "Magnesium/AppDelegate.swift",
+        "Magnesium/SceneDelegate.swift",
+        "Magnesium/Extensions/UIImage+Color.swift",
+        "Magnesium/Extensions/NSLayoutConstraint+Priority.swift",
+        "Magnesium/ExtensionsPublishers+UI.swift",
+        ]
     )
   end
 
