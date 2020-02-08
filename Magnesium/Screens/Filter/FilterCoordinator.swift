@@ -29,8 +29,8 @@ final class FilterCoordinator: Coordinator, AlertPresenter {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences) {
-        let viewModel = FilterViewModel(preferences: preferences)
+    init(preferences: Preferences, labels: CurrentValueSubject<[StandardLabel], Never>) {
+        let viewModel = FilterViewModel(preferences: preferences, labels: labels)
         let viewController = FilterViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         received = viewModel.events

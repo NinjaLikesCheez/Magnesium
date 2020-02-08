@@ -29,7 +29,7 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPrevi
         case .refresh:
             isLoadingSubject.send(false)
         case let .filterSelected(source: source):
-            eventSubject.send(.filter(source: source))
+            eventSubject.send(.filter(source: source, labels: CurrentValueSubject([])))
         case .settingsSelected:
             eventSubject.send(.settings)
         case .addSelected, .itemSelected:

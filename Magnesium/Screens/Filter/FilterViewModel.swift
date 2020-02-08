@@ -18,45 +18,52 @@ enum FilterEvent {
 enum FilterViewEvent {
     case doneSelected
     case sortSelected(source: PopoverSource)
-    case filterStateSelected(source: PopoverSource)
+    case stateSelected(source: PopoverSource)
+    case labelSelected(source: PopoverSource)
 }
 
 struct FilterViewState {
-    var sortOption: AnyPublisher<String, Never>
-    var filterState: AnyPublisher<String, Never>
+    var sections: AnyPublisher<[FilterSection], Never>
 }
 
 final class FilterViewModel: ViewModel, EventEmitter {
     private let preferences: Preferences
+    private let labels: CurrentValueSubject<[StandardLabel], Never>
     private let eventSubject = PassthroughSubject<FilterEvent, Never>()
+    private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
+    private var observers = [AnyCancellable]()
     let state: FilterViewState
 
     var events: AnyPublisher<FilterEvent, Never> {
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences) {
+    init(preferences: Preferences, labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.preferences = preferences
-        let sortOption = preferences.valuePublisher(for: PreferenceKeys.sortOption)
-            .map(\.displayString)
-            .ui()
-            .eraseToAnyPublisher()
-        let filterState = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
-            .map(\.state)
-            .map { $0?.displayString ?? "All" }
-            .ui()
-            .eraseToAnyPublisher()
-        state = FilterViewState(sortOption: sortOption, filterState: filterState)
+        self.labels = labels
+        state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
+
+        preferences.valueUpdatedPublisher(for: PreferenceKeys.sortOption).map { _ in () }
+            .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.filterOptions).map { _ in () })
+            .merge(with: labels.removeDuplicates(by: { $0.map { $0.name } == $1.map { $0.name } }).map { _ in () })
+            .sink { [weak self] _ in
+                self?.updateSections()
+            }
+            .store(in: &observers)
+
+        updateSections()
     }
 
     func handle(_ event: FilterViewEvent) {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)
-        case let .sortSelected(source: source):
+        case let .sortSelected(source):
             handleSortSelected(from: source)
-        case let .filterStateSelected(source: source):
-            handleFilterStateSelected(from: source)
+        case let .stateSelected(source):
+            handleStateSelected(from: source)
+        case let .labelSelected(source):
+            handleLabelSelected(from: source)
         }
     }
 
@@ -83,7 +90,28 @@ final class FilterViewModel: ViewModel, EventEmitter {
         eventSubject.send(.alert(alert, source: source))
     }
 
-    private func handleFilterStateSelected(from source: PopoverSource) {
+    private func handleLabelSelected(from source: PopoverSource) {
+        var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        var alert = Alert(
+            title: "Filter by Label",
+            message: "Only display torrents with the selected label.",
+            style: .actionSheet
+        )
+        let labels: [StandardLabel?] = [nil] + self.labels.value
+
+        for label in labels {
+            let displayName = label.map { $0.displayName } ?? "All"
+            alert.addAction(AlertAction(title: displayName, style: .default) {
+                filterOptions.label = label?.name
+                self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+            })
+        }
+
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
+    }
+
+    private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
         var alert = Alert(
             title: "Filter by State",
@@ -101,5 +129,26 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
         alert.addAction(AlertAction(title: "Cancel", style: .cancel))
         eventSubject.send(.alert(alert, source: source))
+    }
+
+    private func updateSections() {
+        let sortOption = preferences.value(for: PreferenceKeys.sortOption)
+        let filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        var sections = [FilterSection]()
+
+        sections.append(FilterSection(type: .sort, items: [
+            .sort(sortOption.displayString),
+        ]))
+
+        var filtersSection = FilterSection(type: .filters, items: [
+            .state(filterOptions.state?.displayString ?? "All"),
+        ])
+
+        if !labels.value.isEmpty {
+            filtersSection.items.append(.label(filterOptions.label.map { $0.isEmpty ? "None" : $0 } ?? "All"))
+        }
+
+        sections.append(filtersSection)
+        sectionsSubject.send(sections)
     }
 }

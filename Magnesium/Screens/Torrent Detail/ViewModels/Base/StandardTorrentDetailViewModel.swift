@@ -210,7 +210,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private func setLabel(source: PopoverSource) {
         var alert = Alert(title: "Set Label", message: nil, style: .actionSheet)
         for label in labels.value {
-            alert.addAction(AlertAction(title: label.name.isEmpty ? "None" : label.name, style: .default) {
+            alert.addAction(AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(label)
             })
         }

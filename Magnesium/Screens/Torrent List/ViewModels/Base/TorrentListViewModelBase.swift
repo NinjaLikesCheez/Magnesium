@@ -59,7 +59,7 @@ protocol TorrentListPreviewProvider: AnyObject {
 enum TorrentListEvent {
     case alert(Alert, source: PopoverSource?)
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
-    case filter(source: PopoverSource)
+    case filter(source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>)
     case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
 }

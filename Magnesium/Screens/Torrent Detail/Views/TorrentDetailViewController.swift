@@ -18,7 +18,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
     private var observers = [AnyCancellable]()
-    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
+    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.Types, TorrentDetailItem>!
     private var isFirstSnapshot = true
 
     init(viewModel: VM) {
@@ -151,7 +151,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         let animate = !isFirstSnapshot
         isFirstSnapshot = false
 
-        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSectionType, TorrentDetailItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection.Types, TorrentDetailItem>()
 
         for section in sections {
             snapshot.appendSections([section.type])
@@ -175,15 +175,28 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     // MARK: UITableViewDelegate
 
+    private func titleForSection(_ type: TorrentDetailSection.Types) -> String? {
+        switch type {
+        case .header:
+            return nil
+        case .info:
+            return "Information"
+        case .trackers:
+            return "Trackers"
+        case .files:
+            return "Files"
+        }
+    }
+
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         let section = dataSource.snapshot().sectionIdentifiers[section]
-        guard section.displayString != nil else { return .leastNormalMagnitude }
+        guard titleForSection(section) != nil else { return .leastNormalMagnitude }
         return UITableView.automaticDimension
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let section = dataSource.snapshot().sectionIdentifiers[section]
-        guard let title = section.displayString else { return nil }
+        guard let title = titleForSection(section) else { return nil }
         let header = TorrentDetailSectionHeaderView()
         header.configure(title: title)
         return header

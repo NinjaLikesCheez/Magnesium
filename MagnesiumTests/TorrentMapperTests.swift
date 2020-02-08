@@ -130,6 +130,21 @@ class TorrentMapperTests: XCTestCase {
         preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expected)
     }
+
+    func test_filter_withLabel() {
+        let torrents = [
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: 0), label: "test"),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -1), label: ""),
+            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -2), label: "test"),
+        ]
+        let expected = [torrents[0].hash, torrents[2].hash]
+
+        let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences)
+        mapper.update(with: Array(torrents.enumerated()))
+
+        preferences.set(FilterOptions(label: "test"), for: PreferenceKeys.filterOptions)
+        XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expected)
+    }
 }
 
 private struct MockTorrent: StandardTorrent {

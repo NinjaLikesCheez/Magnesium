@@ -104,6 +104,9 @@
 		E99FC26223D1479E0019A992 /* AlertAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25E23D1479E0019A992 /* AlertAction.swift */; };
 		E99FC26823D148CC0019A992 /* TorrentDetailCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC26723D148CC0019A992 /* TorrentDetailCoordinator.swift */; };
 		E9A0BD9323D0040300AEC254 /* AddServerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A0BD9223D0040300AEC254 /* AddServerViewModel.swift */; };
+		E9A2899323EF4535004C74F8 /* FilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899223EF4535004C74F8 /* FilterSection.swift */; };
+		E9A2899523EF4546004C74F8 /* FilterItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899423EF4546004C74F8 /* FilterItem.swift */; };
+		E9A2899723EF477C004C74F8 /* FilterItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899623EF477C004C74F8 /* FilterItemTableViewCell.swift */; };
 		E9A8AFE523ECE9D800865986 /* StandardTorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A8AFE423ECE9D800865986 /* StandardTorrentListViewModel.swift */; };
 		E9A8AFE723ECF55300865986 /* StandardLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A8AFE623ECF55300865986 /* StandardLabel.swift */; };
 		E9A8AFE923ECF79200865986 /* NeverLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A8AFE823ECF79200865986 /* NeverLabel.swift */; };
@@ -251,6 +254,9 @@
 		E99FC26623D1482F0019A992 /* PopoverSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverSource.swift; sourceTree = "<group>"; };
 		E99FC26723D148CC0019A992 /* TorrentDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailCoordinator.swift; sourceTree = "<group>"; };
 		E9A0BD9223D0040300AEC254 /* AddServerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewModel.swift; sourceTree = "<group>"; };
+		E9A2899223EF4535004C74F8 /* FilterSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSection.swift; sourceTree = "<group>"; };
+		E9A2899423EF4546004C74F8 /* FilterItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterItem.swift; sourceTree = "<group>"; };
+		E9A2899623EF477C004C74F8 /* FilterItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterItemTableViewCell.swift; sourceTree = "<group>"; };
 		E9A8AFE423ECE9D800865986 /* StandardTorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTorrentListViewModel.swift; sourceTree = "<group>"; };
 		E9A8AFE623ECF55300865986 /* StandardLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardLabel.swift; sourceTree = "<group>"; };
 		E9A8AFE823ECF79200865986 /* NeverLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeverLabel.swift; sourceTree = "<group>"; };
@@ -772,9 +778,12 @@
 		E9CF491D23E3B15500026723 /* Filter */ = {
 			isa = PBXGroup;
 			children = (
-				E9CF491E23E3B18200026723 /* FilterViewModel.swift */,
 				E95C4D9823E3DB5600202CAA /* FilterCoordinator.swift */,
+				E9A2899423EF4546004C74F8 /* FilterItem.swift */,
+				E9A2899623EF477C004C74F8 /* FilterItemTableViewCell.swift */,
+				E9A2899223EF4535004C74F8 /* FilterSection.swift */,
 				E95C4D9A23E3DE0000202CAA /* FilterViewController.swift */,
+				E9CF491E23E3B18200026723 /* FilterViewModel.swift */,
 			);
 			path = Filter;
 			sourceTree = "<group>";
@@ -912,6 +921,7 @@
 				E951CA0C23E50BC4008A7D1F /* ValueMapper.swift in Sources */,
 				E9B40E8E23B3FCEB009E30AE /* TorrentDetailItem.swift in Sources */,
 				E90366DF23AAB46400C6AB46 /* TorrentTableViewCell.swift in Sources */,
+				E9A2899323EF4535004C74F8 /* FilterSection.swift in Sources */,
 				E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */,
 				E9624D2B23D1FF080051EA99 /* Session.swift in Sources */,
 				E9B40E9023B3FD64009E30AE /* TorrentDetailSection.swift in Sources */,
@@ -941,6 +951,7 @@
 				E96908FD23E9068400A95D31 /* RefreshIntervalViewModel.swift in Sources */,
 				E9801EF723D37FC200181FFD /* AlertPresenter.swift in Sources */,
 				E9A0BD9323D0040300AEC254 /* AddServerViewModel.swift in Sources */,
+				E9A2899723EF477C004C74F8 /* FilterItemTableViewCell.swift in Sources */,
 				E9E9F0F423807044007C6D2D /* TorrentDetailViewModel.swift in Sources */,
 				E95BB40423CA404C002F0520 /* PreferenceKeys.swift in Sources */,
 				E93F5D6523BA93F200B0FFA4 /* TorrentDetailFileViewModel.swift in Sources */,
@@ -986,6 +997,7 @@
 				E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */,
 				E94C28A823D157D4006F26D2 /* AddServerCoordinator.swift in Sources */,
 				E95C4D9523E3CD9600202CAA /* Publishers+AsOptional.swift in Sources */,
+				E9A2899523EF4546004C74F8 /* FilterItem.swift in Sources */,
 				E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */,
 				E95C4D9B23E3DE0000202CAA /* FilterViewController.swift in Sources */,
 				E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */,

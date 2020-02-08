@@ -76,7 +76,10 @@ class TorrentListCoordinatorTests: XCTestCase {
     }
 
     func test_viewModel_filterEvent_shouldPresentFilterViewController() {
-        viewModel.eventSubject.send(.filter(source: .view(UIView(), rect: .zero)))
+        viewModel.eventSubject.send(.filter(
+            source: .view(UIView(), rect: .zero),
+            labels: CurrentValueSubject([])
+        ))
         let viewController = coordinator.presentable.viewController
         // swiftlint:disable:next force_cast
         let navigationController = viewController.presentedViewController as! UINavigationController

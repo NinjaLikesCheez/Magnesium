@@ -12,7 +12,7 @@ import ViewModel
 
 final class SettingsViewController<VM: ViewModel>: UITableViewController
     where VM.ViewEvent == SettingsViewEvent, VM.ViewState == SettingsViewState {
-    private class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
+    private class DataSource: UITableViewDiffableDataSource<SettingsSection.Types, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {
             case .changeServer:
@@ -102,7 +102,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     }
 
     private func update(sections: [SettingsSection]) {
-        var snapshot = NSDiffableDataSourceSnapshot<SettingsSectionType, SettingsItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<SettingsSection.Types, SettingsItem>()
         for section in sections {
             snapshot.appendSections([section.type])
             snapshot.appendItems(section.items, toSection: section.type)

@@ -54,9 +54,9 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             showAlert(alert, from: source)
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
-        case let .filter(source: source):
-            showFilter(from: source)
-        case let .detail(viewModel: viewModel):
+        case let .filter(source, labels):
+            showFilter(from: source, labels: labels)
+        case let .detail(viewModel):
             eventSubject.send(.showDetail(viewModel: viewModel))
         case .settings:
             eventSubject.send(.showSettings)
@@ -100,8 +100,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         viewController.present(documentPicker, animated: true, completion: nil)
     }
 
-    private func showFilter(from source: PopoverSource) {
-        let coordinator = FilterCoordinator(preferences: preferences)
+    private func showFilter(from source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>) {
+        let coordinator = FilterCoordinator(preferences: preferences, labels: labels)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }

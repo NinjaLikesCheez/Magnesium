@@ -24,6 +24,12 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
                         }
                     }
 
+                    if let label = filter.label {
+                        filtered = filtered.filter { subject in
+                            return subject.value.label == label
+                        }
+                    }
+
                     return Self.sort(filtered, using: sort)
                 }
             }

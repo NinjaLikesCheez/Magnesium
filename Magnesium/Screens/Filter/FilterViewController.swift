@@ -13,37 +13,8 @@ import ViewModel
 final class FilterViewController<VM: ViewModel>: UITableViewController
     where VM.ViewEvent == FilterViewEvent, VM.ViewState == FilterViewState {
     private let viewModel: VM
+    private var dataSource: UITableViewDiffableDataSource<FilterSection.Types, FilterItem>!
     private var observers = [AnyCancellable]()
-
-    private lazy var sortCell: UITableViewCell = {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-        cell.textLabel?.text = "Sort"
-        cell.accessoryType = .disclosureIndicator
-
-        if let textLabel = cell.detailTextLabel {
-            viewModel.state.sortOption
-                .asOptional()
-                .assign(to: \.text, on: textLabel)
-                .store(in: &observers)
-        }
-
-        return cell
-    }()
-
-    private lazy var stateCell: UITableViewCell = {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-        cell.textLabel?.text = "State"
-        cell.accessoryType = .disclosureIndicator
-
-        if let textLabel = cell.detailTextLabel {
-            viewModel.state.filterState
-                .asOptional()
-                .assign(to: \.text, on: textLabel)
-                .store(in: &observers)
-        }
-
-        return cell
-    }()
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -60,28 +31,56 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        tableView.cellLayoutMarginsFollowReadableWidth = true
+        tableView.register(FilterItemTableViewCell.self, forCellReuseIdentifier: "cell")
+
+        dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
+            switch item {
+            case let .sort(value):
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                cell.textLabel?.text = "Sort"
+                cell.detailTextLabel?.text = value
+                cell.accessoryType = .disclosureIndicator
+                return cell
+            case let .state(value):
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                cell.textLabel?.text = "State"
+                cell.detailTextLabel?.text = value
+                cell.accessoryType = .disclosureIndicator
+                return cell
+            case let .label(value):
+                let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+                cell.textLabel?.text = "Label"
+                cell.detailTextLabel?.text = value
+                cell.accessoryType = .disclosureIndicator
+                return cell
+            }
+        }
+
+        tableView.dataSource = dataSource
+
+        viewModel.state.sections
+            .sink { [weak self] sections in
+                self?.update(sections: sections)
+            }
+            .store(in: &observers)
+    }
+
+    private func update(sections: [FilterSection]) {
+        var snapshot = NSDiffableDataSourceSnapshot<FilterSection.Types, FilterItem>()
+        for section in sections {
+            snapshot.appendSections([section.type])
+            snapshot.appendItems(section.items, toSection: section.type)
+        }
+        dataSource.apply(snapshot, animatingDifferences: false)
+    }
+
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
         viewModel.handle(.doneSelected)
-    }
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section {
-        case 0:
-            return sortCell
-        case 1:
-            return stateCell
-        default:
-            return UITableViewCell()
-        }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -91,12 +90,14 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
             return
         }
 
-        switch indexPath.section {
-        case 0:
+        switch dataSource.itemIdentifier(for: indexPath) {
+        case .sort:
             viewModel.handle(.sortSelected(source: .view(cell, rect: cell.bounds)))
-        case 1:
-            viewModel.handle(.filterStateSelected(source: .view(cell, rect: cell.bounds)))
-        default:
+        case .state:
+            viewModel.handle(.stateSelected(source: .view(cell, rect: cell.bounds)))
+        case .label:
+            viewModel.handle(.labelSelected(source: .view(cell, rect: cell.bounds)))
+        case .none:
             break
         }
     }

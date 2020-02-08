@@ -18,7 +18,7 @@ class FilterCoordinatorCoordinator: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        coordinator = FilterCoordinator(preferences: preferences)
+        coordinator = FilterCoordinator(preferences: preferences, labels: CurrentValueSubject([]))
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController

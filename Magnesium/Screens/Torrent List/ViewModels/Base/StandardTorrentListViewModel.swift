@@ -92,17 +92,19 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                     }, receiveValue: { _ in })
                 .store(in: &observers)
 
-        case let .addSelected(source: source):
+        case let .addSelected(source):
             let linkSubject = PassthroughSubject<String, Never>()
             linkSubject
                 .sink { [weak self] in self?.addLink($0) }
                 .store(in: &observers)
             eventSubject.send(.add(source: source, linkSubject: linkSubject))
 
-        case let .filterSelected(source: source):
-            eventSubject.send(.filter(source: source))
+        case let .filterSelected(source):
+            let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
+            labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &observers)
+            eventSubject.send(.filter(source: source, labels: mappedLabels))
 
-        case let .itemSelected(index: index):
+        case let .itemSelected(index):
             let subject = torrents.subject(at: index)
             let viewModel = implementation.detailViewModel(for: subject, labels: labels)
             eventSubject.send(.detail(viewModel: viewModel))
@@ -185,7 +187,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 title: "Set Label",
                 image: UIImage(systemName: "square.and.pencil"),
                 children: labels.value.map { label in
-                    UIAction(title: label.name.isEmpty ? "None" : label.name) { [weak self] _ in
+                    UIAction(title: label.displayName) { [weak self] _ in
                         self?.handleSetLabelAction(for: torrent, label: label)
                     }
                 }
