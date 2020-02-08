@@ -154,4 +154,5 @@ private struct MockTorrent: StandardTorrent {
     var peers: Int = 0
     var totalPeers: Int = 0
     var trackerStrings: [String] = []
+    var label = ""
 }

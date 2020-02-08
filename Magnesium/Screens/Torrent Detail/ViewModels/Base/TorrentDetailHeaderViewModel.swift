@@ -18,6 +18,7 @@ struct TorrentDetailHeaderViewState {
     var progress: AnyPublisher<Float, Never>
     var progressColor: AnyPublisher<UIColor, Never>
     var status: AnyPublisher<String, Never>
+    var label: AnyPublisher<String, Never>
 }
 
 struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Identifiable {
@@ -34,7 +35,8 @@ struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Iden
             progressColor: ui.map(\.standardState).map(\.displayColor).eraseToAnyPublisher(),
             status: ui
                 .map { "\($0.standardState.displayString) (\(String(format: "%.2f", $0.progress * 100))%)" }
-                .eraseToAnyPublisher()
+                .eraseToAnyPublisher(),
+            label: ui.map(\.label).eraseToAnyPublisher()
         )
     }
 }

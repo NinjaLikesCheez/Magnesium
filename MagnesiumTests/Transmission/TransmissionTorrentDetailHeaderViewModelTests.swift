@@ -25,6 +25,16 @@ class TransmissionTorrentDetailHeaderViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
+    func test_label() {
+        subject.send(.mock())
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.name.sink {
+            XCTAssertTrue($0.isEmpty)
+            expectation.fulfill()
+        }.store(in: &observers)
+        waitForExpectations(timeout: 0)
+    }
+
     func test_isActive_withActiveStates_shouldBeTrue() {
         for status in [TransmissionTorrent.Status.downloading, .seeding] {
             subject.send(.mock(status: status))

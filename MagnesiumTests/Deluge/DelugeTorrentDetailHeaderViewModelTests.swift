@@ -25,6 +25,16 @@ class DelugeTorrentDetailHeaderViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
+    func test_label() {
+        subject.send(.mock(label: "label"))
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.label.sink {
+            XCTAssertEqual($0, "label")
+            expectation.fulfill()
+        }.store(in: &observers)
+        waitForExpectations(timeout: 0)
+    }
+
     func test_isActive_withActiveStates_shouldBeTrue() {
         for state in [DelugeTorrent.State.downloading, .seeding] {
             subject.send(.mock(state: state))

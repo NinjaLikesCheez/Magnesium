@@ -54,6 +54,10 @@ extension TransmissionTorrent: StandardTorrent {
     var trackerStrings: [String] {
         return trackers.map { $0.host }
     }
+
+    var label: String {
+        return ""
+    }
 }
 
 extension TransmissionTorrentFile: StandardTorrentFile {

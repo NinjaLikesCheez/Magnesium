@@ -30,6 +30,24 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         return label
     }()
 
+    private lazy var labelLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        let base = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
+        let descriptor = base.withSymbolicTraits([.traitItalic]) ?? base
+        label.font = UIFont(descriptor: descriptor, size: 0)
+        label.numberOfLines = 0
+        label.textColor = UIColor.secondaryLabel
+        return label
+    }()
+
+    private lazy var topLabelsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 4
+        return stackView
+    }()
+
     private lazy var progressView: UIProgressView = {
         let progressView = UIProgressView(progressViewStyle: .bar)
         progressView.trackTintColor = .systemGray5
@@ -39,7 +57,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = UIFont.preferredFont(forTextStyle: .callout)
         label.textColor = .systemGray
         return label
     }()
@@ -140,7 +158,9 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        contentView.addSubview(nameLabel)
+        topLabelsStackView.addArrangedSubview(nameLabel)
+        topLabelsStackView.addArrangedSubview(labelLabel)
+        contentView.addSubview(topLabelsStackView)
         contentView.addSubview(progressView)
         contentView.addSubview(statusLabel)
         buttonStackView.addArrangedSubview(pauseButton)
@@ -149,7 +169,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     private func setupLayoutConstraints() {
-        for view in [nameLabel, progressView, statusLabel, buttonStackView] {
+        for view in [topLabelsStackView, progressView, statusLabel, buttonStackView] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
@@ -158,13 +178,13 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         buttonHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 0)
 
         NSLayoutConstraint.activate([
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            nameLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            topLabelsStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            topLabelsStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            topLabelsStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
 
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            progressView.topAnchor.constraint(equalTo: topLabelsStackView.bottomAnchor, constant: 8),
 
             statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -182,6 +202,16 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         state.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
+            .store(in: &observers)
+
+        state.label
+            .asOptional()
+            .assign(to: \.text, on: labelLabel)
+            .store(in: &observers)
+
+        state.label
+            .map { $0.isEmpty }
+            .assign(to: \.isHidden, on: labelLabel)
             .store(in: &observers)
 
         state.isActive
@@ -244,7 +274,8 @@ struct TorrentDetailHeaderTableViewCell_Previews: PreviewProvider {
             isActive: Just(true).eraseToAnyPublisher(),
             progress: Just(1).eraseToAnyPublisher(),
             progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-            status: Just("Seeding (100%)").eraseToAnyPublisher()
+            status: Just("Seeding (100%)").eraseToAnyPublisher(),
+            label: Just("label").eraseToAnyPublisher()
         )
         return Group {
             Container(state: state)
