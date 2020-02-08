@@ -74,6 +74,8 @@ enum TorrentListViewEvent {
 
 struct TorrentListViewState {
     var showAddButton: Bool = true
+    var showFilterButton: Bool = true
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
     var isLoading: AnyPublisher<Bool, Never>
+    var hasActiveFilters: AnyPublisher<Bool, Never>
 }

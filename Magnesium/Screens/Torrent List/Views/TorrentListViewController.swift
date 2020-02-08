@@ -70,12 +70,22 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 action: #selector(addButtonTapped(_:))
             ))
         }
-        rightButtons.append(UIBarButtonItem(
-            image: UIImage(systemName: "line.horizontal.3.decrease.circle"),
+
+        let filterItem = UIBarButtonItem(
+            image: nil,
             style: .plain,
             target: self,
             action: #selector(filterButtonTapped(_:))
-        ))
+        )
+        viewModel.state.hasActiveFilters
+            .sink { [weak filterItem] in
+                filterItem?.image = UIImage(systemName: $0
+                    ? "line.horizontal.3.decrease.circle.fill"
+                    : "line.horizontal.3.decrease.circle")
+            }
+            .store(in: &observers)
+        rightButtons.append(filterItem)
+
         navigationItem.rightBarButtonItems = rightButtons
 
         viewModel.state.isLoading

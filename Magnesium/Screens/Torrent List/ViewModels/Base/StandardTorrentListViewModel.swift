@@ -57,7 +57,15 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
             .ui()
             .eraseToAnyPublisher()
-        state = TorrentListViewState(items: items, isLoading: isLoadingSubject.eraseToAnyPublisher())
+        let hasActiveFilters = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
+            .map { $0 != FilterOptions() }
+            .ui()
+            .eraseToAnyPublisher()
+        state = TorrentListViewState(
+            items: items,
+            isLoading: isLoadingSubject.eraseToAnyPublisher(),
+            hasActiveFilters: hasActiveFilters
+        )
 
         refresh()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })

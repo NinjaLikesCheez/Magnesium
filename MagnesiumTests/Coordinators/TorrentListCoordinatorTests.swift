@@ -180,7 +180,8 @@ class TorrentListCoordinatorTests: XCTestCase {
 private final class MockViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
     let state = TorrentListViewState(
         items: Just([]).eraseToAnyPublisher(),
-        isLoading: Just(false).eraseToAnyPublisher()
+        isLoading: Just(false).eraseToAnyPublisher(),
+        hasActiveFilters: Just(false).eraseToAnyPublisher()
     )
     let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     var events: AnyPublisher<TorrentListEvent, Never> { eventSubject.eraseToAnyPublisher() }

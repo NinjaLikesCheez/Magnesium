@@ -18,6 +18,10 @@ class EmptyTorrentListViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.state.showAddButton)
     }
 
+    func test_showFilterButton_shouldBeFalse() {
+        XCTAssertFalse(viewModel.state.showFilterButton)
+    }
+
     func test_refresh_shouldEmitIsLoadingFalse() {
         var values = [Bool]()
         viewModel.state.isLoading.dropFirst().sink {
@@ -27,16 +31,17 @@ class EmptyTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(values, [false])
     }
 
-    func test_filterSelected_shouldEmitFilterEvent() {
+    func test_hasActiveFilters_shouldBeFalse() {
+        var value: Bool?
+        viewModel.state.hasActiveFilters.sink { value = $0 }.store(in: &observers)
+        XCTAssertFalse(value!)
+    }
+
+    func test_filterSelected_shouldNotEmit() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &observers)
         viewModel.handle(.filterSelected(source: .view(UIView(), rect: .zero)))
-        guard case .filter = event else {
-            XCTFail("Unexpected event")
-            return
-        }
+        XCTAssertNil(event)
     }
 
     func test_settingsSelected_shouldEmitSettingsEvent() {

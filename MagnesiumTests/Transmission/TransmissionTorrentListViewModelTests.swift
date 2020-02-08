@@ -127,6 +127,21 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(count, 1)
     }
 
+    // MARK: hasActiveFilters
+
+    func test_hasActiveFilters_withNoFilters_shouldBeFalse() {
+        var value: Bool?
+        viewModel.state.hasActiveFilters.sink { value = $0 }.store(in: &observers)
+        XCTAssertFalse(value!)
+    }
+
+    func test_hasActiveFilters_withFilters_shouldBeTrue() {
+        var value: Bool?
+        viewModel.state.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &observers)
+        preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
+        XCTAssertTrue(value!)
+    }
+
     // MARK: handle
 
     func test_refresh_whenFails_shouldShowError() {

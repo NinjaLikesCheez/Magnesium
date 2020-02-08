@@ -16,8 +16,10 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPrevi
 
     lazy var state = TorrentListViewState(
         showAddButton: false,
+        showFilterButton: false,
         items: Just([]).eraseToAnyPublisher(),
-        isLoading: isLoadingSubject.eraseToAnyPublisher()
+        isLoading: isLoadingSubject.eraseToAnyPublisher(),
+        hasActiveFilters: Just(false).eraseToAnyPublisher()
     )
 
     var events: AnyPublisher<TorrentListEvent, Never> {
@@ -28,8 +30,8 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPrevi
         switch event {
         case .refresh:
             isLoadingSubject.send(false)
-        case let .filterSelected(source: source):
-            eventSubject.send(.filter(source: source, labels: CurrentValueSubject([])))
+        case .filterSelected:
+            break
         case .settingsSelected:
             eventSubject.send(.settings)
         case .addSelected, .itemSelected:
