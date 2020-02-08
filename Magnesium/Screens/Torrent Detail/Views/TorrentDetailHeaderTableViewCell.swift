@@ -14,6 +14,7 @@ protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell)
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell)
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView)
+    func headerDidResize(_ header: TorrentDetailHeaderTableViewCell)
 }
 
 final class TorrentDetailHeaderTableViewCell: UITableViewCell {
@@ -173,6 +174,9 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
+        nameLabel.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
+        nameLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
+        statusLabel.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
         statusLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
         buttonHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 0)
@@ -184,7 +188,8 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressView.topAnchor.constraint(equalTo: topLabelsStackView.bottomAnchor, constant: 8),
+            progressView.topAnchor.constraint(equalTo: topLabelsStackView.bottomAnchor, constant: 8)
+                .withPriority(.defaultHigh),
 
             statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -205,12 +210,24 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &observers)
 
         state.label
+            .filter { !$0.isEmpty }
             .asOptional()
             .assign(to: \.text, on: labelLabel)
             .store(in: &observers)
 
         state.label
             .map { $0.isEmpty }
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] _ in
+                guard let strongSelf = self else { return }
+                strongSelf.delegate?.headerDidResize(strongSelf)
+            }
+            .store(in: &observers)
+
+        state.label
+            .map { $0.isEmpty }
+            .removeDuplicates()
             .assign(to: \.isHidden, on: labelLabel)
             .store(in: &observers)
 

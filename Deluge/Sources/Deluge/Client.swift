@@ -336,6 +336,16 @@ public final class Client {
         body.append("\r\n--\(boundary)--".data(using: .utf8)!)
         return .success(body)
     }
+
+    /// Sets the label for a torrent.
+    /// - Parameters:
+    ///   - label: The label to set.
+    ///   - hash: The hash of the torrent being updated.
+    public func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, Error> {
+        return request(method: "label.set_torrent", params: [hash, label])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
 }
 
 extension Client.Error: LocalizedError {

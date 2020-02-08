@@ -13,6 +13,7 @@ import ViewModel
 
 protocol StandardTorrentDetailViewModelImplementation {
     associatedtype Torrent: StandardTorrent
+    associatedtype Label: StandardLabel
     associatedtype File: StandardTorrentFile
     func refresh() -> AnyPublisher<Void, Error>
     func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
@@ -20,16 +21,19 @@ protocol StandardTorrentDetailViewModelImplementation {
     func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
     func recheck(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func updateFiles(_ torrent: Torrent) -> AnyPublisher<[File], Error>
+    func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
 final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetailViewModelImplementation>: ViewModel, EventEmitter {
     typealias Torrent = Implementation.Torrent
+    typealias Label = Implementation.Label
     typealias File = Implementation.File
 
     private let implementation: Implementation
     private let preferences: Preferences
-    private let subject: CurrentValueSubject<Torrent, Never>
+    private let torrent: CurrentValueSubject<Torrent, Never>
+    private let labels: CurrentValueSubject<[Label], Never>
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
@@ -60,17 +64,23 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(implementation: Implementation, subject: CurrentValueSubject<Torrent, Never>, preferences: Preferences) {
-        self.subject = subject
-        self.preferences = preferences
+    init(
+        implementation: Implementation,
+        torrent: CurrentValueSubject<Torrent, Never>,
+        labels: CurrentValueSubject<[Label], Never>,
+        preferences: Preferences
+    ) {
         self.implementation = implementation
+        self.torrent = torrent
+        self.labels = labels
+        self.preferences = preferences
 
-        let sections = subject
+        let sections = torrent
             .combineLatest(files.values)
-            .map { torrent, files in
+            .map { torrentValue, files in
                 Self.createSections(
-                    subject: subject,
-                    torrent: torrent,
+                    subject: torrent,
+                    torrent: torrentValue,
                     files: files
                 )
             }
@@ -183,6 +193,13 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
 
     private func handleMoreOptions(source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
+
+        if !labels.value.isEmpty {
+            alert.addAction(AlertAction(title: "Set Label", style: .default) {
+                self.setLabel(source: source)
+            })
+        }
+
         alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
             self.recheck()
         })
@@ -190,8 +207,35 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         eventSubject.send(.alert(alert, source: source))
     }
 
+    private func setLabel(source: PopoverSource) {
+        var alert = Alert(title: "Set Label", message: nil, style: .actionSheet)
+        for label in labels.value {
+            alert.addAction(AlertAction(title: label.name.isEmpty ? "None" : label.name, style: .default) {
+                self.setLabel(label)
+            })
+        }
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
+    }
+
+    private func setLabel(_ label: Label) {
+        implementation.setLabel(label, for: torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Set Label", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
     private func recheck() {
-        implementation.recheck(subject.value)
+        implementation.recheck(torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -207,7 +251,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func handlePause() {
-        implementation.pause(subject.value)
+        implementation.pause(torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -223,7 +267,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func handleResume() {
-        implementation.resume(subject.value)
+        implementation.resume(torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -251,7 +295,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func remove(removeData: Bool) {
-        implementation.remove(subject.value, removeData: removeData)
+        implementation.remove(torrent.value, removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -287,7 +331,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return implementation.updateFiles(subject.value)
+        return implementation.updateFiles(torrent.value)
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.files.update(with: new.map { ($0.index, $0) })
             })

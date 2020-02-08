@@ -17,11 +17,15 @@ protocol StandardTorrentListViewModelImplementation {
     associatedtype Label: StandardLabel
     var updated: AnyPublisher<([Torrent], [Label]), Never> { get }
     func refresh() -> AnyPublisher<([Torrent], [Label]), Error>
-    func detailViewModel(for subject: CurrentValueSubject<Torrent, Never>) -> AnyTorrentDetailViewModel
+    func detailViewModel(
+        for subject: CurrentValueSubject<Torrent, Never>,
+        labels: CurrentValueSubject<[Label], Never>
+    ) -> AnyTorrentDetailViewModel
     func addLink(_ url: String) -> AnyPublisher<(String, String), Never>
     func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
+    func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -100,7 +104,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         case let .itemSelected(index: index):
             let subject = torrents.subject(at: index)
-            let viewModel = implementation.detailViewModel(for: subject)
+            let viewModel = implementation.detailViewModel(for: subject, labels: labels)
             eventSubject.send(.detail(viewModel: viewModel))
 
         case .settingsSelected:
@@ -169,7 +173,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
         let subject = torrents.subject(at: index)
-        return implementation.detailViewModel(for: subject)
+        return implementation.detailViewModel(for: subject, labels: labels)
     }
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
@@ -182,7 +186,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 image: UIImage(systemName: "square.and.pencil"),
                 children: labels.value.map { label in
                     UIAction(title: label.name.isEmpty ? "None" : label.name) { [weak self] _ in
-                        self?.showError(title: "TODO", message: nil)
+                        self?.handleSetLabelAction(for: torrent, label: label)
                     }
                 }
             ))
@@ -217,6 +221,26 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         ))
 
         return UIMenu(title: "", children: actions)
+    }
+
+    // internal for testing
+    func handleSetLabelAction(for torrent: Torrent, label: Label) {
+        implementation.setLabel(label, for: torrent)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(
+                    title: "Failed to Set Label for \"\(torrent.name)\"",
+                    message: error.localizedDescription
+                )
+                }, receiveValue: { _ in })
+            .store(in: &observers)
     }
 
     // internal for testing

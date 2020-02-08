@@ -52,6 +52,11 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        observers = []
+    }
+
     private func setup() {
         setupViews()
         setupLayoutConstraints()

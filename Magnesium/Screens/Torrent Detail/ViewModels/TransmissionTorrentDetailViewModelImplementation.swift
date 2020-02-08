@@ -10,18 +10,13 @@ import Combine
 
 final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = TransmissionTorrent
+    typealias Label = NeverLabel
     typealias File = TransmissionTorrentFile
 
-    private let subject: CurrentValueSubject<TransmissionTorrent, Never>
     private let client: TransmissionClient
     private let refresher: TransmissionRefreshable
 
-    init(
-        subject: CurrentValueSubject<TransmissionTorrent, Never>,
-        client: TransmissionClient,
-        refresher: TransmissionRefreshable
-    ) {
-        self.subject = subject
+    init(client: TransmissionClient, refresher: TransmissionRefreshable) {
         self.client = client
         self.refresher = refresher
     }
@@ -50,5 +45,9 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
 
     func updateFiles(_ torrent: TransmissionTorrent) -> AnyPublisher<[TransmissionTorrentFile], Error> {
         return client.getTorrentFiles(id: torrent.id).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: NeverLabel, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+        return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 }

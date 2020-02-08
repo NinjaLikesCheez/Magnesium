@@ -198,7 +198,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     // MARK: DelugeRefreshable
 
-    func test_refreshDeluges_shouldRefreshTorrents() {
+    func test_refreshDeluge_shouldRefreshTorrents() {
         client.requests.reset()
         client.torrents.append(.randomMock())
 
@@ -215,7 +215,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1))
     }
 
-    // MARK: TorrentDetailViewModelProvider
+    // MARK: TorrentListPreviewProvider
 
     func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
         typealias Implementation = DelugeTorrentDetailViewModelImplementation // swiftlint:disable:this nesting
@@ -227,35 +227,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     }
 
     func test_contextMenuForItem_shouldReturnExpectedMenu() {
-        let menu = viewModel.contextMenuForItem(at: 0)!
-        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
-            var output = String(repeating: " ", count: level * 2)
-            output += "\(menu.title)\n"
-            if let menu = menu as? UIMenu {
-                output += menu.children
-                    .map { menuString($0, level: level + 1) }
-                    .joined()
-            }
-            return output
-        }
-        // swiftformat:disable all
-        let expected = """
-
-              Set Label
-                None
-                Label
-              Pause
-              Remove
-                Keep Data
-                Remove Data
-
-            """
-        // swiftformat:enable all
-        XCTAssertEqual(menuString(menu), expected)
-    }
-
-    func test_contextMenuForItem_withInactiveTorrent_shouldReturnExpectedMenu() {
-        client.torrents = [.mock(state: .paused)]
+        client.labels = [.mock(), .mock(name: "test")]
         viewModel.handle(.refresh)
 
         let menu = viewModel.contextMenuForItem(at: 0)!
@@ -274,7 +246,39 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
               Set Label
                 None
-                Label
+                test
+              Pause
+              Remove
+                Keep Data
+                Remove Data
+
+            """
+        // swiftformat:enable all
+        XCTAssertEqual(menuString(menu), expected)
+    }
+
+    func test_contextMenuForItem_withInactiveTorrent_shouldReturnExpectedMenu() {
+        client.torrents = [.mock(state: .paused)]
+        client.labels = [.mock(), .mock(name: "test")]
+        viewModel.handle(.refresh)
+
+        let menu = viewModel.contextMenuForItem(at: 0)!
+        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
+            var output = String(repeating: " ", count: level * 2)
+            output += "\(menu.title)\n"
+            if let menu = menu as? UIMenu {
+                output += menu.children
+                    .map { menuString($0, level: level + 1) }
+                    .joined()
+            }
+            return output
+        }
+        // swiftformat:disable all
+        let expected = """
+
+              Set Label
+                None
+                test
               Resume
               Remove
                 Keep Data
@@ -283,6 +287,30 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             """
         // swiftformat:enable all
         XCTAssertEqual(menuString(menu), expected)
+    }
+
+    func test_handleSetLabelAction_shouldSetLabelAndRefresh() {
+        client.requests.reset()
+        viewModel.handleSetLabelAction(for: .mock(), label: .mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
+    }
+
+    func test_handleSetLabelAction_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.setLabel = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.handleSetLabelAction(for: .mock(name: "Torrent"), label: .mock())
+        XCTAssertEqual(alert?.title, "Failed to Set Label for \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
     }
 
     func test_handlePauseAction_shouldPauseAndRefresh() {

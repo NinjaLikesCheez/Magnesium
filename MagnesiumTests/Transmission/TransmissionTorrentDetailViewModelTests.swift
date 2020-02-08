@@ -16,11 +16,11 @@ import XCTest
 final class TransmissionTorrentDetailViewModelTests: XCTestCase {
     typealias Implementation = TransmissionTorrentDetailViewModelImplementation
 
-    private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
+    private let torrent = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
+    private let labels = CurrentValueSubject<[NeverLabel], Never>([])
     private let client = MockTransmissionClient()
     private let preferences = MockPreferences()
     private lazy var implementation = Implementation(
-        subject: subject,
         client: client,
         refresher: MockTransmissionRefresher(client: client)
     )
@@ -31,10 +31,13 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         super.setUp()
         viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
-            subject: subject,
+            torrent: torrent,
+            labels: labels,
             preferences: preferences
         )
     }
+
+    // MARK: autoRefresh
 
     func test_autoRefresh_whenNotAppeared_shouldNotFire() {
         preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
@@ -85,6 +88,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    // MARK: refresh
+
     func test_refresh_whenFails_shouldShowError() {
         client.errors.torrentFiles = true
         var alert: Alert?
@@ -107,6 +112,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.refresh)
         XCTAssertEqual(values, [true, false])
     }
+
+    // MARK: sections
 
     func test_sections_shouldHaveHeader() {
         let expectation = self.expectation(description: "Value received")
@@ -164,45 +171,12 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func test_eta_whenZero_shouldFormatProperly() {
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
-    func test_ratio_whenInfinite_shouldFormatProperly() {
-        subject.send(.mock(uploaded: 1))
-        XCTAssertTrue(subject.value.ratio.isInfinite)
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
-    func test_ratio_whenNaN_shouldFormatProperly() {
-        XCTAssertTrue(subject.value.ratio.isNaN)
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
     func test_sections_shouldHaveTrackers() {
         let trackers = [
             Tracker(id: 0, host: "udp://tracker.example.com:9000"),
             Tracker(id: 1, host: "http://tracker.example.com:9000/announce"),
         ]
-        subject.send(.mock(trackers: trackers))
+        torrent.send(.mock(trackers: trackers))
 
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
@@ -225,7 +199,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func test_files_shouldBeSorted() {
+    func test_sections_files_shouldBeSorted() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let section = sections[2]
@@ -248,6 +222,45 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
+    // MARK: eta
+
+    func test_eta_whenZero_shouldFormatProperly() {
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    // MARK: ratio
+
+    func test_ratio_whenInfinite_shouldFormatProperly() {
+        torrent.send(.mock(uploaded: 1))
+        XCTAssertTrue(torrent.value.ratio.isInfinite)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    func test_ratio_whenNaN_shouldFormatProperly() {
+        XCTAssertTrue(torrent.value.ratio.isNaN)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    // MARK: moreOptions
+
     func test_moreOptions_shouldEmitAlert() {
         var alert: Alert?
         viewModel.events.first().sink {
@@ -262,6 +275,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
 
+    // MARK: forceRecheck
+
     func test_forceRecheck_shouldPerformRequestAndRefresh() {
         client.requests.reset()
         var alert: Alert?
@@ -273,7 +288,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        let recheck = alert!.actions[0].handler!
+        let recheck = alert!.actions.first { $0.title == "Force Recheck" }!.handler!
         recheck()
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, verify: 1))
     }
@@ -291,7 +306,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
             optionsAlert = inner
         }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        let recheck = optionsAlert!.actions[0].handler!
+        let recheck = optionsAlert!.actions.first { $0.title == "Force Recheck" }!.handler!
 
         var errorAlert: Alert?
         viewModel.events.first().sink {
@@ -305,6 +320,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(verify: 1))
     }
+
+    // MARK: pause
 
     func test_pause_shouldPerformRequest() {
         client.requests.reset()
@@ -330,6 +347,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(stop: 1))
     }
 
+    // MARK: resume
+
     func test_resume_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.resume)
@@ -353,6 +372,8 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(start: 1))
     }
+
+    // MARK: remove
 
     func test_remove_shouldEmitAlert() {
         client.requests.reset()

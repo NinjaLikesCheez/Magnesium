@@ -33,15 +33,15 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
             .eraseToAnyPublisher()
     }
 
-    func detailViewModel(for subject: CurrentValueSubject<DelugeTorrent, Never>) -> AnyTorrentDetailViewModel {
-        let implementation = DelugeTorrentDetailViewModelImplementation(
-            subject: subject,
-            client: client,
-            refresher: self
-        )
+    func detailViewModel(
+        for subject: CurrentValueSubject<DelugeTorrent, Never>,
+        labels: CurrentValueSubject<[DelugeLabel], Never>
+    ) -> AnyTorrentDetailViewModel {
+        let implementation = DelugeTorrentDetailViewModelImplementation(client: client, refresher: self)
         let viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
-            subject: subject,
+            torrent: subject,
+            labels: labels,
             preferences: preferences
         )
         return AnyEmitterViewModel(viewModel)
@@ -70,11 +70,11 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func pause(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        return client.pause(hashes: [torrent.hash]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.pause(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func resume(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        return client.resume(hashes: [torrent.hash]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.resume(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func remove(_ torrent: DelugeTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
@@ -82,6 +82,10 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
             .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: DelugeLabel, for torrent: Torrent) -> AnyPublisher<Void, Error> {
+        return client.setLabel(label.name, forTorrentHash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {

@@ -15,11 +15,11 @@ import XCTest
 final class DelugeTorrentDetailViewModelTests: XCTestCase {
     typealias Implementation = DelugeTorrentDetailViewModelImplementation
 
-    private let subject = CurrentValueSubject<DelugeTorrent, Never>(.mock())
+    private let torrent = CurrentValueSubject<DelugeTorrent, Never>(.mock())
+    private let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
     private let client = MockDelugeClient()
     private let preferences = MockPreferences()
     private lazy var implementation = Implementation(
-        subject: subject,
         client: client,
         refresher: MockDelugeRefresher(client: client)
     )
@@ -30,10 +30,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         super.setUp()
         viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
-            subject: subject,
+            torrent: torrent,
+            labels: labels,
             preferences: preferences
         )
     }
+
+    // MARK: autoRefresh
 
     func test_autoRefresh_whenNotAppeared_shouldNotFire() {
         preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
@@ -84,6 +87,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 1)
     }
 
+    // MARK: refresh
+
     func test_refresh_whenFails_shouldShowError() {
         client.errors.torrentFiles = true
         var alert: Alert?
@@ -106,6 +111,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         viewModel.handle(.refresh)
         XCTAssertEqual(values, [true, false])
     }
+
+    // MARK: sections
 
     func test_sections_shouldHaveHeader() {
         let expectation = self.expectation(description: "Value received")
@@ -163,42 +170,9 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func test_eta_whenZero_shouldFormatProperly() {
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
-    func test_ratio_whenInfinite_shouldFormatProperly() {
-        subject.send(.mock(uploaded: 1))
-        XCTAssertTrue(subject.value.ratio.isInfinite)
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
-    func test_ratio_whenNaN_shouldFormatProperly() {
-        XCTAssertTrue(subject.value.ratio.isNaN)
-        let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.sink { sections in
-            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
-            XCTAssertEqual(eta.1, "∞")
-            expectation.fulfill()
-        }.store(in: &observers)
-        wait(for: [expectation], timeout: 0)
-    }
-
     func test_sections_shouldHaveTrackers() {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
-        subject.send(.mock(trackers: trackers))
+        torrent.send(.mock(trackers: trackers))
 
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
@@ -221,7 +195,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 0)
     }
 
-    func test_files_shouldBeSorted() {
+    func test_sections_files_shouldBeSorted() {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.sink { sections in
             let section = sections[2]
@@ -244,6 +218,45 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
+    // MARK: eta
+
+    func test_eta_whenZero_shouldFormatProperly() {
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    // MARK: ratio
+
+    func test_ratio_whenInfinite_shouldFormatProperly() {
+        torrent.send(.mock(uploaded: 1))
+        XCTAssertTrue(torrent.value.ratio.isInfinite)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    func test_ratio_whenNaN_shouldFormatProperly() {
+        XCTAssertTrue(torrent.value.ratio.isNaN)
+        let expectation = self.expectation(description: "Value received")
+        viewModel.state.sections.sink { sections in
+            let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
+            XCTAssertEqual(eta.1, "∞")
+            expectation.fulfill()
+        }.store(in: &observers)
+        wait(for: [expectation], timeout: 0)
+    }
+
+    // MARK: moreOptions
+
     func test_moreOptions_shouldEmitAlert() {
         var alert: Alert?
         viewModel.events.first().sink {
@@ -254,9 +267,110 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        let expected = ["Force Recheck", "Cancel"]
+        let expected = ["Set Label", "Force Recheck", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
     }
+
+    // MARK: setLabel
+
+    func test_setLabel_shouldEmitSelectionAlert() {
+        labels.send([.mock(), .mock(name: "test")])
+
+        var optionsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            optionsAlert = inner
+        }.store(in: &observers)
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
+        let setLabel = optionsAlert!.actions.first { $0.title == "Set Label" }!.handler!
+
+        var labelsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            labelsAlert = inner
+        }.store(in: &observers)
+        setLabel()
+        XCTAssertEqual(labelsAlert?.title, "Set Label")
+        XCTAssertEqual(labelsAlert?.actions.map { $0.title }, ["None", "test", "Cancel"])
+    }
+
+    func test_setLabel_whenOptionSelected_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        labels.send([.mock(), .mock(name: "test")])
+
+        var optionsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            optionsAlert = inner
+        }.store(in: &observers)
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
+        let setLabel = optionsAlert!.actions.first { $0.title == "Set Label" }!.handler!
+
+        var labelsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            labelsAlert = inner
+        }.store(in: &observers)
+        setLabel()
+
+        let performSetLabel = labelsAlert!.actions.first { $0.title == "test" }!.handler!
+        performSetLabel()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
+    }
+
+    func test_setLabel_whenOptionSelected_andRequestFails_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        client.errors.setLabel = true
+        labels.send([.mock(), .mock(name: "test")])
+
+        var optionsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            optionsAlert = inner
+        }.store(in: &observers)
+        viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
+        let setLabel = optionsAlert!.actions.first { $0.title == "Set Label" }!.handler!
+
+        var labelsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            labelsAlert = inner
+        }.store(in: &observers)
+        setLabel()
+        let performSetLabel = labelsAlert!.actions.first { $0.title == "test" }!.handler!
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        performSetLabel()
+        XCTAssertEqual(errorAlert?.title, "Failed to Set Label")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
+    }
+
+    // MARK: forceRecheck
 
     func test_forceRecheck_shouldPerformRequestAndRefresh() {
         client.requests.reset()
@@ -269,7 +383,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        let recheck = alert!.actions[0].handler!
+        let recheck = alert!.actions.first { $0.title == "Force Recheck" }!.handler!
         recheck()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
     }
@@ -287,7 +401,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             optionsAlert = inner
         }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        let recheck = optionsAlert!.actions[0].handler!
+        let recheck = optionsAlert!.actions.first { $0.title == "Force Recheck" }!.handler!
 
         var errorAlert: Alert?
         viewModel.events.first().sink {
@@ -301,6 +415,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
     }
+
+    // MARK: pause
 
     func test_pause_shouldPerformRequest() {
         client.requests.reset()
@@ -326,6 +442,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
     }
 
+    // MARK: resume
+
     func test_resume_shouldPerformRequest() {
         client.requests.reset()
         viewModel.handle(.resume)
@@ -349,6 +467,8 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(errorAlert?.title, "Failed to Resume")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
     }
+
+    // MARK: remove
 
     func test_remove_shouldEmitAlert() {
         client.requests.reset()

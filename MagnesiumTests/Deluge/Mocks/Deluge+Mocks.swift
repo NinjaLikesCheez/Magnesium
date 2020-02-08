@@ -80,6 +80,12 @@ extension DelugeTorrent {
     }
 }
 
+extension DelugeLabel {
+    static func mock(name: String = "", count: Int = 0) -> DelugeLabel {
+        return DelugeLabel(name: name, count: count)
+    }
+}
+
 extension DelugeTorrentFile {
     static func mock(index: Int, name: String, progress: Float = 0) -> DelugeTorrentFile {
         return DelugeTorrentFile(

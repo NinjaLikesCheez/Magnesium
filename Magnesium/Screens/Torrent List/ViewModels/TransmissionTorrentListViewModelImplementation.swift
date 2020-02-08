@@ -33,15 +33,15 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             .eraseToAnyPublisher()
     }
 
-    func detailViewModel(for subject: CurrentValueSubject<TransmissionTorrent, Never>) -> AnyTorrentDetailViewModel {
-        let implementation = TransmissionTorrentDetailViewModelImplementation(
-            subject: subject,
-            client: client,
-            refresher: self
-        )
+    func detailViewModel(
+        for subject: CurrentValueSubject<TransmissionTorrent, Never>,
+        labels: CurrentValueSubject<[NeverLabel], Never>
+    ) -> AnyTorrentDetailViewModel {
+        let implementation = TransmissionTorrentDetailViewModelImplementation(client: client, refresher: self)
         let viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
-            subject: subject,
+            torrent: subject,
+            labels: labels,
             preferences: preferences
         )
         return AnyEmitterViewModel(viewModel)
@@ -62,11 +62,11 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
     }
 
     func pause(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        return client.stop(ids: [torrent.id]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.stop(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func resume(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        return client.start(ids: [torrent.id]).map { _ in () }.mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.start(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func remove(_ torrent: TransmissionTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
@@ -74,6 +74,10 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: NeverLabel, for torrent: Torrent) -> AnyPublisher<Void, Error> {
+        return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 
     func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {

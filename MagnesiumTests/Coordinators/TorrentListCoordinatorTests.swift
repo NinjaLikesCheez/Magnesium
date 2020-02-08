@@ -185,16 +185,17 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListPreviewPr
 
     private(set) var previewViewModels = [AnyTorrentDetailViewModel]()
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        let subject = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
+        let torrent = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
+        let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
         let preferences = MockPreferences()
         let client = MockDelugeClient()
         let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
             implementation: DelugeTorrentDetailViewModelImplementation(
-                subject: subject,
                 client: client,
                 refresher: MockDelugeRefresher(client: client)
             ),
-            subject: subject,
+            torrent: torrent,
+            labels: labels,
             preferences: preferences
         ))
         previewViewModels.append(viewModel)

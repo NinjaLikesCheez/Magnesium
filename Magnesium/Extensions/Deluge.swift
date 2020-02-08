@@ -27,6 +27,7 @@ protocol DelugeClient {
     func add(url: URL) -> AnyPublisher<Void, DelugeError>
     func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError>
     func add(fileURL: URL) -> AnyPublisher<Void, DelugeError>
+    func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError>
 }
 
 extension DefaultDelugeClient: DelugeClient {}

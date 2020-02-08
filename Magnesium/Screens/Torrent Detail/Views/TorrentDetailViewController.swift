@@ -210,4 +210,10 @@ extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate 
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
         viewModel.handle(.remove(source: .view(sender, rect: sender.bounds)))
     }
+
+    func headerDidResize(_ header: TorrentDetailHeaderTableViewCell) {
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.dataSource.apply(self.dataSource.snapshot(), animatingDifferences: true)
+        }
+    }
 }

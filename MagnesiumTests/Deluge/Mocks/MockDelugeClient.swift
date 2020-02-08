@@ -21,6 +21,7 @@ final class MockDelugeClient: DelugeClient {
         var recheck = 0
         var addURL = 0
         var addMagnetURL = 0
+        var setLabel = 0
 
         mutating func reset() {
             self = Requests()
@@ -37,11 +38,13 @@ final class MockDelugeClient: DelugeClient {
         var removeWithData = false
         var recheck = false
         var addURL = false
+        var setLabel = false
     }
 
     var requests = Requests()
     var errors = Errors()
     var torrents = [DelugeTorrent.mock()]
+    var labels = [DelugeLabel.mock()]
 
     func authenticate() -> AnyPublisher<Void, DelugeError> {
         requests.authenticate += 1
@@ -58,14 +61,9 @@ final class MockDelugeClient: DelugeClient {
             return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         }
 
-        let labels = [DelugeLabel(name: "", count: 0), DelugeLabel(name: "Label", count: 0)]
         return Just((torrents, labels))
             .setFailureType(to: DelugeError.self)
             .eraseToAnyPublisher()
-    }
-
-    func getLabels() -> AnyPublisher<[String], DelugeError> {
-        return Just([]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 
     func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
@@ -132,6 +130,15 @@ final class MockDelugeClient: DelugeClient {
     }
 
     func add(fileURL: URL) -> AnyPublisher<Void, DelugeError> {
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError> {
+        requests.setLabel += 1
+        guard !errors.setLabel else {
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
+        }
+
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 }

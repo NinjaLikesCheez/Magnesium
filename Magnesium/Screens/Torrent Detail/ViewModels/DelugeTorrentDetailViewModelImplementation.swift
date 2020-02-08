@@ -10,18 +10,13 @@ import Combine
 
 final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = DelugeTorrent
+    typealias Label = DelugeLabel
     typealias File = DelugeTorrentFile
 
-    private let subject: CurrentValueSubject<DelugeTorrent, Never>
     private let client: DelugeClient
     private let refresher: DelugeRefreshable
 
-    init(
-        subject: CurrentValueSubject<DelugeTorrent, Never>,
-        client: DelugeClient,
-        refresher: DelugeRefreshable
-    ) {
-        self.subject = subject
+    init(client: DelugeClient, refresher: DelugeRefreshable) {
         self.client = client
         self.refresher = refresher
     }
@@ -50,5 +45,9 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
 
     func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {
         return client.getTorrentFiles(hash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: DelugeLabel, for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+        return client.setLabel(label.name, forTorrentHash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 }
