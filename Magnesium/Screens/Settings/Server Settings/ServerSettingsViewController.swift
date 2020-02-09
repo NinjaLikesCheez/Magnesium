@@ -42,16 +42,6 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         isModalInPresentation = true
         navigationItem.title = viewModel.state.title
         navigationItem.largeTitleDisplayMode = .never
-
-        viewModel.state.isLoading
-            .sink { [weak self] isLoading in
-                self?.isLoadingChanged(isLoading)
-            }
-            .store(in: &observers)
-
-        viewModel.state.isSaveButtonEnabled
-            .assign(to: \.isEnabled, on: saveBarButtonItem)
-            .store(in: &observers)
     }
 
     required init?(coder: NSCoder) {
@@ -63,6 +53,16 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
+
+        viewModel.state.isLoading
+            .sink { [weak self] isLoading in
+                self?.isLoadingChanged(isLoading)
+            }
+            .store(in: &observers)
+
+        viewModel.state.isSaveButtonEnabled
+            .assign(to: \.isEnabled, on: saveBarButtonItem)
+            .store(in: &observers)
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {

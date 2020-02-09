@@ -11,10 +11,11 @@ import Foundation
 import Preferences
 
 final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
-    init(preferences: Preferences) {
-        let filter = preferences.valuePublisher(for: PreferenceKeys.sortOption)
-            .combineLatest(preferences.valuePublisher(for: PreferenceKeys.filterOptions))
-            .map { sort, filter -> FilterFunction in
+    init(preferences: Preferences, query: CurrentValueSubject<String?, Never>) {
+        let sortOption = preferences.valuePublisher(for: PreferenceKeys.sortOption)
+        let filterOptions = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
+        let filter = Publishers.CombineLatest3(sortOption, filterOptions, query)
+            .map { sort, filter, query -> FilterFunction in
                 return { subjects in
                     var filtered = subjects
 
@@ -30,11 +31,27 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
                         }
                     }
 
+                    if let query = query {
+                        let trimmed = (query as NSString).trimmingCharacters(in: CharacterSet.whitespaces)
+                        if !trimmed.isEmpty {
+                            filtered = filtered.filter { subject in
+                                Self.search(needle: trimmed, haystack: subject.value.name)
+                            }
+                        }
+                    }
+
                     return Self.sort(filtered, using: sort)
                 }
             }
             .eraseToAnyPublisher()
         super.init(filter: filter)
+    }
+
+    private static func search(needle: String, haystack: String) -> Bool {
+        let delimiters = CharacterSet([" ", "."])
+        let normalizedNeedle = needle.lowercased().components(separatedBy: delimiters).joined(separator: " ")
+        let normalizedHaystack = haystack.lowercased().components(separatedBy: delimiters).joined(separator: " ")
+        return normalizedHaystack.contains(normalizedNeedle)
     }
 
     private static func sort<T: StandardTorrent>(

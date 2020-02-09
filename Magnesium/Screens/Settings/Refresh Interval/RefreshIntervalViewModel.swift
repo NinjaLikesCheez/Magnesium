@@ -32,6 +32,8 @@ final class RefreshIntervalViewModel: ViewModel {
         (0, "Never"),
         (2, "2 seconds"),
         (5, "5 seconds"),
+        (10, "10 seconds"),
+        (30, "30 seconds"),
     ]
 
     init(preferences: Preferences) {

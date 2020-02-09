@@ -209,6 +209,25 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         }
     }
 
+    func test_search_shouldUpdateItems() {
+        client.torrents = [
+            .mock(hash: "A", name: "test torrent", dateAdded: Date(timeIntervalSinceNow: 0)),
+            .mock(hash: "B", name: "example", dateAdded: Date(timeIntervalSinceNow: -1)),
+            .mock(hash: "C", name: "TEST.TORRENT", dateAdded: Date(timeIntervalSinceNow: -2)),
+        ]
+        viewModel.handle(.refresh)
+        var items: [AnyTorrentListItemViewModel]?
+        viewModel.state.items.sink { items = $0 }.store(in: &observers)
+        viewModel.handle(.search(query: "test tor"))
+        XCTAssertEqual(items!.count, 2)
+        let names: [String?] = items?.map {
+            var name: String?
+            $0.state.name.sink { name = $0 }.store(in: &observers)
+            return name
+        } ?? []
+        XCTAssertEqual(names, ["test torrent", "TEST.TORRENT"])
+    }
+
     // MARK: TransmissionRefreshable
 
     func test_refreshTransmission_shouldRefreshTorrents() {

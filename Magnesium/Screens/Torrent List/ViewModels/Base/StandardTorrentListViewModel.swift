@@ -39,6 +39,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let labels = CurrentValueSubject<[Label], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
+    private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
     let state: TorrentListViewState
     var observers = [AnyCancellable]()
@@ -49,7 +50,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     init(implementation: Implementation, preferences: Preferences) {
         self.preferences = preferences
-        torrents = TorrentMapper(preferences: preferences)
+        torrents = TorrentMapper(preferences: preferences, query: querySubject)
         self.implementation = implementation
 
         let items = torrents.values
@@ -119,6 +120,9 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         case .settingsSelected:
             eventSubject.send(.settings)
+
+        case let .search(query):
+            querySubject.send(query)
         }
     }
 

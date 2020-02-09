@@ -35,6 +35,18 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 action: #selector(moreButtonTapped(_:))
             ),
         ]
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureTableView()
+
+        refreshControl = UIRefreshControl()
+        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
         viewModel.state.isLoading
             .sink { [weak self] isLoading in
@@ -45,18 +57,25 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 }
             }
             .store(in: &observers)
+
+        viewModel.state.sections
+            .sink { [weak self] sections in
+                self?.update(with: sections)
+            }
+            .store(in: &observers)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel.handle(.appear)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel.handle(.disappear)
+    }
 
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
-
+    private func configureTableView() {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.allowsSelection = false
         tableView.separatorStyle = .none
@@ -129,22 +148,6 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         }
 
         tableView.dataSource = dataSource
-
-        viewModel.state.sections
-            .sink { [weak self] sections in
-                self?.update(with: sections)
-            }
-            .store(in: &observers)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        viewModel.handle(.appear)
-    }
-
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        viewModel.handle(.disappear)
     }
 
     private func update(with sections: [TorrentDetailSection]) {

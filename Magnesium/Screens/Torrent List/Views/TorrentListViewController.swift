@@ -26,8 +26,8 @@ protocol TorrentListViewPreviewProvider: AnyObject {
     func didDismissPreviewForItem(at index: Int)
 }
 
-final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController
-    where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
+// swiftlint:disable:next line_length
+final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
     private enum Section {
         case main
     }
@@ -47,13 +47,66 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private let viewModel: VM
     private var observers = [AnyCancellable]()
     private var dataSource: UITableViewDiffableDataSource<Section, Item>!
+    private var filterBarButtonItem: UIBarButtonItem?
     fileprivate var applySnapshotInBackground = true
     weak var previewProvider: TorrentListViewPreviewProvider?
+
+    private lazy var searchController: UISearchController = {
+        let searchController = UISearchController()
+        searchController.searchBar.autocapitalizationType = .none
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        return searchController
+    }()
 
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
         title = "Torrents"
+        configureNavigationItem()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureNavigationItem()
+        configureTableView()
+
+        refreshControl = UIRefreshControl()
+        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
+
+        if viewModel.state.showFilterButton {
+            viewModel.state.hasActiveFilters
+                .sink { [weak self] in
+                    self?.filterBarButtonItem?.image = UIImage(systemName: $0
+                        ? "line.horizontal.3.decrease.circle.fill"
+                        : "line.horizontal.3.decrease.circle")
+                }
+                .store(in: &observers)
+        }
+
+        viewModel.state.isLoading
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.refreshControl?.beginRefreshing()
+                } else {
+                    self?.refreshControl?.endRefreshing()
+                }
+            }
+            .store(in: &observers)
+
+        viewModel.state.items
+            .sink { [weak self] items in
+                self?.update(with: items)
+            }
+            .store(in: &observers)
+    }
+
+    private func configureNavigationItem() {
+        navigationItem.searchController = searchController
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "gear"),
             style: .plain,
@@ -72,45 +125,20 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         }
 
         if viewModel.state.showFilterButton {
-            let filterItem = UIBarButtonItem(
+            let item = UIBarButtonItem(
                 image: nil,
                 style: .plain,
                 target: self,
                 action: #selector(filterButtonTapped(_:))
             )
-            viewModel.state.hasActiveFilters
-                .sink { [weak filterItem] in
-                    filterItem?.image = UIImage(systemName: $0
-                        ? "line.horizontal.3.decrease.circle.fill"
-                        : "line.horizontal.3.decrease.circle")
-                }
-                .store(in: &observers)
-            rightButtons.append(filterItem)
+            filterBarButtonItem = item
+            rightButtons.append(item)
         }
 
         navigationItem.rightBarButtonItems = rightButtons
-
-        viewModel.state.isLoading
-            .sink { [weak self] isLoading in
-                if isLoading {
-                    self?.refreshControl?.beginRefreshing()
-                } else {
-                    self?.refreshControl?.endRefreshing()
-                }
-            }
-            .store(in: &observers)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        refreshControl = UIRefreshControl()
-        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
-
+    private func configureTableView() {
         tableView.rowHeight = TorrentTableViewCell.estimatedHeight
         tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
@@ -129,12 +157,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
         dataSource.defaultRowAnimation = .fade
         tableView.dataSource = dataSource
-
-        viewModel.state.items
-            .sink { [weak self] items in
-                self?.update(with: items)
-            }
-            .store(in: &observers)
     }
 
     private func update(with viewModels: [AnyTorrentListItemViewModel]) {
@@ -215,5 +237,11 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
         previewProvider?.didDismissPreviewForItem(at: indexPath.row)
         return nil
+    }
+
+    // MARK: UISearchResultsUpdating
+
+    func updateSearchResults(for searchController: UISearchController) {
+        viewModel.handle(.search(query: searchController.searchBar.text))
     }
 }

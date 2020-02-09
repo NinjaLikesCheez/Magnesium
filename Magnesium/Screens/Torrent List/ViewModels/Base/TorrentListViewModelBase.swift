@@ -68,6 +68,7 @@ enum TorrentListViewEvent {
     case filterSelected(source: PopoverSource)
     case itemSelected(index: Int)
     case settingsSelected
+    case search(query: String?)
 }
 
 struct TorrentListViewState {

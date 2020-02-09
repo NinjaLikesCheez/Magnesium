@@ -44,6 +44,13 @@ class EmptyTorrentListViewModelTests: XCTestCase {
         XCTAssertNil(event)
     }
 
+    func test_search_shouldNotEmit() {
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.search(query: "test"))
+        XCTAssertNil(event)
+    }
+
     func test_settingsSelected_shouldEmitSettingsEvent() {
         var event: TorrentListEvent?
         viewModel.events.sink {
