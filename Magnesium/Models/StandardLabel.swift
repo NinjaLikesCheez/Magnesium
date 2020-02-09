@@ -6,8 +6,6 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
-import Foundation
-
 protocol StandardLabel {
     var name: String { get }
     var count: Int { get }

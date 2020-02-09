@@ -9,14 +9,12 @@
 import Combine
 import Foundation
 import Preferences
-import UIKit
 import ViewModel
 
 final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, DelugeRefreshable {
     private let client: DelugeClient
     private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<([DelugeTorrent], [DelugeLabel]), Never>()
-    private var observers = [AnyCancellable]()
 
     var updated: AnyPublisher<([DelugeTorrent], [DelugeLabel]), Never> {
         return updatedSubject.eraseToAnyPublisher()

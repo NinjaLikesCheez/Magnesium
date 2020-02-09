@@ -10,7 +10,6 @@ import Combine
 import Coordinator
 import Preferences
 import UIKit
-import ViewModel
 
 final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow

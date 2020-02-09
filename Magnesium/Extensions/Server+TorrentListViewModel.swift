@@ -8,7 +8,6 @@
 
 import Foundation
 import Preferences
-import ViewModel
 
 extension Server {
     func listViewModel(preferences: Preferences) -> AnyTorrentListViewModel? {
