@@ -13,7 +13,7 @@ import ViewModel
 final class FilterViewController<VM: ViewModel>: UITableViewController
     where VM.ViewEvent == FilterViewEvent, VM.ViewState == FilterViewState {
     private let viewModel: VM
-    private var dataSource: UITableViewDiffableDataSource<FilterSection.Types, FilterItem>!
+    private var dataSource: UITableViewDiffableDataSource<FilterSection.SectionType, FilterItem>!
     private var observers = [AnyCancellable]()
 
     init(viewModel: VM) {
@@ -70,7 +70,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
     }
 
     private func update(sections: [FilterSection]) {
-        var snapshot = NSDiffableDataSourceSnapshot<FilterSection.Types, FilterItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<FilterSection.SectionType, FilterItem>()
         for section in sections {
             snapshot.appendSections([section.type])
             snapshot.appendItems(section.items, toSection: section.type)

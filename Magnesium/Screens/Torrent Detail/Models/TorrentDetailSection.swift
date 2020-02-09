@@ -7,13 +7,13 @@
 //
 
 struct TorrentDetailSection: Equatable {
-    enum Types: Equatable {
+    enum SectionType: Equatable {
         case header
         case info
         case trackers
         case files
     }
 
-    let type: Types
+    let type: SectionType
     let items: [TorrentDetailItem]
 }

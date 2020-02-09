@@ -7,13 +7,13 @@
 //
 
 struct SettingsSection: Equatable {
-    enum Types: Hashable {
+    enum SectionType: Hashable {
         case changeServer
         case servers
         case general
         case advancedSettings
     }
 
-    let type: Types
+    let type: SectionType
     let items: [SettingsItem]
 }

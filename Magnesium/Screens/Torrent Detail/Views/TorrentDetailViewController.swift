@@ -18,7 +18,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
     private var observers = [AnyCancellable]()
-    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.Types, TorrentDetailItem>!
+    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
 
     init(viewModel: VM) {
@@ -154,7 +154,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         let animate = !isFirstSnapshot
         isFirstSnapshot = false
 
-        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection.Types, TorrentDetailItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection.SectionType, TorrentDetailItem>()
 
         for section in sections {
             snapshot.appendSections([section.type])
@@ -178,7 +178,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     // MARK: UITableViewDelegate
 
-    private func titleForSection(_ type: TorrentDetailSection.Types) -> String? {
+    private func titleForSection(_ type: TorrentDetailSection.SectionType) -> String? {
         switch type {
         case .header:
             return nil

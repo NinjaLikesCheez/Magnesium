@@ -7,11 +7,11 @@
 //
 
 struct FilterSection: Equatable {
-    enum Types: Equatable {
+    enum SectionType: Equatable {
         case sort
         case filters
     }
 
-    let type: Types
+    let type: SectionType
     var items: [FilterItem]
 }
