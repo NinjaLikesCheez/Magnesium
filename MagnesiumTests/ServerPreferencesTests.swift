@@ -8,7 +8,6 @@
 
 import Combine
 @testable import Magnesium
-import Preferences
 import XCTest
 
 class ServerPreferencesTests: XCTestCase {

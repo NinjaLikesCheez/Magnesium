@@ -7,9 +7,7 @@
 //
 
 import Combine
-import Coordinator
 @testable import Magnesium
-import Preferences
 import XCTest
 
 final class DelugeTorrentListViewModelTests: XCTestCase {

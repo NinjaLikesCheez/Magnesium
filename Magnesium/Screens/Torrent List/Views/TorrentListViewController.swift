@@ -83,8 +83,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                     filterItem?.image = UIImage(systemName: $0
                         ? "line.horizontal.3.decrease.circle.fill"
                         : "line.horizontal.3.decrease.circle")
-            }
-            .store(in: &observers)
+                }
+                .store(in: &observers)
             rightButtons.append(filterItem)
         }
 

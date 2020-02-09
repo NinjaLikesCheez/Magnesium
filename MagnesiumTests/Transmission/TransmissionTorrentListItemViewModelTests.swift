@@ -14,14 +14,6 @@ class TransmissionTorrentListItemViewModelTests: XCTestCase {
     private var observers = [AnyCancellable]()
     private let subject = CurrentValueSubject<TransmissionTorrent, Never>(.mock())
     private lazy var viewModel = StandardTorrentListItemViewModel(subject: subject)
-    private let inactiveStatuses: [TransmissionTorrent.Status] = [
-        .paused,
-        .checking,
-        .checkQueued,
-        .downloadQueued,
-        .seedQueued,
-        .isolated,
-    ]
 
     func test_identity_shouldBeEqualToHash() {
         let torrent1 = TransmissionTorrent.mock(hash: "A")
