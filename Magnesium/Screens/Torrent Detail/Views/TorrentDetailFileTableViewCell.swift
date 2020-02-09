@@ -85,7 +85,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
             progressLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
-            progressLabel.bottomAnchor.constraint(equalTo: nameLabel.bottomAnchor),
+            progressLabel.bottomAnchor.constraint(equalTo: sizeLabel.bottomAnchor),
 
             sizeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2),
             sizeLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
