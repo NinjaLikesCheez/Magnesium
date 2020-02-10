@@ -88,4 +88,12 @@ class EmptyTorrentListViewModelTests: XCTestCase {
     func test_contextMenuForItem_shouldReturnNil() {
         XCTAssertNil(viewModel.contextMenuForItem(at: 0))
     }
+
+    func test_leadingSwipeActionsConfiguration_shouldReturnNil() {
+        XCTAssertNil(viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero)))
+    }
+
+    func test_trailingSwipeActionsConfiguration_shouldReturnNil() {
+        XCTAssertNil(viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero)))
+    }
 }

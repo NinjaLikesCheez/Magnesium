@@ -7,6 +7,7 @@
 //
 
 import Combine
+import LinkPresentation
 @testable import Magnesium
 import ViewModel
 import XCTest
@@ -53,12 +54,30 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
+    func test_showAddFile_shouldPresentDocumentPickerViewController() {
+        coordinator.showAddFile()
+        let presentedViewController = coordinator.presentable.viewController.presentedViewController
+        guard type(of: presentedViewController!) === UIDocumentPickerViewController.self else {
+            XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
+            return
+        }
+    }
+
     // MARK: handle - TorrentListEvent
 
     func test_viewModel_alertEvent_shouldPresentAlertController() {
         viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert), source: nil))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
         guard type(of: presentedViewController!) === UIAlertController.self else {
+            XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
+            return
+        }
+    }
+
+    func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
+        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata()))
+        let presentedViewController = coordinator.presentable.viewController.presentedViewController
+        guard type(of: presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
             return
         }
@@ -173,11 +192,29 @@ class TorrentListCoordinatorTests: XCTestCase {
         coordinator.didDismissPreviewForItem(at: 0)
         XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
     }
+
+    func test_leadingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {
+        let configuration = coordinator.leadingSwipeActionsConfigurationForItem(
+            at: 0,
+            source: .view(UIView(), rect: .zero)
+        )!
+        XCTAssertEqual(configuration.actions.count, 1)
+        XCTAssertEqual(configuration.actions[0].title, "leadingMock")
+    }
+
+    func test_trailingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {
+        let configuration = coordinator.trailingSwipeActionsConfigurationForItem(
+            at: 0,
+            source: .view(UIView(), rect: .zero)
+        )!
+        XCTAssertEqual(configuration.actions.count, 1)
+        XCTAssertEqual(configuration.actions[0].title, "trailingMock")
+    }
 }
 
 // MARK: - Mocks
 
-private final class MockViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
+private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider {
     let state = TorrentListViewState(
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher(),
@@ -208,6 +245,21 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListPreviewPr
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
         return UIMenu(title: "Menu", identifier: UIMenu.Identifier(rawValue: "mock"))
+    }
+
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
+        return UISwipeActionsConfiguration(actions: [
+            UIContextualAction(style: .normal, title: "leadingMock", handler: { _, _, _ in }),
+        ])
+    }
+
+    func trailingSwipeActionsConfigurationForItem(
+        at index: Int,
+        source: PopoverSource
+    ) -> UISwipeActionsConfiguration? {
+        return UISwipeActionsConfiguration(actions: [
+            UIContextualAction(style: .normal, title: "trailingMock", handler: { _, _, _ in }),
+        ])
     }
 }
 

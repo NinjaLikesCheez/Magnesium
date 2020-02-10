@@ -7,8 +7,11 @@
 //
 
 import Combine
+import CoreServices
 import Foundation
+import LinkPresentation
 import Preferences
+import UIKit
 import ViewModel
 
 protocol StandardTorrentDetailViewModelImplementation {
@@ -16,11 +19,11 @@ protocol StandardTorrentDetailViewModelImplementation {
     associatedtype Label: StandardLabel
     associatedtype File: StandardTorrentFile
     func refresh() -> AnyPublisher<Void, Error>
+    func updateFiles(_ torrent: Torrent) -> AnyPublisher<[File], Error>
     func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
     func recheck(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func updateFiles(_ torrent: Torrent) -> AnyPublisher<[File], Error>
     func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
 }
 
@@ -137,6 +140,128 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         return sections
     }
 
+    private func showError(title: String, message: String?) {
+        var alert = Alert(
+            title: title,
+            message: message,
+            style: .alert
+        )
+        alert.addAction(AlertAction(title: "OK", style: .default))
+        eventSubject.send(.alert(alert, source: nil))
+    }
+
+    private func pause() {
+        implementation.pause(torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Pause", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func resume() {
+        implementation.resume(torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Resume", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func remove(removeData: Bool) {
+        implementation.remove(torrent.value, removeData: removeData)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case .finished:
+                    self?.eventSubject.send(.complete)
+                case let .failure(error):
+                    self?.showError(title: "Failed to Remove", message: error.localizedDescription)
+                }
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    // internal for testing
+    func recheck() {
+        implementation.recheck(torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Recheck", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    // internal for testing
+    func setLabel(_ label: Label) {
+        implementation.setLabel(label, for: torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: "Failed to Set Label", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func presentRemove(from source: PopoverSource) {
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        alert.addAction(AlertAction(title: "Keep Data", style: .default) {
+            self.remove(removeData: false)
+        })
+        alert.addAction(AlertAction(title: "Remove Data", style: .destructive) {
+            self.remove(removeData: true)
+        })
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
+    }
+
+    // internal for testing
+    func presentLabelSelection(from source: PopoverSource) {
+        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        for label in labels.value {
+            alert.addAction(AlertAction(title: label.displayName, style: .default) {
+                self.setLabel(label)
+            })
+        }
+        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        eventSubject.send(.alert(alert, source: source))
+    }
+
+    // MARK: Handle
+
     func handle(_ event: TorrentDetailViewEvent) {
         switch event {
         case .appear:
@@ -146,13 +271,13 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         case .refresh:
             handleRefresh()
         case let .moreOptions(source):
-            handleMoreOptions(source: source)
+            handleMoreOptions(from: source)
         case .pause:
-            handlePause()
+            pause()
         case .resume:
-            handleResume()
+            resume()
         case let .remove(source):
-            handleRemove(source: source)
+            presentRemove(from: source)
         }
     }
 
@@ -191,128 +316,32 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    private func handleMoreOptions(source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+    private func refreshFiles() -> AnyPublisher<Void, Error> {
+        return implementation.updateFiles(torrent.value)
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.files.update(with: new.map { ($0.index, $0) })
+            })
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    private func handleMoreOptions(from source: PopoverSource) {
+        var activities = [UIActivity]()
 
         if !labels.value.isEmpty {
-            alert.addAction(AlertAction(title: "Set Label", style: .default) {
-                self.setLabel(source: source)
+            activities.append(SetLabelActivity {
+                self.presentLabelSelection(from: source)
             })
         }
 
-        alert.addAction(AlertAction(title: "Force Recheck", style: .default) {
+        activities.append(RecheckActivity {
             self.recheck()
         })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        eventSubject.send(.alert(alert, source: source))
+
+        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent.value)))
     }
 
-    private func setLabel(source: PopoverSource) {
-        var alert = Alert(title: "Set Label", message: nil, style: .actionSheet)
-        for label in labels.value {
-            alert.addAction(AlertAction(title: label.displayName, style: .default) {
-                self.setLabel(label)
-            })
-        }
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        eventSubject.send(.alert(alert, source: source))
-    }
-
-    private func setLabel(_ label: Label) {
-        implementation.setLabel(label, for: torrent.value)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
-            })
-            .ui()
-            .sink(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Set Label", message: error.localizedDescription)
-                }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func recheck() {
-        implementation.recheck(torrent.value)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
-            })
-            .ui()
-            .sink(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Recheck", message: error.localizedDescription)
-                }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func handlePause() {
-        implementation.pause(torrent.value)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
-            })
-            .ui()
-            .sink(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Pause", message: error.localizedDescription)
-                }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func handleResume() {
-        implementation.resume(torrent.value)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
-            })
-            .ui()
-            .sink(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Resume", message: error.localizedDescription)
-                }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func handleRemove(source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.addAction(AlertAction(title: "Keep Data", style: .default) {
-            self.remove(removeData: false)
-        })
-        alert.addAction(AlertAction(title: "Remove Data", style: .destructive) {
-            self.remove(removeData: true)
-        })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
-        eventSubject.send(.alert(alert, source: source))
-    }
-
-    private func remove(removeData: Bool) {
-        implementation.remove(torrent.value, removeData: removeData)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
-            })
-            .ui()
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .finished:
-                    self?.eventSubject.send(.complete)
-                case let .failure(error):
-                    self?.showError(title: "Failed to Remove", message: error.localizedDescription)
-                }
-                }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
+    // MARK: Auto Refresh
 
     private func configureAutoRefreshTimer(interval: TimeInterval?) {
         autoRefreshTimer?.invalidate()
@@ -328,24 +357,5 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-    }
-
-    private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return implementation.updateFiles(torrent.value)
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.files.update(with: new.map { ($0.index, $0) })
-            })
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(AlertAction(title: "OK", style: .default))
-        eventSubject.send(.alert(alert, source: nil))
     }
 }

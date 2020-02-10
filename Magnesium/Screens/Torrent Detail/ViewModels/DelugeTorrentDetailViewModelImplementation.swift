@@ -25,6 +25,10 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
         return refresher.refreshDeluge().mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
+    func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {
+        return client.getTorrentFiles(hash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
     func pause(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         return client.pause(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
@@ -41,10 +45,6 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
 
     func recheck(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         return client.recheck(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
-    }
-
-    func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {
-        return client.getTorrentFiles(hash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func setLabel(_ label: DelugeLabel, for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {

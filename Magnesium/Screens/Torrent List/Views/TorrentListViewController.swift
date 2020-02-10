@@ -11,19 +11,13 @@ import Coordinator
 import UIKit
 import ViewModel
 
-/// A type that is able to provide previews for a `TorrentListViewController`.
-protocol TorrentListViewPreviewProvider: AnyObject {
-    /// The user has requested a preview for the item at the provided index.
-    /// - Parameter index: The item index to create a preview for.
+protocol TorrentListViewProvider: AnyObject {
     func previewForItem(at index: Int) -> UIViewController?
-    /// The user has requested a preview for the item at the provided index.
-    /// - Parameter index: The item index to return actions for.
     func contextMenuForItem(at index: Int) -> UIMenu?
-    /// The user has selected the preview indicating that it should be committed.
-    /// - Parameter index: The item index whose preview is being committed.
     func commitPreviewForItem(at index: Int)
-    /// Called when a preview is dismissed. Use this opportunity to release any cached state related to the preview.
     func didDismissPreviewForItem(at index: Int)
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
+    func trailingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
 }
 
 // swiftlint:disable:next line_length
@@ -44,12 +38,18 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         }
     }
 
+    private class DataSource: UITableViewDiffableDataSource<Section, Item> {
+        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+            return true
+        }
+    }
+
     private let viewModel: VM
     private var observers = [AnyCancellable]()
-    private var dataSource: UITableViewDiffableDataSource<Section, Item>!
+    private var dataSource: DataSource!
     private var filterBarButtonItem: UIBarButtonItem?
     fileprivate var applySnapshotInBackground = true
-    weak var previewProvider: TorrentListViewPreviewProvider?
+    weak var provider: TorrentListViewProvider?
 
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
@@ -72,7 +72,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureNavigationItem()
         configureTableView()
 
         refreshControl = UIRefreshControl()
@@ -143,7 +142,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
 
-        dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
+        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: "torrent",
                 for: indexPath
@@ -211,10 +210,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         return UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: { [weak self] in
-                self?.previewProvider?.previewForItem(at: indexPath.row)
+                self?.provider?.previewForItem(at: indexPath.row)
             },
             actionProvider: { [weak self] _ in
-                self?.previewProvider?.contextMenuForItem(at: indexPath.row)
+                self?.provider?.contextMenuForItem(at: indexPath.row)
             }
         )
     }
@@ -226,7 +225,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     ) {
         guard let indexPath = configuration.identifier as? IndexPath else { return }
         animator.addAnimations {
-            self.previewProvider?.commitPreviewForItem(at: indexPath.row)
+            self.provider?.commitPreviewForItem(at: indexPath.row)
         }
     }
 
@@ -235,8 +234,30 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
-        previewProvider?.didDismissPreviewForItem(at: indexPath.row)
+        provider?.didDismissPreviewForItem(at: indexPath.row)
         return nil
+    }
+
+    override func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+        return provider?.leadingSwipeActionsConfigurationForItem(
+            at: indexPath.row,
+            source: .view(cell, rect: cell.bounds)
+        )
+    }
+
+    override func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+        return provider?.trailingSwipeActionsConfigurationForItem(
+            at: indexPath.row,
+            source: .view(cell, rect: cell.bounds)
+        )
     }
 
     // MARK: UISearchResultsUpdating

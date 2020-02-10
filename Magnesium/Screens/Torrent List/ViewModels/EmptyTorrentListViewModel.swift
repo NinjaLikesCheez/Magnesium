@@ -10,7 +10,7 @@ import Combine
 import UIKit
 import ViewModel
 
-final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPreviewProvider {
+final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvider {
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
 
@@ -42,6 +42,17 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListPrevi
     }
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
+        return nil
+    }
+
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
+        return nil
+    }
+
+    func trailingSwipeActionsConfigurationForItem(
+        at index: Int,
+        source: PopoverSource
+    ) -> UISwipeActionsConfiguration? {
         return nil
     }
 }

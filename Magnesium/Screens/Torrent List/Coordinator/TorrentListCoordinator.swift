@@ -44,13 +44,19 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         viewController = TorrentListViewController(viewModel: viewModel)
         received = viewModel.events
         super.init()
-        viewController.previewProvider = self
+        viewController.provider = self
     }
 
     func handle(_ event: TorrentListEvent) {
         switch event {
         case let .alert(alert, source):
             showAlert(alert, from: source)
+        case let .activities(activities, metadata: metadata):
+            let activityController = UIActivityViewController(
+                activityItems: [MetadataItem(metadata: metadata)],
+                applicationActivities: activities
+            )
+            viewController.present(activityController, animated: true)
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
         case let .filter(source, labels):
@@ -93,7 +99,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         viewController.present(alertController, animated: true, completion: nil)
     }
 
-    private func showAddFile() {
+    // internal for testing
+    func showAddFile() {
         let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.torrent"], in: .open)
         documentPicker.delegate = self
         viewController.present(documentPicker, animated: true, completion: nil)
@@ -135,7 +142,7 @@ extension TorrentListCoordinator: UIDocumentPickerDelegate {
     }
 }
 
-extension TorrentListCoordinator: TorrentListViewPreviewProvider {
+extension TorrentListCoordinator: TorrentListViewProvider {
     func previewForItem(at index: Int) -> UIViewController? {
         guard let viewModel = viewModel.detailViewModelForItem(at: index) else { return nil }
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
@@ -157,5 +164,16 @@ extension TorrentListCoordinator: TorrentListViewPreviewProvider {
 
     func didDismissPreviewForItem(at index: Int) {
         previewCoordinatorMap.removeValue(forKey: index)
+    }
+
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
+        return viewModel.leadingSwipeActionsConfigurationForItem(at: index, source: source)
+    }
+
+    func trailingSwipeActionsConfigurationForItem(
+        at index: Int,
+        source: PopoverSource
+    ) -> UISwipeActionsConfiguration? {
+        return viewModel.trailingSwipeActionsConfigurationForItem(at: index, source: source)
     }
 }

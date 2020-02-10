@@ -25,6 +25,10 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
         return refresher.refreshTransmission().mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
+    func updateFiles(_ torrent: TransmissionTorrent) -> AnyPublisher<[TransmissionTorrentFile], Error> {
+        return client.getTorrentFiles(id: torrent.id).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
     func pause(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return client.stop(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
@@ -41,10 +45,6 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
 
     func recheck(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return client.verify(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
-    }
-
-    func updateFiles(_ torrent: TransmissionTorrent) -> AnyPublisher<[TransmissionTorrentFile], Error> {
-        return client.getTorrentFiles(id: torrent.id).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func setLabel(_ label: NeverLabel, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {

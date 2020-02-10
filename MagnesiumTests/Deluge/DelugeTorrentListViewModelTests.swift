@@ -24,6 +24,283 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
     }
 
+    func test_pause_shouldPauseAndRefresh() {
+        client.requests.reset()
+        viewModel.pause(.mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, pause: 1))
+    }
+
+    func test_pause_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.pause = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.pause(.mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Pause \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
+    }
+
+    func test_resume_shouldResumeAndRefresh() {
+        client.requests.reset()
+        viewModel.resume(.mock(name: "Torrent"))
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, resume: 1))
+    }
+
+    func test_resume_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.resume = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.resume(.mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Resume \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
+    }
+
+    func test_presentRemoveOptions_shouldEmitAlert() {
+        client.requests.reset()
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        XCTAssertEqual(alert?.title, "Remove")
+        XCTAssertEqual(alert?.message, "Mock")
+        XCTAssertEqual(alert?.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+    }
+
+    func test_presentRemoveOptions_whenRemoveDataSelected_shouldRemoveAndRefresh() {
+        client.requests.reset()
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        alert?.actions.first { $0.title == "Remove Data" }?.handler?()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [true]))
+    }
+
+    func test_presentRemoveOptions_whenRemoveDataSelected_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.removeWithData = true
+
+        var optionsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            optionsAlert = inner
+        }.store(in: &observers)
+        viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        optionsAlert?.actions.first { $0.title == "Remove Data" }?.handler?()
+        XCTAssertEqual(errorAlert?.title, "Failed to Remove \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
+    }
+
+    func test_presentRemoveOptions_whenKeepDataSelected_shouldRemoveAndRefresh() {
+        client.requests.reset()
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        alert?.actions.first { $0.title == "Keep Data" }?.handler?()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [false]))
+    }
+
+    func test_presentRemoveOptions_whenKeepDataSelected_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.removeKeepData = true
+
+        var optionsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            optionsAlert = inner
+        }.store(in: &observers)
+        viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        optionsAlert?.actions.first { $0.title == "Keep Data" }?.handler?()
+        XCTAssertEqual(errorAlert?.title, "Failed to Remove \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
+    }
+
+    func test_setLabel_shouldSetLabelAndRefresh() {
+        client.requests.reset()
+        viewModel.setLabel(for: .mock(), label: .mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
+    }
+
+    func test_setLabel_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.setLabel = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.setLabel(for: .mock(name: "Torrent"), label: .mock())
+        XCTAssertEqual(alert?.title, "Failed to Set Label for \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
+    }
+
+    func test_recheck_shouldRecheckAndRefresh() {
+        client.requests.reset()
+        viewModel.recheck(.mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
+    }
+
+    func test_recheck_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.recheck = true
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+
+        viewModel.recheck(.mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Recheck \"Torrent\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
+    }
+
+    // MARK: presentLabelSelection
+
+    func test_presentLabelSelection_shouldEmitSelectionAlert() {
+        client.labels = [.mock(), .mock(name: "test")]
+        viewModel.handle(.refresh)
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.presentLabelSelection(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        XCTAssertEqual(alert?.title, "Set Label")
+        XCTAssertEqual(alert?.message, "Mock")
+        XCTAssertEqual(alert?.actions.map { $0.title }, ["None", "test", "Cancel"])
+    }
+
+    func test_presentLabelSelection_whenOptionSelected_shouldPerformRequestAndRefresh() {
+        client.labels = [.mock(), .mock(name: "test")]
+        viewModel.handle(.refresh)
+        client.requests.reset()
+
+        var alert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            alert = inner
+        }.store(in: &observers)
+        viewModel.presentLabelSelection(for: .mock(), from: .view(UIView(), rect: .zero))
+        alert?.actions.first { $0.title == "test" }?.handler?()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
+    }
+
+    func test_presentLabelSelection_whenOptionSelected_andRequestFails_shouldPerformRequestAndRefresh() {
+        client.labels = [.mock(), .mock(name: "test")]
+        viewModel.handle(.refresh)
+        client.requests.reset()
+        client.errors.setLabel = true
+
+        var labelsAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            labelsAlert = inner
+        }.store(in: &observers)
+        viewModel.presentLabelSelection(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        labelsAlert?.actions.first { $0.title == "test" }?.handler?()
+        XCTAssertEqual(errorAlert?.title, "Failed to Set Label for \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
+    }
+
+    // MARK: presentActivities
+
+    func test_moreOptions_shouldEmitActivities() {
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
+        guard case let .activities(activities, metadata) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Recheck"])
+        XCTAssertEqual(metadata.title, "Mock")
+    }
+
     // MARK: autoRefresh
 
     func test_autoRefresh_shouldFire() {
@@ -247,7 +524,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1))
     }
 
-    // MARK: TorrentListPreviewProvider
+    // MARK: TorrentListProvider
 
     func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
         typealias Implementation = DelugeTorrentDetailViewModelImplementation // swiftlint:disable:this nesting
@@ -321,123 +598,31 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(menuString(menu), expected)
     }
 
-    func test_handleSetLabelAction_shouldSetLabelAndRefresh() {
-        client.requests.reset()
-        viewModel.handleSetLabelAction(for: .mock(), label: .mock())
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
+    func test_leadingSwipeActionsConfiguration_whenTorrentIsActive_shouldReturnedExpectedConfiguration() {
+        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(
+            at: 0,
+            source: .view(UIView(), rect: .zero)
+        )
+        XCTAssertEqual(configuration?.actions.map { $0.image }, [UIImage(systemName: "pause.fill")])
     }
 
-    func test_handleSetLabelAction_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.setLabel = true
+    func test_leadingSwipeActionsConfiguration_whenTorrentIsInactive_shouldReturnedExpectedConfiguration() {
+        client.torrents = [.mock(state: .paused)]
+        viewModel.handle(.refresh)
 
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.handleSetLabelAction(for: .mock(name: "Torrent"), label: .mock())
-        XCTAssertEqual(alert?.title, "Failed to Set Label for \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
+        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(
+            at: 0,
+            source: .view(UIView(), rect: .zero)
+        )
+        XCTAssertEqual(configuration?.actions.map { $0.image }, [UIImage(systemName: "play.fill")])
     }
 
-    func test_handlePauseAction_shouldPauseAndRefresh() {
-        client.requests.reset()
-        viewModel.handlePauseAction(for: .mock())
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, pause: 1))
-    }
-
-    func test_handlePauseAction_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.pause = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.handlePauseAction(for: .mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Pause \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
-    }
-
-    func test_handleResumeAction_shouldResumeAndRefresh() {
-        client.requests.reset()
-        viewModel.handleResumeAction(for: .mock(name: "Torrent"))
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, resume: 1))
-    }
-
-    func test_handleResumeAction_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.resume = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.handleResumeAction(for: .mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Resume \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
-    }
-
-    func test_handleRemoveAction_withRemoveData_shouldRemoveAndRefresh() {
-        client.requests.reset()
-        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: true)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [true]))
-    }
-
-    func test_handleRemoveAction_withRemoveData_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.removeWithData = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: true)
-        XCTAssertEqual(alert?.title, "Failed to Remove \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
-    }
-
-    func test_handleRemoveAction_withKeepData_shouldRemoveAndRefresh() {
-        client.requests.reset()
-        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: false)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [false]))
-    }
-
-    func test_handleRemoveAction_withKeepData_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.removeKeepData = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.handleRemoveAction(for: .mock(name: "Torrent"), removeData: false)
-        XCTAssertEqual(alert?.title, "Failed to Remove \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
+    func test_trailingSwipeActionsConfiguration_shouldReturnExpectedConfiguration() {
+        let configuration = viewModel.trailingSwipeActionsConfigurationForItem(
+            at: 0,
+            source: .view(UIView(), rect: .zero)
+        )
+        let expected = [UIImage(systemName: "trash.fill"), UIImage(systemName: "ellipsis.circle.fill")]
+        XCTAssertEqual(configuration?.actions.map { $0.image }, expected)
     }
 }

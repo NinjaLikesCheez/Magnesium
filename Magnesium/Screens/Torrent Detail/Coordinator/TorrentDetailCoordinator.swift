@@ -8,6 +8,8 @@
 
 import Combine
 import Coordinator
+import LinkPresentation
+import UIKit
 import ViewModel
 
 enum TorrentDetailCoordinatorEvent {
@@ -44,6 +46,12 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
             eventSubject.send(.complete)
         case let .alert(alert, source: source):
             showAlert(alert, from: source)
+        case let .activities(activities, metadata):
+            let activityController = UIActivityViewController(
+                activityItems: [MetadataItem(metadata: metadata)],
+                applicationActivities: activities
+            )
+            viewController.present(activityController, animated: true)
         }
     }
 }

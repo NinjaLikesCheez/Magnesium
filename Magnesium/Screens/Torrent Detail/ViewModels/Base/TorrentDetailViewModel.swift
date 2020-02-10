@@ -7,6 +7,8 @@
 //
 
 import Combine
+import LinkPresentation
+import UIKit
 import ViewModel
 
 typealias AnyTorrentDetailViewModel = AnyEmitterViewModel<
@@ -18,6 +20,7 @@ typealias AnyTorrentDetailViewModel = AnyEmitterViewModel<
 enum TorrentDetailEvent {
     case complete
     case alert(Alert, source: PopoverSource?)
+    case activities([UIActivity], metadata: LPLinkMetadata)
 }
 
 enum TorrentDetailViewEvent {

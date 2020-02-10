@@ -7,6 +7,7 @@
 //
 
 import Combine
+import LinkPresentation
 @testable import Magnesium
 import ViewModel
 import XCTest
@@ -51,6 +52,15 @@ class TorrentDetailCoordinatorTests: XCTestCase {
         viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert), source: nil))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")
+            return
+        }
+    }
+
+    func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
+        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata()))
+        let viewController = coordinator.presentable.viewController
+        guard type(of: viewController.presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")
             return
         }

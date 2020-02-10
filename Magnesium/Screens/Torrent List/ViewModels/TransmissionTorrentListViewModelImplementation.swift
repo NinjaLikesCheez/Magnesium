@@ -71,12 +71,15 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
 
     func remove(_ torrent: TransmissionTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
         return client.remove(ids: [torrent.id], removeData: removeData)
-            .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
-    func setLabel(_ label: NeverLabel, for torrent: Torrent) -> AnyPublisher<Void, Error> {
+    func recheck(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+        return client.verify(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func setLabel(_ label: NeverLabel, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 
