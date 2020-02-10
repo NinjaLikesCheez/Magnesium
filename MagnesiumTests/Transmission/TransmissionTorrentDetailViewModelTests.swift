@@ -453,7 +453,7 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
         var event: TorrentDetailEvent?
         viewModel.events.sink { event = $0 }.store(in: &observers)
         viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
-        guard case let .activities(activities, metadata) = event else {
+        guard case let .activities(activities, metadata, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }

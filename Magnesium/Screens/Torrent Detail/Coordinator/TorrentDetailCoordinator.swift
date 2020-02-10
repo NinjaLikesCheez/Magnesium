@@ -44,14 +44,27 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
         switch event {
         case .complete:
             eventSubject.send(.complete)
-        case let .alert(alert, source: source):
+        case let .alert(alert, source):
             showAlert(alert, from: source)
-        case let .activities(activities, metadata):
-            let activityController = UIActivityViewController(
-                activityItems: [MetadataItem(metadata: metadata)],
-                applicationActivities: activities
-            )
-            viewController.present(activityController, animated: true)
+        case let .activities(activities, metadata, source):
+            showActivities(activities, metadata: metadata, source: source)
         }
+    }
+
+    private func showActivities(_ activities: [UIActivity], metadata: LPLinkMetadata, source: PopoverSource) {
+        let activityController = UIActivityViewController(
+            activityItems: [MetadataItem(metadata: metadata)],
+            applicationActivities: activities
+        )
+
+        switch source {
+        case let .barButton(barButton):
+            activityController.popoverPresentationController?.barButtonItem = barButton
+        case let .view(view, rect: rect):
+            activityController.popoverPresentationController?.sourceView = view
+            activityController.popoverPresentationController?.sourceRect = rect
+        }
+
+        viewController.present(activityController, animated: true)
     }
 }

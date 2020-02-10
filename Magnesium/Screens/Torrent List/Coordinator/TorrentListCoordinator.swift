@@ -8,6 +8,7 @@
 
 import Combine
 import Coordinator
+import LinkPresentation
 import Preferences
 import UIKit
 
@@ -51,12 +52,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         switch event {
         case let .alert(alert, source):
             showAlert(alert, from: source)
-        case let .activities(activities, metadata: metadata):
-            let activityController = UIActivityViewController(
-                activityItems: [MetadataItem(metadata: metadata)],
-                applicationActivities: activities
-            )
-            viewController.present(activityController, animated: true)
+        case let .activities(activities, metadata, source):
+            showActivities(activities, metadata: metadata, source: source)
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
         case let .filter(source, labels):
@@ -66,6 +63,23 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         case .settings:
             eventSubject.send(.showSettings)
         }
+    }
+
+    private func showActivities(_ activities: [UIActivity], metadata: LPLinkMetadata, source: PopoverSource) {
+        let activityController = UIActivityViewController(
+            activityItems: [MetadataItem(metadata: metadata)],
+            applicationActivities: activities
+        )
+
+        switch source {
+        case let .barButton(barButton):
+            activityController.popoverPresentationController?.barButtonItem = barButton
+        case let .view(view, rect: rect):
+            activityController.popoverPresentationController?.sourceView = view
+            activityController.popoverPresentationController?.sourceRect = rect
+        }
+
+        viewController.present(activityController, animated: true)
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
@@ -163,7 +177,9 @@ extension TorrentListCoordinator: TorrentListViewProvider {
     }
 
     func didDismissPreviewForItem(at index: Int) {
-        previewCoordinatorMap.removeValue(forKey: index)
+        DispatchQueue.main.async { [weak self] in
+            self?.previewCoordinatorMap.removeValue(forKey: index)
+        }
     }
 
     func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {

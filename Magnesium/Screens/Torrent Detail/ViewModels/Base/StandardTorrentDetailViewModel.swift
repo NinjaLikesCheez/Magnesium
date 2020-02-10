@@ -338,7 +338,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             self.recheck()
         })
 
-        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent.value)))
+        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent.value), source: source))
     }
 
     // MARK: Auto Refresh

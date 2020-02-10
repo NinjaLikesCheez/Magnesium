@@ -75,7 +75,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     }
 
     func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
-        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata()))
+        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata(), source: .view(UIView(), rect: .zero)))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
         guard type(of: presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
@@ -190,7 +190,12 @@ class TorrentListCoordinatorTests: XCTestCase {
         coordinator.childCoordinators.removeAll()
         XCTAssertFalse(isKnownUniquelyReferenced(&childCoordinator))
         coordinator.didDismissPreviewForItem(at: 0)
-        XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
+        let expectation = self.expectation(description: "")
+        DispatchQueue.main.async {
+            XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 0.2)
     }
 
     func test_leadingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {

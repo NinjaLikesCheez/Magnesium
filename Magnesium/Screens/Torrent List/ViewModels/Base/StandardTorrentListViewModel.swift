@@ -265,7 +265,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             self.recheck(torrent)
         })
 
-        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent)))
+        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent), source: source))
     }
 
     private func showError(title: String, message: String?) {

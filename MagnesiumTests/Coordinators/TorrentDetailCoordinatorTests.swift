@@ -58,7 +58,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     }
 
     func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
-        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata()))
+        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata(), source: .view(UIView(), rect: .zero)))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")

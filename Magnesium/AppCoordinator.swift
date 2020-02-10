@@ -113,8 +113,22 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }
-        let navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
-        splitViewController.showDetailViewController(navigationController, sender: nil)
+
+        if splitViewController.traitCollection.horizontalSizeClass == .regular {
+            UIView.performWithoutAnimation {
+                // the navigationController needs to be allocated in the performWithoutAnimation block or else
+                // it performs a broken push animation on appear
+                let navigationController = UINavigationController(
+                    rootViewController: coordinator.presentable.viewController
+                )
+                splitViewController.showDetailViewController(navigationController, sender: nil)
+            }
+        } else {
+            let navigationController = UINavigationController(
+                rootViewController: coordinator.presentable.viewController
+            )
+            splitViewController.showDetailViewController(navigationController, sender: nil)
+        }
     }
 
     // internal for testing

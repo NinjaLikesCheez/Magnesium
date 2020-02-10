@@ -293,7 +293,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         var event: TorrentListEvent?
         viewModel.events.sink { event = $0 }.store(in: &observers)
         viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
-        guard case let .activities(activities, metadata) = event else {
+        guard case let .activities(activities, metadata, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }

@@ -20,7 +20,7 @@ typealias AnyTorrentDetailViewModel = AnyEmitterViewModel<
 enum TorrentDetailEvent {
     case complete
     case alert(Alert, source: PopoverSource?)
-    case activities([UIActivity], metadata: LPLinkMetadata)
+    case activities([UIActivity], metadata: LPLinkMetadata, source: PopoverSource)
 }
 
 enum TorrentDetailViewEvent {
