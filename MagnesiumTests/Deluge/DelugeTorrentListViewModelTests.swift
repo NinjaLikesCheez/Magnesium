@@ -172,37 +172,13 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
     }
 
-    func test_setLabel_shouldSetLabelAndRefresh() {
+    func test_verify_shouldRecheckAndRefresh() {
         client.requests.reset()
-        viewModel.setLabel(for: .mock(), label: .mock())
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
-    }
-
-    func test_setLabel_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.setLabel = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.setLabel(for: .mock(name: "Torrent"), label: .mock())
-        XCTAssertEqual(alert?.title, "Failed to Set Label for \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
-    }
-
-    func test_recheck_shouldRecheckAndRefresh() {
-        client.requests.reset()
-        viewModel.recheck(.mock())
+        viewModel.verify(.mock())
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
     }
 
-    func test_recheck_whenFails_shouldEmitAlert() {
+    func test_verify_whenFails_shouldEmitAlert() {
         client.requests.reset()
         client.errors.recheck = true
 
@@ -215,9 +191,32 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.recheck(.mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Recheck \"Torrent\"")
+        viewModel.verify(.mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Verify Files for \"Torrent\"")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
+    }
+
+    func test_updateTrackers_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        viewModel.updateTrackers(for: .mock())
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, reannounce: 1))
+    }
+
+    func test_updateTrackers_whenFails_shouldEmitAlert() {
+        client.errors.reannounce = true
+        client.requests.reset()
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        viewModel.updateTrackers(for: .mock(name: "Mock"))
+        XCTAssertEqual(errorAlert?.title, "Failed to Update Trackers for \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(reannounce: 1))
     }
 
     // MARK: presentLabelSelection
@@ -297,7 +296,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Recheck"])
+        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Verify Files", "Update Trackers"])
         XCTAssertEqual(metadata.title, "Mock")
     }
 
@@ -535,7 +534,7 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         }
     }
 
-    func test_contextMenuForItem_shouldReturnExpectedMenu() {
+    func test_contextMenuForItem_withActiveTorrent_shouldReturnExpectedMenu() {
         client.labels = [.mock(), .mock(name: "test")]
         viewModel.handle(.refresh)
 
@@ -553,10 +552,12 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         // swiftformat:disable all
         let expected = """
 
+              Pause
               Set Label
                 None
                 test
-              Pause
+              Verify Files
+              Update Trackers
               Remove
                 Keep Data
                 Remove Data
@@ -585,10 +586,12 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         // swiftformat:disable all
         let expected = """
 
+              Resume
               Set Label
                 None
                 test
-              Resume
+              Verify Files
+              Update Trackers
               Remove
                 Keep Data
                 Remove Data

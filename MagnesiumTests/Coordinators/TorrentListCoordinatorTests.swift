@@ -195,7 +195,7 @@ class TorrentListCoordinatorTests: XCTestCase {
             XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 0.2)
+        waitForExpectations(timeout: 0.5)
     }
 
     func test_leadingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {

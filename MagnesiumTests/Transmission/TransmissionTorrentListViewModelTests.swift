@@ -172,13 +172,13 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(remove: [false]))
     }
 
-    func test_recheck_shouldRecheckAndRefresh() {
+    func test_verify_shouldVerifyAndRefresh() {
         client.requests.reset()
-        viewModel.recheck(.mock())
+        viewModel.verify(.mock())
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, verify: 1))
     }
 
-    func test_recheck_whenFails_shouldEmitAlert() {
+    func test_verify_whenFails_shouldEmitAlert() {
         client.requests.reset()
         client.errors.verify = true
 
@@ -191,14 +191,37 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
 
-        viewModel.recheck(.mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Recheck \"Torrent\"")
+        viewModel.verify(.mock(name: "Torrent"))
+        XCTAssertEqual(alert?.title, "Failed to Verify Files for \"Torrent\"")
         XCTAssertEqual(client.requests, MockTransmissionClient.Requests(verify: 1))
+    }
+
+    func test_updateTrackers_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        viewModel.updateTrackers(for: .mock())
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(torrents: 1, reannounce: 1))
+    }
+
+    func test_updateTrackers_whenFails_shouldEmitAlert() {
+        client.errors.reannounce = true
+        client.requests.reset()
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        viewModel.updateTrackers(for: .mock(name: "Mock"))
+        XCTAssertEqual(errorAlert?.title, "Failed to Update Trackers for \"Mock\"")
+        XCTAssertEqual(client.requests, MockTransmissionClient.Requests(reannounce: 1))
     }
 
     // MARK: presentActivities
 
-    func test_moreOptions_shouldEmitActivities() {
+    func test_presentActivities_shouldEmitActivities() {
         var event: TorrentListEvent?
         viewModel.events.sink { event = $0 }.store(in: &observers)
         viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
@@ -206,7 +229,7 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-        XCTAssertEqual(activities.map { $0.activityTitle }, ["Recheck"])
+        XCTAssertEqual(activities.map { $0.activityTitle }, ["Verify Files", "Update Trackers"])
         XCTAssertEqual(metadata.title, "Mock")
     }
 
@@ -460,6 +483,8 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         let expected = """
 
               Pause
+              Verify Files
+              Update Trackers
               Remove
                 Keep Data
                 Remove Data
@@ -488,6 +513,8 @@ final class TransmissionTorrentListViewModelTests: XCTestCase {
         let expected = """
 
               Resume
+              Verify Files
+              Update Trackers
               Remove
                 Keep Data
                 Remove Data

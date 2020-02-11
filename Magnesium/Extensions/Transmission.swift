@@ -23,6 +23,7 @@ protocol TransmissionClient {
     func stop(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
     func remove(ids: [Int], removeData: Bool) -> AnyPublisher<Void, TransmissionError>
     func verify(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
+    func reannounce(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
     func add(url: URL) -> AnyPublisher<Void, TransmissionError>
     func add(fileURL: URL) -> AnyPublisher<Void, TransmissionError>
 }

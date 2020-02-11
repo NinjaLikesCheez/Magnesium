@@ -22,6 +22,7 @@ final class MockDelugeClient: DelugeClient {
         var addURL = 0
         var addMagnetURL = 0
         var setLabel = 0
+        var reannounce = 0
 
         mutating func reset() {
             self = Requests()
@@ -39,6 +40,7 @@ final class MockDelugeClient: DelugeClient {
         var recheck = false
         var addURL = false
         var setLabel = false
+        var reannounce = false
     }
 
     var requests = Requests()
@@ -136,6 +138,15 @@ final class MockDelugeClient: DelugeClient {
     func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError> {
         requests.setLabel += 1
         guard !errors.setLabel else {
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
+        }
+
+        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+    }
+
+    func reannounce(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
+        requests.reannounce += 1
+        guard !errors.reannounce else {
             return Fail(error: .unauthenticated).eraseToAnyPublisher()
         }
 

@@ -200,13 +200,13 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
     }
 
-    func test_recheck_shouldPerformRequestAndRefresh() {
+    func test_verify_shouldPerformRequestAndRefresh() {
         client.requests.reset()
-        viewModel.recheck()
+        viewModel.verify()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
     }
 
-    func test_recheck_whenFails_shouldEmitAlert() {
+    func test_verify_whenFails_shouldEmitAlert() {
         client.errors.recheck = true
         client.requests.reset()
 
@@ -218,9 +218,32 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             }
             errorAlert = inner
         }.store(in: &observers)
-        viewModel.recheck()
-        XCTAssertEqual(errorAlert?.title, "Failed to Recheck")
+        viewModel.verify()
+        XCTAssertEqual(errorAlert?.title, "Failed to Verify Files")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
+    }
+
+    func test_updateTrackers_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        viewModel.updateTrackers()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, reannounce: 1))
+    }
+
+    func test_updateTrackers_whenFails_shouldEmitAlert() {
+        client.errors.reannounce = true
+        client.requests.reset()
+
+        var errorAlert: Alert?
+        viewModel.events.first().sink {
+            guard case let .alert(inner, source: _) = $0 else {
+                XCTFail("Unexpected event")
+                return
+            }
+            errorAlert = inner
+        }.store(in: &observers)
+        viewModel.updateTrackers()
+        XCTAssertEqual(errorAlert?.title, "Failed to Update Trackers")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(reannounce: 1))
     }
 
     // MARK: presentLabelSelection
@@ -513,7 +536,7 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Recheck"])
+        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Verify Files", "Update Trackers"])
         XCTAssertEqual(metadata.title, "Mock")
     }
 }

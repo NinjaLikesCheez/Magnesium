@@ -266,6 +266,14 @@ public final class Client {
             return Fail(error: .filesystem(error)).eraseToAnyPublisher()
         }
     }
+
+    /// Updates the trackers for the torrent and requests more peers.
+    /// - Parameter ids: The IDs of the torrents whose trackers should be updated.
+    public func reannounce(ids: [Int]) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-reannounce", args: ["ids": ids])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
 }
 
 extension Client.Error: LocalizedError {

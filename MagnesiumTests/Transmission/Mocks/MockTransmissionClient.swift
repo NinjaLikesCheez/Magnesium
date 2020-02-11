@@ -20,6 +20,7 @@ final class MockTransmissionClient: TransmissionClient {
         var remove = [Bool]()
         var verify = 0
         var addURL = 0
+        var reannounce = 0
 
         mutating func reset() {
             self = Requests()
@@ -36,6 +37,7 @@ final class MockTransmissionClient: TransmissionClient {
         var removeWithData = false
         var verify = false
         var addURL = false
+        var reannounce = false
     }
 
     var requests = Requests()
@@ -121,6 +123,15 @@ final class MockTransmissionClient: TransmissionClient {
     }
 
     func add(fileURL: URL) -> AnyPublisher<Void, TransmissionError> {
+        return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+    }
+
+    func reannounce(ids: [Int]) -> AnyPublisher<Void, TransmissionError> {
+        requests.reannounce += 1
+        guard !errors.reannounce else {
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
+        }
+
         return Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     }
 }

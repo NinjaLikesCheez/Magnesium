@@ -43,11 +43,15 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
             .eraseToAnyPublisher()
     }
 
-    func recheck(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+    func verify(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         return client.recheck(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func setLabel(_ label: DelugeLabel, for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         return client.setLabel(label.name, forTorrentHash: torrent.hash).mapError { $0 as Error }.eraseToAnyPublisher()
+    }
+
+    func updateTrackers(for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+        return client.reannounce(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 }

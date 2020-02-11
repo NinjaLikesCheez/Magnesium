@@ -23,8 +23,9 @@ protocol StandardTorrentDetailViewModelImplementation {
     func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
-    func recheck(_ torrent: Torrent) -> AnyPublisher<Void, Error>
+    func verify(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
+    func updateTrackers(for torrent: Torrent) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -203,8 +204,8 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     // internal for testing
-    func recheck() {
-        implementation.recheck(torrent.value)
+    func verify() {
+        implementation.verify(torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -214,13 +215,13 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Recheck", message: error.localizedDescription)
+                self?.showError(title: "Failed to Verify Files", message: error.localizedDescription)
                 }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     // internal for testing
-    func setLabel(_ label: Label) {
+    private func setLabel(_ label: Label) {
         implementation.setLabel(label, for: torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -232,6 +233,26 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: "Failed to Set Label", message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    // internal for testing
+    func updateTrackers() {
+        implementation.updateTrackers(for: torrent.value)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(
+                    title: "Failed to Update Trackers",
+                    message: error.localizedDescription
+                )
                 }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -334,8 +355,12 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             })
         }
 
-        activities.append(RecheckActivity {
-            self.recheck()
+        activities.append(VerifyFilesActivity {
+            self.verify()
+        })
+
+        activities.append(UpdateTrackersActivity {
+            self.updateTrackers()
         })
 
         eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent.value), source: source))

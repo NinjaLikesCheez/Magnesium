@@ -26,8 +26,9 @@ protocol StandardTorrentListViewModelImplementation {
     func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
-    func recheck(_ torrent: Torrent) -> AnyPublisher<Void, Error>
+    func verify(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
+    func updateTrackers(for torrent: Torrent) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -190,8 +191,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     // internal for testing
-    func recheck(_ torrent: Torrent) {
-        implementation.recheck(torrent)
+    func verify(_ torrent: Torrent) {
+        implementation.verify(torrent)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -201,13 +202,15 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Recheck \"\(torrent.name)\"", message: error.localizedDescription)
+                self?.showError(
+                    title: "Failed to Verify Files for \"\(torrent.name)\"",
+                    message: error.localizedDescription
+                )
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    // internal for testing
-    func setLabel(for torrent: Torrent, label: Label) {
+    private func setLabel(for torrent: Torrent, label: Label) {
         implementation.setLabel(label, for: torrent)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -220,6 +223,26 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 guard case let .failure(error) = completion else { return }
                 self?.showError(
                     title: "Failed to Set Label for \"\(torrent.name)\"",
+                    message: error.localizedDescription
+                )
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    // internal for testing
+    func updateTrackers(for torrent: Torrent) {
+        implementation.updateTrackers(for: torrent)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(
+                    title: "Failed to Update Trackers for \"\(torrent.name)\"",
                     message: error.localizedDescription
                 )
                 }, receiveValue: { _ in })
@@ -261,8 +284,12 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             })
         }
 
-        activities.append(RecheckActivity {
-            self.recheck(torrent)
+        activities.append(VerifyFilesActivity {
+            self.verify(torrent)
+        })
+
+        activities.append(UpdateTrackersActivity {
+            self.updateTrackers(for: torrent)
         })
 
         eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent), source: source))
@@ -328,18 +355,6 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         let torrent = torrents.subject(at: index).value
         var actions = [UIMenuElement]()
 
-        if !labels.value.isEmpty {
-            actions.append(UIMenu(
-                title: "Set Label",
-                image: UIImage(systemName: "square.and.pencil"),
-                children: labels.value.map { label in
-                    UIAction(title: label.displayName) { [weak self] _ in
-                        self?.setLabel(for: torrent, label: label)
-                    }
-                }
-            ))
-        }
-
         if torrent.isActive {
             actions.append(UIAction(title: "Pause", image: UIImage(systemName: "pause")) { [weak self] _ in
                 self?.pause(torrent)
@@ -349,6 +364,34 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 self?.resume(torrent)
             })
         }
+
+        if !labels.value.isEmpty {
+            actions.append(UIMenu(
+                title: "Set Label",
+                image: UIImage(systemName: "tag"),
+                children: labels.value.map { label in
+                    UIAction(title: label.displayName) { [weak self] _ in
+                        self?.setLabel(for: torrent, label: label)
+                    }
+                }
+            ))
+        }
+
+        actions.append(UIAction(
+            title: "Verify Files",
+            image: UIImage(systemName: "tray.full"),
+            handler: { [weak self] _ in
+                self?.verify(torrent)
+            }
+        ))
+
+        actions.append(UIAction(
+            title: "Update Trackers",
+            image: UIImage(systemName: "arrow.clockwise"),
+            handler: { [weak self] _ in
+                self?.updateTrackers(for: torrent)
+            }
+        ))
 
         actions.append(UIMenu(
             title: "Remove",
@@ -361,10 +404,11 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 UIAction(
                     title: "Remove Data",
                     image: UIImage(systemName: "trash"),
-                    attributes: .destructive
-                ) { [weak self] _ in
-                    self?.remove(torrent, removeData: true)
-                },
+                    attributes: .destructive,
+                    handler: { [weak self] _ in
+                        self?.remove(torrent, removeData: true)
+                    }
+                ),
             ]
         ))
 

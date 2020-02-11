@@ -12,7 +12,7 @@ final class SetLabelActivity: BlockActivity {
     init(handler: @escaping () -> Void) {
         super.init(
             title: "Set Label",
-            image: UIImage(systemName: "square.and.pencil"),
+            image: UIImage(systemName: "tag"),
             type: UIActivity.ActivityType(rawValue: "ca.jameshurst.Magnesium.set-label"),
             handler: handler
         )

@@ -75,12 +75,16 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             .eraseToAnyPublisher()
     }
 
-    func recheck(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+    func verify(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return client.verify(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func setLabel(_ label: NeverLabel, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+    }
+
+    func updateTrackers(for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+        return client.reannounce(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {
