@@ -56,15 +56,7 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
             activityItems: [MetadataItem(metadata: metadata)],
             applicationActivities: activities
         )
-
-        switch source {
-        case let .barButton(barButton):
-            activityController.popoverPresentationController?.barButtonItem = barButton
-        case let .view(view, rect: rect):
-            activityController.popoverPresentationController?.sourceView = view
-            activityController.popoverPresentationController?.sourceRect = rect
-        }
-
+        activityController.configure(popoverSource: source)
         viewController.present(activityController, animated: true)
     }
 }

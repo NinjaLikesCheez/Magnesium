@@ -15,3 +15,17 @@ public enum PopoverSource {
     /// The bar button item to present the popover from.
     case barButton(UIBarButtonItem)
 }
+
+extension UIViewController {
+    func configure(popoverSource source: PopoverSource?) {
+        switch source {
+        case let .view(view, rect: rect):
+            popoverPresentationController?.sourceView = view
+            popoverPresentationController?.sourceRect = rect
+        case let .barButton(barButtonItem):
+            popoverPresentationController?.barButtonItem = barButtonItem
+        case .none:
+            break
+        }
+    }
+}

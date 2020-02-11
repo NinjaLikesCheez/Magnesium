@@ -16,15 +16,7 @@ protocol AlertPresenter {
 extension AlertPresenter where Self: Coordinator {
     func showAlert(_ alert: Alert, from source: PopoverSource? = nil, useTopViewController: Bool = false) {
         let alertController = alert.createAlertController()
-        switch source {
-        case let .view(view, rect: rect):
-            alertController.popoverPresentationController?.sourceView = view
-            alertController.popoverPresentationController?.sourceRect = rect
-        case let .barButton(barButtonItem):
-            alertController.popoverPresentationController?.barButtonItem = barButtonItem
-        case .none:
-            break
-        }
+        alertController.configure(popoverSource: source)
 
         if useTopViewController {
             var current = presentable.viewController

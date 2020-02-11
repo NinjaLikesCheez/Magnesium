@@ -70,15 +70,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             activityItems: [MetadataItem(metadata: metadata)],
             applicationActivities: activities
         )
-
-        switch source {
-        case let .barButton(barButton):
-            activityController.popoverPresentationController?.barButtonItem = barButton
-        case let .view(view, rect: rect):
-            activityController.popoverPresentationController?.sourceView = view
-            activityController.popoverPresentationController?.sourceRect = rect
-        }
-
+        activityController.configure(popoverSource: source)
         viewController.present(activityController, animated: true)
     }
 
@@ -128,15 +120,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 
         let viewController = coordinator.presentable.viewController
         viewController.modalPresentationStyle = .popover
-
-        switch source {
-        case let .barButton(barButton):
-            viewController.popoverPresentationController?.barButtonItem = barButton
-        case let .view(view, rect: rect):
-            viewController.popoverPresentationController?.sourceView = view
-            viewController.popoverPresentationController?.sourceRect = rect
-        }
-
+        viewController.configure(popoverSource: source)
         self.viewController.present(viewController, animated: true)
     }
 
