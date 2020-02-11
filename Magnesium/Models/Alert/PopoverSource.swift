@@ -9,7 +9,7 @@
 import UIKit
 
 /// The source of a popover presentation.
-public enum PopoverSource {
+enum PopoverSource {
     /// The view and frame to present the popover from.
     case view(UIView, rect: CGRect)
     /// The bar button item to present the popover from.
@@ -17,6 +17,8 @@ public enum PopoverSource {
 }
 
 extension UIViewController {
+    /// Configures this viewController's the `popoverPresentationController`'s.
+    /// - Parameter source: The source for a popover presentation.
     func configure(popoverSource source: PopoverSource?) {
         switch source {
         case let .view(view, rect: rect):

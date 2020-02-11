@@ -7,27 +7,27 @@
 //
 
 /// A model describing an alert action.
-public struct AlertAction {
+struct AlertAction {
     /// The style of an alert action.
-    public enum Style {
+    enum Style {
         case `default`
         case cancel
         case destructive
     }
 
     /// The action's title.
-    public var title: String?
+    var title: String?
     /// The action's style.
-    public var style: Style
+    var style: Style
     /// The handler to run when the action is triggered.
-    public var handler: (() -> Void)?
+    var handler: (() -> Void)?
 
     /// Creates a new action with the given properties.
     /// - Parameters:
     ///   - title: The action's title.
     ///   - style: The action's style.
     ///   - handler: The action's handler.
-    public init(title: String, style: Style, handler: (() -> Void)? = nil) {
+    init(title: String, style: Style, handler: (() -> Void)? = nil) {
         self.title = title
         self.style = style
         self.handler = handler

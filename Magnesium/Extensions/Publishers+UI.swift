@@ -11,24 +11,24 @@
 import Combine
 import Foundation
 
-public extension Publisher {
+extension Publisher {
     func ui() -> Publishers.UI<Self> {
         return .init(upstream: self)
     }
 }
 
-public extension Publishers {
+extension Publishers {
     struct UI<Upstream: Publisher>: Publisher {
-        public typealias Output = Upstream.Output
-        public typealias Failure = Upstream.Failure
+        typealias Output = Upstream.Output
+        typealias Failure = Upstream.Failure
 
-        public let upstream: Upstream
+        let upstream: Upstream
 
-        public init(upstream: Upstream) {
+        init(upstream: Upstream) {
             self.upstream = upstream
         }
 
-        public func receive<Downstream: Subscriber>(
+        func receive<Downstream: Subscriber>(
             subscriber: Downstream
         ) where Upstream.Failure == Downstream.Failure, Upstream.Output == Downstream.Input {
             upstream.subscribe(Inner(downstream: subscriber))

@@ -7,21 +7,21 @@
 //
 
 /// A model describing an alert.
-public struct Alert {
+struct Alert {
     /// The style of an alert.
-    public enum Style {
+    enum Style {
         case actionSheet
         case alert
     }
 
     /// The alert's title.
-    public var title: String?
+    var title: String?
     /// The alert's message.
-    public var message: String?
+    var message: String?
     /// The alert's style.
-    public var style: Style
+    var style: Style
     /// The alert's actions.
-    public var actions = [AlertAction]()
+    var actions = [AlertAction]()
 
     /// Creates a new alert with the given properties.
     /// - Parameters:
@@ -29,7 +29,7 @@ public struct Alert {
     ///   - message: The alert's message.
     ///   - style: The alert's style.
     ///   - actions: The alert's actions.
-    public init(title: String?, message: String?, style: Style, actions: [AlertAction] = []) {
+    init(title: String?, message: String?, style: Style, actions: [AlertAction] = []) {
         self.title = title
         self.message = message
         self.style = style
