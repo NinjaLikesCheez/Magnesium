@@ -40,7 +40,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
     func test_viewModel_completeEvent_shouldEmitCompleteEvent() {
         var event: TorrentDetailCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.eventSubject.send(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -58,7 +58,11 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     }
 
     func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
-        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata(), source: .view(UIView(), rect: .zero)))
+        viewModel.eventSubject.send(.activities(
+            [],
+            torrent: DelugeTorrent.mock(),
+            source: .view(UIView(), rect: .zero)
+        ))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")

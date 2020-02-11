@@ -23,19 +23,6 @@ struct Alert {
     /// The alert's actions.
     var actions = [AlertAction]()
 
-    /// Creates a new alert with the given properties.
-    /// - Parameters:
-    ///   - title: The alert's title.
-    ///   - message: The alert's message.
-    ///   - style: The alert's style.
-    ///   - actions: The alert's actions.
-    init(title: String?, message: String?, style: Style, actions: [AlertAction] = []) {
-        self.title = title
-        self.message = message
-        self.style = style
-        self.actions = actions
-    }
-
     mutating func addAction(_ action: AlertAction) {
         actions.append(action)
     }

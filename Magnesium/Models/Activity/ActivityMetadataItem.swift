@@ -9,7 +9,7 @@
 import LinkPresentation
 import UIKit
 
-final class MetadataItem: NSObject, UIActivityItemSource {
+final class ActivityMetadataItem: NSObject, UIActivityItemSource {
     private let metadata: LPLinkMetadata
 
     init(metadata: LPLinkMetadata) {

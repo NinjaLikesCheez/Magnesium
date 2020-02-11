@@ -134,18 +134,15 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
 
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
+        var event: ServerSettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.save)
-        XCTAssertEqual(alert?.title, "Authentication Failed")
-        XCTAssertEqual(alert?.message, "Ensure your password is correct.")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Authentication Failed")
+        XCTAssertEqual(alert.message, "Ensure your password is correct.")
     }
 
     func test_save_withoutData_shouldDoNothing() {
@@ -200,12 +197,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[2].value.value = "password"
 
         var event: ServerSettingsEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.save)
         guard case .complete = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
@@ -213,12 +208,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_save_withServer_shouldEmitCompleteEvent() {
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.save)
         guard case .complete = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
@@ -236,62 +229,51 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
     func test_delete_withServer_shouldEmitAlert() {
         let viewModel = editViewModel
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: ServerSettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
-        XCTAssertNil(alert?.title)
-        XCTAssertEqual(alert?.message, "Are you sure you want to delete this server?")
-        XCTAssertEqual(alert?.actions[0].title, "Delete Server")
-        XCTAssertEqual(alert?.actions[0].style, AlertAction.Style.destructive)
-        XCTAssertEqual(alert?.actions[1].title, "Cancel")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertNil(alert.title)
+        XCTAssertEqual(alert.message, "Are you sure you want to delete this server?")
+        XCTAssertEqual(alert.actions[0].title, "Delete Server")
+        XCTAssertEqual(alert.actions[0].style, AlertAction.Style.destructive)
+        XCTAssertEqual(alert.actions[1].title, "Cancel")
     }
 
     func test_delete_whenDeleteServerSelected_shouldRemoveServer() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: ServerSettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
-        let delete = alert!.actions[0].handler!
-        delete()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        alert.actions.first { $0.title == "Delete Server" }?.handler?()
         XCTAssertTrue(preferences.getServers().isEmpty)
     }
 
     func test_delete_whenDeleteServerSelected_shouldEmitCompleteEvent() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
-        let delete = alert!.actions[0].handler!
-
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink {
-            event = $0
-        }.store(in: &observers)
-        delete()
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+
+        event = nil
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        alert.actions.first { $0.title == "Delete Server" }?.handler?()
         XCTAssertTrue(preferences.getServers().isEmpty)
         guard case .complete = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }

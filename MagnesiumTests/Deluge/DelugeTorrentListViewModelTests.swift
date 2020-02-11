@@ -21,8 +21,11 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        client.torrents = [.mock(name: "Mock")]
         viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
     }
+
+    // MARK: pause
 
     func test_pause_shouldPauseAndRefresh() {
         client.requests.reset()
@@ -30,23 +33,23 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, pause: 1))
     }
 
+    // MARK: pause
+
     func test_pause_whenFails_shouldEmitAlert() {
         client.requests.reset()
         client.errors.pause = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.pause(.mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Pause \"Torrent\"")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Failed to Pause \"Torrent\"")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(pause: 1))
     }
+
+    // MARK: resume
 
     func test_resume_shouldResumeAndRefresh() {
         client.requests.reset()
@@ -57,49 +60,43 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     func test_resume_whenFails_shouldEmitAlert() {
         client.requests.reset()
         client.errors.resume = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.resume(.mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Resume \"Torrent\"")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Failed to Resume \"Torrent\"")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(resume: 1))
     }
 
+    // MARK: presentRemoveOptions
+
     func test_presentRemoveOptions_shouldEmitAlert() {
         client.requests.reset()
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
-        XCTAssertEqual(alert?.title, "Remove")
-        XCTAssertEqual(alert?.message, "Mock")
-        XCTAssertEqual(alert?.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Remove")
+        XCTAssertEqual(alert.message, "Mock")
+        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
     }
 
     func test_presentRemoveOptions_whenRemoveDataSelected_shouldRemoveAndRefresh() {
         client.requests.reset()
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
-        alert?.actions.first { $0.title == "Remove Data" }?.handler?()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        alert.actions.first { $0.title == "Remove Data" }?.handler?()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [true]))
     }
 
@@ -107,41 +104,35 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         client.requests.reset()
         client.errors.removeWithData = true
 
-        var optionsAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            optionsAlert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        guard case let .alert(optionsAlert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
 
-        var errorAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            errorAlert = inner
-        }.store(in: &observers)
-        optionsAlert?.actions.first { $0.title == "Remove Data" }?.handler?()
-        XCTAssertEqual(errorAlert?.title, "Failed to Remove \"Mock\"")
+        event = nil
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        optionsAlert.actions.first { $0.title == "Remove Data" }?.handler?()
+        guard case let .alert(errorAlert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(errorAlert.title, "Failed to Remove \"Mock\"")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [true]))
     }
 
     func test_presentRemoveOptions_whenKeepDataSelected_shouldRemoveAndRefresh() {
         client.requests.reset()
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
-        alert?.actions.first { $0.title == "Keep Data" }?.handler?()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        alert.actions.first { $0.title == "Keep Data" }?.handler?()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, remove: [false]))
     }
 
@@ -149,111 +140,78 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         client.requests.reset()
         client.errors.removeKeepData = true
 
-        var optionsAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            optionsAlert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.presentRemoveOptions(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
+        guard case let .alert(optionsAlert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
 
-        var errorAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            errorAlert = inner
-        }.store(in: &observers)
-        optionsAlert?.actions.first { $0.title == "Keep Data" }?.handler?()
-        XCTAssertEqual(errorAlert?.title, "Failed to Remove \"Mock\"")
+        event = nil
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        optionsAlert.actions.first { $0.title == "Keep Data" }?.handler?()
+        guard case let .alert(errorAlert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(errorAlert.title, "Failed to Remove \"Mock\"")
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(remove: [false]))
     }
 
-    func test_verify_shouldRecheckAndRefresh() {
-        client.requests.reset()
-        viewModel.verify(.mock())
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
+    // MARK: presentActivities
+
+    func test_presentActivities_shouldEmitActivities() {
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
+        guard case let .activities(activities, _, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(activities.map { $0.title }, ["Set Label", "Verify Files", "Update Trackers"])
     }
 
-    func test_verify_whenFails_shouldEmitAlert() {
-        client.requests.reset()
-        client.errors.recheck = true
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
-        viewModel.verify(.mock(name: "Torrent"))
-        XCTAssertEqual(alert?.title, "Failed to Verify Files for \"Torrent\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
+    private func getActivities() -> [Activity] {
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
+        guard case let .activities(activities, _, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return []
+        }
+        return activities
     }
 
-    func test_updateTrackers_shouldPerformRequestAndRefresh() {
-        client.requests.reset()
-        viewModel.updateTrackers(for: .mock())
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, reannounce: 1))
-    }
+    // MARK: setLabelActivity
 
-    func test_updateTrackers_whenFails_shouldEmitAlert() {
-        client.errors.reannounce = true
-        client.requests.reset()
-
-        var errorAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            errorAlert = inner
-        }.store(in: &observers)
-        viewModel.updateTrackers(for: .mock(name: "Mock"))
-        XCTAssertEqual(errorAlert?.title, "Failed to Update Trackers for \"Mock\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(reannounce: 1))
-    }
-
-    // MARK: presentLabelSelection
-
-    func test_presentLabelSelection_shouldEmitSelectionAlert() {
+    func test_setLabelActivity_shouldEmitSelectionAlert() {
         client.labels = [.mock(), .mock(name: "test")]
         viewModel.handle(.refresh)
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-        viewModel.presentLabelSelection(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
-        XCTAssertEqual(alert?.title, "Set Label")
-        XCTAssertEqual(alert?.message, "Mock")
-        XCTAssertEqual(alert?.actions.map { $0.title }, ["None", "test", "Cancel"])
+        var event: TorrentListEvent?
+        viewModel.events.dropFirst().first().sink { event = $0 }.store(in: &observers)
+        getActivities().first { $0.title == "Set Label" }?.handler()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Set Label")
+        XCTAssertEqual(alert.message, "Mock")
+        XCTAssertEqual(alert.actions.map { $0.title }, ["None", "test", "Cancel"])
     }
 
     func test_presentLabelSelection_whenOptionSelected_shouldPerformRequestAndRefresh() {
         client.labels = [.mock(), .mock(name: "test")]
         viewModel.handle(.refresh)
         client.requests.reset()
-
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-        viewModel.presentLabelSelection(for: .mock(), from: .view(UIView(), rect: .zero))
-        alert?.actions.first { $0.title == "test" }?.handler?()
+        var event: TorrentListEvent?
+        viewModel.events.dropFirst().first().sink { event = $0 }.store(in: &observers)
+        getActivities().first { $0.title == "Set Label" }?.handler()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        alert.actions.first { $0.title == "test" }?.handler?()
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, setLabel: 1))
     }
 
@@ -263,41 +221,68 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
         client.requests.reset()
         client.errors.setLabel = true
 
-        var labelsAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            labelsAlert = inner
-        }.store(in: &observers)
-        viewModel.presentLabelSelection(for: .mock(name: "Mock"), from: .view(UIView(), rect: .zero))
-
-        var errorAlert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            errorAlert = inner
-        }.store(in: &observers)
-        labelsAlert?.actions.first { $0.title == "test" }?.handler?()
-        XCTAssertEqual(errorAlert?.title, "Failed to Set Label for \"Mock\"")
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
-    }
-
-    // MARK: presentActivities
-
-    func test_moreOptions_shouldEmitActivities() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
-        viewModel.presentActivities(for: .mock(name: "Mock"), source: .view(UIView(), rect: .zero), complete: { _ in })
-        guard case let .activities(activities, metadata, _) = event else {
+        viewModel.events.dropFirst().first().sink { event = $0 }.store(in: &observers)
+        getActivities().first { $0.title == "Set Label" }?.handler()
+        guard case let .alert(labelsAlert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-        XCTAssertEqual(activities.map { $0.activityTitle }, ["Set Label", "Verify Files", "Update Trackers"])
-        XCTAssertEqual(metadata.title, "Mock")
+
+        event = nil
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        labelsAlert.actions.first { $0.title == "test" }?.handler?()
+        guard case let .alert(errorAlert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+
+        XCTAssertEqual(errorAlert.title, "Failed to Set Label for \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(setLabel: 1))
+    }
+
+    // MARK: verifyFilesActivity
+
+    func test_verifyFilesActivity_shouldPerformRequestAndREfre() {
+        client.requests.reset()
+        getActivities().first { $0.title == "Verify Files" }?.handler()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, recheck: 1))
+    }
+
+    func test_verifyFilesActivity_whenFails_shouldEmitAlert() {
+        client.requests.reset()
+        client.errors.recheck = true
+        var event: TorrentListEvent?
+        viewModel.events.dropFirst().first().sink { event = $0 }.store(in: &observers)
+        getActivities().first { $0.title == "Verify Files" }?.handler()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Failed to Verify Files for \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(recheck: 1))
+    }
+
+    // MARK: updateTrackersActivity
+
+    func test_updateTrackersActivity_shouldPerformRequestAndRefresh() {
+        client.requests.reset()
+        getActivities().first { $0.title == "Update Trackers" }?.handler()
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(currentState: 1, reannounce: 1))
+    }
+
+    func test_updateTrackersActivity_whenFails_shouldEmitAlert() {
+        client.errors.reannounce = true
+        client.requests.reset()
+        var event: TorrentListEvent?
+        viewModel.events.dropFirst().first().sink { event = $0 }.store(in: &observers)
+        getActivities().first { $0.title == "Update Trackers" }?.handler()
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Failed to Update Trackers for \"Mock\"")
+        XCTAssertEqual(client.requests, MockDelugeClient.Requests(reannounce: 1))
     }
 
     // MARK: autoRefresh
@@ -328,16 +313,14 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
     // MARK: addLink
 
     func test_addLink_withInvalidInput_shouldEmitAlert() {
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.addLink("^")
-        XCTAssertEqual(alert?.message, "That link doesn't appear to be valid.")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.message, "That link doesn't appear to be valid.")
     }
 
     func test_addLink_withMagnetLink_shouldPerformAddMagnetURLRequest() {
@@ -356,16 +339,14 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func test_addLink_whenFails_shouldEmitAlert() {
         client.errors.addURL = true
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.addLink("https://example.com")
-        XCTAssertEqual(alert?.title, "Failed to Add Torrent")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Failed to Add Torrent")
     }
 
     // MARK: items
@@ -420,16 +401,14 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func test_refresh_whenFails_shouldShowError() {
         client.errors.currentState = true
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: TorrentListEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.refresh)
-        XCTAssertEqual(alert?.title, "Update Failed")
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Update Failed")
     }
 
     func test_refresh_isLoading_shouldEmitTrueThenFalse() {
@@ -453,31 +432,27 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func test_filterSelected_shouldEmitFilterEvent() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.filterSelected(source: .view(UIView(), rect: .zero)))
         guard case .filter = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
 
     func test_settingsSelected_shouldEmitSettingsEvent() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.settingsSelected)
         guard case .settings = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
 
     func test_selectItem_shouldEmitDetailEvent() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.itemSelected(index: 0))
         guard case .detail = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

@@ -39,44 +39,38 @@ class EmptyTorrentListViewModelTests: XCTestCase {
 
     func test_filterSelected_shouldNotEmit() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.filterSelected(source: .view(UIView(), rect: .zero)))
         XCTAssertNil(event)
     }
 
     func test_search_shouldNotEmit() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.search(query: "test"))
         XCTAssertNil(event)
     }
 
     func test_settingsSelected_shouldEmitSettingsEvent() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.settingsSelected)
         guard case .settings = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
 
     func test_addSelected_shouldNotEmitEvents() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.addSelected(source: .view(UIView(), rect: .zero)))
         XCTAssertNil(event)
     }
 
     func test_itemSelected_shouldNotEmitEvents() {
         var event: TorrentListEvent?
-        viewModel.events.sink {
-            event = $0
-        }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.itemSelected(index: 0))
         XCTAssertNil(event)
     }

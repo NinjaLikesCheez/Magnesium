@@ -9,9 +9,7 @@
 import Combine
 import CoreServices
 import Foundation
-import LinkPresentation
 import Preferences
-import UIKit
 import ViewModel
 
 protocol StandardTorrentDetailViewModelImplementation {
@@ -203,8 +201,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    // internal for testing
-    func verify() {
+    private func verify() {
         implementation.verify(torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -220,7 +217,6 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    // internal for testing
     private func setLabel(_ label: Label) {
         implementation.setLabel(label, for: torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
@@ -237,8 +233,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    // internal for testing
-    func updateTrackers() {
+    private func updateTrackers() {
         implementation.updateTrackers(for: torrent.value)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -269,8 +264,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         eventSubject.send(.alert(alert, source: source))
     }
 
-    // internal for testing
-    func presentLabelSelection(from source: PopoverSource) {
+    private func presentLabelSelection(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
@@ -347,23 +341,23 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func handleMoreOptions(from source: PopoverSource) {
-        var activities = [UIActivity]()
+        var activities = [Activity]()
 
         if !labels.value.isEmpty {
-            activities.append(SetLabelActivity {
+            activities.append(.setLabel {
                 self.presentLabelSelection(from: source)
             })
         }
 
-        activities.append(VerifyFilesActivity {
+        activities.append(.verifyFiles {
             self.verify()
         })
 
-        activities.append(UpdateTrackersActivity {
+        activities.append(.updateTrackers {
             self.updateTrackers()
         })
 
-        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent.value), source: source))
+        eventSubject.send(.activities(activities, torrent: torrent.value, source: source))
     }
 
     // MARK: Auto Refresh

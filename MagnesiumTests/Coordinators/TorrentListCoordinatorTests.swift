@@ -75,7 +75,11 @@ class TorrentListCoordinatorTests: XCTestCase {
     }
 
     func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
-        viewModel.eventSubject.send(.activities([], metadata: LPLinkMetadata(), source: .view(UIView(), rect: .zero)))
+        viewModel.eventSubject.send(.activities(
+            [],
+            torrent: DelugeTorrent.mock(),
+            source: .view(UIView(), rect: .zero)
+        ))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
         guard type(of: presentedViewController!) === UIActivityViewController.self else {
             XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
@@ -112,7 +116,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_viewModel_detailEvent_shouldEmitShowDetailEvent() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         let detailViewModel = AnyEmitterViewModel(MockDetailViewModel())
         viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
         guard case let .showDetail(viewModel) = event else {
@@ -124,7 +128,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_viewModel_settingsEvent_shouldEmitShowSettingsEvent() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.eventSubject.send(.settings)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -161,7 +165,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         XCTAssertNotNil(coordinator.previewForItem(at: 0))
         let childCoordinator = coordinator.childCoordinators.values.first?.base
             as! TorrentDetailCoordinator<AnyTorrentDetailViewModel> // swiftlint:disable:this force_cast

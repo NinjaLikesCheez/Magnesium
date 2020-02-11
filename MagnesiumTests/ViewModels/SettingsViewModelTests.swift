@@ -41,7 +41,7 @@ class SettingsViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.doneSelected)
         guard case .complete = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
@@ -52,18 +52,15 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
-
+        var event: SettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
         let expected = ["Server 1", "Server 2", "Cancel"]
-        XCTAssertEqual(alert?.actions.map { $0.title ?? "" }, expected)
+        XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
     }
 
     func test_changeServerSelected_whenServerSelected_shouldUpdateSession() {
@@ -73,19 +70,15 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
-        var alert: Alert?
-        viewModel.events.first().sink {
-            guard case let .alert(inner, source: _) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            alert = inner
-        }.store(in: &observers)
+        var event: SettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        let changeServer = alert!.actions[1].handler!
-
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
         let previousID = session.server!.id
-        changeServer()
+        alert.actions.first { $0.title == "Server 2" }?.handler?()
         XCTAssertNotEqual(session.server!.id, previousID)
     }
 
@@ -95,15 +88,13 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        var server: Server!
-        viewModel.events.first().sink {
-            guard case let .edit(server: inner) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            server = inner
-        }.store(in: &observers)
+        var event: SettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.serverSelected(index: 1))
+        guard case let .edit(server) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
         XCTAssertEqual(server.id, server2.id)
     }
 
@@ -114,7 +105,7 @@ class SettingsViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.addServerSelected)
         guard case .addServer = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
@@ -126,7 +117,7 @@ class SettingsViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.refreshIntervalSelected)
         guard case .refreshInterval = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
@@ -138,7 +129,7 @@ class SettingsViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.advancedSettingsSelected)
         guard case .advancedSettings = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }

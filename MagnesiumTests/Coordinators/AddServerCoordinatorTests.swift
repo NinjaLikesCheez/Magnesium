@@ -47,7 +47,7 @@ class AddServerCoordinatorTests: XCTestCase {
 
     func test_serverSettingsCoordinator_completeEvent_shouldEmitCompleteEvent() {
         var event: AddServerCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         coordinator.handle(ServerSettingsCoordinatorEvent.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

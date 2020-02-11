@@ -82,7 +82,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.doneSelected)
         guard case .complete = event else {
-            XCTFail("Unexpected event")
+            XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }

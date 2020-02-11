@@ -39,7 +39,7 @@ class FilterCoordinatorCoordinator: XCTestCase {
 
     func test_filterEvent_complete_shouldEmitCompleteEvent() {
         var event: FilterCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         coordinator.handle(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

@@ -19,28 +19,24 @@ class AddServerViewModelTests: XCTestCase {
     }
 
     func test_select_withDeluge_shouldEmitDelugeSelectType() {
-        var type: ServerType!
-        viewModel.events.first().sink {
-            guard case let .add(inner) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            type = inner
-        }.store(in: &observers)
+        var event: AddServerEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.selectType(index: 0))
+        guard case let .add(type) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
         XCTAssertEqual(type, ServerType.deluge)
     }
 
     func test_select_withTransmission_shouldEmitTransmissionSelectType() {
-        var type: ServerType!
-        viewModel.events.first().sink {
-            guard case let .add(inner) = $0 else {
-                XCTFail("Unexpected event")
-                return
-            }
-            type = inner
-        }.store(in: &observers)
+        var event: AddServerEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.selectType(index: 1))
+        guard case let .add(type) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
         XCTAssertEqual(type, ServerType.transmission)
     }
 }

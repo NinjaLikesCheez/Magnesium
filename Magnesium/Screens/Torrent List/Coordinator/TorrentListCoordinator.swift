@@ -52,8 +52,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         switch event {
         case let .alert(alert, source):
             showAlert(alert, from: source)
-        case let .activities(activities, metadata, source):
-            showActivities(activities, metadata: metadata, source: source)
+        case let .activities(activities, torrent, source):
+            showActivities(activities, torrent: torrent, source: source)
         case let .add(source, linkSubject):
             showAdd(from: source, linkSubject: linkSubject)
         case let .filter(source, labels):
@@ -65,10 +65,10 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         }
     }
 
-    private func showActivities(_ activities: [UIActivity], metadata: LPLinkMetadata, source: PopoverSource) {
+    private func showActivities(_ activities: [Activity], torrent: StandardTorrent, source: PopoverSource) {
         let activityController = UIActivityViewController(
-            activityItems: [MetadataItem(metadata: metadata)],
-            applicationActivities: activities
+            activityItems: [ActivityMetadataItem(metadata: LPLinkMetadata(torrent: torrent))],
+            applicationActivities: activities.map { $0.createUIActivity() }
         )
         activityController.configure(popoverSource: source)
         viewController.present(activityController, animated: true)

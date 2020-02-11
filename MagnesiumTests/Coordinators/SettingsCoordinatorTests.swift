@@ -42,7 +42,7 @@ class SettingsCoordinatorTests: XCTestCase {
 
     func test_settingsEvent_complete_shouldEmitCompleteEvent() {
         var event: SettingsCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
         coordinator.handle(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

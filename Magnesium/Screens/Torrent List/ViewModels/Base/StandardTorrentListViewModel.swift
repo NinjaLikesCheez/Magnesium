@@ -190,8 +190,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .store(in: &observers)
     }
 
-    // internal for testing
-    func verify(_ torrent: Torrent) {
+    private func verify(_ torrent: Torrent) {
         implementation.verify(torrent)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -229,8 +228,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .store(in: &observers)
     }
 
-    // internal for testing
-    func updateTrackers(for torrent: Torrent) {
+    private func updateTrackers(for torrent: Torrent) {
         implementation.updateTrackers(for: torrent)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
@@ -262,8 +260,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         eventSubject.send(.alert(alert, source: source))
     }
 
-    // internal for testing
-    func presentLabelSelection(for torrent: Torrent, from source: PopoverSource) {
+    private func presentLabelSelection(for torrent: Torrent, from source: PopoverSource) {
         var alert = Alert(title: "Set Label", message: torrent.name, style: .actionSheet)
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
@@ -276,23 +273,23 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     // internal for testing
     func presentActivities(for torrent: Torrent, source: PopoverSource, complete: (Bool) -> Void) {
-        var activities = [UIActivity]()
+        var activities = [Activity]()
 
         if !labels.value.isEmpty {
-            activities.append(SetLabelActivity {
+            activities.append(.setLabel {
                 self.presentLabelSelection(for: torrent, from: source)
             })
         }
 
-        activities.append(VerifyFilesActivity {
+        activities.append(.verifyFiles {
             self.verify(torrent)
         })
 
-        activities.append(UpdateTrackersActivity {
+        activities.append(.updateTrackers {
             self.updateTrackers(for: torrent)
         })
 
-        eventSubject.send(.activities(activities, metadata: LPLinkMetadata(torrent: torrent), source: source))
+        eventSubject.send(.activities(activities, torrent: torrent, source: source))
     }
 
     private func showError(title: String, message: String?) {

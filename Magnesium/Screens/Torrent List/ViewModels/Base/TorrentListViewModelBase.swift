@@ -76,7 +76,7 @@ protocol TorrentListProvider: AnyObject {
 
 enum TorrentListEvent {
     case alert(Alert, source: PopoverSource?)
-    case activities([UIActivity], metadata: LPLinkMetadata, source: PopoverSource)
+    case activities([Activity], torrent: StandardTorrent, source: PopoverSource)
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
     case filter(source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>)
     case detail(viewModel: AnyTorrentDetailViewModel)
