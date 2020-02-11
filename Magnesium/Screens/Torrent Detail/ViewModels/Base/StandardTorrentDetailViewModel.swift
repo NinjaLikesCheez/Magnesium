@@ -7,7 +7,6 @@
 //
 
 import Combine
-import CoreServices
 import Foundation
 import Preferences
 import ViewModel
