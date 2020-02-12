@@ -11,7 +11,6 @@ struct SettingsSection: Equatable {
         case changeServer
         case servers
         case general
-        case advancedSettings
     }
 
     let type: SectionType

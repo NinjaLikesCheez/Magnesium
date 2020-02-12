@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Foundation
 import Preferences
 import ViewModel
 
@@ -16,7 +17,6 @@ enum SettingsEvent {
     case edit(server: Server)
     case addServer
     case refreshInterval
-    case advancedSettings
 }
 
 enum SettingsViewEvent {
@@ -25,7 +25,6 @@ enum SettingsViewEvent {
     case serverSelected(index: Int)
     case addServerSelected
     case refreshIntervalSelected
-    case advancedSettingsSelected
 }
 
 struct SettingsViewState {
@@ -73,8 +72,6 @@ final class SettingsViewModel: ViewModel, EventEmitter {
             eventSubject.send(.addServer)
         case .refreshIntervalSelected:
             eventSubject.send(.refreshInterval)
-        case .advancedSettingsSelected:
-            eventSubject.send(.advancedSettings)
         }
     }
 
@@ -86,7 +83,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
                 self.session.setServer(server)
             })
         }
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -102,10 +99,16 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
 
         let refreshInterval = preferences.value(for: PreferenceKeys.autoRefreshInterval)
-        let refreshDisplay = refreshInterval <= 0 ? "Never" : String(format: "%.0f seconds", refreshInterval)
-        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: refreshDisplay)]))
+        let refreshString: String
+        if refreshInterval <= 0 {
+            refreshString = NSLocalizedString("refresh_interval_never", comment: "Never")
+        } else {
+            let format = NSLocalizedString("refresh_interval_seconds", comment: "{number} seconds")
+            let seconds = String(format: "%.0f seconds", refreshInterval)
+            refreshString = String.localizedStringWithFormat(format, seconds)
+        }
+        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: refreshString)]))
 
-        sections.append(SettingsSection(type: .advancedSettings, items: [.advancedSettings]))
         sectionsSubject.send(sections)
     }
 }

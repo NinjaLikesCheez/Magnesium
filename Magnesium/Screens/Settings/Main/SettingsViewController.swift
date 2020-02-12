@@ -18,11 +18,9 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             case .changeServer:
                 return nil
             case .servers:
-                return "Servers"
+                return NSLocalizedString("settings_section_servers", comment: "Servers")
             case .general:
-                return "General"
-            case .advancedSettings:
-                return "Advanced"
+                return NSLocalizedString("settings_section_general", comment: "General")
             }
         }
     }
@@ -34,11 +32,10 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = "Settings"
+        title = NSLocalizedString("settings_screen_title", comment: "Settings")
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "Done",
-            style: .done,
+            barButtonSystemItem: .done,
             target: self,
             action: #selector(doneButtonTapped(_:))
         )
@@ -57,7 +54,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 if cell == nil {
                     cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = "Current Server"
+                cell.textLabel?.text = NSLocalizedString("settings_option_current_server", comment: "Current Server")
                 cell.detailTextLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -68,7 +65,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 return cell
             case .addServer:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-                cell.textLabel?.text = "Add Server"
+                cell.textLabel?.text = NSLocalizedString("settings_option_add_server", comment: "Add Server")
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case let .refreshInterval(current: current):
@@ -76,13 +73,11 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 if cell == nil {
                     cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = "Refresh Interval"
+                cell.textLabel?.text = NSLocalizedString(
+                    "settings_option_refresh_interval",
+                    comment: "Refresh Interval"
+                )
                 cell.detailTextLabel?.text = current
-                cell.accessoryType = .disclosureIndicator
-                return cell
-            case .advancedSettings:
-                let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-                cell.textLabel?.text = "Advanced Settings"
                 cell.accessoryType = .disclosureIndicator
                 return cell
             }
@@ -129,8 +124,6 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             viewModel.handle(.addServerSelected)
         case .refreshInterval:
             viewModel.handle(.refreshIntervalSelected)
-        case .advancedSettings:
-            viewModel.handle(.advancedSettingsSelected)
         case .none:
             break
         }

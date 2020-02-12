@@ -70,7 +70,8 @@ extension StandardTorrent {
         if standardState == .downloading {
             return etaString
         } else {
-            return "Ratio: \(ratioString())"
+            let format = NSLocalizedString("torrent_ratio", comment: "Ratio: {number}")
+            return .localizedStringWithFormat(format, ratioString())
         }
     }
 }

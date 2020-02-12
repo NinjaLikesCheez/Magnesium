@@ -42,9 +42,9 @@ enum ServerType: String, Codable {
     var displayString: String {
         switch self {
         case .deluge:
-            return "Deluge"
+            return NSLocalizedString("server_deluge", comment: "Deluge")
         case .transmission:
-            return "Transmission"
+            return NSLocalizedString("server_transmission", comment: "Transmission")
         }
     }
 }

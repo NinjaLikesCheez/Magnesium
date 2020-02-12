@@ -110,19 +110,46 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         ]))
         let ui = subject.ui()
         sections.append(TorrentDetailSection(type: .info, items: [
-            .info("Size", ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher()),
-            .info("Download Speed", ui
-                .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
-                .eraseToAnyPublisher()),
-            .info("Upload Speed", ui
-                .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
-                .eraseToAnyPublisher()),
-            .info("Downloaded", ui.map { ByteFormatter.string(fromByteCount: $0.downloaded) }.eraseToAnyPublisher()),
-            .info("Uploaded", ui.map { ByteFormatter.string(fromByteCount: $0.uploaded) }.eraseToAnyPublisher()),
-            .info("ETA", ui.map(\.etaString).eraseToAnyPublisher()),
-            .info("Ratio", ui.map { $0.ratioString(precision: 3) }.eraseToAnyPublisher()),
-            .info("Peers", ui.map { "\($0.peers) (\($0.totalPeers))" }.eraseToAnyPublisher()),
-            .info("Seeds", ui.map { "\($0.seeds) (\($0.totalSeeds))" }.eraseToAnyPublisher()),
+            .info(
+                NSLocalizedString("torrent_info_size", comment: "Size"),
+                ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_download_speed", comment: "Download Speed"),
+                ui
+                    .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
+                    .eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_upload_speed", comment: "Upload Speed"),
+                ui
+                    .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
+                    .eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_downloaded_size", comment: "Downloaded"),
+                ui.map { ByteFormatter.string(fromByteCount: $0.downloaded) }.eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_uploaded_size", comment: "Uploaded"),
+                ui.map { ByteFormatter.string(fromByteCount: $0.uploaded) }.eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_eta", comment: "ETA"),
+                ui.map(\.etaString).eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_ratio", comment: "Ratio"),
+                ui.map { $0.ratioString(precision: 3) }.eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_peers", comment: "Peers"),
+                ui.map { "\($0.peers) (\($0.totalPeers))" }.eraseToAnyPublisher()
+            ),
+            .info(
+                NSLocalizedString("torrent_info_seeds", comment: "Seeds"),
+                ui.map { "\($0.seeds) (\($0.totalSeeds))" }.eraseToAnyPublisher()
+            ),
         ]))
 
         if !torrent.trackerStrings.isEmpty {
@@ -144,7 +171,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             message: message,
             style: .alert
         )
-        alert.addAction(AlertAction(title: "OK", style: .default))
+        alert.addAction(.ok())
         eventSubject.send(.alert(alert, source: nil))
     }
 
@@ -159,8 +186,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Pause", message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(
+                    title: NSLocalizedString("error_pause", comment: "Failed to Pause"),
+                    message: error.localizedDescription
+                )
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -175,8 +205,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Resume", message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(
+                    title: NSLocalizedString("error_resume", comment: "Failed to Resume"),
+                    message: error.localizedDescription
+                )
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -194,9 +227,12 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 case .finished:
                     self?.eventSubject.send(.complete)
                 case let .failure(error):
-                    self?.showError(title: "Failed to Remove", message: error.localizedDescription)
+                    self?.showError(
+                        title: NSLocalizedString("error_remove", comment: "Failed to Remove"),
+                        message: error.localizedDescription
+                    )
                 }
-                }, receiveValue: { _ in })
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -211,8 +247,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Verify Files", message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(
+                    title: NSLocalizedString("error_verify_files", comment: "Failed to Verify Files"),
+                    message: error.localizedDescription
+                )
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -227,8 +266,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Set Label", message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(
+                    title: NSLocalizedString("error_set_label", comment: "Failed to Set Label"),
+                    message: error.localizedDescription
+                )
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -244,22 +286,30 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(
-                    title: "Failed to Update Trackers",
+                    title: NSLocalizedString("error_update_trackers", comment: "Failed to Update Trackers"),
                     message: error.localizedDescription
                 )
-                }, receiveValue: { _ in })
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     private func presentRemove(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
-        alert.addAction(AlertAction(title: "Keep Data", style: .default) {
-            self.remove(removeData: false)
-        })
-        alert.addAction(AlertAction(title: "Remove Data", style: .destructive) {
-            self.remove(removeData: true)
-        })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("remove_torrent_option_keep_data", comment: "Keep Data"),
+            style: .default,
+            handler: {
+                self.remove(removeData: false)
+            }
+        ))
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data"),
+            style: .destructive,
+            handler: {
+                self.remove(removeData: true)
+            }
+        ))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -270,7 +320,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 self.setLabel(label)
             })
         }
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -324,7 +374,10 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .handleEvents(receiveCompletion: { [weak self] completion in
                 self?.isLoadingSubject.send(false)
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Update Failed", message: error.localizedDescription)
+                self?.showError(
+                    title: NSLocalizedString("error_refresh", comment: "Update Failed"),
+                    message: error.localizedDescription
+                )
             })
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)

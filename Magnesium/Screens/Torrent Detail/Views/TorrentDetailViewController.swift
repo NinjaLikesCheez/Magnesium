@@ -25,7 +25,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
 
-        title = "Info"
+        title = NSLocalizedString("torrent_detail_screen_title", comment: "Info")
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItems = [
             UIBarButtonItem(
@@ -183,11 +183,11 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         case .header:
             return nil
         case .info:
-            return "Information"
+            return NSLocalizedString("torrent_detail_section_info", comment: "Information")
         case .trackers:
-            return "Trackers"
+            return NSLocalizedString("torrent_detail_section_trackers", comment: "Trackers")
         case .files:
-            return "Files"
+            return NSLocalizedString("torrent_detail_section_files", comment: "Files")
         }
     }
 

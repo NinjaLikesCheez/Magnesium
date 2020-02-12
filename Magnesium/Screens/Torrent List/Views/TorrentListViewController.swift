@@ -62,7 +62,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
-        title = "Torrents"
+        title = NSLocalizedString("torrents_screen_title", comment: "Torrents")
         configureNavigationItem()
     }
 

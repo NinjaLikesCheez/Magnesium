@@ -112,7 +112,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
                 fontWeight: .semibold,
                 alignment: .center
             )
-            cell.configure(text: "Delete", configuration: configuration)
+            cell.configure(text: NSLocalizedString("action_delete", comment: "Delete"), configuration: configuration)
             return cell
         case .none:
             return UITableViewCell()

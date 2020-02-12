@@ -17,7 +17,7 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = "Add Server"
+        title = NSLocalizedString("add_server_screen_title", comment: "Add Server")
     }
 
     required init?(coder: NSCoder) {

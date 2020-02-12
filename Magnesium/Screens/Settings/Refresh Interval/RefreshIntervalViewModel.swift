@@ -28,13 +28,16 @@ final class RefreshIntervalViewModel: ViewModel {
     private let preferences: Preferences
     let state: RefreshIntervalViewState
 
-    private let options: [(Int, String)] = [
-        (0, "Never"),
-        (2, "2 seconds"),
-        (5, "5 seconds"),
-        (10, "10 seconds"),
-        (30, "30 seconds"),
-    ]
+    private let options: [(Int, String)] = {
+        let format = NSLocalizedString("refresh_interval_seconds", comment: "{number} seconds")
+        return [
+            (0, NSLocalizedString("refresh_interval_never", comment: "Never")),
+            (2, String.localizedStringWithFormat(format, "2")),
+            (5, String.localizedStringWithFormat(format, "5")),
+            (10, String.localizedStringWithFormat(format, "10")),
+            (30, String.localizedStringWithFormat(format, "30")),
+        ]
+    }()
 
     init(preferences: Preferences) {
         self.preferences = preferences

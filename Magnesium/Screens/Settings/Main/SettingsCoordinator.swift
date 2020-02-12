@@ -54,10 +54,6 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
             let viewModel = RefreshIntervalViewModel(preferences: preferences)
             let viewController = RefreshIntervalViewController(viewModel: viewModel)
             return navigationController.pushViewController(viewController, animated: true)
-        case .advancedSettings:
-            let viewModel = AdvancedSettingsViewModel(preferences: preferences)
-            let viewController = UIHostingController(rootView: AdvancedSettingsView(viewModel: viewModel))
-            navigationController.pushViewController(viewController, animated: true)
         }
     }
 

@@ -21,17 +21,17 @@ extension TorrentState {
     var displayString: String {
         switch self {
         case .downloading:
-            return "Downloading"
+            return NSLocalizedString("torrent_state_downloading", comment: "Downloading")
         case .seeding:
-            return "Seeding"
+            return NSLocalizedString("torrent_state_seeding", comment: "Seeding")
         case .paused:
-            return "Paused"
+            return NSLocalizedString("torrent_state_paused", comment: "Paused")
         case .queued:
-            return "Queued"
+            return NSLocalizedString("torrent_state_queued", comment: "Queued")
         case .checking:
-            return "Checking"
+            return NSLocalizedString("torrent_state_checking", comment: "Checking")
         case .error:
-            return "Error"
+            return NSLocalizedString("torrent_state_error", comment: "Error")
         }
     }
 

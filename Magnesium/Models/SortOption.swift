@@ -6,6 +6,8 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
+import Foundation
+
 struct SortOption: Codable, Equatable {
     var property: Property
     var direction: Direction
@@ -58,13 +60,13 @@ extension SortOption {
         var displayString: String {
             switch self {
             case .dateAdded:
-                return "Date Added"
+                return NSLocalizedString("sort_property_date_added", comment: "Date Added")
             case .name:
-                return "Name"
+                return NSLocalizedString("sort_property_name", comment: "Name")
             case .downloadSpeed:
-                return "Download Speed"
+                return NSLocalizedString("sort_property_download_speed", comment: "Download Speed")
             case .uploadSpeed:
-                return "Upload Speed"
+                return NSLocalizedString("sort_property_upload_speed", comment: "Upload Speed")
             }
         }
     }

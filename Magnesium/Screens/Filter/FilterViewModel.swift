@@ -7,6 +7,7 @@
 //
 
 import Combine
+import Foundation
 import Preferences
 import ViewModel
 
@@ -70,8 +71,11 @@ final class FilterViewModel: ViewModel, EventEmitter {
     private func handleSortSelected(from source: PopoverSource) {
         let currentSort = preferences.value(for: PreferenceKeys.sortOption)
         var alert = Alert(
-            title: "Sort by",
-            message: "Select the current sort option to sort in the opposite direction.",
+            title: NSLocalizedString("sort_by_alert_title", comment: "Sort by"),
+            message: NSLocalizedString(
+                "sort_by_alert_message",
+                comment: "Select the current sort option to sort in the opposite direction."
+            ),
             style: .actionSheet
         )
 
@@ -86,48 +90,61 @@ final class FilterViewModel: ViewModel, EventEmitter {
             })
         }
 
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
         var alert = Alert(
-            title: "Filter by Label",
-            message: "Only display torrents with the selected label.",
+            title: NSLocalizedString("filter_label_alert_title", comment: "Filter by Label"),
+            message: NSLocalizedString(
+                "filter_label_alert_message",
+                comment: "Only display torrents with the selected label."
+            ),
             style: .actionSheet
         )
         let labels: [StandardLabel?] = [nil] + self.labels.value
 
         for label in labels {
-            let displayName = label.map { $0.displayName } ?? "All"
-            alert.addAction(AlertAction(title: displayName, style: .default) {
-                filterOptions.label = label?.name
-                self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
-            })
+            alert.addAction(AlertAction(
+                title: label.map { $0.displayName } ?? NSLocalizedString("filter_all", comment: "All"),
+                style: .default,
+                handler: {
+                    filterOptions.label = label?.name
+                    self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+                }
+            ))
         }
 
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
     private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
         var alert = Alert(
-            title: "Filter by State",
-            message: "Only display torrents with the selected state.",
+            title: NSLocalizedString("filter_state_alert_title", comment: "Filter by State"),
+            message: NSLocalizedString(
+                "filter_state_alert_message",
+                comment: "Only display torrents with the selected state."
+            ),
             style: .actionSheet
         )
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
         for state in states {
-            alert.addAction(AlertAction(title: state?.displayString ?? "All", style: .default) {
-                filterOptions.state = state
-                self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
-            })
+            alert.addAction(AlertAction(
+                title: state?.displayString ?? NSLocalizedString("filter_all", comment: "All"),
+                style: .default,
+                handler: {
+                    filterOptions.state = state
+                    self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+                }
+            ))
         }
 
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -141,11 +158,14 @@ final class FilterViewModel: ViewModel, EventEmitter {
         ]))
 
         var filtersSection = FilterSection(type: .filters, items: [
-            .state(filterOptions.state?.displayString ?? "All"),
+            .state(filterOptions.state?.displayString ?? NSLocalizedString("filter_all", comment: "All")),
         ])
 
         if !labels.value.isEmpty {
-            filtersSection.items.append(.label(filterOptions.label.map { $0.isEmpty ? "None" : $0 } ?? "All"))
+            let labelName = filterOptions.label.map {
+                $0.isEmpty ? NSLocalizedString("label_none", comment: "None") : $0
+            }
+            filtersSection.items.append(.label(labelName ?? NSLocalizedString("filter_all", comment: "All")))
         }
 
         sections.append(filtersSection)

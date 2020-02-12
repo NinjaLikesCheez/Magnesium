@@ -150,7 +150,14 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Pause \"\(torrent.name)\"", message: error.localizedDescription)
+                let format = NSLocalizedString(
+                    "error_pause_torrent",
+                    comment: "Failed to Pause \"{torrentName}\""
+                )
+                self?.showError(
+                    title: .localizedStringWithFormat(format, torrent.name),
+                    message: error.localizedDescription
+                )
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -167,7 +174,14 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Resume \"\(torrent.name)\"", message: error.localizedDescription)
+                let format = NSLocalizedString(
+                    "error_resume_torrent",
+                    comment: "Failed to Resume \"{torrentName}\""
+                )
+                self?.showError(
+                    title: .localizedStringWithFormat(format, torrent.name),
+                    message: error.localizedDescription
+                )
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -184,7 +198,14 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Failed to Remove \"\(torrent.name)\"", message: error.localizedDescription)
+                let format = NSLocalizedString(
+                    "error_remove_torrent",
+                    comment: "Failed to Remove \"{torrentName}\""
+                )
+                self?.showError(
+                    title: .localizedStringWithFormat(format, torrent.name),
+                    message: error.localizedDescription
+                )
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -200,8 +221,12 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
+                let format = NSLocalizedString(
+                    "error_verify_files_torrent",
+                    comment: "Failed to Verify Files for \"{torrentName}\""
+                )
                 self?.showError(
-                    title: "Failed to Verify Files for \"\(torrent.name)\"",
+                    title: .localizedStringWithFormat(format, torrent.name),
                     message: error.localizedDescription
                 )
             }, receiveValue: { _ in })
@@ -219,11 +244,15 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
+                let format = NSLocalizedString(
+                    "error_set_label_torrent",
+                    comment: "Failed to Set Label for \"{torrentName}\""
+                )
                 self?.showError(
-                    title: "Failed to Set Label for \"\(torrent.name)\"",
+                    title: .localizedStringWithFormat(format, torrent.name),
                     message: error.localizedDescription
                 )
-                }, receiveValue: { _ in })
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -238,35 +267,55 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
+                let format = NSLocalizedString(
+                    "error_update_trackers_torrent",
+                    comment: "Failed to Update Trackers for \"{torrentName}\""
+                )
                 self?.showError(
-                    title: "Failed to Update Trackers for \"\(torrent.name)\"",
+                    title: .localizedStringWithFormat(format, torrent.name),
                     message: error.localizedDescription
                 )
-                }, receiveValue: { _ in })
+            }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
     // internal for testing
     func presentRemoveOptions(for torrent: Torrent, from source: PopoverSource) {
-        var alert = Alert(title: "Remove", message: torrent.name, style: .actionSheet)
-        alert.addAction(AlertAction(title: "Keep Data", style: .default) {
-            self.remove(torrent, removeData: false)
-        })
-        alert.addAction(AlertAction(title: "Remove Data", style: .destructive) {
-            self.remove(torrent, removeData: true)
-        })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        var alert = Alert(
+            title: NSLocalizedString("remove_torrent_alert_title", comment: "Remove"),
+            message: torrent.name,
+            style: .actionSheet
+        )
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("remove_torrent_option_keep_data", comment: "Keep Data"),
+            style: .default,
+            handler: {
+                self.remove(torrent, removeData: false)
+            }
+        ))
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data"),
+            style: .destructive,
+            handler: {
+                self.remove(torrent, removeData: true)
+            }
+        ))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
     private func presentLabelSelection(for torrent: Torrent, from source: PopoverSource) {
-        var alert = Alert(title: "Set Label", message: torrent.name, style: .actionSheet)
+        var alert = Alert(
+            title: NSLocalizedString("action_set_label", comment: "Set Label"),
+            message: torrent.name,
+            style: .actionSheet
+        )
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(for: torrent, label: label)
             })
         }
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -297,7 +346,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             message: message,
             style: .alert
         )
-        alert.addAction(AlertAction(title: "OK", style: .default))
+        alert.addAction(.ok())
         eventSubject.send(.alert(alert, source: nil))
     }
 
@@ -325,7 +374,10 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: "Update Failed", message: error.localizedDescription)
+                self?.showError(
+                    title: NSLocalizedString("error_refresh", comment: "Update Failed"),
+                    message: error.localizedDescription
+                )
             })
             .eraseToAnyPublisher()
     }
@@ -352,18 +404,26 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         var actions = [UIMenuElement]()
 
         if torrent.isActive {
-            actions.append(UIAction(title: "Pause", image: UIImage(systemName: "pause")) { [weak self] _ in
-                self?.pause(torrent)
-            })
+            actions.append(UIAction(
+                title: NSLocalizedString("action_pause", comment: "Pause"),
+                image: UIImage(systemName: "pause"),
+                handler: { [weak self] _ in
+                    self?.pause(torrent)
+                }
+            ))
         } else {
-            actions.append(UIAction(title: "Resume", image: UIImage(systemName: "play")) { [weak self] _ in
-                self?.resume(torrent)
-            })
+            actions.append(UIAction(
+                title: NSLocalizedString("action_resume", comment: "Resume"),
+                image: UIImage(systemName: "play"),
+                handler: { [weak self] _ in
+                    self?.resume(torrent)
+                }
+            ))
         }
 
         if !labels.value.isEmpty {
             actions.append(UIMenu(
-                title: "Set Label",
+                title: NSLocalizedString("action_set_label", comment: "Set Label"),
                 image: UIImage(systemName: "tag"),
                 children: labels.value.map { label in
                     UIAction(title: label.displayName) { [weak self] _ in
@@ -374,7 +434,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         }
 
         actions.append(UIAction(
-            title: "Verify Files",
+            title: NSLocalizedString("action_verify_files", comment: "Verify Files"),
             image: UIImage(systemName: "tray.full"),
             handler: { [weak self] _ in
                 self?.verify(torrent)
@@ -382,7 +442,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         ))
 
         actions.append(UIAction(
-            title: "Update Trackers",
+            title: NSLocalizedString("action_update_trackers", comment: "Update Trackers"),
             image: UIImage(systemName: "arrow.clockwise"),
             handler: { [weak self] _ in
                 self?.updateTrackers(for: torrent)
@@ -390,15 +450,19 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         ))
 
         actions.append(UIMenu(
-            title: "Remove",
+            title: NSLocalizedString("remove_torrent_alert_title", comment: "Remove"),
             image: UIImage(systemName: "trash"),
             options: .destructive,
             children: [
-                UIAction(title: "Keep Data", image: UIImage(systemName: "trash")) { [weak self] _ in
-                    self?.remove(torrent, removeData: false)
-                },
                 UIAction(
-                    title: "Remove Data",
+                    title: NSLocalizedString("remove_torrent_option_keep_data", comment: "Keep Data"),
+                    image: UIImage(systemName: "trash"),
+                    handler: { [weak self] _ in
+                        self?.remove(torrent, removeData: false)
+                    }
+                ),
+                UIAction(
+                    title: NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data"),
                     image: UIImage(systemName: "trash"),
                     attributes: .destructive,
                     handler: { [weak self] _ in

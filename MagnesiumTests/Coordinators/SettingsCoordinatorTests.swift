@@ -107,19 +107,6 @@ class SettingsCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_settingsEvent_advancedSettings_shouldPushAdvancedSettingsViewController() {
-        coordinator.handle(.advancedSettings)
-        RunLoop.main.run(until: Date())
-        // swiftlint:disable:next force_cast
-        let navigationController = coordinator.presentable.viewController as! UINavigationController
-        let viewController = navigationController.viewControllers[1]
-        let expectedType = UIHostingController<AdvancedSettingsView<AdvancedSettingsViewModel>>.self
-        guard type(of: viewController) === expectedType else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
-    }
-
     // MARK: - ServerSettingsCoordinatorEvent
 
     func test_serverSettingsCoordinator_completeEvent_shouldPopViewController() {

@@ -75,33 +75,55 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
-        var alert = Alert(title: "Add Torrent", message: "How would you like to add the torrent?", style: .actionSheet)
-        alert.addAction(AlertAction(title: "Add Link", style: .default) {
-            self.showAddLink(subject: linkSubject)
-        })
-        alert.addAction(AlertAction(title: "Add File", style: .default) {
-            self.showAddFile()
-        })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        var alert = Alert(
+            title: NSLocalizedString("add_torrent_alert_title", comment: "Add Torrent"),
+            message: NSLocalizedString("add_torrent_alert_prompt", comment: "How would you like to add the torrent?"),
+            style: .actionSheet
+        )
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("add_torrent_method_link", comment: "Add Link"),
+            style: .default,
+            handler: {
+                self.showAddLink(subject: linkSubject)
+            }
+        ))
+        alert.addAction(AlertAction(
+            title: NSLocalizedString("add_torrent_method_file", comment: "Add File"),
+            style: .default,
+            handler: {
+                self.showAddFile()
+            }
+        ))
+        alert.addAction(AlertAction(title: NSLocalizedString("action_cancel", comment: "Cancel"), style: .cancel))
         showAlert(alert, from: source)
     }
 
     // internal for testing
     func showAddLink(subject: PassthroughSubject<String, Never>) {
         let alertController = UIAlertController(
-            title: "Enter a URL",
-            message: "This can be either a link to a torrent or a magnet link.",
+            title: NSLocalizedString("add_torrent_link_alert_title", comment: "Enter a URL"),
+            message: NSLocalizedString(
+                "add_torrent_link_alert_message",
+                comment: "This can be either a link to a torrent or a magnet link."
+            ),
             preferredStyle: .alert
         )
         alertController.addTextField { textField in
             textField.textContentType = .URL
             textField.placeholder = "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a"
         }
-        alertController.addAction(UIAlertAction(title: "Add", style: .default) { _ in
-            subject.send(alertController.textFields?.first?.text ?? "")
-            subject.send(completion: .finished)
-        })
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alertController.addAction(UIAlertAction(
+            title: NSLocalizedString("action_add", comment: "Add"),
+            style: .default,
+            handler: { _ in
+                subject.send(alertController.textFields?.first?.text ?? "")
+                subject.send(completion: .finished)
+            }
+        ))
+        alertController.addAction(UIAlertAction(
+            title: NSLocalizedString("action_cancel", comment: "Cancel"),
+            style: .cancel
+        ))
         viewController.present(alertController, animated: true, completion: nil)
     }
 

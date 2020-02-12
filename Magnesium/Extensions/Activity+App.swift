@@ -11,7 +11,7 @@ import UIKit
 extension Activity {
     static func setLabel(handler: @escaping () -> Void) -> Activity {
         return Activity(
-            title: "Set Label",
+            title: NSLocalizedString("action_set_label", comment: "Set Label"),
             image: UIImage(systemName: "tag"),
             type: "ca.jameshurst.Magnesium.set-label",
             handler: handler
@@ -20,7 +20,7 @@ extension Activity {
 
     static func verifyFiles(handler: @escaping () -> Void) -> Activity {
         return Activity(
-            title: "Verify Files",
+            title: NSLocalizedString("action_verify_files", comment: "Verify Files"),
             image: UIImage(systemName: "tray.full"),
             type: "ca.jameshurst.Magnesium.verify-files",
             handler: handler
@@ -29,7 +29,7 @@ extension Activity {
 
     static func updateTrackers(handler: @escaping () -> Void) -> Activity {
         return Activity(
-            title: "Update Trackers",
+            title: NSLocalizedString("action_update_trackers", comment: "Update Trackers"),
             image: UIImage(systemName: "arrow.clockwise"),
             type: "ca.jameshurst.Magnesium.update-trackers",
             handler: handler
