@@ -23,11 +23,10 @@ struct StandardTorrentDetailFileViewModel<T: StandardTorrentFile>: ViewModel, Id
 
     init(subject: CurrentValueSubject<T, Never>) {
         id = subject.value.index
-        let ui = subject.ui()
         state = TorrentDetailFileViewState(
-            name: ui.map(\.name).eraseToAnyPublisher(),
-            size: ui.map { Formatters.bytes.string(fromByteCount: $0.size) }.eraseToAnyPublisher(),
-            progress: ui.map { Formatters.percentage.string(for: $0.progress) ?? "" }.eraseToAnyPublisher()
+            name: subject.map(\.name).ui().eraseToAnyPublisher(),
+            size: subject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher(),
+            progress: subject.map { Formatters.percentage.string(for: $0.progress) ?? "" }.ui().eraseToAnyPublisher()
         )
     }
 }

@@ -27,13 +27,12 @@ struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Iden
 
     init(subject: CurrentValueSubject<T, Never>) {
         id = subject.value.hash
-        let ui = subject.ui()
         state = TorrentDetailHeaderViewState(
-            name: ui.map(\.name).eraseToAnyPublisher(),
-            isActive: ui.map(\.isActive).eraseToAnyPublisher(),
-            progress: ui.map(\.progress).eraseToAnyPublisher(),
-            progressColor: ui.map(\.standardState).map(\.displayColor).eraseToAnyPublisher(),
-            status: ui
+            name: subject.map(\.name).ui().eraseToAnyPublisher(),
+            isActive: subject.map(\.isActive).ui().eraseToAnyPublisher(),
+            progress: subject.map(\.progress).ui().eraseToAnyPublisher(),
+            progressColor: subject.map(\.standardState.displayColor).ui().eraseToAnyPublisher(),
+            status: subject
                 .map {
                     let format = NSLocalizedString("torrent_status_and_progress", comment: "{status} ({percentage})")
                     return String.localizedStringWithFormat(
@@ -42,8 +41,9 @@ struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Iden
                         Formatters.percentage(precision: 2).string(for: $0.progress) ?? ""
                     )
                 }
+                .ui()
                 .eraseToAnyPublisher(),
-            label: ui.map(\.label).eraseToAnyPublisher()
+            label: subject.map(\.label).ui().eraseToAnyPublisher()
         )
     }
 }

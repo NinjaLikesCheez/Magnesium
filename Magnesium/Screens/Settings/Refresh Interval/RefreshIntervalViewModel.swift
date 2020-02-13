@@ -41,11 +41,11 @@ final class RefreshIntervalViewModel: ViewModel {
 
     init(preferences: Preferences) {
         self.preferences = preferences
-        let publisher = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval).ui()
+        let publisher = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
         state = RefreshIntervalViewState(options: options.map { option in
             RefreshIntervalOptionViewState(
                 name: option.1,
-                isSelected: publisher.map { Int($0) == option.0 }.eraseToAnyPublisher()
+                isSelected: publisher.map { Int($0) == option.0 }.ui().eraseToAnyPublisher()
             )
         })
     }

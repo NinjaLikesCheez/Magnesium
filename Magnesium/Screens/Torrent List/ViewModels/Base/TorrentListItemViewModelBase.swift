@@ -32,15 +32,14 @@ struct StandardTorrentListItemViewModel<T: StandardTorrent>: ViewModel, Identifi
 
     init(subject: CurrentValueSubject<T, Never>) {
         hash = subject.value.hash
-        let ui = subject.ui()
         state = TorrentListItemViewState(
-            name: ui.map(\.name).eraseToAnyPublisher(),
-            progress: ui.map(\.progress).eraseToAnyPublisher(),
-            progressColor: ui.map(\.standardState).map(\.displayColor).eraseToAnyPublisher(),
-            state: ui.map(\.standardState).map(\.localizedString).eraseToAnyPublisher(),
-            speed: ui.map(\.formattedSpeed).eraseToAnyPublisher(),
-            progressString: ui.map(\.formattedLongProgress).eraseToAnyPublisher(),
-            ratioOrETA: ui.map(\.formattedRatioOrETA).eraseToAnyPublisher()
+            name: subject.map(\.name).ui().eraseToAnyPublisher(),
+            progress: subject.map(\.progress).ui().eraseToAnyPublisher(),
+            progressColor: subject.map(\.standardState.displayColor).ui().eraseToAnyPublisher(),
+            state: subject.map(\.standardState.localizedString).ui().eraseToAnyPublisher(),
+            speed: subject.map(\.formattedSpeed).ui().eraseToAnyPublisher(),
+            progressString: subject.map(\.formattedLongProgress).ui().eraseToAnyPublisher(),
+            ratioOrETA: subject.map(\.formattedRatioOrETA).ui().eraseToAnyPublisher()
         )
     }
 }
