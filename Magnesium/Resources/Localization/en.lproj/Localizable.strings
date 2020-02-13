@@ -41,6 +41,9 @@
 /* Add Torrent */
 "add_torrent_alert_title" = "Add Torrent";
 
+/* Add {fileName} to {serverName}? */
+"add_torrent_file_to_server_confirmation" = "Add %1$@ to %2$@?";
+
 /* This can be either a link to a torrent or a magnet link. */
 "add_torrent_link_alert_message" = "This can be either a link to a torrent or a magnet link.";
 
@@ -245,6 +248,9 @@
 /* Trackers */
 "torrent_detail_section_trackers" = "Trackers";
 
+/* ↓ {bytes}/s */
+"torrent_download_speed" = "↓ %@/s";
+
 /* Download Speed */
 "torrent_info_download_speed" = "Download Speed";
 
@@ -272,6 +278,12 @@
 /* Uploaded */
 "torrent_info_uploaded_size" = "Uploaded";
 
+/* {connectedPeers} ({totalPeers}) */
+"torrent_peers" = "%1$d (%2$d)";
+
+/* {downloaded} / {uploaded} ({percentage}) */
+"torrent_progress" = "%1$@ / %2$@ (%3$@)";
+
 /* Ratio: {number} */
 "torrent_ratio" = "Ratio: %@";
 
@@ -292,6 +304,12 @@
 
 /* Seeding */
 "torrent_state_seeding" = "Seeding";
+
+/* {status} ({percentage}) */
+"torrent_status_and_progress" = "%1$@ (%2$@)";
+
+/* ↑ {bytes}/s */
+"torrent_upload_speed" = "↑ %@/s";
 
 /* Torrents */
 "torrents_screen_title" = "Torrents";

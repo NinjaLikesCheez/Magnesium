@@ -39,7 +39,7 @@ enum ServerType: String, Codable {
     case deluge
     case transmission
 
-    var displayString: String {
+    var localizedString: String {
         switch self {
         case .deluge:
             return NSLocalizedString("server_deluge", comment: "Deluge")

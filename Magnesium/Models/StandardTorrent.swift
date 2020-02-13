@@ -37,41 +37,52 @@ extension StandardTorrent {
         return standardState == .downloading || standardState == .seeding
     }
 
-    var speedString: String {
+    var formattedSpeed: String {
         if standardState == .downloading {
-            return """
-            ↓ \(ByteFormatter.string(fromByteCount: downloadRate))/s \
-            ↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s
-            """
+            let downloadFormat = NSLocalizedString("torrent_download_speed", comment: "↓ {bytes}/s")
+            let download = String.localizedStringWithFormat(
+                downloadFormat,
+                Formatters.bytes.string(fromByteCount: downloadRate)
+            )
+            let uploadFormat = NSLocalizedString("torrent_upload_speed", comment: "↑ {bytes}/s")
+            let upload = String.localizedStringWithFormat(
+                uploadFormat,
+                Formatters.bytes.string(fromByteCount: uploadRate)
+            )
+            return "\(download) \(upload)"
         } else if standardState == .seeding {
-            return "↑ \(ByteFormatter.string(fromByteCount: uploadRate))/s"
+            let format = NSLocalizedString("torrent_upload_speed", comment: "↑ {bytes}/s")
+            return .localizedStringWithFormat(format, Formatters.bytes.string(fromByteCount: uploadRate))
         } else {
             return ""
         }
     }
 
-    var progressString: String {
-        return """
-        \(ByteFormatter.string(fromByteCount: downloaded)) / \
-        \(ByteFormatter.string(fromByteCount: size)) \
-        (\(String(format: "%.0f", progress * 100))%)
-        """
+    var formattedLongProgress: String {
+        let format = NSLocalizedString("torrent_progress", comment: "{downloaded} / {uploaded} ({percentage})")
+        return .localizedStringWithFormat(
+            format,
+            Formatters.bytes.string(fromByteCount: downloaded),
+            Formatters.bytes.string(fromByteCount: size),
+            Formatters.percentage.string(for: progress) ?? ""
+        )
     }
 
-    var etaString: String {
-        return eta > 0 ? DateFormatters.etaFormatter.string(from: eta) ?? "" : "∞"
+    var formattedETA: String {
+        return eta > 0 ? Formatters.eta.string(from: eta) ?? "" : "∞"
     }
 
-    func ratioString(precision: Int = 1) -> String {
-        return !ratio.isInfinite && !ratio.isNaN ? String(format: "%.\(precision)f", ratio) : "∞"
+    func formattedRatio(precision: Int = 1) -> String {
+        guard !ratio.isInfinite, !ratio.isNaN else { return "∞" }
+        return Formatters.number(precision: precision).string(for: ratio) ?? ""
     }
 
-    var ratioOrETAString: String {
+    var formattedRatioOrETA: String {
         if standardState == .downloading {
-            return etaString
+            return formattedETA
         } else {
             let format = NSLocalizedString("torrent_ratio", comment: "Ratio: {number}")
-            return .localizedStringWithFormat(format, ratioString())
+            return .localizedStringWithFormat(format, formattedRatio())
         }
     }
 }

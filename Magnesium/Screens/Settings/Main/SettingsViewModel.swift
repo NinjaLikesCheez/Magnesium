@@ -99,15 +99,15 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
 
         let refreshInterval = preferences.value(for: PreferenceKeys.autoRefreshInterval)
-        let refreshString: String
+        let localizedRefresh: String
         if refreshInterval <= 0 {
-            refreshString = NSLocalizedString("refresh_interval_never", comment: "Never")
+            localizedRefresh = NSLocalizedString("refresh_interval_never", comment: "Never")
         } else {
             let format = NSLocalizedString("refresh_interval_seconds", comment: "{number} seconds")
-            let seconds = String(format: "%.0f seconds", refreshInterval)
-            refreshString = String.localizedStringWithFormat(format, seconds)
+            let seconds = Formatters.number.string(for: refreshInterval) ?? ""
+            localizedRefresh = String.localizedStringWithFormat(format, seconds)
         }
-        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: refreshString)]))
+        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: localizedRefresh)]))
 
         sectionsSubject.send(sections)
     }

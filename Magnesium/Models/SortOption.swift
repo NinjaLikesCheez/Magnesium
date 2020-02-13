@@ -12,7 +12,7 @@ struct SortOption: Codable, Equatable {
     var property: Property
     var direction: Direction
 
-    var displayString: String {
+    var localizedString: String {
         let directionString: String
         switch direction {
         case .ascending:
@@ -21,7 +21,7 @@ struct SortOption: Codable, Equatable {
             directionString = "↓"
         }
 
-        return "\(directionString) \(property.displayString)"
+        return "\(directionString) \(property.localizedString)"
     }
 
     init(property: Property) {
@@ -57,7 +57,7 @@ extension SortOption {
             }
         }
 
-        var displayString: String {
+        var localizedString: String {
             switch self {
             case .dateAdded:
                 return NSLocalizedString("sort_property_date_added", comment: "Date Added")

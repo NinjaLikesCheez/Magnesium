@@ -360,11 +360,11 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
 
     func test_sections_shouldHaveInfoRows() {
         let expected: [(String, String)] = [
-            ("Size", "0.0 KB"),
-            ("Download Speed", "0.0 KB/s"),
-            ("Upload Speed", "0.0 KB/s"),
-            ("Downloaded", "0.0 KB"),
-            ("Uploaded", "0.0 KB"),
+            ("Size", "0 KB"),
+            ("Download Speed", "0 KB/s"),
+            ("Upload Speed", "0 KB/s"),
+            ("Downloaded", "0 KB"),
+            ("Uploaded", "0 KB"),
             ("ETA", "∞"),
             ("Ratio", "∞"),
             ("Peers", "0 (0)"),

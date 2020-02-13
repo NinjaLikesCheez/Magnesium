@@ -163,15 +163,19 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     func addTorrentFile(at url: URL) {
         guard let server = session.server else { return }
+        let messageFormat = NSLocalizedString(
+            "add_torrent_file_to_server_confirmation",
+            comment: "Add {fileName} to {serverName}?"
+        )
         var alert = Alert(
-            title: "Add Torrent",
-            message: "Add \(url.lastPathComponent) to \(server.name)?",
+            title: NSLocalizedString("add_torrent_alert_title", comment: "Add Torrent"),
+            message: .localizedStringWithFormat(messageFormat, url.lastPathComponent, server.name),
             style: .alert
         )
-        alert.addAction(AlertAction(title: "Add", style: .default) {
+        alert.addAction(AlertAction(title: NSLocalizedString("action_add", comment: "Add"), style: .default) {
             self.addFileFlow.addFile(at: url)
         })
-        alert.addAction(AlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(.cancel())
         showAlert(alert, useTopViewController: true)
     }
 }

@@ -80,7 +80,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
         )
 
         for property in SortOption.Property.allCases {
-            alert.addAction(AlertAction(title: property.displayString, style: .default) {
+            alert.addAction(AlertAction(title: property.localizedString, style: .default) {
                 if property == currentSort.property {
                     let sortOption = currentSort.withOppositeDirection()
                     self.preferences.set(sortOption, for: PreferenceKeys.sortOption)
@@ -135,7 +135,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
         for state in states {
             alert.addAction(AlertAction(
-                title: state?.displayString ?? NSLocalizedString("filter_all", comment: "All"),
+                title: state?.localizedString ?? NSLocalizedString("filter_all", comment: "All"),
                 style: .default,
                 handler: {
                     filterOptions.state = state
@@ -154,11 +154,11 @@ final class FilterViewModel: ViewModel, EventEmitter {
         var sections = [FilterSection]()
 
         sections.append(FilterSection(type: .sort, items: [
-            .sort(sortOption.displayString),
+            .sort(sortOption.localizedString),
         ]))
 
         var filtersSection = FilterSection(type: .filters, items: [
-            .state(filterOptions.state?.displayString ?? NSLocalizedString("filter_all", comment: "All")),
+            .state(filterOptions.state?.localizedString ?? NSLocalizedString("filter_all", comment: "All")),
         ])
 
         if !labels.value.isEmpty {

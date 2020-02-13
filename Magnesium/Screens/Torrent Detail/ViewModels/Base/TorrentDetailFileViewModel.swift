@@ -26,8 +26,8 @@ struct StandardTorrentDetailFileViewModel<T: StandardTorrentFile>: ViewModel, Id
         let ui = subject.ui()
         state = TorrentDetailFileViewState(
             name: ui.map(\.name).eraseToAnyPublisher(),
-            size: ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher(),
-            progress: ui.map { String(format: "%.0f%%", $0.progress * 100) }.eraseToAnyPublisher()
+            size: ui.map { Formatters.bytes.string(fromByteCount: $0.size) }.eraseToAnyPublisher(),
+            progress: ui.map { Formatters.percentage.string(for: $0.progress) ?? "" }.eraseToAnyPublisher()
         )
     }
 }

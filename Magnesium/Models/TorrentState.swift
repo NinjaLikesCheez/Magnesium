@@ -18,7 +18,7 @@ enum TorrentState: String, Codable, Equatable, CaseIterable {
 }
 
 extension TorrentState {
-    var displayString: String {
+    var localizedString: String {
         switch self {
         case .downloading:
             return NSLocalizedString("torrent_state_downloading", comment: "Downloading")

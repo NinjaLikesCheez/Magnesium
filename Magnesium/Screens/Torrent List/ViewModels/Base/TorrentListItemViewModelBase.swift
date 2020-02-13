@@ -37,10 +37,10 @@ struct StandardTorrentListItemViewModel<T: StandardTorrent>: ViewModel, Identifi
             name: ui.map(\.name).eraseToAnyPublisher(),
             progress: ui.map(\.progress).eraseToAnyPublisher(),
             progressColor: ui.map(\.standardState).map(\.displayColor).eraseToAnyPublisher(),
-            state: ui.map(\.standardState).map(\.displayString).eraseToAnyPublisher(),
-            speed: ui.map(\.speedString).eraseToAnyPublisher(),
-            progressString: ui.map(\.progressString).eraseToAnyPublisher(),
-            ratioOrETA: ui.map(\.ratioOrETAString).eraseToAnyPublisher()
+            state: ui.map(\.standardState).map(\.localizedString).eraseToAnyPublisher(),
+            speed: ui.map(\.formattedSpeed).eraseToAnyPublisher(),
+            progressString: ui.map(\.formattedLongProgress).eraseToAnyPublisher(),
+            ratioOrETA: ui.map(\.formattedRatioOrETA).eraseToAnyPublisher()
         )
     }
 }

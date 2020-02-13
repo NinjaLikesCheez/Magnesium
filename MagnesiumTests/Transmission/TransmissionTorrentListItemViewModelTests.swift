@@ -100,7 +100,7 @@ class TransmissionTorrentListItemViewModelTests: XCTestCase {
         subject.send(.mock(downloadRate: 1_540_527, uploadRate: 465_158))
         let expectation = self.expectation(description: "Value received")
         viewModel.state.speed.first().sink {
-            XCTAssertEqual($0, "↓ 1.5 MB/s ↑ 454.3 KB/s")
+            XCTAssertEqual($0, "↓ 1.5 MB/s ↑ 454 KB/s")
             expectation.fulfill()
         }.store(in: &observers)
         waitForExpectations(timeout: 0)
@@ -110,7 +110,7 @@ class TransmissionTorrentListItemViewModelTests: XCTestCase {
         subject.send(.mock(status: .seeding, downloadRate: 1_540_527, uploadRate: 465_158))
         let expectation = self.expectation(description: "Value received")
         viewModel.state.speed.first().sink {
-            XCTAssertEqual($0, "↑ 454.3 KB/s")
+            XCTAssertEqual($0, "↑ 454 KB/s")
             expectation.fulfill()
         }.store(in: &observers)
         waitForExpectations(timeout: 0)

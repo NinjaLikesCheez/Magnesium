@@ -112,43 +112,49 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         sections.append(TorrentDetailSection(type: .info, items: [
             .info(
                 NSLocalizedString("torrent_info_size", comment: "Size"),
-                ui.map { ByteFormatter.string(fromByteCount: $0.size) }.eraseToAnyPublisher()
+                ui.map { Formatters.bytes.string(fromByteCount: $0.size) }.eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_download_speed", comment: "Download Speed"),
                 ui
-                    .map { "\(ByteFormatter.string(fromByteCount: $0.downloadRate))/s" }
+                    .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
                     .eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_upload_speed", comment: "Upload Speed"),
                 ui
-                    .map { "\(ByteFormatter.string(fromByteCount: $0.uploadRate))/s" }
+                    .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
                     .eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_downloaded_size", comment: "Downloaded"),
-                ui.map { ByteFormatter.string(fromByteCount: $0.downloaded) }.eraseToAnyPublisher()
+                ui.map { Formatters.bytes.string(fromByteCount: $0.downloaded) }.eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_uploaded_size", comment: "Uploaded"),
-                ui.map { ByteFormatter.string(fromByteCount: $0.uploaded) }.eraseToAnyPublisher()
+                ui.map { Formatters.bytes.string(fromByteCount: $0.uploaded) }.eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_eta", comment: "ETA"),
-                ui.map(\.etaString).eraseToAnyPublisher()
+                ui.map(\.formattedETA).eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_ratio", comment: "Ratio"),
-                ui.map { $0.ratioString(precision: 3) }.eraseToAnyPublisher()
+                ui.map { $0.formattedRatio(precision: 3) }.eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_peers", comment: "Peers"),
-                ui.map { "\($0.peers) (\($0.totalPeers))" }.eraseToAnyPublisher()
+                ui.map {
+                    let format = NSLocalizedString("torrent_peers", comment: "{connectedPeers} ({totalPeers})")
+                    return String.localizedStringWithFormat(format, $0.peers, $0.totalPeers)
+                }.eraseToAnyPublisher()
             ),
             .info(
                 NSLocalizedString("torrent_info_seeds", comment: "Seeds"),
-                ui.map { "\($0.seeds) (\($0.totalSeeds))" }.eraseToAnyPublisher()
+                ui.map {
+                    let format = NSLocalizedString("torrent_peers", comment: "{connectedPeers} ({totalPeers})")
+                    return String.localizedStringWithFormat(format, $0.seeds, $0.totalSeeds)
+                }.eraseToAnyPublisher()
             ),
         ]))
 

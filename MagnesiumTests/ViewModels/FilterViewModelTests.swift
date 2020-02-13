@@ -106,7 +106,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         let previousOption = preferences.value(for: PreferenceKeys.sortOption)
-        alert?.actions.first { $0.title == previousOption.property.displayString }?.handler?()
+        alert?.actions.first { $0.title == previousOption.property.localizedString }?.handler?()
         let newOption = preferences.value(for: PreferenceKeys.sortOption)
         XCTAssertEqual(newOption, previousOption.withOppositeDirection())
     }
