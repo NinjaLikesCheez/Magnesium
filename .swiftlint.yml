@@ -89,6 +89,7 @@ identifier_name:
     - id
     - ID
     - ui
+    - ok
   max_length: 60
 
 type_name:

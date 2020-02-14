@@ -34,11 +34,9 @@ struct StandardTorrentDetailHeaderViewModel<T: StandardTorrent>: ViewModel, Iden
             progressColor: subject.map(\.standardState.displayColor).ui().eraseToAnyPublisher(),
             status: subject
                 .map {
-                    let format = NSLocalizedString("torrent_status_and_progress", comment: "{status} ({percentage})")
-                    return String.localizedStringWithFormat(
-                        format,
-                        $0.standardState.localizedString,
-                        Formatters.percentage(precision: 2).string(for: $0.progress) ?? ""
+                    return L10n.torrentStatusAndProgress(
+                        status: $0.standardState.localizedString,
+                        progress: Formatters.percentage(precision: 2).string(for: $0.progress) ?? ""
                     )
                 }
                 .ui()

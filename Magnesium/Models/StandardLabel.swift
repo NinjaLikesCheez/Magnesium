@@ -15,6 +15,6 @@ protocol StandardLabel {
 
 extension StandardLabel {
     var displayName: String {
-        return name.isEmpty ? NSLocalizedString("label_none", comment: "None") : name
+        return name.isEmpty ? L10n.noneLabel : name
     }
 }

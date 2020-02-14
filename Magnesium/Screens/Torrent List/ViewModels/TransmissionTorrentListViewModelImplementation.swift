@@ -49,20 +49,15 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
 
     func addLink(_ url: String) -> AnyPublisher<(String, String), Never> {
         guard let url = URL(string: url) else {
-            return Just((
-                NSLocalizedString("error_add_link", comment: "Unable to Add Link"),
-                NSLocalizedString("error_link_invalid", comment: "That link doesn't appear to be valid.")
-            )).eraseToAnyPublisher()
+            return Just((L10n.torrentLinkValidationError, L10n.torrentLinkValidationErrorDescription))
+                .eraseToAnyPublisher()
         }
 
         return client.add(url: url)
             .ignoreOutput()
             .map { _ in ("", "") }
             .catch { error -> AnyPublisher<(String, String), Never> in
-                return Just((
-                    NSLocalizedString("error_add_torrent", comment: "Failed to Add Torrent"),
-                    error.localizedDescription
-                )).eraseToAnyPublisher()
+                return Just((L10n.addTorrentError, error.localizedDescription)).eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }

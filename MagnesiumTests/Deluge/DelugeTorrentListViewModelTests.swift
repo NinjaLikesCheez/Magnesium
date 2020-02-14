@@ -289,25 +289,25 @@ final class DelugeTorrentListViewModelTests: XCTestCase {
 
     func test_autoRefresh_shouldFire() {
         client.requests.reset()
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(currentState: 1))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
         client.requests.reset()
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockDelugeClient.Requests(currentState: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     // MARK: addLink

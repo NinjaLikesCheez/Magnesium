@@ -29,13 +29,12 @@ final class RefreshIntervalViewModel: ViewModel {
     let state: RefreshIntervalViewState
 
     private let options: [(Int, String)] = {
-        let format = NSLocalizedString("refresh_interval_seconds", comment: "{number} seconds")
         return [
-            (0, NSLocalizedString("refresh_interval_never", comment: "Never")),
-            (2, String.localizedStringWithFormat(format, "2")),
-            (5, String.localizedStringWithFormat(format, "5")),
-            (10, String.localizedStringWithFormat(format, "10")),
-            (30, String.localizedStringWithFormat(format, "30")),
+            (0, L10n.refreshIntervalNever),
+            (2, L10n.refreshIntervalSeconds(2)),
+            (5, L10n.refreshIntervalSeconds(5)),
+            (10, L10n.refreshIntervalSeconds(10)),
+            (30, L10n.refreshIntervalSeconds(30)),
         ]
     }()
 
@@ -54,7 +53,7 @@ final class RefreshIntervalViewModel: ViewModel {
         switch event {
         case let .optionSelected(index: index):
             let interval = options[index].0
-            preferences.set(TimeInterval(interval), for: PreferenceKeys.autoRefreshInterval)
+            preferences.set(interval, for: PreferenceKeys.autoRefreshInterval)
         }
     }
 }

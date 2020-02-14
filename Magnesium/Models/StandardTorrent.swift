@@ -37,34 +37,23 @@ extension StandardTorrent {
         return standardState == .downloading || standardState == .seeding
     }
 
-    var formattedSpeed: String {
+    var localizedSpeed: String {
         if standardState == .downloading {
-            let downloadFormat = NSLocalizedString("torrent_download_speed", comment: "↓ {bytes}/s")
-            let download = String.localizedStringWithFormat(
-                downloadFormat,
-                Formatters.bytes.string(fromByteCount: downloadRate)
-            )
-            let uploadFormat = NSLocalizedString("torrent_upload_speed", comment: "↑ {bytes}/s")
-            let upload = String.localizedStringWithFormat(
-                uploadFormat,
-                Formatters.bytes.string(fromByteCount: uploadRate)
-            )
+            let download = L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
+            let upload = L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
             return "\(download) \(upload)"
         } else if standardState == .seeding {
-            let format = NSLocalizedString("torrent_upload_speed", comment: "↑ {bytes}/s")
-            return .localizedStringWithFormat(format, Formatters.bytes.string(fromByteCount: uploadRate))
+            return L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
         } else {
             return ""
         }
     }
 
-    var formattedLongProgress: String {
-        let format = NSLocalizedString("torrent_progress", comment: "{downloaded} / {uploaded} ({percentage})")
-        return .localizedStringWithFormat(
-            format,
-            Formatters.bytes.string(fromByteCount: downloaded),
-            Formatters.bytes.string(fromByteCount: size),
-            Formatters.percentage.string(for: progress) ?? ""
+    var localizedProgress: String {
+        return L10n.torrentProgress(
+            downloaded: Formatters.bytes.string(fromByteCount: downloaded),
+            size: Formatters.bytes.string(fromByteCount: size),
+            progress: Formatters.percentage.string(for: progress) ?? ""
         )
     }
 
@@ -77,12 +66,11 @@ extension StandardTorrent {
         return Formatters.number(precision: precision).string(for: ratio) ?? ""
     }
 
-    var formattedRatioOrETA: String {
+    var localizedRatioOrETA: String {
         if standardState == .downloading {
             return formattedETA
         } else {
-            let format = NSLocalizedString("torrent_ratio", comment: "Ratio: {number}")
-            return .localizedStringWithFormat(format, formattedRatio())
+            return L10n.torrentRatio(formattedRatio())
         }
     }
 }

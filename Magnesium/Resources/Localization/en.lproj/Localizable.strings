@@ -1,4 +1,3 @@
-
 /* Add */
 "action_add" = "Add";
 
@@ -16,6 +15,9 @@
 
 /* Pause */
 "action_pause" = "Pause";
+
+/* Remove */
+"action_remove" = "Remove";
 
 /* Resume */
 "action_resume" = "Resume";
@@ -59,8 +61,8 @@
 /* Are you sure you want to delete this server? */
 "delete_server_confirmation" = "Are you sure you want to delete this server?";
 
-/* Unable to Add Link */
-"error_add_link" = "Unable to Add Link";
+/* Edit Server */
+"edit_server_screen_title" = "Edit Server";
 
 /* Unable to Add Server */
 "error_add_server" = "Unable to Add Server";
@@ -73,9 +75,6 @@
 
 /* Ensure your password is correct. */
 "error_deluge_unauthenticated" = "Ensure your password is correct.";
-
-/* That link doesn't appear to be valid. */
-"error_link_invalid" = "That link doesn't appear to be valid.";
 
 /* Failed to Pause */
 "error_pause" = "Failed to Pause";
@@ -98,11 +97,20 @@
 /* Failed to Resume \"{torrentName}\" */
 "error_resume_torrent" = "Failed to Resume \"%@\"";
 
+/* Unable to Save Server */
+"error_save_server" = "Unable to Save Server";
+
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
 
 /* Failed to Set Label for \"{torrentName}\" */
 "error_set_label_torrent" = "Failed to Set Label for \"%@\"";
+
+/* Unable to Add Link */
+"error_torrent_link_validation" = "Unable to Add Link";
+
+/* That link doesn't appear to be valid. */
+"error_torrent_link_validation_description" = "That link doesn't appear to be valid.";
 
 /* Ensure your username and password are correct. */
 "error_transmission_unauthenticated" = "Ensure your username and password are correct.";
@@ -156,10 +164,7 @@
 "refresh_interval_screen_title" = "Refresh Interval";
 
 /* {number} seconds */
-"refresh_interval_seconds" = "%@ seconds";
-
-/* Remove */
-"remove_torrent_alert_title" = "Remove";
+"refresh_interval_seconds" = "%d seconds";
 
 /* Keep Data */
 "remove_torrent_option_keep_data" = "Keep Data";
@@ -169,12 +174,6 @@
 
 /* Deluge */
 "server_deluge" = "Deluge";
-
-/* Add Server */
-"server_settings_add_title" = "Add Server";
-
-/* Edit Server */
-"server_settings_edit_title" = "Edit Server";
 
 /* name */
 "server_settings_option_name" = "name";
@@ -236,18 +235,6 @@
 /* Upload Speed */
 "sort_property_upload_speed" = "Upload Speed";
 
-/* Info */
-"torrent_detail_screen_title" = "Info";
-
-/* Files */
-"torrent_detail_section_files" = "Files";
-
-/* Information */
-"torrent_detail_section_info" = "Information";
-
-/* Trackers */
-"torrent_detail_section_trackers" = "Trackers";
-
 /* ↓ {bytes}/s */
 "torrent_download_speed" = "↓ %@/s";
 
@@ -255,7 +242,7 @@
 "torrent_info_download_speed" = "Download Speed";
 
 /* Downloaded */
-"torrent_info_downloaded_size" = "Downloaded";
+"torrent_info_downloaded" = "Downloaded";
 
 /* ETA */
 "torrent_info_eta" = "ETA";
@@ -265,6 +252,18 @@
 
 /* Ratio */
 "torrent_info_ratio" = "Ratio";
+
+/* Info */
+"torrent_info_screen_title" = "Info";
+
+/* Files */
+"torrent_info_section_files" = "Files";
+
+/* Information */
+"torrent_info_section_info" = "Information";
+
+/* Trackers */
+"torrent_info_section_trackers" = "Trackers";
 
 /* Seeds */
 "torrent_info_seeds" = "Seeds";
@@ -276,7 +275,7 @@
 "torrent_info_upload_speed" = "Upload Speed";
 
 /* Uploaded */
-"torrent_info_uploaded_size" = "Uploaded";
+"torrent_info_uploaded" = "Uploaded";
 
 /* {connectedPeers} ({totalPeers}) */
 "torrent_peers" = "%1$d (%2$d)";
@@ -313,3 +312,4 @@
 
 /* Torrents */
 "torrents_screen_title" = "Torrents";
+

@@ -32,7 +32,7 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = NSLocalizedString("refresh_interval_screen_title", comment: "Refresh Interval")
+        title = L10n.refreshIntervalScreenTitle
     }
 
     required init?(coder: NSCoder) {

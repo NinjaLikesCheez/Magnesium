@@ -254,52 +254,52 @@ final class TransmissionTorrentDetailViewModelTests: XCTestCase {
     // MARK: autoRefresh
 
     func test_autoRefresh_whenNotAppeared_shouldNotFire() {
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     func test_autoRefresh_whenAppeared_shouldFire() {
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 1))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     func test_autoRefresh_whenDisappeared_shouldNotFire() {
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
         viewModel.handle(.disappear)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
-        preferences.set(0.5, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
         client.requests.reset()
         viewModel.handle(.appear)
         preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.client.requests, MockTransmissionClient.Requests(torrentFiles: 0))
             expectation.fulfill()
         }
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 2)
     }
 
     // MARK: refresh

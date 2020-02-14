@@ -19,7 +19,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        navigationItem.title = NSLocalizedString("filter_screen_title", comment: "Filter")
+        navigationItem.title = L10n.filterScreenTitle
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
             target: self,
@@ -41,19 +41,19 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
             switch item {
             case let .sort(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = NSLocalizedString("filter_option_sort", comment: "Sort")
+                cell.textLabel?.text = L10n.filterOptionSort
                 cell.detailTextLabel?.text = value
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case let .state(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = NSLocalizedString("filter_option_state", comment: "State")
+                cell.textLabel?.text = L10n.filterOptionState
                 cell.detailTextLabel?.text = value
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case let .label(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = NSLocalizedString("filter_option_label", comment: "Label")
+                cell.textLabel?.text = L10n.filterOptionLabel
                 cell.detailTextLabel?.text = value
                 cell.accessoryType = .disclosureIndicator
                 return cell

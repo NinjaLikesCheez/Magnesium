@@ -10,7 +10,7 @@ import Foundation
 import Preferences
 
 enum PreferenceKeys {
-    static let autoRefreshInterval = PreferenceKey<TimeInterval>("autoRefreshInterval", defaultValue: 2)
+    static let autoRefreshInterval = PreferenceKey<Int>("autoRefreshInterval", defaultValue: 2)
     static let servers = PreferenceKey<[Server]>("servers", defaultValue: [])
     static let selectedServerID = PreferenceKey<Server.ID?>("selectedServerID", defaultValue: nil)
     static let sortOption = PreferenceKey<SortOption>("sortOption", defaultValue: SortOption(property: .dateAdded))

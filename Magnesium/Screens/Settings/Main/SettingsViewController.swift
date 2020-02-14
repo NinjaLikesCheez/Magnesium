@@ -18,9 +18,9 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             case .changeServer:
                 return nil
             case .servers:
-                return NSLocalizedString("settings_section_servers", comment: "Servers")
+                return L10n.settingsSectionServers
             case .general:
-                return NSLocalizedString("settings_section_general", comment: "General")
+                return L10n.settingsSectionGeneral
             }
         }
     }
@@ -32,7 +32,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = NSLocalizedString("settings_screen_title", comment: "Settings")
+        title = L10n.settingsScreenTitle
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .done,
@@ -54,7 +54,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 if cell == nil {
                     cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = NSLocalizedString("settings_option_current_server", comment: "Current Server")
+                cell.textLabel?.text = L10n.settingsOptionCurrentServer
                 cell.detailTextLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -65,7 +65,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 return cell
             case .addServer:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-                cell.textLabel?.text = NSLocalizedString("settings_option_add_server", comment: "Add Server")
+                cell.textLabel?.text = L10n.settingsOptionAddServer
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case let .refreshInterval(current: current):
@@ -73,10 +73,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
                 if cell == nil {
                     cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = NSLocalizedString(
-                    "settings_option_refresh_interval",
-                    comment: "Refresh Interval"
-                )
+                cell.textLabel?.text = L10n.settingsOptionRefreshInterval
                 cell.detailTextLabel?.text = current
                 cell.accessoryType = .disclosureIndicator
                 return cell

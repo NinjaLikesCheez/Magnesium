@@ -83,7 +83,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
                 self.session.setServer(server)
             })
         }
-        alert.addAction(.cancel())
+        alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -101,11 +101,9 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         let refreshInterval = preferences.value(for: PreferenceKeys.autoRefreshInterval)
         let localizedRefresh: String
         if refreshInterval <= 0 {
-            localizedRefresh = NSLocalizedString("refresh_interval_never", comment: "Never")
+            localizedRefresh = L10n.refreshIntervalNever
         } else {
-            let format = NSLocalizedString("refresh_interval_seconds", comment: "{number} seconds")
-            let seconds = Formatters.number.string(for: refreshInterval) ?? ""
-            localizedRefresh = String.localizedStringWithFormat(format, seconds)
+            localizedRefresh = L10n.refreshIntervalSeconds(Int(refreshInterval))
         }
         sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: localizedRefresh)]))
 

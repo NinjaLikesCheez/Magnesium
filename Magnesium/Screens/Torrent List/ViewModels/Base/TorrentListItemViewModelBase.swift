@@ -37,9 +37,9 @@ struct StandardTorrentListItemViewModel<T: StandardTorrent>: ViewModel, Identifi
             progress: subject.map(\.progress).ui().eraseToAnyPublisher(),
             progressColor: subject.map(\.standardState.displayColor).ui().eraseToAnyPublisher(),
             state: subject.map(\.standardState.localizedString).ui().eraseToAnyPublisher(),
-            speed: subject.map(\.formattedSpeed).ui().eraseToAnyPublisher(),
-            progressString: subject.map(\.formattedLongProgress).ui().eraseToAnyPublisher(),
-            ratioOrETA: subject.map(\.formattedRatioOrETA).ui().eraseToAnyPublisher()
+            speed: subject.map(\.localizedSpeed).ui().eraseToAnyPublisher(),
+            progressString: subject.map(\.localizedProgress).ui().eraseToAnyPublisher(),
+            ratioOrETA: subject.map(\.localizedRatioOrETA).ui().eraseToAnyPublisher()
         )
     }
 }

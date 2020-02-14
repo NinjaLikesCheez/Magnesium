@@ -60,13 +60,13 @@ extension SortOption {
         var localizedString: String {
             switch self {
             case .dateAdded:
-                return NSLocalizedString("sort_property_date_added", comment: "Date Added")
+                return L10n.sortPropertyDateAdded
             case .name:
-                return NSLocalizedString("sort_property_name", comment: "Name")
+                return L10n.sortPropertyName
             case .downloadSpeed:
-                return NSLocalizedString("sort_property_download_speed", comment: "Download Speed")
+                return L10n.sortPropertyDownloadSpeed
             case .uploadSpeed:
-                return NSLocalizedString("sort_property_upload_speed", comment: "Upload Speed")
+                return L10n.sortPropertyUploadSpeed
             }
         }
     }

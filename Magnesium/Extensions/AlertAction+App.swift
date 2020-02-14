@@ -9,11 +9,11 @@
 import Foundation
 
 extension AlertAction {
-    static func ok() -> AlertAction {
-        return AlertAction(title: NSLocalizedString("action_ok", comment: "OK"), style: .default)
+    static var ok: AlertAction {
+        return AlertAction(title: L10n.ok, style: .default)
     }
 
-    static func cancel() -> AlertAction {
-        return AlertAction(title: NSLocalizedString("action_cancel", comment: "Cancel"), style: .cancel)
+    static var cancel: AlertAction {
+        return AlertAction(title: L10n.cancel, style: .cancel)
     }
 }

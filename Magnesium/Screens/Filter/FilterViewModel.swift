@@ -70,14 +70,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
     private func handleSortSelected(from source: PopoverSource) {
         let currentSort = preferences.value(for: PreferenceKeys.sortOption)
-        var alert = Alert(
-            title: NSLocalizedString("sort_by_alert_title", comment: "Sort by"),
-            message: NSLocalizedString(
-                "sort_by_alert_message",
-                comment: "Select the current sort option to sort in the opposite direction."
-            ),
-            style: .actionSheet
-        )
+        var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet)
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.localizedString, style: .default) {
@@ -90,25 +83,18 @@ final class FilterViewModel: ViewModel, EventEmitter {
             })
         }
 
-        alert.addAction(.cancel())
+        alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
-        var alert = Alert(
-            title: NSLocalizedString("filter_label_alert_title", comment: "Filter by Label"),
-            message: NSLocalizedString(
-                "filter_label_alert_message",
-                comment: "Only display torrents with the selected label."
-            ),
-            style: .actionSheet
-        )
+        var alert = Alert(title: L10n.filterLabelAlertTitle, message: L10n.filterLabelAlertMessage, style: .actionSheet)
         let labels: [StandardLabel?] = [nil] + self.labels.value
 
         for label in labels {
             alert.addAction(AlertAction(
-                title: label.map { $0.displayName } ?? NSLocalizedString("filter_all", comment: "All"),
+                title: label.map { $0.displayName } ?? L10n.allFilter,
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
@@ -117,25 +103,18 @@ final class FilterViewModel: ViewModel, EventEmitter {
             ))
         }
 
-        alert.addAction(.cancel())
+        alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
     private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
-        var alert = Alert(
-            title: NSLocalizedString("filter_state_alert_title", comment: "Filter by State"),
-            message: NSLocalizedString(
-                "filter_state_alert_message",
-                comment: "Only display torrents with the selected state."
-            ),
-            style: .actionSheet
-        )
+        var alert = Alert(title: L10n.filterStateAlertTitle, message: L10n.filterStateAlertMessage, style: .actionSheet)
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
         for state in states {
             alert.addAction(AlertAction(
-                title: state?.localizedString ?? NSLocalizedString("filter_all", comment: "All"),
+                title: state?.localizedString ?? L10n.allFilter,
                 style: .default,
                 handler: {
                     filterOptions.state = state
@@ -144,7 +123,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
             ))
         }
 
-        alert.addAction(.cancel())
+        alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -158,14 +137,14 @@ final class FilterViewModel: ViewModel, EventEmitter {
         ]))
 
         var filtersSection = FilterSection(type: .filters, items: [
-            .state(filterOptions.state?.localizedString ?? NSLocalizedString("filter_all", comment: "All")),
+            .state(filterOptions.state?.localizedString ?? L10n.allFilter),
         ])
 
         if !labels.value.isEmpty {
             let labelName = filterOptions.label.map {
-                $0.isEmpty ? NSLocalizedString("label_none", comment: "None") : $0
+                $0.isEmpty ? L10n.noneLabel : $0
             }
-            filtersSection.items.append(.label(labelName ?? NSLocalizedString("filter_all", comment: "All")))
+            filtersSection.items.append(.label(labelName ?? L10n.allFilter))
         }
 
         sections.append(filtersSection)

@@ -63,8 +63,8 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
         let nameInput = TextInputTableViewCellViewState(
-            name: NSLocalizedString("server_settings_option_name", comment: "name"),
-            placeholder: NSLocalizedString("server_transmission", comment: "Transmission"),
+            name: L10n.serverSettingsOptionName,
+            placeholder: L10n.transmission,
             value: nameSubject,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
             configuration: TextInputConfiguration.default.withReturnKeyType(.next)
@@ -72,7 +72,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
         let serverEnabled = CurrentValueSubject<Bool, Never>(true)
         let serverInput = TextInputTableViewCellViewState(
-            name: NSLocalizedString("server_settings_option_server", comment: "server"),
+            name: L10n.serverSettingsOptionServer,
             placeholder: "https://example.com",
             value: serverSubject,
             isEnabled: serverEnabled.eraseToAnyPublisher(),
@@ -81,8 +81,8 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
         let usernameEnabled = CurrentValueSubject<Bool, Never>(true)
         let usernameInput = TextInputTableViewCellViewState(
-            name: NSLocalizedString("server_settings_option_username", comment: "username"),
-            placeholder: NSLocalizedString("server_settings_option_username_hint_optional", comment: "user (optional)"),
+            name: L10n.serverSettingsOptionUsername,
+            placeholder: L10n.serverSettingsOptionUsernameHintOptional,
             value: usernameSubject,
             isEnabled: usernameEnabled.eraseToAnyPublisher(),
             configuration: TextInputConfiguration.username.withReturnKeyType(.next)
@@ -90,29 +90,16 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
         let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
         let passwordInput = TextInputTableViewCellViewState(
-            name: NSLocalizedString("server_settings_option_password", comment: "password"),
-            placeholder: NSLocalizedString(
-                "server_settings_option_password_hint_optional",
-                comment: "password (optional)"
-            ),
+            name: L10n.serverSettingsOptionPassword,
+            placeholder: L10n.serverSettingsOptionPasswordHintOptional,
             value: passwordSubject,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
             configuration: TextInputConfiguration.password.withReturnKeyType(.send)
         )
 
-        let title: String
-        let saveButtonTitle: String
-        if server == nil {
-            title = NSLocalizedString("server_settings_add_title", comment: "Add Server")
-            saveButtonTitle = NSLocalizedString("action_add", comment: "Add")
-        } else {
-            title = NSLocalizedString("server_settings_edit_title", comment: "Edit Server")
-            saveButtonTitle = NSLocalizedString("action_save", comment: "Save")
-        }
-
         state = ServerSettingsViewState(
-            title: title,
-            saveButtonTitle: saveButtonTitle,
+            title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
+            saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
             isSaveButtonEnabled: isSaveButtonEnabledSubject.ui().eraseToAnyPublisher(),
@@ -163,8 +150,9 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
         let username = usernameSubject.value
         let password = passwordSubject.value
-
+        let errorTitle = server == nil ? L10n.addServerError : L10n.saveServerError
         isLoadingSubject.send(true)
+
         let client = clientProvider.createClient(baseURL: url, username: username, password: password)
         client.authenticate()
             .ui()
@@ -176,10 +164,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
                         let keychain = TransmissionKeychainData(password: password)
                         try self?.saveServer(name: name, settings: settings, keychain: keychain)
                     } catch {
-                        self?.showError(
-                            title: NSLocalizedString("error_add_server", comment: "Unable to Add Server"),
-                            message: error.localizedDescription
-                        )
+                        self?.showError(title: errorTitle, message: error.localizedDescription)
                     }
                 case let .failure(error):
                     self?.showError(error)
@@ -215,23 +200,12 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
     private func handleDelete(source: PopoverSource) {
         guard let server = server else { return }
-        var alert = Alert(
-            title: nil,
-            message: NSLocalizedString(
-                "delete_server_confirmation",
-                comment: "Are you sure you want to delete this server?"
-            ),
-            style: .actionSheet
-        )
-        alert.addAction(AlertAction(
-            title: NSLocalizedString("action_delete_server", comment: "Delete Server"),
-            style: .destructive,
-            handler: {
-                self.preferences.remove(server: server)
-                self.eventSubject.send(.complete)
-            }
-        ))
-        alert.addAction(.cancel())
+        var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet)
+        alert.addAction(AlertAction(title: L10n.deleteServer, style: .destructive) {
+            self.preferences.remove(server: server)
+            self.eventSubject.send(.complete)
+        })
+        alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
@@ -239,15 +213,12 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         let message: String
         switch error {
         case .unauthenticated:
-            message = NSLocalizedString(
-                "error_transmission_unauthenticated",
-                comment: "Ensure your username and password are correct."
-            )
+            message = L10n.transmissionAuthenticationErrorDescription
         default:
             message = error.localizedDescription
         }
 
-        showError(title: NSLocalizedString("error_authentication", comment: "Authentication Failed"), message: message)
+        showError(title: L10n.authenticationError, message: message)
     }
 
     private func showError(title: String, message: String?) {
@@ -256,7 +227,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
             message: message,
             style: .alert
         )
-        alert.addAction(.ok())
+        alert.addAction(.ok)
         eventSubject.send(.alert(alert, source: nil))
     }
 }

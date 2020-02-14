@@ -18,8 +18,8 @@ enum TorrentDetailItem: Equatable, Hashable {
         switch (lhs, rhs) {
         case let (.header(value1), .header(value2)):
             return value1.id == value2.id
-        case let (.info(value1), .info(value2)):
-            return value1.0 == value2.0
+        case let (.info(value1, _), .info(value2, _)):
+            return value1 == value2
         case let (.tracker(value1), .tracker(value2)):
             return value1 == value2
         case let (.file(value1), .file(value2)):
@@ -33,8 +33,8 @@ enum TorrentDetailItem: Equatable, Hashable {
         switch self {
         case let .header(value):
             hasher.combine(value.id)
-        case let .info(value):
-            hasher.combine(value.0)
+        case let .info(value, _):
+            hasher.combine(value)
         case let .tracker(value):
             hasher.combine(value)
         case let .file(value):
