@@ -4,6 +4,8 @@ default_platform(:ios)
 DERIVED_DATA_PATH = "fastlane/build"
 TEST_DEVICE = "iPhone 8"
 
+xcversion(version: ">= 11.4")
+
 platform :ios do
   desc "Runs actions for CI"
   lane :run_ci do

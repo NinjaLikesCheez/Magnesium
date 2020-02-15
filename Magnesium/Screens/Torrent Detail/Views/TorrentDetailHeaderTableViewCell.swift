@@ -216,7 +216,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &observers)
 
         state.label
-            .map { $0.isEmpty }
+            .map(\.isEmpty)
             .removeDuplicates()
             .dropFirst()
             .sink { [weak self] _ in
@@ -226,7 +226,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &observers)
 
         state.label
-            .map { $0.isEmpty }
+            .map(\.isEmpty)
             .removeDuplicates()
             .assign(to: \.isHidden, on: labelLabel)
             .store(in: &observers)

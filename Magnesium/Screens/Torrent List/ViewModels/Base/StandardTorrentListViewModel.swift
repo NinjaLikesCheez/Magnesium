@@ -57,7 +57,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         let items = torrents.values
             .map { $0.map { AnyViewModel(StandardTorrentListItemViewModel(subject: $0)) } }
-            .removeDuplicates { $0.map { $0.id } == $1.map { $0.id } }
+            .removeDuplicates { $0.map(\.id) == $1.map(\.id) }
             .ui()
             .eraseToAnyPublisher()
         let hasActiveFilters = preferences.valuePublisher(for: PreferenceKeys.filterOptions)

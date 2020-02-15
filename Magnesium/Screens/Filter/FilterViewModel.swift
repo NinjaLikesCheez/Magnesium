@@ -46,7 +46,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
         preferences.valueUpdatedPublisher(for: PreferenceKeys.sortOption).map { _ in () }
             .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.filterOptions).map { _ in () })
-            .merge(with: labels.removeDuplicates(by: { $0.map { $0.name } == $1.map { $0.name } }).map { _ in () })
+            .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
             }
@@ -94,7 +94,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
         for label in labels {
             alert.addAction(AlertAction(
-                title: label.map { $0.displayName } ?? L10n.allFilter,
+                title: label.map(\.displayName) ?? L10n.allFilter,
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name

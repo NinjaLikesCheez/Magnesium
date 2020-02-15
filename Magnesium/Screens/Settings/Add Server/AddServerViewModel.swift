@@ -27,7 +27,7 @@ final class AddServerViewModel: ViewModel, EventEmitter {
     let state: AddServerViewState
 
     init() {
-        state = AddServerViewState(types: serverTypes.map { $0.localizedString })
+        state = AddServerViewState(types: serverTypes.map(\.localizedString))
     }
 
     var events: AnyPublisher<AddServerEvent, Never> {
