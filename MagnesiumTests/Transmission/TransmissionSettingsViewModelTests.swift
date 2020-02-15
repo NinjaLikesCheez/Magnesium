@@ -101,7 +101,19 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "web://site"
-        XCTAssertFalse(isSaveButtonEnabled(viewModel))
+        var event: ServerSettingsEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.save)
+        guard case let .alert(alert, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(alert.title, "Unable to Add Server")
+        XCTAssertEqual(
+            alert.message,
+            "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
+        )
+        XCTAssertEqual(alert.actions.map(\.title), ["OK"])
     }
 
     func test_save_shouldChangeIsLoading() {

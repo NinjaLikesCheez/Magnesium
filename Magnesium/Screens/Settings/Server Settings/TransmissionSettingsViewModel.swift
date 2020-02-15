@@ -109,15 +109,8 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         nameSubject
             .combineLatest(serverSubject)
             .map { name, server in
-                guard
-                    let name = name,
-                    let server = server,
-                    let serverURL = URL(string: server)
-                else {
-                    return false
-                }
-                return !name.isEmpty
-                    && ["http", "https"].contains(serverURL.scheme) && serverURL.host != nil
+                guard let name = name, let server = server else { return false }
+                return !name.isEmpty && !server.isEmpty
             }
             .removeDuplicates()
             .assign(to: \.value, on: isSaveButtonEnabledSubject)
@@ -143,7 +136,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
     private func handleSave() {
         guard isSaveButtonEnabledSubject.value,
             let name = nameSubject.value,
-            let url = serverSubject.value.flatMap({ URL(string: $0) })
+            let urlString = serverSubject.value
         else {
             return
         }
@@ -151,6 +144,12 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         let username = usernameSubject.value
         let password = passwordSubject.value
         let errorTitle = server == nil ? L10n.addServerError : L10n.saveServerError
+
+        guard let url = URL(string: urlString), ["http", "https"].contains(url.scheme) && url.host != nil else {
+            showError(title: errorTitle, message: L10n.serverURLValidationErrorDescription)
+            return
+        }
+
         isLoadingSubject.send(true)
 
         let client = clientProvider.createClient(baseURL: url, username: username, password: password)

@@ -92,6 +92,9 @@
 /* Unable to Save Server */
 "error_save_server" = "Unable to Save Server";
 
+/* The server URL is invalid. Ensure the URL begins with "http://" or "https://". */
+"error_server_url_validation" = "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\".";
+
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
 

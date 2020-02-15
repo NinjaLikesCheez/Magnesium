@@ -98,17 +98,8 @@ final class DelugeSettingsViewModel: ViewModel, EventEmitter {
         nameSubject
             .combineLatest(serverSubject, passwordSubject)
             .map { name, server, password in
-                guard
-                    let name = name,
-                    let server = server,
-                    let serverURL = URL(string: server),
-                    let password = password
-                else {
-                    return false
-                }
-                return !name.isEmpty
-                    && ["http", "https"].contains(serverURL.scheme) && serverURL.host != nil
-                    && !password.isEmpty
+                guard let name = name, let server = server, let password = password else { return false }
+                return !name.isEmpty && !server.isEmpty && !password.isEmpty
             }
             .removeDuplicates()
             .assign(to: \.value, on: isSaveButtonEnabledSubject)
@@ -134,15 +125,20 @@ final class DelugeSettingsViewModel: ViewModel, EventEmitter {
     private func handleSave() {
         guard isSaveButtonEnabledSubject.value,
             let name = nameSubject.value,
-            let url = serverSubject.value.flatMap({ URL(string: $0) }),
+            let urlString = serverSubject.value,
             let password = passwordSubject.value
         else {
             return
         }
 
         let errorTitle = server == nil ? L10n.addServerError : L10n.saveServerError
-        isLoadingSubject.send(true)
 
+        guard let url = URL(string: urlString), ["http", "https"].contains(url.scheme) && url.host != nil else {
+            showError(title: errorTitle, message: L10n.serverURLValidationErrorDescription)
+            return
+        }
+
+        isLoadingSubject.send(true)
         let client = clientProvider.createClient(baseURL: url, password: password)
         client.authenticate()
             .ui()

@@ -157,6 +157,13 @@ enum L10n {
         )
     }
 
+    static var serverURLValidationErrorDescription: String {
+        return NSLocalizedString(
+            "error_server_url_validation",
+            comment: "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
+        )
+    }
+
     // MARK: Servers
 
     static var deluge: String {
