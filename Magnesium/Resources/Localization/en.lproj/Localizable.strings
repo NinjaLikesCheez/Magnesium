@@ -1,3 +1,4 @@
+
 /* Add */
 "action_add" = "Add";
 
@@ -79,32 +80,20 @@
 /* Failed to Pause */
 "error_pause" = "Failed to Pause";
 
-/* Failed to Pause \"{torrentName}\" */
-"error_pause_torrent" = "Failed to Pause \"%@\"";
-
 /* Update Failed */
 "error_refresh" = "Update Failed";
 
 /* Failed to Remove */
 "error_remove" = "Failed to Remove";
 
-/* Failed to Remove \"{torrentName}\" */
-"error_remove_torrent" = "Failed to Remove \"%@\"";
-
 /* Failed to Resume */
 "error_resume" = "Failed to Resume";
-
-/* Failed to Resume \"{torrentName}\" */
-"error_resume_torrent" = "Failed to Resume \"%@\"";
 
 /* Unable to Save Server */
 "error_save_server" = "Unable to Save Server";
 
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
-
-/* Failed to Set Label for \"{torrentName}\" */
-"error_set_label_torrent" = "Failed to Set Label for \"%@\"";
 
 /* Unable to Add Link */
 "error_torrent_link_validation" = "Unable to Add Link";
@@ -118,14 +107,8 @@
 /* Failed to Update Trackers */
 "error_update_trackers" = "Failed to Update Trackers";
 
-/* Failed to Update Trackers for \"{torrentName}\" */
-"error_update_trackers_torrent" = "Failed to Update Trackers for \"%@\"";
-
 /* Failed to Verify Files */
 "error_verify_files" = "Failed to Verify Files";
-
-/* Failed to Verify Files for \"{torrentName}\" */
-"error_verify_files_torrent" = "Failed to Verify Files for \"%@\"";
 
 /* All */
 "filter_all" = "All";
@@ -171,6 +154,9 @@
 
 /* Remove Data */
 "remove_torrent_option_remove_data" = "Remove Data";
+
+/* {number} Selected */
+"selected_count" = "%d Selected";
 
 /* Deluge */
 "server_deluge" = "Deluge";
@@ -312,4 +298,3 @@
 
 /* Torrents */
 "torrents_screen_title" = "Torrents";
-

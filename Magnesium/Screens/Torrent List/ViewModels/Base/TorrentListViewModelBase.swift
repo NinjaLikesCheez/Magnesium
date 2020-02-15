@@ -75,7 +75,7 @@ protocol TorrentListProvider: AnyObject {
 
 enum TorrentListEvent {
     case alert(Alert, source: PopoverSource?)
-    case activities([Activity], torrent: StandardTorrent, source: PopoverSource)
+    case activities([Activity], torrents: [StandardTorrent], source: PopoverSource)
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
     case filter(source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>)
     case detail(viewModel: AnyTorrentDetailViewModel)
@@ -89,6 +89,10 @@ enum TorrentListViewEvent {
     case itemSelected(index: Int)
     case settingsSelected
     case search(query: String?)
+    case resumeSelected(indices: [Int])
+    case pauseSelected(indices: [Int])
+    case removeSelected(indices: [Int], source: PopoverSource)
+    case moreOptionsSelected(indices: [Int], source: PopoverSource)
 }
 
 struct TorrentListViewState {

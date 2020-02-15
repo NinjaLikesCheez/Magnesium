@@ -18,16 +18,16 @@ protocol StandardTorrentListViewModelImplementation {
     var updated: AnyPublisher<([Torrent], [Label]), Never> { get }
     func refresh() -> AnyPublisher<([Torrent], [Label]), Error>
     func detailViewModel(
-        for subject: CurrentValueSubject<Torrent, Never>,
+        for torrent: CurrentValueSubject<Torrent, Never>,
         labels: CurrentValueSubject<[Label], Never>
     ) -> AnyTorrentDetailViewModel
     func addLink(_ url: String) -> AnyPublisher<(String, String), Never>
-    func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
-    func verify(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
-    func updateTrackers(for torrent: Torrent) -> AnyPublisher<Void, Error>
+    func pause(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
+    func resume(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
+    func remove(_ torrents: [Torrent], removeData: Bool) -> AnyPublisher<Void, Error>
+    func verify(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
+    func setLabel(_ label: Label, for torrents: [Torrent]) -> AnyPublisher<Void, Error>
+    func updateTrackers(for torrents: [Torrent]) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -39,7 +39,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let preferences: Preferences
     private let torrents: TorrentMapper<String, Torrent>
     private let labels = CurrentValueSubject<[Label], Never>([])
-    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
@@ -66,7 +66,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .eraseToAnyPublisher()
         state = TorrentListViewState(
             items: items,
-            isLoading: isLoadingSubject.eraseToAnyPublisher(),
+            isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
             hasActiveFilters: hasActiveFilters
         )
 
@@ -96,11 +96,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         switch event {
         case .refresh:
             guard !isLoadingSubject.value else { return }
-            isLoadingSubject.send(true)
             refresh()
-                .sink(receiveCompletion: { [weak self] _ in
-                    self?.isLoadingSubject.send(false)
-                }, receiveValue: { _ in })
+                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                 .store(in: &observers)
 
         case let .addSelected(source):
@@ -125,6 +122,18 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         case let .search(query):
             querySubject.send(query)
+
+        case let .resumeSelected(indices):
+            resume(indices.map { torrents.subject(at: $0).value })
+
+        case let .pauseSelected(indices):
+            pause(indices.map { torrents.subject(at: $0).value })
+
+        case let .removeSelected(indices, source):
+            presentRemoveOptions(for: indices.map { torrents.subject(at: $0).value }, from: source)
+
+        case let .moreOptionsSelected(indices, source):
+            presentActivities(for: indices.map { torrents.subject(at: $0).value }, source: source)
         }
     }
 
@@ -138,9 +147,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .store(in: &observers)
     }
 
-    // internal for testing
-    func pause(_ torrent: Torrent) {
-        implementation.pause(torrent)
+    private func pause(_ torrents: [Torrent]) {
+        implementation.pause(torrents)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -150,14 +158,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.pauseError(torrentName: torrent.name), message: error.localizedDescription)
+                self?.showError(title: L10n.pauseError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    // internal for testing
-    func resume(_ torrent: Torrent) {
-        implementation.resume(torrent)
+    private func resume(_ torrents: [Torrent]) {
+        implementation.resume(torrents)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -167,14 +174,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.resumeError(torrentName: torrent.name), message: error.localizedDescription)
+                self?.showError(title: L10n.resumeError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    // internal for testing
-    func remove(_ torrent: Torrent, removeData: Bool) {
-        implementation.remove(torrent, removeData: removeData)
+    private func remove(_ torrents: [Torrent], removeData: Bool) {
+        implementation.remove(torrents, removeData: removeData)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -184,13 +190,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.removeError(torrentName: torrent.name), message: error.localizedDescription)
+                self?.showError(title: L10n.removeError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    private func verify(_ torrent: Torrent) {
-        implementation.verify(torrent)
+    private func setLabel(for torrents: [Torrent], label: Label) {
+        implementation.setLabel(label, for: torrents)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -200,16 +206,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(
-                    title: L10n.verifyFilesError(torrentName: torrent.name),
-                    message: error.localizedDescription
-                )
+                self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    private func setLabel(for torrent: Torrent, label: Label) {
-        implementation.setLabel(label, for: torrent)
+    private func verify(_ torrents: [Torrent]) {
+        implementation.verify(torrents)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -219,16 +222,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(
-                    title: L10n.setLabelError(torrentName: torrent.name),
-                    message: error.localizedDescription
-                )
+                self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    private func updateTrackers(for torrent: Torrent) {
-        implementation.updateTrackers(for: torrent)
+    private func updateTrackers(for torrents: [Torrent]) {
+        implementation.updateTrackers(for: torrents)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
@@ -238,57 +238,54 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(
-                    title: L10n.updateTrackersError(torrentName: torrent.name),
-                    message: error.localizedDescription
-                )
+                self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
-    // internal for testing
-    func presentRemoveOptions(for torrent: Torrent, from source: PopoverSource) {
-        var alert = Alert(title: L10n.remove, message: torrent.name, style: .actionSheet)
+    private func presentRemoveOptions(for torrents: [Torrent], from source: PopoverSource) {
+        let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
+        var alert = Alert(title: L10n.remove, message: message, style: .actionSheet)
         alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
-            self.remove(torrent, removeData: false)
+            self.remove(torrents, removeData: false)
         })
         alert.addAction(AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
-            self.remove(torrent, removeData: true)
+            self.remove(torrents, removeData: true)
         })
         alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
-    private func presentLabelSelection(for torrent: Torrent, from source: PopoverSource) {
-        var alert = Alert(title: L10n.setLabel, message: torrent.name, style: .actionSheet)
+    private func presentLabelSelection(for torrents: [Torrent], from source: PopoverSource) {
+        let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
+        var alert = Alert(title: L10n.setLabel, message: message, style: .actionSheet)
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
-                self.setLabel(for: torrent, label: label)
+                self.setLabel(for: torrents, label: label)
             })
         }
         alert.addAction(.cancel)
         eventSubject.send(.alert(alert, source: source))
     }
 
-    // internal for testing
-    func presentActivities(for torrent: Torrent, source: PopoverSource, complete: (Bool) -> Void) {
+    private func presentActivities(for torrents: [Torrent], source: PopoverSource) {
         var activities = [Activity]()
 
         if !labels.value.isEmpty {
             activities.append(.setLabel {
-                self.presentLabelSelection(for: torrent, from: source)
+                self.presentLabelSelection(for: torrents, from: source)
             })
         }
 
         activities.append(.verifyFiles {
-            self.verify(torrent)
+            self.verify(torrents)
         })
 
         activities.append(.updateTrackers {
-            self.updateTrackers(for: torrent)
+            self.updateTrackers(for: torrents)
         })
 
-        eventSubject.send(.activities(activities, torrent: torrent, source: source))
+        eventSubject.send(.activities(activities, torrents: torrents, source: source))
     }
 
     private func showError(title: String, message: String?) {
@@ -331,8 +328,10 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func performRefresh() -> AnyPublisher<Void, Error> {
+        isLoadingSubject.send(true)
         return implementation.refresh()
             .handleEvents(receiveOutput: { [weak self] update in
+                self?.isLoadingSubject.send(false)
                 self?.labels.send(update.1)
                 self?.torrents.update(with: update.0.map { ($0.hash, $0) })
             })
@@ -353,32 +352,32 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         if torrent.isActive {
             actions.append(UIAction(title: L10n.pause, image: UIImage(systemName: "pause")) { [weak self] _ in
-                self?.pause(torrent)
+                self?.pause([torrent])
             })
         } else {
             actions.append(UIAction(title: L10n.resume, image: UIImage(systemName: "play")) { [weak self] _ in
-                self?.resume(torrent)
+                self?.resume([torrent])
             })
         }
 
         if !labels.value.isEmpty {
             let children = labels.value.map { label in
                 UIAction(title: label.displayName) { [weak self] _ in
-                    self?.setLabel(for: torrent, label: label)
+                    self?.setLabel(for: [torrent], label: label)
                 }
             }
             actions.append(UIMenu(title: L10n.setLabel, image: UIImage(systemName: "tag"), children: children))
         }
 
         actions.append(UIAction(title: L10n.verifyFiles, image: UIImage(systemName: "tray.full")) { [weak self] _ in
-            self?.verify(torrent)
+            self?.verify([torrent])
         })
 
         actions.append(UIAction(
             title: L10n.updateTrackers,
             image: UIImage(systemName: "arrow.clockwise"),
             handler: { [weak self] _ in
-                self?.updateTrackers(for: torrent)
+                self?.updateTrackers(for: [torrent])
             }
         ))
 
@@ -391,7 +390,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                     title: L10n.removeTorrentOptionKeepData,
                     image: UIImage(systemName: "trash"),
                     handler: { [weak self] _ in
-                        self?.remove(torrent, removeData: false)
+                        self?.remove([torrent], removeData: false)
                     }
                 ),
                 UIAction(
@@ -399,7 +398,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                     image: UIImage(systemName: "trash"),
                     attributes: .destructive,
                     handler: { [weak self] _ in
-                        self?.remove(torrent, removeData: true)
+                        self?.remove([torrent], removeData: true)
                     }
                 ),
             ]
@@ -412,7 +411,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         let torrent = torrents.subject(at: index).value
         if torrent.isActive {
             let pause = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-                self.pause(torrent)
+                self.pause([torrent])
                 complete(true)
             }
             pause.backgroundColor = .systemBlue
@@ -420,7 +419,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             return UISwipeActionsConfiguration(actions: [pause])
         } else {
             let resume = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-                self.resume(torrent)
+                self.resume([torrent])
                 complete(true)
             }
             resume.backgroundColor = .systemBlue
@@ -435,13 +434,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     ) -> UISwipeActionsConfiguration? {
         let torrent = torrents.subject(at: index).value
         let remove = UIContextualAction(style: .destructive, title: nil) { _, _, complete in
-            self.presentRemoveOptions(for: torrent, from: source)
+            self.presentRemoveOptions(for: [torrent], from: source)
             complete(true)
         }
         remove.image = UIImage(systemName: "trash.fill")
 
         let more = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-            self.presentActivities(for: torrent, source: source, complete: complete)
+            self.presentActivities(for: [torrent], source: source)
             complete(true)
         }
         more.image = UIImage(systemName: "ellipsis.circle.fill")

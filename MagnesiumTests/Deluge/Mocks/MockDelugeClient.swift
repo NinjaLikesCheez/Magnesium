@@ -39,6 +39,7 @@ final class MockDelugeClient: DelugeClient {
         var removeWithData = false
         var recheck = false
         var addURL = false
+        var addMagnetURL = false
         var setLabel = false
         var reannounce = false
     }
@@ -128,6 +129,10 @@ final class MockDelugeClient: DelugeClient {
 
     func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError> {
         requests.addMagnetURL += 1
+        guard !errors.addMagnetURL else {
+            return Fail(error: .unauthenticated).eraseToAnyPublisher()
+        }
+
         return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     }
 

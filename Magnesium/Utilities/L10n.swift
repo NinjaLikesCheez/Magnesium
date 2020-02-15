@@ -61,7 +61,7 @@ enum L10n {
 
     // MARK: Screens
 
-    static var torrentScreenTitle: String {
+    static var torrentsScreenTitle: String {
         return NSLocalizedString("torrents_screen_title", comment: "Torrents")
     }
 
@@ -95,63 +95,24 @@ enum L10n {
         return NSLocalizedString("error_pause", comment: "Failed to Pause")
     }
 
-    static func pauseError(torrentName: String) -> String {
-        let format = NSLocalizedString("error_pause_torrent", comment: "Failed to Pause \"{torrentName}\"")
-        return .localizedStringWithFormat(format, torrentName)
-    }
-
     static var resumeError: String {
         return NSLocalizedString("error_resume", comment: "Failed to Resume")
-    }
-
-    static func resumeError(torrentName: String) -> String {
-        let format = NSLocalizedString("error_resume_torrent", comment: "Failed to Resume \"{torrentName}\"")
-        return .localizedStringWithFormat(format, torrentName)
     }
 
     static var removeError: String {
         return NSLocalizedString("error_remove", comment: "Failed to Remove")
     }
 
-    static func removeError(torrentName: String) -> String {
-        let format = NSLocalizedString("error_remove_torrent", comment: "Failed to Remove \"{torrentName}\"")
-        return .localizedStringWithFormat(format, torrentName)
-    }
-
     static var verifyFilesError: String {
         return NSLocalizedString("error_verify_files", comment: "Failed to Verify Files")
-    }
-
-    static func verifyFilesError(torrentName: String) -> String {
-        let format = NSLocalizedString(
-            "error_verify_files_torrent",
-            comment: "Failed to Verify Files for \"{torrentName}\""
-        )
-        return .localizedStringWithFormat(format, torrentName)
     }
 
     static var setLabelError: String {
         return NSLocalizedString("error_set_label", comment: "Failed to Set Label")
     }
 
-    static func setLabelError(torrentName: String) -> String {
-        let format = NSLocalizedString(
-            "error_set_label_torrent",
-            comment: "Failed to Set Label for \"{torrentName}\""
-        )
-        return .localizedStringWithFormat(format, torrentName)
-    }
-
     static var updateTrackersError: String {
         return NSLocalizedString("error_update_trackers", comment: "Failed to Update Trackers")
-    }
-
-    static func updateTrackersError(torrentName: String) -> String {
-        let format = NSLocalizedString(
-            "error_update_trackers_torrent",
-            comment: "Failed to Update Trackers for \"{torrentName}\""
-        )
-        return .localizedStringWithFormat(format, torrentName)
     }
 
     static var refreshError: String {
@@ -327,6 +288,18 @@ enum L10n {
 
     static var removeTorrentOptionRemoveData: String {
         return NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data")
+    }
+
+    // MARK: Torrent List
+
+    static func selectedCount(_ count: Int) -> String {
+        let format = NSLocalizedString("selected_count", comment: "{number} Selected")
+        return .localizedStringWithFormat(format, count)
+    }
+
+    static func torrentCount(_ count: Int) -> String {
+        let format = NSLocalizedString("torrent_count", comment: "{number} Torrents")
+        return .localizedStringWithFormat(format, count)
     }
 
     // MARK: Torrent Info

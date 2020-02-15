@@ -192,8 +192,3 @@ class FilterViewModelTests: XCTestCase {
         XCTAssertEqual(newOption, FilterOptions(label: "test"))
     }
 }
-
-struct MockLabel: StandardLabel {
-    var name = ""
-    var count = 0
-}

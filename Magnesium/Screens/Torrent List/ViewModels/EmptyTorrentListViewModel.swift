@@ -32,7 +32,8 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvi
             isLoadingSubject.send(false)
         case .settingsSelected:
             eventSubject.send(.settings)
-        case .addSelected, .itemSelected, .filterSelected, .search:
+        case .addSelected, .itemSelected, .filterSelected, .search, .resumeSelected, .pauseSelected, .removeSelected,
+             .moreOptionsSelected:
             break
         }
     }

@@ -53,7 +53,7 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
 
     private func showActivities(_ activities: [Activity], torrent: StandardTorrent, source: PopoverSource) {
         let activityController = UIActivityViewController(
-            activityItems: [ActivityMetadataItem(metadata: LPLinkMetadata(torrent: torrent))],
+            activityItems: [ActivityMetadataItem(metadata: LPLinkMetadata(torrents: [torrent]))],
             applicationActivities: activities.map { $0.createUIActivity() }
         )
         activityController.configure(popoverSource: source)
