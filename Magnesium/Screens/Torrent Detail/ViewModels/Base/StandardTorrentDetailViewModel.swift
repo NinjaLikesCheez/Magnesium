@@ -337,7 +337,6 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func handleRefresh() {
-        guard !isRefreshingSubject.value else { return }
         isRefreshingSubject.send(true)
         implementation.refresh()
             .mapError { $0 as Error }

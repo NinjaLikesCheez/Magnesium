@@ -181,6 +181,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.activityView.stopAnimating()
+                    self?.tableView.separatorStyle = .singleLine
                     self?.refreshControl?.endRefreshing()
                 }
             }
@@ -208,6 +209,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         tableView.rowHeight = TorrentTableViewCell.estimatedHeight
         tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
         tableView.allowsMultipleSelectionDuringEditing = true
+        tableView.separatorStyle = .none
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
 
         dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in

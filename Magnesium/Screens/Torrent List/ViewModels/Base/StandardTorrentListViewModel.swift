@@ -106,7 +106,6 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     func handle(_ event: TorrentListViewEvent) {
         switch event {
         case .refresh:
-            guard !isLoadingSubject.value else { return }
             refresh()
                 .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
                 .store(in: &observers)
