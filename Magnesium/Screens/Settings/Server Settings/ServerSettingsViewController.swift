@@ -50,7 +50,6 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
 

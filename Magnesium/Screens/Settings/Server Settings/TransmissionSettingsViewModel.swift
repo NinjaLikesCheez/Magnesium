@@ -145,7 +145,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         let password = passwordSubject.value
         let errorTitle = server == nil ? L10n.addServerError : L10n.saveServerError
 
-        guard let url = URL(string: urlString), ["http", "https"].contains(url.scheme) && url.host != nil else {
+        guard let url = URL(string: urlString), ["http", "https"].contains(url.scheme), url.host != nil else {
             showError(title: errorTitle, message: L10n.serverURLValidationErrorDescription)
             return
         }

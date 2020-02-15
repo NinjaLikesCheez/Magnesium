@@ -275,7 +275,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
 private final class MockDetailViewModel: ViewModel, EventEmitter {
     let state = TorrentDetailViewState(
         sections: Just([]).eraseToAnyPublisher(),
-        isLoading: Just(false).eraseToAnyPublisher()
+        isRefreshing: Just(false).eraseToAnyPublisher()
     )
     let events: AnyPublisher<TorrentDetailEvent, Never> = Empty().eraseToAnyPublisher()
     func handle(_ event: TorrentDetailViewEvent) {}

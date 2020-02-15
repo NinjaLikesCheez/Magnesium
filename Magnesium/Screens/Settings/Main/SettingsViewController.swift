@@ -44,7 +44,6 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
 
         dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in

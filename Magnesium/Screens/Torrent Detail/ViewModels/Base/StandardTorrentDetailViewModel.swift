@@ -35,7 +35,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private let preferences: Preferences
     private let torrent: CurrentValueSubject<Torrent, Never>
     private let labels: CurrentValueSubject<[Label], Never>
-    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
+    private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     private var observers = [AnyCancellable]()
     private var autoRefreshTimer: Timer?
@@ -88,7 +88,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
-        state = TorrentDetailViewState(sections: sections, isLoading: isLoadingSubject.eraseToAnyPublisher())
+        state = TorrentDetailViewState(sections: sections, isRefreshing: isRefreshingSubject.eraseToAnyPublisher())
 
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
@@ -337,8 +337,8 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func handleRefresh() {
-        guard !isLoadingSubject.value else { return }
-        isLoadingSubject.send(true)
+        guard !isRefreshingSubject.value else { return }
+        isRefreshingSubject.send(true)
         implementation.refresh()
             .mapError { $0 as Error }
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
@@ -347,21 +347,12 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
-                self?.isLoadingSubject.send(false)
+                self?.isRefreshingSubject.send(false)
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.refreshError, message: error.localizedDescription)
             })
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-    }
-
-    private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return implementation.updateFiles(torrent.value)
-            .handleEvents(receiveOutput: { [weak self] new in
-                self?.files.update(with: new.map { ($0.index, $0) })
-            })
-            .map { _ in () }
-            .eraseToAnyPublisher()
     }
 
     private func handleMoreOptions(from source: PopoverSource) {
@@ -400,5 +391,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
+    }
+
+    private func refreshFiles() -> AnyPublisher<Void, Error> {
+        return implementation.updateFiles(torrent.value)
+            .handleEvents(receiveOutput: { [weak self] new in
+                self?.files.update(with: new.map { ($0.index, $0) })
+            })
+            .map { _ in () }
+            .eraseToAnyPublisher()
     }
 }

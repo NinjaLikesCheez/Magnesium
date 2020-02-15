@@ -76,7 +76,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 private final class MockViewModel: ViewModel, EventEmitter {
     let state = TorrentDetailViewState(
         sections: Just([]).eraseToAnyPublisher(),
-        isLoading: Just(false).eraseToAnyPublisher()
+        isRefreshing: Just(false).eraseToAnyPublisher()
     )
     let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
     var events: AnyPublisher<TorrentDetailEvent, Never> { eventSubject.eraseToAnyPublisher() }

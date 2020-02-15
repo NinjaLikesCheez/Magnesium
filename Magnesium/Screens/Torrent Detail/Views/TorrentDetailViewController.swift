@@ -47,11 +47,9 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        viewModel.state.isLoading
+        viewModel.state.isRefreshing
             .sink { [weak self] isLoading in
-                if isLoading {
-                    self?.refreshControl?.beginRefreshing()
-                } else {
+                if !isLoading {
                     self?.refreshControl?.endRefreshing()
                 }
             }

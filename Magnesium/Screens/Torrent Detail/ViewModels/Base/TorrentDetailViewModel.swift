@@ -33,5 +33,5 @@ enum TorrentDetailViewEvent {
 
 struct TorrentDetailViewState {
     var sections: AnyPublisher<[TorrentDetailSection], Never>
-    var isLoading: AnyPublisher<Bool, Never>
+    var isRefreshing: AnyPublisher<Bool, Never>
 }

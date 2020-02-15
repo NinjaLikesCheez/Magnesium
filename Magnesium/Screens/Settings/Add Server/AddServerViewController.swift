@@ -26,7 +26,6 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
     }
 

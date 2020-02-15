@@ -338,6 +338,7 @@
 			isa = PBXGroup;
 			children = (
 				E94FDF1423F2409A0052BA9A /* Activity+App.swift */,
+				E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */,
 				E9801EF623D37FC200181FFD /* AlertPresenter.swift */,
 				E9786AF523D38D5600E4157E /* Deluge.swift */,
 				E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+Torrent.swift */,
@@ -348,7 +349,6 @@
 				E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */,
 				E96B724E23D39368005E8E89 /* Transmission.swift */,
 				E93F5D6223BA85CC00B0FFA4 /* UIImage+Color.swift */,
-				E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -593,11 +593,11 @@
 		E976FA42237E3634006B9DA9 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				E98D936023D2845D0013A1E1 /* TorrentMapper.swift */,
-				E9CE4C3323B453BE001D1C63 /* Formatters.swift */,
-				E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */,
 				E917B4BC23E764DA0090D490 /* AddFileFlow.swift */,
+				E9CE4C3323B453BE001D1C63 /* Formatters.swift */,
 				E999B0B723F62BFA000889FD /* L10n.swift */,
+				E98D936023D2845D0013A1E1 /* TorrentMapper.swift */,
+				E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";

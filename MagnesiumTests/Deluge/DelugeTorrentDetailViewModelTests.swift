@@ -366,9 +366,9 @@ final class DelugeTorrentDetailViewModelTests: XCTestCase {
         XCTAssertEqual(alert.title, "Update Failed")
     }
 
-    func test_refresh_isLoading_shouldEmitTrueThenFalse() {
+    func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {
         var values = [Bool]()
-        viewModel.state.isLoading.dropFirst().sink {
+        viewModel.state.isRefreshing.dropFirst().sink {
             values.append($0)
         }.store(in: &observers)
         viewModel.handle(.refresh)

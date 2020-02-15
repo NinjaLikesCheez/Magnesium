@@ -34,7 +34,6 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.register(FilterItemTableViewCell.self, forCellReuseIdentifier: "cell")
 
         dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
@@ -43,19 +42,16 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
                 cell.textLabel?.text = L10n.filterOptionSort
                 cell.detailTextLabel?.text = value
-                cell.accessoryType = .disclosureIndicator
                 return cell
             case let .state(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
                 cell.textLabel?.text = L10n.filterOptionState
                 cell.detailTextLabel?.text = value
-                cell.accessoryType = .disclosureIndicator
                 return cell
             case let .label(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
                 cell.textLabel?.text = L10n.filterOptionLabel
                 cell.detailTextLabel?.text = value
-                cell.accessoryType = .disclosureIndicator
                 return cell
             }
         }
