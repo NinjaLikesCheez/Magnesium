@@ -35,6 +35,37 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         return alert
     }
 
+    // MARK: - Title
+
+    func test_title_shouldBeExpectedTitle() {
+        var title: String?
+        viewModel.state.title.sink { title = $0 }.store(in: &observers)
+        XCTAssertEqual(title, "Torrents")
+    }
+
+    func test_title_whenEditing_shouldBeSelectionCount() {
+        var title: String?
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.handle(.didBeginEditing)
+        XCTAssertEqual(title, "0 Selected")
+    }
+
+    func test_title_whenEditingSelectionChanged_shouldUpdate() {
+        viewModel.handle(.didBeginEditing)
+        var title: String?
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.handle(.multiSelectUpdated(indices: [0, 1]))
+        XCTAssertEqual(title, "2 Selected")
+    }
+
+    func test_title_whenEditingEnded_shouldBeDefault() {
+        viewModel.handle(.didBeginEditing)
+        var title: String?
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.handle(.didEndEditing)
+        XCTAssertEqual(title, "Torrents")
+    }
+
     // MARK: - Auto Refresh
 
     func test_autoRefresh_shouldFire() {

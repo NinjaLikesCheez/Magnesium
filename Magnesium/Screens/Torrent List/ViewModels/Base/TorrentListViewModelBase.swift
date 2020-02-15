@@ -93,12 +93,17 @@ enum TorrentListViewEvent {
     case pauseSelected(indices: [Int])
     case removeSelected(indices: [Int], source: PopoverSource)
     case moreOptionsSelected(indices: [Int], source: PopoverSource)
+    case didBeginEditing
+    case didEndEditing
+    case multiSelectUpdated(indices: [Int])
 }
 
 struct TorrentListViewState {
     var showAddButton: Bool = true
     var showFilterButton: Bool = true
+    var title: AnyPublisher<String, Never>
     var items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
     var isLoading: AnyPublisher<Bool, Never>
     var hasActiveFilters: AnyPublisher<Bool, Never>
+    var editActionsEnabled: AnyPublisher<Bool, Never>
 }

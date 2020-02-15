@@ -140,10 +140,12 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         return view
     }()
 
+    // MARK: Initialization
+
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
-        title = L10n.torrentsScreenTitle
+        viewModel.state.title.sink { [weak self] in self?.title = $0 }.store(in: &observers)
         navigationItem.searchController = searchController
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
@@ -152,6 +154,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -192,6 +196,48 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 self?.update(with: items)
             }
             .store(in: &observers)
+
+        for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
+            viewModel.state.editActionsEnabled
+                .assign(to: \.isEnabled, on: button)
+                .store(in: &observers)
+        }
+    }
+
+    private func configureTableView() {
+        tableView.rowHeight = TorrentTableViewCell.estimatedHeight
+        tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
+        tableView.allowsMultipleSelectionDuringEditing = true
+        tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
+
+        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: "torrent",
+                for: indexPath
+            ) as? TorrentTableViewCell else {
+                return nil
+            }
+
+            cell.configure(with: item.viewModel.state)
+            return cell
+        }
+
+        dataSource.defaultRowAnimation = .fade
+        tableView.dataSource = dataSource
+    }
+
+    private func update(with viewModels: [AnyTorrentListItemViewModel]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(viewModels.map { Item(viewModel: $0) }, toSection: .main)
+
+        if applySnapshotInBackground {
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.dataSource.apply(snapshot, animatingDifferences: true)
+            }
+        } else {
+            dataSource.apply(snapshot, animatingDifferences: true)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -207,6 +253,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
         )
     }
+
+    // MARK: Editing
 
     private func configureNormalBarButtonItems() {
         navigationItem.leftBarButtonItem = settingsBarButtonItem
@@ -246,49 +294,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         ]
     }
 
-    private func configureTableView() {
-        tableView.rowHeight = TorrentTableViewCell.estimatedHeight
-        tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
-        tableView.allowsMultipleSelectionDuringEditing = true
-        tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
-
-        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: "torrent",
-                for: indexPath
-            ) as? TorrentTableViewCell else {
-                return nil
-            }
-
-            cell.configure(with: item.viewModel.state)
-            return cell
-        }
-
-        dataSource.defaultRowAnimation = .fade
-        tableView.dataSource = dataSource
-    }
-
-    private func update(with viewModels: [AnyTorrentListItemViewModel]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(viewModels.map { Item(viewModel: $0) }, toSection: .main)
-
-        if applySnapshotInBackground {
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.dataSource.apply(snapshot, animatingDifferences: true)
-            }
-        } else {
-            dataSource.apply(snapshot, animatingDifferences: true)
-        }
-    }
-
-    private func updateEditButtonStates() {
-        let enabled = !(tableView.indexPathsForSelectedRows?.isEmpty ?? true)
-        pauseBarButtonItem.isEnabled = enabled
-        resumeBarButtonItem.isEnabled = enabled
-        removeBarButtonItem.isEnabled = enabled
-        moreBarButtonItem.isEnabled = enabled
-    }
+    // MARK: Actions
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
@@ -313,8 +319,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     @objc
     private func selectButtonTapped(_ sender: UIBarButtonItem) {
         setEditing(true, animated: true)
-        title = L10n.selectedCount(0)
-        updateEditButtonStates()
+        viewModel.handle(.didBeginEditing)
         configureEditingBarButtonItems()
         configureEditingToolbarItems()
     }
@@ -322,7 +327,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
         setEditing(false, animated: true)
-        title = L10n.torrentsScreenTitle
+        viewModel.handle(.didEndEditing)
+        viewModel.handle(.multiSelectUpdated(indices: []))
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
     }
@@ -355,8 +361,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard !isEditing else {
-            title = L10n.selectedCount(tableView.indexPathsForSelectedRows?.count ?? 0)
-            updateEditButtonStates()
+            viewModel.handle(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
             return
         }
 
@@ -365,8 +370,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if isEditing {
-            title = L10n.selectedCount(tableView.indexPathsForSelectedRows?.count ?? 0)
-            updateEditButtonStates()
+            viewModel.handle(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
         }
     }
 

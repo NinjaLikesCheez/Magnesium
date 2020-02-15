@@ -40,6 +40,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let torrents: TorrentMapper<String, Torrent>
     private let labels = CurrentValueSubject<[Label], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
+    private let isEditingSubject = CurrentValueSubject<Bool, Never>(false)
+    private let multiSelectCountSubject = CurrentValueSubject<Int, Never>(0)
     private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
@@ -55,6 +57,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         torrents = TorrentMapper(preferences: preferences, query: querySubject)
         self.implementation = implementation
 
+        let title = isEditingSubject
+            .combineLatest(multiSelectCountSubject)
+            .map { isEditing, count in
+                return isEditing ? L10n.selectedCount(count) : L10n.torrentsScreenTitle
+            }
+            .ui()
+            .eraseToAnyPublisher()
         let items = torrents.values
             .map { $0.map { AnyViewModel(StandardTorrentListItemViewModel(subject: $0)) } }
             .removeDuplicates { $0.map(\.id) == $1.map(\.id) }
@@ -65,9 +74,11 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .eraseToAnyPublisher()
         state = TorrentListViewState(
+            title: title,
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
-            hasActiveFilters: hasActiveFilters
+            hasActiveFilters: hasActiveFilters,
+            editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher()
         )
 
         refresh()
@@ -134,6 +145,15 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         case let .moreOptionsSelected(indices, source):
             presentActivities(for: indices.map { torrents.subject(at: $0).value }, source: source)
+
+        case .didBeginEditing:
+            isEditingSubject.send(true)
+
+        case .didEndEditing:
+            isEditingSubject.send(false)
+
+        case let .multiSelectUpdated(indices):
+            multiSelectCountSubject.send(indices.count)
         }
     }
 

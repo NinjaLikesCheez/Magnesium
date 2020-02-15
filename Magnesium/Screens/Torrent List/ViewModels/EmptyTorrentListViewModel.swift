@@ -17,9 +17,11 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvi
     lazy var state = TorrentListViewState(
         showAddButton: false,
         showFilterButton: false,
+        title: Just(L10n.torrentsScreenTitle).eraseToAnyPublisher(),
         items: Just([]).eraseToAnyPublisher(),
         isLoading: isLoadingSubject.eraseToAnyPublisher(),
-        hasActiveFilters: Just(false).eraseToAnyPublisher()
+        hasActiveFilters: Just(false).eraseToAnyPublisher(),
+        editActionsEnabled: Just(false).eraseToAnyPublisher()
     )
 
     var events: AnyPublisher<TorrentListEvent, Never> {
@@ -32,8 +34,7 @@ final class EmptyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvi
             isLoadingSubject.send(false)
         case .settingsSelected:
             eventSubject.send(.settings)
-        case .addSelected, .itemSelected, .filterSelected, .search, .resumeSelected, .pauseSelected, .removeSelected,
-             .moreOptionsSelected:
+        default:
             break
         }
     }
