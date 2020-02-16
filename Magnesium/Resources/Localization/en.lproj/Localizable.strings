@@ -74,8 +74,8 @@
 /* Authentication Failed */
 "error_authentication" = "Authentication Failed";
 
-/* Ensure your password is correct. */
-"error_deluge_unauthenticated" = "Ensure your password is correct.";
+/* Unable to retrieve Session ID. */
+"error_no_session_id" = "Unable to retrieve Session ID.";
 
 /* Failed to Pause */
 "error_pause" = "Failed to Pause";
@@ -93,7 +93,13 @@
 "error_save_server" = "Unable to Save Server";
 
 /* The server URL is invalid. Ensure the URL begins with "http://" or "https://". */
-"error_server_url_validation" = "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\".";
+"error_server_url_validation_description" = "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\".";
+
+/* The server returned an error. */
+"error_server_description" = "The server returned an error.";
+
+/* The server returned an error: {serverMessage}. */
+"error_server_message_description" = "The server returned an error: %@.";
 
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
@@ -104,8 +110,14 @@
 /* That link doesn't appear to be valid. */
 "error_torrent_link_validation_description" = "That link doesn't appear to be valid.";
 
-/* Ensure your username and password are correct. */
-"error_transmission_unauthenticated" = "Ensure your username and password are correct.";
+/* Unable to authenticate. Verify that your credentials are correct. */
+"error_unauthenticated_description" = "Unable to authenticate. Verify that your credentials are correct.";
+
+/* The server returned an unexpected response. */
+"error_unexpected_response_description" = "The server returned an unexpected response.";
+
+/* The server returned an unexpected status code ({statusCode}). */
+"error_unexpected_status_code_description" = "The server returned an unexpected status code (%d).";
 
 /* Failed to Update Trackers */
 "error_update_trackers" = "Failed to Update Trackers";

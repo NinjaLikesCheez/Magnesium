@@ -142,26 +142,53 @@ enum L10n {
         return NSLocalizedString("error_save_server", comment: "Unable to Save Server")
     }
 
-    static var delugeAuthenticationErrorDescription: String {
-        return NSLocalizedString("error_deluge_unauthenticated", comment: "Ensure your password is correct.")
-    }
-
     static var authenticationError: String {
         return NSLocalizedString("error_authentication", comment: "Authentication Failed")
     }
 
-    static var transmissionAuthenticationErrorDescription: String {
+    static var serverURLValidationErrorDescription: String {
         return NSLocalizedString(
-            "error_transmission_unauthenticated",
-            comment: "Ensure your username and password are correct."
+            "error_server_url_validation_description",
+            comment: "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
         )
     }
 
-    static var serverURLValidationErrorDescription: String {
+    static var unauthenticatedErrorDescription: String {
         return NSLocalizedString(
-            "error_server_url_validation",
-            comment: "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
+            "error_unauthenticated_description",
+            comment: "Unable to authenticate. Verify that your credentials are correct."
         )
+    }
+
+    static var unexpectedResponseErrorDescription: String {
+        return NSLocalizedString(
+            "error_unexpected_response_description",
+            comment: "The server returned an unexpected response."
+        )
+    }
+
+    static var serverErrorDescription: String {
+        return NSLocalizedString("error_server_description", comment: "The server returned an error.")
+    }
+
+    static func serverMessageErrorDescription(_ message: String) -> String {
+        let format = NSLocalizedString(
+            "error_server_message_description",
+            comment: "The server returned an error: {serverMessage}."
+        )
+        return .localizedStringWithFormat(format, message)
+    }
+
+    static var noSessionIDErrorDescription: String {
+        return NSLocalizedString("error_no_session_id", comment: "Unable to retrieve Session ID.")
+    }
+
+    static func unexpectedStatusCodeErrorDescription(_ statusCode: Int) -> String {
+        let format = NSLocalizedString(
+            "error_unexpected_status_code_description",
+            comment: "The server returned an unexpected status code ({statusCode})."
+        )
+        return .localizedStringWithFormat(format, statusCode)
     }
 
     // MARK: Servers

@@ -355,28 +355,3 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 }
-
-extension Client.Error: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case let .encoding(error):
-            return error.localizedDescription
-        case let .decoding(error):
-            return error.localizedDescription
-        case let .filesystem(error):
-            return error.localizedDescription
-        case let .request(error):
-            return error.localizedDescription
-        case .unauthenticated:
-            return "Unable to authenticate. Verify that your credentials are correct."
-        case .unexpectedResponse:
-            return "The server returned an unexpected response."
-        case let .serverError(message: message):
-            if let message = message {
-                return "The server returned an error: \(message)"
-            } else {
-                return "The server returned an error."
-            }
-        }
-    }
-}

@@ -275,32 +275,3 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 }
-
-extension Client.Error: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case let .encoding(error):
-            return error.localizedDescription
-        case let .decoding(error):
-            return error.localizedDescription
-        case let .filesystem(error):
-            return error.localizedDescription
-        case let .request(error):
-            return error.localizedDescription
-        case let .statusCode(statusCode):
-            return "The server returned an unexpected status code (\(statusCode))."
-        case .noSessionID:
-            return "Unable to retrieve Session ID."
-        case .unauthenticated:
-            return "Unable to authenticate. Verify that your credentials are correct."
-        case .unexpectedResponse:
-            return "The server returned an unexpected response."
-        case let .serverError(result: result):
-            if let result = result {
-                return "The server returned an error: \(result)"
-            } else {
-                return "The server returned an error."
-            }
-        }
-    }
-}

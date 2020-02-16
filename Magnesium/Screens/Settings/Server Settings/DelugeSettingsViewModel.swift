@@ -195,7 +195,7 @@ final class DelugeSettingsViewModel: ViewModel, EventEmitter {
         let message: String
         switch error {
         case .unauthenticated:
-            message = L10n.delugeAuthenticationErrorDescription
+            message = L10n.unauthenticatedErrorDescription
         default:
             message = error.localizedDescription
         }

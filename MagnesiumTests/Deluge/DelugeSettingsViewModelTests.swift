@@ -139,7 +139,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(client.requests, MockDelugeClient.Requests(authenticate: 1))
     }
 
-    func test_save_whenAuthenticationFail_shouldEmitError() {
+    func test_save_whenAuthenticationFails_shouldEmitError() {
         client.errors.authenticate = true
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
@@ -154,7 +154,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             return
         }
         XCTAssertEqual(alert.title, "Authentication Failed")
-        XCTAssertEqual(alert.message, "Ensure your password is correct.")
+        XCTAssertEqual(alert.message, "Unable to authenticate. Verify that your credentials are correct.")
     }
 
     func test_save_withoutData_shouldDoNothing() {
