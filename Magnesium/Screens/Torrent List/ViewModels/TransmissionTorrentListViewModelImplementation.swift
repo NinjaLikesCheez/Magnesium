@@ -88,6 +88,12 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
         return client.reannounce(ids: torrents.map(\.id)).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
+    func moveDownloadFolder(for torrents: [TransmissionTorrent], to path: String) -> AnyPublisher<Void, Error> {
+        return client.moveLocation(ofTorrentIDs: torrents.map(\.id), to: path)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+
     func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {
         return client.getTorrents()
             .handleEvents(receiveOutput: { [weak self] torrents in

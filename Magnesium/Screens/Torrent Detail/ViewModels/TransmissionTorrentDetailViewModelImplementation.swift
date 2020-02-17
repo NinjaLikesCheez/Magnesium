@@ -54,4 +54,10 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
     func updateTrackers(for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return client.reannounce(ids: [torrent.id]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
+
+    func moveDownloadFolder(for torrent: TransmissionTorrent, to path: String) -> AnyPublisher<Void, Error> {
+        return client.moveLocation(ofTorrentIDs: [torrent.id], to: path)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }

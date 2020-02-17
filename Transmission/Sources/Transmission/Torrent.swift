@@ -46,8 +46,10 @@ public struct Torrent {
     public var peers: Int
     /// The total number of peers.
     public var totalPeers: Int
-    /// THe torrent's trackers.
+    /// The torrent's trackers.
     public var trackers: [Tracker]
+    /// The torrent's download path.
+    public var downloadPath: String
 
     public init(
         id: Int,
@@ -66,7 +68,8 @@ public struct Torrent {
         totalSeeds: Int,
         peers: Int,
         totalPeers: Int,
-        trackers: [Tracker]
+        trackers: [Tracker],
+        downloadPath: String
     ) {
         self.id = id
         self.hash = hash
@@ -85,6 +88,7 @@ public struct Torrent {
         self.peers = peers
         self.totalPeers = totalPeers
         self.trackers = trackers
+        self.downloadPath = downloadPath
     }
 }
 
@@ -106,7 +110,8 @@ extension Torrent {
             let seeds = dictionary["peersSendingToUs"] as? Int,
             let peers = dictionary["peersGettingFromUs"] as? Int,
             let peersConnected = dictionary["peersConnected"] as? Int,
-            let trackers = (dictionary["trackerStats"] as? [[String: Any]])?.compactMap({ Tracker(dictionary: $0) })
+            let trackers = (dictionary["trackerStats"] as? [[String: Any]])?.compactMap({ Tracker(dictionary: $0) }),
+            let downloadPath = dictionary["downloadDir"] as? String
         else {
             return nil
         }
@@ -128,5 +133,6 @@ extension Torrent {
         self.peers = peers
         totalPeers = peersConnected
         self.trackers = trackers
+        self.downloadPath = downloadPath
     }
 }

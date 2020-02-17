@@ -46,6 +46,8 @@ public struct Torrent {
     public var trackers: [String]
     /// The torrent's label.
     public var label: String
+    /// The torrent's download path.
+    public var downloadPath: String
 
     public init(
         hash: String,
@@ -64,7 +66,8 @@ public struct Torrent {
         peers: Int,
         totalPeers: Int,
         trackers: [String],
-        label: String
+        label: String,
+        downloadPath: String
     ) {
         self.hash = hash
         self.name = name
@@ -83,6 +86,7 @@ public struct Torrent {
         self.totalPeers = totalPeers
         self.trackers = trackers
         self.label = label
+        self.downloadPath = downloadPath
     }
 }
 
@@ -103,7 +107,8 @@ extension Torrent {
             let peers = dictionary["num_peers"] as? Int,
             let totalPeers = dictionary["total_peers"] as? Int,
             let trackers = (dictionary["trackers"] as? [[String: Any]])?.compactMap({ $0["url"] as? String }),
-            let label = dictionary["label"] as? String
+            let label = dictionary["label"] as? String,
+            let downloadPath = dictionary["download_location"] as? String
         else {
             return nil
         }
@@ -141,5 +146,6 @@ extension Torrent {
         self.totalPeers = totalPeers
         self.trackers = trackers
         self.label = label
+        self.downloadPath = downloadPath
     }
 }

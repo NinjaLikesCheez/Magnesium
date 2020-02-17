@@ -13,26 +13,31 @@ import ViewModel
 import XCTest
 
 class TorrentListCoordinatorTests: XCTestCase {
-    private let window = UIWindow()
-    private let viewModel = MockViewModel()
-    private let preferences = MockPreferences()
-    private lazy var session = Session(preferences: preferences)
+    private var window: UIWindow!
+    private var viewModel: MockViewModel!
+    private var preferences: MockPreferences!
+    private var session: Session!
     private var coordinator: TorrentListCoordinator!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
+        window = UIWindow()
+        viewModel = MockViewModel()
+        preferences = MockPreferences()
+        session = Session(preferences: preferences)
         coordinator = TorrentListCoordinator(
             viewModel: AnyTorrentListViewModel(viewModel),
             session: session,
             preferences: preferences
         )
         coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &observers)
-
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
     }
+
+    // MARK: - Presentable
 
     func test_presentable_shouldBeTorrentListViewController() {
         let viewController = coordinator.presentable.viewController
@@ -41,6 +46,8 @@ class TorrentListCoordinatorTests: XCTestCase {
             return
         }
     }
+
+    // MARK: - Add Torrent
 
     func test_showAddLink_shouldPresentAlertController() {
         coordinator.showAddLink(subject: .init())
@@ -63,9 +70,9 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    // MARK: handle - TorrentListEvent
+    // MARK: - Handle TorrentListEvent
 
-    func test_viewModel_alertEvent_shouldPresentAlertController() {
+    func test_alert_shouldPresentAlertController() {
         viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert), source: nil))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
         guard type(of: presentedViewController!) === UIAlertController.self else {
@@ -74,7 +81,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_viewModel_activitiesEvent_shouldPresentActivityViewController() {
+    func test_activities_shouldPresentActivityViewController() {
         viewModel.eventSubject.send(.activities(
             [],
             torrents: [DelugeTorrent.mock()],
@@ -87,7 +94,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_viewModel_addEvent_shouldPresentAlertController() {
+    func test_add_shouldPresentAlertController() {
         viewModel.eventSubject.send(.add(source: .view(UIView(), rect: .zero), linkSubject: .init()))
         let viewController = coordinator.presentable.viewController
         // swiftlint:disable:next force_cast
@@ -98,7 +105,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(alertController.preferredStyle, .actionSheet)
     }
 
-    func test_viewModel_filterEvent_shouldPresentFilterViewController() {
+    func test_filter_shouldPresentFilterViewController() {
         viewModel.eventSubject.send(.filter(
             source: .view(UIView(), rect: .zero),
             labels: CurrentValueSubject([])
@@ -114,7 +121,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_viewModel_detailEvent_shouldEmitShowDetailEvent() {
+    func test_detail_shouldEmitShowDetailEvent() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &observers)
         let detailViewModel = AnyEmitterViewModel(MockDetailViewModel())
@@ -126,7 +133,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertTrue(detailViewModel === viewModel)
     }
 
-    func test_viewModel_settingsEvent_shouldEmitShowSettingsEvent() {
+    func test_settings_shouldEmitShowSettingsEvent() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.eventSubject.send(.settings)
@@ -136,16 +143,30 @@ class TorrentListCoordinatorTests: XCTestCase {
         }
     }
 
-    // MARK: handle - FilterCoordinatorEvent
+    func test_moveDownloadFolder_shouldPresentAlertController() {
+        viewModel.eventSubject.send(.moveDownloadFolder(currentPath: "/path", subject: PassthroughSubject()))
+        let viewController = coordinator.presentable.viewController
+        // swiftlint:disable:next force_cast
+        let alertController = viewController.presentedViewController as! UIAlertController
+        XCTAssertEqual(alertController.title, "Move Download Folder")
+        XCTAssertEqual(alertController.actions.map { $0.title }, ["Save", "Cancel"])
+        XCTAssertEqual(alertController.textFields?.count ?? 0, 1)
+        let textField = alertController.textFields![0]
+        XCTAssertEqual(textField.textContentType, .URL)
+        XCTAssertEqual(textField.placeholder, "/downloads")
+        XCTAssertEqual(textField.text, "/path")
+    }
 
-    func test_filterCoordinator_completeEvent_shouldDismiss() {
+    // MARK: - Handle FilterCoordinatorEvent
+
+    func test_filterCoordinatorEvent_complete_shouldDismiss() {
         let viewController = MockPresentableViewController()
         coordinator.handle(FilterCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
         XCTAssertEqual(viewController.dismissCallCount, 1)
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
 
-    // MARK: TorrentListPreviewProvider
+    // MARK: - TorrentListPreviewProvider
 
     func test_previewForItem_shouldAddDetailChildCoordinator() {
         let viewController = coordinator.previewForItem(at: 0)
@@ -241,11 +262,9 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
         let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
         let preferences = MockPreferences()
         let client = MockDelugeClient()
+        let refresher = MockDelugeRefresher()
         let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
-            implementation: DelugeTorrentDetailViewModelImplementation(
-                client: client,
-                refresher: MockDelugeRefresher(client: client)
-            ),
+            implementation: DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher),
             torrent: torrent,
             labels: labels,
             preferences: preferences

@@ -25,4 +25,9 @@ class DelugeTorrentTests: XCTestCase {
             XCTAssertEqual(torrent.standardState, pair.1)
         }
     }
+
+    func test_trackerStrings_shouldBeEqualToTrackers() {
+        let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
+        XCTAssertEqual(DelugeTorrent.mock(trackers: trackers).trackerStrings, trackers)
+    }
 }

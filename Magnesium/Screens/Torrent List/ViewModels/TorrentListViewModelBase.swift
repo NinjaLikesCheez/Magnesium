@@ -80,6 +80,7 @@ enum TorrentListEvent {
     case filter(source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>)
     case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
+    case moveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>)
 }
 
 enum TorrentListViewEvent {
@@ -102,7 +103,7 @@ struct TorrentListViewState {
     var showAddButton: Bool = true
     var showFilterButton: Bool = true
     var title: AnyPublisher<String, Never>
-    var items: AnyPublisher<[AnyTorrentListItemViewModel], Never>
+    var items: AnyPublisher<[TorrentListItem], Never>
     var isLoading: AnyPublisher<Bool, Never>
     var hasActiveFilters: AnyPublisher<Bool, Never>
     var editActionsEnabled: AnyPublisher<Bool, Never>

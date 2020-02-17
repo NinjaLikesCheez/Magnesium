@@ -136,11 +136,11 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
         viewModel.handle(.save)
-        XCTAssertEqual(client.requests, MockDelugeClient.Requests(authenticate: 1))
+        XCTAssertEqual(client.authenticateCallCount, 1)
     }
 
     func test_save_whenAuthenticationFails_shouldEmitError() {
-        client.errors.authenticate = true
+        client.authenticateResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"

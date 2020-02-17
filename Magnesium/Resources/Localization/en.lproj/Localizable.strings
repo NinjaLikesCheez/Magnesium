@@ -11,6 +11,9 @@
 /* Delete Server */
 "action_delete_server" = "Delete Server";
 
+/* Move Download Folder */
+"action_move_download_folder" = "Move Download Folder";
+
 /* OK */
 "action_ok" = "OK";
 
@@ -73,6 +76,9 @@
 
 /* Authentication Failed */
 "error_authentication" = "Authentication Failed";
+
+/* Failed to Move Download Folder */
+"error_move_download_folder" = "Failed to Move Download Folder";
 
 /* Unable to retrieve Session ID. */
 "error_no_session_id" = "Unable to retrieve Session ID.";
@@ -238,6 +244,9 @@
 
 /* ↓ {bytes}/s */
 "torrent_download_speed" = "↓ %@/s";
+
+/* Download Folder */
+"torrent_info_download_folder" = "Download Folder";
 
 /* Download Speed */
 "torrent_info_download_speed" = "Download Speed";

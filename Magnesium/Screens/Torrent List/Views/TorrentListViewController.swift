@@ -26,19 +26,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         case main
     }
 
-    private struct Item: Equatable, Hashable {
-        let viewModel: AnyTorrentListItemViewModel
-
-        static func == (lhs: Item, rhs: Item) -> Bool {
-            return type(of: lhs.viewModel.base) == type(of: rhs.viewModel.base) && lhs.viewModel.id == rhs.viewModel.id
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(viewModel.id)
-        }
-    }
-
-    private class DataSource: UITableViewDiffableDataSource<Section, Item> {
+    private class DataSource: UITableViewDiffableDataSource<Section, TorrentListItem> {
         override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
             return true
         }
@@ -220,7 +208,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 return nil
             }
 
-            cell.configure(with: item.viewModel.state)
+            cell.configure(with: item)
             return cell
         }
 
@@ -228,10 +216,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         tableView.dataSource = dataSource
     }
 
-    private func update(with viewModels: [AnyTorrentListItemViewModel]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+    private func update(with items: [TorrentListItem]) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, TorrentListItem>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(viewModels.map { Item(viewModel: $0) }, toSection: .main)
+        snapshot.appendItems(items, toSection: .main)
 
         if applySnapshotInBackground {
             DispatchQueue.global(qos: .userInteractive).async {
@@ -321,6 +309,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     @objc
     private func selectButtonTapped(_ sender: UIBarButtonItem) {
         setEditing(true, animated: true)
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
         viewModel.handle(.didBeginEditing)
         configureEditingBarButtonItems()
         configureEditingToolbarItems()
@@ -329,6 +321,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
         setEditing(false, animated: true)
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
         viewModel.handle(.didEndEditing)
         viewModel.handle(.multiSelectUpdated(indices: []))
         configureNormalBarButtonItems()

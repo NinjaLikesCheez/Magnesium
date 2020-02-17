@@ -26,6 +26,7 @@ protocol StandardTorrent {
     var totalPeers: Int { get }
     var trackerStrings: [String] { get }
     var label: String { get }
+    var downloadPath: String { get }
 }
 
 extension StandardTorrent {

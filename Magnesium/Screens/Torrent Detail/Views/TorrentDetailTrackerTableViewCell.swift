@@ -33,6 +33,7 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
     }
 
     private func setup() {
+        selectionStyle = .none
         setupViews()
         setupLayoutConstraints()
     }
@@ -59,7 +60,7 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(withTracker tracker: String, isLastRow: Bool) {
+    func configure(tracker: String, isLastRow: Bool) {
         trackerLabel.text = tracker
         separatorView.isHidden = isLastRow
     }

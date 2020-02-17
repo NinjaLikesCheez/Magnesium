@@ -10,13 +10,10 @@ import Combine
 @testable import Magnesium
 
 final class MockTransmissionRefresher: TransmissionRefreshable {
-    private let client: TransmissionClient
-
-    init(client: TransmissionClient) {
-        self.client = client
-    }
-
+    private(set) var refreshTransmissionCallCount = 0
+    var refreshTransmissionResult = Just(()).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
     func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {
-        return client.getTorrents().map { _ in () }.eraseToAnyPublisher()
+        refreshTransmissionCallCount += 1
+        return refreshTransmissionResult
     }
 }

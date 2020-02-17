@@ -122,6 +122,14 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(values, [true, false])
     }
 
+    func test_refresh_isLoading_whenFails_shouldEmitTrueThenFalse() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        var values = [Bool]()
+        viewModel.state.isLoading.dropFirst().sink { values.append($0) }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertEqual(values, [true, false])
+    }
+
     // MARK: addSelected
 
     func test_addSelected_shouldEmitAddEvent() {
@@ -198,13 +206,13 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(hash: "C", name: "TEST.TORRENT", dateAdded: Date(timeIntervalSinceNow: -2)),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
-        var items: [AnyTorrentListItemViewModel]?
+        var items: [TorrentListItem]?
         viewModel.state.items.sink { items = $0 }.store(in: &observers)
         viewModel.handle(.search(query: "test tor"))
         XCTAssertEqual(items!.count, 2)
         let names: [String?] = items?.map {
             var name: String?
-            $0.state.name.sink { name = $0 }.store(in: &observers)
+            $0.name.sink { name = $0 }.store(in: &observers)
             return name
         } ?? []
         XCTAssertEqual(names, ["test torrent", "TEST.TORRENT"])
@@ -274,7 +282,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(implementation.removeParamRemoveData, [false])
     }
 
-    func test_removeSelected_whenKeepDataSelected_andFails_shouldCallImplementationRemoveAndRefresh() {
+    func test_removeSelected_whenKeepDataSelected_andFails_shouldEmitAlert() {
         implementation.removeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         let optionsAlert = getAlert {
             viewModel.handle(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
@@ -296,7 +304,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(implementation.removeParamRemoveData, [true])
     }
 
-    func test_removeSelected_whenRemoveDataSelected_andFails_shouldCallImplementationRemoveAndRefresh() {
+    func test_removeSelected_whenRemoveDataSelected_andFails_shouldEmitAlert() {
         implementation.removeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         let optionsAlert = getAlert {
             viewModel.handle(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
@@ -325,7 +333,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let activities = getActivities {
             viewModel.handle(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
         }!
-        XCTAssertEqual(activities.map { $0.title }, ["Set Label", "Verify Files", "Update Trackers"])
+        let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
+        XCTAssertEqual(activities.map { $0.title }, expected)
     }
 
     func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() {
@@ -334,7 +343,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let activities = getActivities {
             viewModel.handle(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
         }!
-        XCTAssertEqual(activities.map { $0.title }, ["Verify Files", "Update Trackers"])
+        let expected = ["Verify Files", "Move Download Folder", "Update Trackers"]
+        XCTAssertEqual(activities.map { $0.title }, expected)
     }
 
     // MARK: moreOptionsSelected - Set Label
@@ -403,7 +413,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
-    func test_verifyFilesActivity__whenFails_shouldEmitAlert() {
+    func test_verifyFilesActivity_whenFails_shouldEmitAlert() {
         implementation.verifyResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         let activities = getActivities {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
@@ -412,6 +422,96 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             activities.first { $0.title == "Verify Files" }?.handler()
         }!
         XCTAssertEqual(alert.title, "Failed to Verify Files")
+    }
+
+    // MARK: moreOptionsSelected - Move Download Folder
+
+    func test_moveDownloadFolderActivity_shouldEmitMoveDownloadFolderEvent() {
+        let activities = getActivities {
+            viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case .moveDownloadFolder = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
+    func test_moveDownloadFolderActivity_withSameDownloadPath_shouldHaveCurrentPath() {
+        implementation.refreshResult = Just(([
+            MockTorrent(downloadPath: "/downloads"),
+            MockTorrent(downloadPath: "/downloads"),
+        ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+
+        let activities = getActivities {
+            viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case let .moveDownloadFolder(path, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertEqual(path, "/downloads")
+    }
+
+    func test_moveDownloadFolderActivity_withDifferentDownloadPaths_shouldHaveNilCurrentPath() {
+        implementation.refreshResult = Just(([
+            MockTorrent(downloadPath: "/downloads"),
+            MockTorrent(downloadPath: "/downloads2"),
+        ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+
+        let activities = getActivities {
+            viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case let .moveDownloadFolder(path, _) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        XCTAssertNil(path)
+    }
+
+    // swiftlint:disable:next line_length
+    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_shouldCallImplementationMoveDownloadFolderAndRefresh() {
+        let activities = getActivities {
+            viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case let .moveDownloadFolder(_, subject) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        subject.send("/new")
+        XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
+        XCTAssertEqual(implementation.moveDownloadFolderParamPath, ["/new"])
+    }
+
+    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andFails_shouldEmitAlert() {
+        implementation.moveDownloadFolderResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        let activities = getActivities {
+            viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case let .moveDownloadFolder(_, subject) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+        let alert = getAlert {
+            subject.send("/new")
+        }!
+        XCTAssertEqual(alert.title, "Failed to Move Download Folder")
     }
 
     // MARK: moreOptionsSelected - Update Trackers
@@ -511,6 +611,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
               Pause
               Verify Files
+              Move Download Folder
               Update Trackers
               Remove
                 Keep Data
@@ -542,6 +643,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
                 label1
                 label2
               Verify Files
+              Move Download Folder
               Update Trackers
               Remove
                 Keep Data
@@ -581,6 +683,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
                 label1
                 label2
               Verify Files
+              Move Download Folder
               Update Trackers
               Remove
                 Keep Data
@@ -724,6 +827,17 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
         updateTrackersCallCount += 1
         updateTrackersParamTorrents.append(torrents)
         return updateTrackersResult
+    }
+
+    private(set) var moveDownloadFolderCallCount = 0
+    private(set) var moveDownloadFolderParamTorrents = [[MockTorrent]]()
+    private(set) var moveDownloadFolderParamPath = [String]()
+    var moveDownloadFolderResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+    func moveDownloadFolder(for torrents: [MockTorrent], to path: String) -> AnyPublisher<Void, Error> {
+        moveDownloadFolderCallCount += 1
+        moveDownloadFolderParamTorrents.append(torrents)
+        moveDownloadFolderParamPath.append(path)
+        return moveDownloadFolderResult
     }
 }
 

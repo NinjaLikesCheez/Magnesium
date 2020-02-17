@@ -29,6 +29,7 @@ protocol DelugeClient {
     func add(fileURL: URL) -> AnyPublisher<Void, DelugeError>
     func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError>
     func reannounce(hashes: [String]) -> AnyPublisher<Void, DelugeError>
+    func moveStorage(forTorrentHashes hashes: [String], to path: String) -> AnyPublisher<Void, DelugeError>
 }
 
 extension DefaultDelugeClient: DelugeClient {}

@@ -168,6 +168,7 @@ public final class Client {
             "total_peers",
             "trackers",
             "label",
+            "download_location",
         ]
 
         return request(method: "web.update_ui", params: [keys, []])
@@ -232,7 +233,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Resumes torrents.
+    /// Resumes the given torrents.
     /// - Parameter hashes: The hashes of the torrents to resume.
     public func resume(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.resume_torrent", params: [hashes])
@@ -240,7 +241,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Pauses torrents.
+    /// Pauses the given torrents.
     /// - Parameter hashes: The hashes of the torrents to pause.
     public func pause(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.pause_torrent", params: [hashes])
@@ -248,7 +249,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Removes torrents from the server.
+    /// Removes the given torrents from the server.
     /// - Parameters:
     ///   - hashes: The hashes of the torrents to remove.
     ///   - removeData: If the torrents' data should be removed.
@@ -258,7 +259,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Rechecks torrents' data.
+    /// Rechecks the given torrents' data.
     /// - Parameter hashes: The hashes of the torrents to recheck.
     public func recheck(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.force_recheck", params: [hashes])
@@ -347,10 +348,20 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Updates the trackers for the torrent and requests more peers.
+    /// Updates the trackers for the given torrents and requests more peers.
     /// - Parameter ids: The IDs of the torrents whose trackers should be updated.
     public func reannounce(hashes: [String]) -> AnyPublisher<Void, Error> {
         return request(method: "core.force_reannounce", params: [hashes])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Moves the storage for the given torrents.
+    /// - Parameters:
+    ///   - hashes: The torrent hashes to update.
+    ///   - path: The path to the new download folder.
+    public func moveStorage(forTorrentHashes hashes: [String], to path: String) -> AnyPublisher<Void, Error> {
+        return request(method: "core.move_storage", params: [hashes, path])
             .map { _ in () }
             .eraseToAnyPublisher()
     }

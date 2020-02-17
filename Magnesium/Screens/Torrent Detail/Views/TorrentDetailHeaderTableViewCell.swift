@@ -7,7 +7,6 @@
 //
 
 import Combine
-import SwiftUI
 import UIKit
 
 protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
@@ -152,6 +151,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     private func setup() {
+        selectionStyle = .none
         UIView.performWithoutAnimation {
             setupViews()
             setupLayoutConstraints()
@@ -175,9 +175,8 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         }
 
         nameLabel.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
-        nameLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
+        labelLabel.setContentCompressionResistancePriority(.defaultHigh - 1, for: .vertical)
         statusLabel.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
-        statusLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
         buttonHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 0)
 
@@ -203,19 +202,25 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with state: TorrentDetailHeaderViewState) {
-        state.name
+    func configure(with item: TorrentDetailHeaderItem) {
+        item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
-        state.label
+        item.label
             .filter { !$0.isEmpty }
             .asOptional()
             .assign(to: \.text, on: labelLabel)
             .store(in: &observers)
 
-        state.label
+        item.label
+            .map(\.isEmpty)
+            .removeDuplicates()
+            .assign(to: \.isHidden, on: labelLabel)
+            .store(in: &observers)
+
+        item.label
             .map(\.isEmpty)
             .removeDuplicates()
             .dropFirst()
@@ -225,26 +230,20 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             }
             .store(in: &observers)
 
-        state.label
-            .map(\.isEmpty)
-            .removeDuplicates()
-            .assign(to: \.isHidden, on: labelLabel)
-            .store(in: &observers)
-
-        state.isActive
+        item.isActive
             .sink(receiveValue: { [weak self] in self?.isActive = $0 })
             .store(in: &observers)
 
-        state.progress
+        item.progress
             .assign(to: \.progress, on: progressView)
             .store(in: &observers)
 
-        state.progressColor
+        item.progressColor
             .asOptional()
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        state.status
+        item.status
             .asOptional()
             .assign(to: \.text, on: statusLabel)
             .store(in: &observers)
@@ -262,46 +261,5 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     @objc
     private func removeButtonTapped(_ sender: UIButton) {
         delegate?.headerDidSelectRemove(self, sender: sender)
-    }
-}
-
-struct TorrentDetailHeaderTableViewCell_Previews: PreviewProvider {
-    private struct Container: UIViewRepresentable {
-        let state: TorrentDetailHeaderViewState
-
-        func makeUIView(
-            context: UIViewRepresentableContext<Container>
-        ) -> PreviewViewContainer<TorrentDetailHeaderTableViewCell> {
-            return PreviewViewContainer(TorrentDetailHeaderTableViewCell(style: .default, reuseIdentifier: nil))
-        }
-
-        func updateUIView(
-            _ uiView: PreviewViewContainer<TorrentDetailHeaderTableViewCell>,
-            context: UIViewRepresentableContext<Container>
-        ) {
-            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            uiView.inner.configure(with: state)
-        }
-    }
-
-    static var previews: some View {
-        let state = TorrentDetailHeaderViewState(
-            name: Just("Torrent").eraseToAnyPublisher(),
-            isActive: Just(true).eraseToAnyPublisher(),
-            progress: Just(1).eraseToAnyPublisher(),
-            progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-            status: Just("Seeding (100%)").eraseToAnyPublisher(),
-            label: Just("label").eraseToAnyPublisher()
-        )
-        return Group {
-            Container(state: state)
-                .previewDisplayName("Light")
-                .previewLayout(.sizeThatFits)
-            Container(state: state)
-                .previewLayout(.sizeThatFits)
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
-        }
     }
 }

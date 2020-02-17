@@ -7,7 +7,6 @@
 //
 
 import Combine
-import SwiftUI
 import UIKit
 
 final class TorrentDetailFileTableViewCell: UITableViewCell {
@@ -58,6 +57,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 
     private func setup() {
+        selectionStyle = .none
         setupViews()
         setupLayoutConstraints()
     }
@@ -99,60 +99,22 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with state: TorrentDetailFileViewState, isLastRow: Bool) {
-        state.name
+    func configure(with item: TorrentDetailFileItem, isLastRow: Bool) {
+        item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
-        state.size
+        item.size
             .asOptional()
             .assign(to: \.text, on: sizeLabel)
             .store(in: &observers)
 
-        state.progress
+        item.progress
             .asOptional()
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
 
         separatorView.isHidden = isLastRow
-    }
-}
-
-struct TorrentDetailFileTableViewCell_Previews: PreviewProvider {
-    private struct Container: UIViewRepresentable {
-        let state: TorrentDetailFileViewState
-
-        func makeUIView(
-            context: UIViewRepresentableContext<Container>
-        ) -> PreviewViewContainer<TorrentDetailFileTableViewCell> {
-            return PreviewViewContainer(TorrentDetailFileTableViewCell(style: .default, reuseIdentifier: nil))
-        }
-
-        func updateUIView(
-            _ uiView: PreviewViewContainer<TorrentDetailFileTableViewCell>,
-            context: UIViewRepresentableContext<Container>
-        ) {
-            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            uiView.inner.configure(with: state, isLastRow: false)
-        }
-    }
-
-    static var previews: some View {
-        let state = TorrentDetailFileViewState(
-            name: Just("file.rar").eraseToAnyPublisher(),
-            size: Just("50.0 MB").eraseToAnyPublisher(),
-            progress: Just("100%").eraseToAnyPublisher()
-        )
-        return Group {
-            Container(state: state)
-                .previewDisplayName("Light")
-                .previewLayout(.sizeThatFits)
-            Container(state: state)
-                .previewLayout(.sizeThatFits)
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
-        }
     }
 }

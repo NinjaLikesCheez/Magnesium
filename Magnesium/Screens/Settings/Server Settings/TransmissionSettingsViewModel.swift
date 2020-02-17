@@ -62,39 +62,39 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         passwordSubject = CurrentValueSubject(keychain?.password)
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
-        let nameInput = TextInputTableViewCellViewState(
+        let nameInput = TextInputItem(
             name: L10n.serverSettingsOptionName,
             placeholder: L10n.transmission,
             value: nameSubject,
             isEnabled: nameEnabled.eraseToAnyPublisher(),
-            configuration: TextInputConfiguration.default.withReturnKeyType(.next)
+            configuration: TextInputItem.Configuration.default.withReturnKeyType(.next)
         )
 
         let serverEnabled = CurrentValueSubject<Bool, Never>(true)
-        let serverInput = TextInputTableViewCellViewState(
+        let serverInput = TextInputItem(
             name: L10n.serverSettingsOptionServer,
             placeholder: "https://example.com",
             value: serverSubject,
             isEnabled: serverEnabled.eraseToAnyPublisher(),
-            configuration: TextInputConfiguration.url.withReturnKeyType(.next)
+            configuration: TextInputItem.Configuration.url.withReturnKeyType(.next)
         )
 
         let usernameEnabled = CurrentValueSubject<Bool, Never>(true)
-        let usernameInput = TextInputTableViewCellViewState(
+        let usernameInput = TextInputItem(
             name: L10n.serverSettingsOptionUsername,
             placeholder: L10n.serverSettingsOptionUsernameHintOptional,
             value: usernameSubject,
             isEnabled: usernameEnabled.eraseToAnyPublisher(),
-            configuration: TextInputConfiguration.username.withReturnKeyType(.next)
+            configuration: TextInputItem.Configuration.username.withReturnKeyType(.next)
         )
 
         let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
-        let passwordInput = TextInputTableViewCellViewState(
+        let passwordInput = TextInputItem(
             name: L10n.serverSettingsOptionPassword,
             placeholder: L10n.serverSettingsOptionPasswordHintOptional,
             value: passwordSubject,
             isEnabled: passwordEnabled.eraseToAnyPublisher(),
-            configuration: TextInputConfiguration.password.withReturnKeyType(.send)
+            configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
         state = ServerSettingsViewState(

@@ -59,6 +59,10 @@ enum L10n {
         return NSLocalizedString("action_delete", comment: "Delete")
     }
 
+    static var moveDownloadFolder: String {
+        return NSLocalizedString("action_move_download_folder", comment: "Move Download Folder")
+    }
+
     // MARK: Screens
 
     static var torrentsScreenTitle: String {
@@ -189,6 +193,10 @@ enum L10n {
             comment: "The server returned an unexpected status code ({statusCode})."
         )
         return .localizedStringWithFormat(format, statusCode)
+    }
+
+    static var moveDownloadFolderError: String {
+        return NSLocalizedString("error_move_download_folder", comment: "Failed to Move Download Folder")
     }
 
     // MARK: Servers
@@ -384,6 +392,10 @@ enum L10n {
 
     static var torrentInfoSeed: String {
         return NSLocalizedString("torrent_info_seeds", comment: "Seeds")
+    }
+
+    static var torrentInfoDownloadFolder: String {
+        return NSLocalizedString("torrent_info_download_folder", comment: "Download Folder")
     }
 
     // MARK: Label

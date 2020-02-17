@@ -7,11 +7,25 @@
 //
 
 import Combine
-import SwiftUI
 import UIKit
+import ViewModel
 
 final class TorrentDetailInfoTableViewCell: UITableViewCell {
     private var observers = [AnyCancellable]()
+
+    private lazy var verticalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 5
+        return stackView
+    }()
+
+    private lazy var horizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        return stackView
+    }()
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -24,6 +38,21 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         return label
+    }()
+
+    private lazy var expandedValueLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.numberOfLines = 0
+        return label
+    }()
+
+    private lazy var expandImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.tintColor = .secondaryLabel
+        imageView.image = UIImage(systemName: "chevron.down")
+        imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .subheadline)
+        return imageView
     }()
 
     private lazy var separatorView: UIView = {
@@ -47,30 +76,32 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
     }
 
     private func setup() {
+        selectionStyle = .none
         setupViews()
         setupLayoutConstraints()
     }
 
     private func setupViews() {
-        contentView.addSubview(nameLabel)
-        contentView.addSubview(valueLabel)
+        horizontalStackView.addArrangedSubview(nameLabel)
+        horizontalStackView.addArrangedSubview(valueLabel)
+        horizontalStackView.addArrangedSubview(expandImageView)
+        verticalStackView.addArrangedSubview(horizontalStackView)
+        verticalStackView.addArrangedSubview(expandedValueLabel)
+        contentView.addSubview(verticalStackView)
         contentView.addSubview(separatorView)
     }
 
     private func setupLayoutConstraints() {
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        valueLabel.translatesAutoresizingMaskIntoConstraints = false
+        verticalStackView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            nameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+        nameLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
-            valueLabel.leadingAnchor.constraint(greaterThanOrEqualTo: nameLabel.trailingAnchor, constant: 8),
-            valueLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            valueLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
-            valueLabel.bottomAnchor.constraint(equalTo: nameLabel.bottomAnchor),
+        NSLayoutConstraint.activate([
+            verticalStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            verticalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            verticalStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            verticalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -79,48 +110,51 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(name: String, value: AnyPublisher<String, Never>, isLastRow: Bool) {
-        nameLabel.text = name
-        value
-            .asOptional()
-            .assign(to: \.text, on: valueLabel)
-            .store(in: &observers)
+    func configure(with item: TorrentDetailInfoItem, isExpanded: Bool, isLastRow: Bool) {
+        nameLabel.text = item.name
         separatorView.isHidden = isLastRow
-    }
-}
 
-struct TorrentDetailInfoTableViewCell_Previews: PreviewProvider {
-    private struct Container: UIViewRepresentable {
-        let name: String
-        let value: AnyPublisher<String, Never>
-
-        func makeUIView(
-            context: UIViewRepresentableContext<Container>
-        ) -> PreviewViewContainer<TorrentDetailInfoTableViewCell> {
-            return PreviewViewContainer(TorrentDetailInfoTableViewCell(style: .default, reuseIdentifier: nil))
-        }
-
-        func updateUIView(
-            _ uiView: PreviewViewContainer<TorrentDetailInfoTableViewCell>,
-            context: UIViewRepresentableContext<Container>
-        ) {
-            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            uiView.inner.configure(name: name, value: value, isLastRow: false)
+        if isExpanded, let expandedValue = item.expandedValue {
+            configureForExpanded()
+            expandedValue
+                .asOptional()
+                .assign(to: \.text, on: expandedValueLabel)
+                .store(in: &observers)
+        } else {
+            configureForCollapsed()
+            expandImageView.isHidden = item.expandedValue == nil
+            item.value
+                .asOptional()
+                .assign(to: \.text, on: valueLabel)
+                .store(in: &observers)
         }
     }
 
-    static var previews: some View {
-        let name = "Downloaded"
-        let value = Just("1.4 GB").eraseToAnyPublisher()
-        return Group {
-            Container(name: name, value: value)
-                .previewDisplayName("Light")
-                .previewLayout(.sizeThatFits)
-            Container(name: name, value: value)
-                .previewLayout(.sizeThatFits)
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
+    private func configureForExpanded() {
+        valueLabel.alpha = 0
+        expandImageView.alpha = 0
+        expandedValueLabel.alpha = 1
+        expandedValueLabel.isHidden = false
+    }
+
+    private func configureForCollapsed() {
+        valueLabel.alpha = 1
+        expandImageView.alpha = 1
+        expandedValueLabel.alpha = 0
+        expandedValueLabel.isHidden = true
+    }
+
+    func prepareForExpansion() {
+        valueLabel.alpha = 1
+        expandImageView.alpha = 1
+        expandedValueLabel.alpha = 0
+    }
+
+    func animateExpansion() {
+        UIView.animate(withDuration: 0.25) {
+            self.valueLabel.alpha = 0
+            self.expandImageView.alpha = 0
+            self.expandedValueLabel.alpha = 1
         }
     }
 }

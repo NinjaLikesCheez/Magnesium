@@ -28,6 +28,7 @@ protocol StandardTorrentListViewModelImplementation {
     func verify(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
     func setLabel(_ label: Label, for torrents: [Torrent]) -> AnyPublisher<Void, Error>
     func updateTrackers(for torrents: [Torrent]) -> AnyPublisher<Void, Error>
+    func moveDownloadFolder(for torrents: [Torrent], to path: String) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -65,7 +66,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .ui()
             .eraseToAnyPublisher()
         let items = torrents.values
-            .map { $0.map { AnyViewModel(StandardTorrentListItemViewModel(subject: $0)) } }
+            .map { $0.map { TorrentListItem(torrent: $0) } }
             .removeDuplicates { $0.map(\.id) == $1.map(\.id) }
             .ui()
             .eraseToAnyPublisher()
@@ -258,6 +259,22 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
+                }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func moveDownloadFolder(for torrents: [Torrent], to path: String) {
+        implementation.moveDownloadFolder(for: torrents, to: path)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &observers)
     }
@@ -298,6 +315,17 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
         activities.append(.verifyFiles {
             self.verify(torrents)
+        })
+
+        activities.append(.moveDownloadFolder {
+            let subject = PassthroughSubject<String, Never>()
+            subject
+                .sink { [weak self] path in
+                    self?.moveDownloadFolder(for: torrents, to: path)
+                }
+                .store(in: &self.observers)
+            let currentPath = Set(torrents.map(\.downloadPath)).count == 1 ? torrents[0].downloadPath : nil
+            self.eventSubject.send(.moveDownloadFolder(currentPath: currentPath, subject: subject))
         })
 
         activities.append(.updateTrackers {
@@ -353,6 +381,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 self?.isLoadingSubject.send(false)
                 self?.labels.send(update.1)
                 self?.torrents.update(with: update.0.map { ($0.hash, $0) })
+            }, receiveCompletion: { [weak self] _ in
+                self?.isLoadingSubject.send(false)
             })
             .map { _ in () }
             .eraseToAnyPublisher()
@@ -393,13 +423,30 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         })
 
         actions.append(UIAction(
+            title: L10n.moveDownloadFolder,
+            image: UIImage(systemName: "tray.and.arrow.down"),
+            handler: { [weak self] _ in
+                guard let strongSelf = self else { return }
+                let subject = PassthroughSubject<String, Never>()
+                subject
+                    .sink { [weak self] path in
+                        self?.moveDownloadFolder(for: [torrent], to: path)
+                    }
+                    .store(in: &strongSelf.observers)
+                strongSelf.eventSubject.send(.moveDownloadFolder(
+                    currentPath: torrent.downloadPath,
+                    subject: subject
+                ))
+            }
+        ))
+
+        actions.append(UIAction(
             title: L10n.updateTrackers,
             image: UIImage(systemName: "arrow.clockwise"),
             handler: { [weak self] _ in
                 self?.updateTrackers(for: [torrent])
             }
         ))
-
         actions.append(UIMenu(
             title: L10n.remove,
             image: UIImage(systemName: "trash"),

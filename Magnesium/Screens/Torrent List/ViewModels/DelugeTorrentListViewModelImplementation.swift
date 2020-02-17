@@ -101,6 +101,12 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         return client.reannounce(hashes: torrents.map(\.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
+    func moveDownloadFolder(for torrents: [DelugeTorrent], to path: String) -> AnyPublisher<Void, Error> {
+        return client.moveStorage(forTorrentHashes: torrents.map(\.hash), to: path)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
         return client.getCurrentState()
             .handleEvents(receiveOutput: { [weak self] in

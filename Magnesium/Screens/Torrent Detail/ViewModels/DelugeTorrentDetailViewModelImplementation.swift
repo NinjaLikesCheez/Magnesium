@@ -54,4 +54,10 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     func updateTrackers(for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         return client.reannounce(hashes: [torrent.hash]).mapError { $0 as Error }.eraseToAnyPublisher()
     }
+
+    func moveDownloadFolder(for torrent: DelugeTorrent, to path: String) -> AnyPublisher<Void, Error> {
+        return client.moveStorage(forTorrentHashes: [torrent.hash], to: path)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }

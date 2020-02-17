@@ -26,6 +26,7 @@ protocol TransmissionClient {
     func reannounce(ids: [Int]) -> AnyPublisher<Void, TransmissionError>
     func add(url: URL) -> AnyPublisher<Void, TransmissionError>
     func add(fileURL: URL) -> AnyPublisher<Void, TransmissionError>
+    func moveLocation(ofTorrentIDs ids: [Int], to path: String) -> AnyPublisher<Void, TransmissionError>
 }
 
 extension DefaultTransmissionClient: TransmissionClient {}

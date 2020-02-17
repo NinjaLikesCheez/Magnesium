@@ -23,6 +23,7 @@ protocol StandardTorrentDetailViewModelImplementation {
     func verify(_ torrent: Torrent) -> AnyPublisher<Void, Error>
     func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
     func updateTrackers(for torrent: Torrent) -> AnyPublisher<Void, Error>
+    func moveDownloadFolder(for torrent: Torrent, to path: String) -> AnyPublisher<Void, Error>
 }
 
 // swiftlint:disable:next line_length
@@ -95,10 +96,6 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    deinit {
-        autoRefreshTimer?.invalidate()
-    }
-
     private static func createSections(
         subject: CurrentValueSubject<Torrent, Never>,
         torrent: Torrent,
@@ -106,51 +103,63 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
         sections.append(TorrentDetailSection(type: .header, items: [
-            .header(AnyViewModel(StandardTorrentDetailHeaderViewModel(subject: subject))),
+            .header(TorrentDetailHeaderItem(torrent: subject)),
         ]))
         sections.append(TorrentDetailSection(type: .info, items: [
-            .info(
-                L10n.torrentInfoSize,
-                subject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoDownloadSpeed,
-                subject
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoSize,
+                value: subject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoDownloadSpeed,
+                value: subject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoUploadSpeed,
-                subject
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoUploadSpeed,
+                value: subject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoDownloaded,
-                subject.map { Formatters.bytes.string(fromByteCount: $0.downloaded) }.ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoUploaded,
-                subject.map { Formatters.bytes.string(fromByteCount: $0.uploaded) }.ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoETA,
-                subject.map(\.formattedETA).ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoRatio,
-                subject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoPeers,
-                subject.map { L10n.torrentPeers(peers: $0.peers, totalPeers: $0.totalPeers) }.ui().eraseToAnyPublisher()
-            ),
-            .info(
-                L10n.torrentInfoSeed,
-                subject.map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }.ui().eraseToAnyPublisher()
-            ),
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoDownloaded,
+                value: subject.map { Formatters.bytes.string(fromByteCount: $0.downloaded) }.ui().eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoUploaded,
+                value: subject.map { Formatters.bytes.string(fromByteCount: $0.uploaded) }.ui().eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoETA,
+                value: subject.map(\.formattedETA).ui().eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoRatio,
+                value: subject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoPeers,
+                value: subject
+                    .map { L10n.torrentPeers(peers: $0.peers, totalPeers: $0.totalPeers) }
+                    .ui()
+                    .eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoSeed,
+                value: subject.map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
+                    .ui()
+                    .eraseToAnyPublisher()
+            )),
+            .info(TorrentDetailInfoItem(
+                name: L10n.torrentInfoDownloadFolder,
+                value: subject.map { ($0.downloadPath as NSString).lastPathComponent }
+                    .ui()
+                    .eraseToAnyPublisher(),
+                expandedValue: subject.map(\.downloadPath).ui().eraseToAnyPublisher()
+            )),
         ]))
 
         if !torrent.trackerStrings.isEmpty {
@@ -159,21 +168,99 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
 
         if !files.isEmpty {
             sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(AnyViewModel(StandardTorrentDetailFileViewModel(subject: $0)))
+                .file(TorrentDetailFileItem(file: $0))
             }))
         }
 
         return sections
     }
 
-    private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(.ok)
-        eventSubject.send(.alert(alert, source: nil))
+    deinit {
+        autoRefreshTimer?.invalidate()
+    }
+
+    func handle(_ event: TorrentDetailViewEvent) {
+        switch event {
+        case .appear:
+            handleAppear()
+        case .disappear:
+            handleDisappear()
+        case .refresh:
+            handleRefresh()
+        case let .moreOptions(source):
+            handleMoreOptions(from: source)
+        case .pause:
+            pause()
+        case .resume:
+            resume()
+        case let .remove(source):
+            presentRemoveOptions(from: source)
+        }
+    }
+
+    private func handleAppear() {
+        if let timer = autoRefreshTimer, timer.isValid {
+            return
+        }
+
+        timerIntervalObserver = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
+                self?.configureAutoRefreshTimer(interval: value)
+            })
+    }
+
+    private func handleDisappear() {
+        autoRefreshTimer?.invalidate()
+        timerIntervalObserver?.cancel()
+    }
+
+    private func handleRefresh() {
+        isRefreshingSubject.send(true)
+        implementation.refresh()
+            .mapError { $0 as Error }
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+                guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
+                return strongSelf.refreshFiles()
+            }
+            .ui()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                self?.isRefreshingSubject.send(false)
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
+            })
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func handleMoreOptions(from source: PopoverSource) {
+        let torrent = self.torrent.value
+        var activities = [Activity]()
+
+        if !labels.value.isEmpty {
+            activities.append(.setLabel {
+                self.presentLabelSelection(from: source)
+            })
+        }
+
+        activities.append(.verifyFiles {
+            self.verify()
+        })
+
+        activities.append(.moveDownloadFolder {
+            let subject = PassthroughSubject<String, Never>()
+            subject
+                .sink { [weak self] path in
+                    self?.moveDownloadFolder(to: path)
+                }
+                .store(in: &self.observers)
+            self.eventSubject.send(.moveDownloadFolder(currentPath: torrent.downloadPath, subject: subject))
+        })
+
+        activities.append(.updateTrackers {
+            self.updateTrackers()
+        })
+
+        eventSubject.send(.activities(activities, torrent: torrent, source: source))
     }
 
     private func pause() {
@@ -240,7 +327,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
-            }, receiveValue: { _ in })
+                }, receiveValue: { _ in })
             .store(in: &observers)
     }
 
@@ -276,7 +363,23 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .store(in: &observers)
     }
 
-    private func presentRemove(from source: PopoverSource) {
+    private func moveDownloadFolder(to path: String) {
+        implementation.moveDownloadFolder(for: torrent.value, to: path)
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard let strongSelf = self, case .finished = completion else { return }
+                strongSelf.implementation.refresh()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &strongSelf.observers)
+            })
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
+            }, receiveValue: { _ in })
+            .store(in: &observers)
+    }
+
+    private func presentRemoveOptions(from source: PopoverSource) {
         var alert = Alert(title: nil, message: nil, style: .actionSheet)
         alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
             self.remove(removeData: false)
@@ -299,79 +402,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         eventSubject.send(.alert(alert, source: source))
     }
 
-    // MARK: Handle
-
-    func handle(_ event: TorrentDetailViewEvent) {
-        switch event {
-        case .appear:
-            handleAppear()
-        case .disappear:
-            handleDisappear()
-        case .refresh:
-            handleRefresh()
-        case let .moreOptions(source):
-            handleMoreOptions(from: source)
-        case .pause:
-            pause()
-        case .resume:
-            resume()
-        case let .remove(source):
-            presentRemove(from: source)
-        }
-    }
-
-    private func handleAppear() {
-        if let timer = autoRefreshTimer, timer.isValid {
-            return
-        }
-
-        timerIntervalObserver = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
-                self?.configureAutoRefreshTimer(interval: value)
-            })
-    }
-
-    private func handleDisappear() {
-        autoRefreshTimer?.invalidate()
-        timerIntervalObserver?.cancel()
-    }
-
-    private func handleRefresh() {
-        isRefreshingSubject.send(true)
-        implementation.refresh()
-            .mapError { $0 as Error }
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
-                guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
-                return strongSelf.refreshFiles()
-            }
-            .ui()
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                self?.isRefreshingSubject.send(false)
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
-            })
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
-    }
-
-    private func handleMoreOptions(from source: PopoverSource) {
-        var activities = [Activity]()
-
-        if !labels.value.isEmpty {
-            activities.append(.setLabel {
-                self.presentLabelSelection(from: source)
-            })
-        }
-
-        activities.append(.verifyFiles {
-            self.verify()
-        })
-
-        activities.append(.updateTrackers {
-            self.updateTrackers()
-        })
-
-        eventSubject.send(.activities(activities, torrent: torrent.value, source: source))
+    private func showError(title: String, message: String?) {
+        var alert = Alert(
+            title: title,
+            message: message,
+            style: .alert
+        )
+        alert.addAction(.ok)
+        eventSubject.send(.alert(alert, source: nil))
     }
 
     // MARK: Auto Refresh

@@ -34,4 +34,5 @@ struct MockTorrent: StandardTorrent, Equatable {
     var totalPeers: Int = 0
     var trackerStrings: [String] = []
     var label = ""
+    var downloadPath: String = ""
 }

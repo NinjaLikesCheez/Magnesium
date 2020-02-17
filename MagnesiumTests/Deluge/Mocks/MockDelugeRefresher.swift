@@ -10,13 +10,10 @@ import Combine
 @testable import Magnesium
 
 final class MockDelugeRefresher: DelugeRefreshable {
-    private let client: DelugeClient
-
-    init(client: DelugeClient) {
-        self.client = client
-    }
-
+    private(set) var refreshDelugeCallCount = 0
+    var refreshDelugeResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
-        return client.getCurrentState().map { _ in () }.eraseToAnyPublisher()
+        refreshDelugeCallCount += 1
+        return refreshDelugeResult
     }
 }

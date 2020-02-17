@@ -20,6 +20,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var observers = [AnyCancellable]()
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
+    private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -74,7 +75,6 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     private func configureTableView() {
         tableView.cellLayoutMarginsFollowReadableWidth = true
-        tableView.allowsSelection = false
         tableView.separatorStyle = .none
         tableView.contentInset.top = 20
         tableView.register(TorrentDetailHeaderTableViewCell.self, forCellReuseIdentifier: "header")
@@ -90,7 +90,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
         dataSource = UITableViewDiffableDataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
             switch item {
-            case let .header(viewModel):
+            case let .header(item):
                 guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: "header",
                     for: indexPath
@@ -99,9 +99,9 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 }
 
                 cell.delegate = self
-                cell.configure(with: viewModel.state)
+                cell.configure(with: item)
                 return cell
-            case let .info(name, value):
+            case let .info(item):
                 guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: "info",
                     for: indexPath
@@ -110,8 +110,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 }
 
                 cell.configure(
-                    name: name,
-                    value: value,
+                    with: item,
+                    isExpanded: self?.expandedInfoIDs.contains(item.id) ?? false,
                     isLastRow: indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
                 )
                 return cell
@@ -124,11 +124,11 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 }
 
                 cell.configure(
-                    withTracker: tracker,
+                    tracker: tracker,
                     isLastRow: indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
                 )
                 return cell
-            case let .file(viewModel):
+            case let .file(item):
                 guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: "file",
                     for: indexPath
@@ -137,7 +137,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 }
 
                 cell.configure(
-                    with: viewModel.state,
+                    with: item,
                     isLastRow: indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
                 )
                 return cell
@@ -148,7 +148,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     }
 
     private func update(with sections: [TorrentDetailSection]) {
-        let animate = !isFirstSnapshot
+        let animated = !isFirstSnapshot
         isFirstSnapshot = false
 
         var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection.SectionType, TorrentDetailItem>()
@@ -159,7 +159,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         }
 
         DispatchQueue.global(qos: .userInteractive).async {
-            self.dataSource.apply(snapshot, animatingDifferences: animate)
+            self.dataSource.apply(snapshot, animatingDifferences: animated)
         }
     }
 
@@ -209,6 +209,33 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
     }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch dataSource.itemIdentifier(for: indexPath) {
+        case let .info(item):
+            guard !expandedInfoIDs.contains(item.id),
+                item.expandedValue != nil,
+                let cell = tableView.cellForRow(at: indexPath) as? TorrentDetailInfoTableViewCell
+            else {
+                return
+            }
+
+            expandedInfoIDs.insert(item.id)
+
+            let isLastRow = indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
+            cell.configure(with: item, isExpanded: true, isLastRow: isLastRow)
+            cell.prepareForExpansion()
+
+            UIView.performWithoutAnimation {
+                tableView.beginUpdates()
+                tableView.endUpdates()
+            }
+
+            cell.animateExpansion()
+        default:
+            break
+        }
+    }
 }
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
@@ -225,8 +252,7 @@ extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate 
     }
 
     func headerDidResize(_ header: TorrentDetailHeaderTableViewCell) {
-        DispatchQueue.global(qos: .userInteractive).async {
-            self.dataSource.apply(self.dataSource.snapshot(), animatingDifferences: true)
-        }
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
 }

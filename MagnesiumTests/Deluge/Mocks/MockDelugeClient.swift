@@ -11,150 +11,128 @@ import Foundation
 @testable import Magnesium
 
 final class MockDelugeClient: DelugeClient {
-    struct Requests: Equatable {
-        var authenticate = 0
-        var currentState = 0
-        var torrentFiles = 0
-        var pause = 0
-        var resume = 0
-        var remove = [Bool]()
-        var recheck = 0
-        var addURL = 0
-        var addMagnetURL = 0
-        var setLabel = 0
-        var reannounce = 0
-
-        mutating func reset() {
-            self = Requests()
-        }
-    }
-
-    struct Errors {
-        var authenticate = false
-        var currentState = false
-        var torrentFiles = false
-        var pause = false
-        var resume = false
-        var removeKeepData = false
-        var removeWithData = false
-        var recheck = false
-        var addURL = false
-        var addMagnetURL = false
-        var setLabel = false
-        var reannounce = false
-    }
-
-    var requests = Requests()
-    var errors = Errors()
-    var torrents = [DelugeTorrent.mock()]
-    var labels = [DelugeLabel.mock()]
-
+    private(set) var authenticateCallCount = 0
+    var authenticateResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func authenticate() -> AnyPublisher<Void, DelugeError> {
-        requests.authenticate += 1
-        guard !errors.authenticate else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        authenticateCallCount += 1
+        return authenticateResult
     }
 
+    private(set) var getCurrentStateCallCount = 0
+    var getCurrentStateResult = Just(([DelugeTorrent.mock()], [DelugeLabel.mock()]))
+        .setFailureType(to: DelugeError.self)
+        .eraseToAnyPublisher()
     func getCurrentState() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), DelugeError> {
-        requests.currentState += 1
-        guard !errors.currentState else {
-            return Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just((torrents, labels))
-            .setFailureType(to: DelugeError.self)
-            .eraseToAnyPublisher()
+        getCurrentStateCallCount += 1
+        return getCurrentStateResult
     }
 
+    private(set) var getTorrentFilesCallCount = 0
+    private(set) var getTorrentFilesParamHash = [String]()
+    var getTorrentFilesResult = Just([
+        DelugeTorrentFile.mock(index: 0, name: "file.rar"),
+        DelugeTorrentFile.mock(index: 1, name: "file.r00"),
+        DelugeTorrentFile.mock(index: 2, name: "file.r01"),
+    ]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError> {
-        requests.torrentFiles += 1
-        guard !errors.torrentFiles else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just([
-            DelugeTorrentFile.mock(index: 0, name: "file.rar"),
-            DelugeTorrentFile.mock(index: 1, name: "file.r00"),
-            DelugeTorrentFile.mock(index: 2, name: "file.r01"),
-        ]).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        getTorrentFilesCallCount += 1
+        getTorrentFilesParamHash.append(hash)
+        return getTorrentFilesResult
     }
 
+    private(set) var pauseCallCount = 0
+    private(set) var pauseParamHashes = [[String]]()
+    var pauseResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
-        requests.pause += 1
-        guard !errors.pause else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        pauseCallCount += 1
+        pauseParamHashes.append(hashes)
+        return pauseResult
     }
 
+    private(set) var resumeCallCount = 0
+    private(set) var resumeParamHashes = [[String]]()
+    var resumeResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
-        requests.resume += 1
-        guard !errors.resume else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        resumeCallCount += 1
+        resumeParamHashes.append(hashes)
+        return resumeResult
     }
 
+    private(set) var removeCallCount = 0
+    private(set) var removeParamHashes = [[String]]()
+    private(set) var removeParamRemoveData = [Bool]()
+    var removeResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError> {
-        requests.remove.append(removeData)
-        guard !(removeData && errors.removeWithData), !(!removeData && errors.removeKeepData) else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        removeCallCount += 1
+        removeParamHashes.append(hashes)
+        removeParamRemoveData.append(removeData)
+        return removeResult
     }
 
+    private(set) var recheckCallCount = 0
+    private(set) var recheckParamHashes = [[String]]()
+    var recheckResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
-        requests.recheck += 1
-        guard !errors.recheck else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        recheckCallCount += 1
+        recheckParamHashes.append(hashes)
+        return recheckResult
     }
 
+    private(set) var addURLCallCount = 0
+    private(set) var addURLParamURL = [URL]()
+    var addURLResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func add(url: URL) -> AnyPublisher<Void, DelugeError> {
-        requests.addURL += 1
-        guard !errors.addURL else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        addURLCallCount += 1
+        addURLParamURL.append(url)
+        return addURLResult
     }
 
+    private(set) var addMagnetURLCallCount = 0
+    private(set) var addMagnetURLParamMagnetURL = [URL]()
+    var addMagnetURLResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError> {
-        requests.addMagnetURL += 1
-        guard !errors.addMagnetURL else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        addMagnetURLCallCount += 1
+        addMagnetURLParamMagnetURL.append(magnetURL)
+        return addMagnetURLResult
     }
 
+    private(set) var addFileURLCallCount = 0
+    private(set) var addFileURLParamFileURL = [URL]()
+    var addFileURLResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func add(fileURL: URL) -> AnyPublisher<Void, DelugeError> {
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        addFileURLCallCount += 1
+        addFileURLParamFileURL.append(fileURL)
+        return addFileURLResult
     }
 
+    private(set) var setLabelCallCount = 0
+    private(set) var setLabelParamLabel = [String]()
+    private(set) var setLabelParamHash = [String]()
+    var setLabelResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError> {
-        requests.setLabel += 1
-        guard !errors.setLabel else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
-
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        setLabelCallCount += 1
+        setLabelParamLabel.append(label)
+        setLabelParamHash.append(hash)
+        return setLabelResult
     }
 
+    private(set) var reannounceCallCount = 0
+    private(set) var reannounceParamHashes = [[String]]()
+    var reannounceResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
     func reannounce(hashes: [String]) -> AnyPublisher<Void, DelugeError> {
-        requests.reannounce += 1
-        guard !errors.reannounce else {
-            return Fail(error: .unauthenticated).eraseToAnyPublisher()
-        }
+        reannounceCallCount += 1
+        reannounceParamHashes.append(hashes)
+        return reannounceResult
+    }
 
-        return Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+    private(set) var moveStorageCallCount = 0
+    private(set) var moveStorageParamHashes = [[String]]()
+    private(set) var moveStorageParamPath = [String]()
+    var moveStorageResult = Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+    func moveStorage(forTorrentHashes hashes: [String], to path: String) -> AnyPublisher<Void, DelugeError> {
+        moveStorageCallCount += 1
+        moveStorageParamHashes.append(hashes)
+        moveStorageParamPath.append(path)
+        return moveStorageResult
     }
 }

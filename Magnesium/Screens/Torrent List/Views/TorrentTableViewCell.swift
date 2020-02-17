@@ -7,7 +7,6 @@
 //
 
 import Combine
-import SwiftUI
 import UIKit
 
 final class TorrentTableViewCell: UITableViewCell {
@@ -135,81 +134,39 @@ final class TorrentTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with state: TorrentListItemViewState) {
-        state.name
+    func configure(with item: TorrentListItem) {
+        item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
             .store(in: &observers)
 
-        state.progress
+        item.progress
             .assign(to: \.progress, on: progressView)
             .store(in: &observers)
 
-        state.progressColor
+        item.progressColor
             .asOptional()
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &observers)
 
-        state.state
+        item.state
             .asOptional()
             .assign(to: \.text, on: stateLabel)
             .store(in: &observers)
 
-        state.speed
+        item.speed
             .asOptional()
             .assign(to: \.text, on: speedLabel)
             .store(in: &observers)
 
-        state.progressString
+        item.progressString
             .asOptional()
             .assign(to: \.text, on: progressLabel)
             .store(in: &observers)
 
-        state.ratioOrETA
+        item.ratioOrETA
             .asOptional()
             .assign(to: \.text, on: ratioOrETALabel)
             .store(in: &observers)
-    }
-}
-
-struct TorrentTableViewCell_Previews: PreviewProvider {
-    private struct Container: UIViewRepresentable {
-        let state: TorrentListItemViewState
-
-        func makeUIView(
-            context: UIViewRepresentableContext<Container>
-        ) -> PreviewViewContainer<TorrentTableViewCell> {
-            return PreviewViewContainer(TorrentTableViewCell(style: .default, reuseIdentifier: nil))
-        }
-
-        func updateUIView(
-            _ uiView: PreviewViewContainer<TorrentTableViewCell>,
-            context: UIViewRepresentableContext<Container>
-        ) {
-            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            uiView.inner.configure(with: state)
-        }
-    }
-
-    static var previews: some View {
-        let state = TorrentListItemViewState(
-            name: Just("Torrent").eraseToAnyPublisher(),
-            progress: Just(1).eraseToAnyPublisher(),
-            progressColor: Just(TorrentState.seeding.displayColor).eraseToAnyPublisher(),
-            state: Just("Seeding").eraseToAnyPublisher(),
-            speed: Just("↑ 0.0 KB/s").eraseToAnyPublisher(),
-            progressString: Just("1.0 GB / 1.0 GB").eraseToAnyPublisher(),
-            ratioOrETA: Just("Ratio: 1.0").eraseToAnyPublisher()
-        )
-        return Group {
-            Container(state: state)
-                .previewDisplayName("Light")
-                .previewLayout(.sizeThatFits)
-            Container(state: state)
-                .previewDisplayName("Dark")
-                .previewLayout(.sizeThatFits)
-                .environment(\.colorScheme, .dark)
-        }
     }
 }

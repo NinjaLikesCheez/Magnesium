@@ -170,6 +170,7 @@ public final class Client {
             "peersGettingFromUs",
             "peersConnected",
             "trackerStats",
+            "downloadDir",
         ]
 
         return request(method: "torrent-get", args: ["fields": fields])
@@ -212,7 +213,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Starts torrents.
+    /// Starts the given torrents.
     /// - Parameter ids: The IDs of the torrents to resume.
     public func start(ids: [Int]) -> AnyPublisher<Void, Error> {
         return request(method: "torrent-start", args: ["ids": ids])
@@ -220,7 +221,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Stops torrents.
+    /// Stops the given torrents.
     /// - Parameter ids: The IDs of the torrents to pause.
     public func stop(ids: [Int]) -> AnyPublisher<Void, Error> {
         return request(method: "torrent-stop", args: ["ids": ids])
@@ -238,7 +239,7 @@ public final class Client {
             .eraseToAnyPublisher()
     }
 
-    /// Verifies torrents' data.
+    /// Verifies the given torrents' data.
     /// - Parameter ids: The IDs of the torrents to verify.
     public func verify(ids: [Int]) -> AnyPublisher<Void, Error> {
         return request(method: "torrent-verify", args: ["ids": ids])
@@ -267,10 +268,20 @@ public final class Client {
         }
     }
 
-    /// Updates the trackers for the torrent and requests more peers.
+    /// Updates the trackers for the given torrents and requests more peers.
     /// - Parameter ids: The IDs of the torrents whose trackers should be updated.
     public func reannounce(ids: [Int]) -> AnyPublisher<Void, Error> {
         return request(method: "torrent-reannounce", args: ["ids": ids])
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    /// Moves the download location of the given torrents.
+    /// - Parameters:
+    ///   - ids: The torrent IDs to update.
+    ///   - path: The path to the new download folder.
+    public func moveLocation(ofTorrentIDs ids: [Int], to path: String) -> AnyPublisher<Void, Error> {
+        return request(method: "torrent-set-location", args: ["ids": ids, "location": path, "move": true])
             .map { _ in () }
             .eraseToAnyPublisher()
     }

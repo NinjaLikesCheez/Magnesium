@@ -62,6 +62,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             eventSubject.send(.showDetail(viewModel: viewModel))
         case .settings:
             eventSubject.send(.showSettings)
+        case let .moveDownloadFolder(currentPath, subject):
+            showMoveDownloadFolder(currentPath: currentPath, subject: subject)
         }
     }
 
@@ -130,6 +132,25 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         case .complete:
             coordinator.presentable.viewController.dismiss(animated: true)
         }
+    }
+
+    private func showMoveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>) {
+        let alertController = UIAlertController(
+            title: L10n.moveDownloadFolder,
+            message: nil,
+            preferredStyle: .alert
+        )
+        alertController.addTextField { textField in
+            textField.textContentType = .URL
+            textField.placeholder = "/downloads"
+            textField.text = currentPath
+        }
+        alertController.addAction(UIAlertAction(title: L10n.save, style: .default) { _ in
+            subject.send(alertController.textFields?.first?.text ?? "")
+            subject.send(completion: .finished)
+        })
+        alertController.addAction(UIAlertAction(title: L10n.cancel, style: .cancel))
+        viewController.present(alertController, animated: true, completion: nil)
     }
 }
 

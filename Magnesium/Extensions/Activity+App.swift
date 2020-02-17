@@ -35,4 +35,13 @@ extension Activity {
             handler: handler
         )
     }
+
+    static func moveDownloadFolder(handler: @escaping () -> Void) -> Activity {
+        return Activity(
+            title: L10n.moveDownloadFolder,
+            image: UIImage(systemName: "tray.and.arrow.down"),
+            type: "ca.jameshurst.Magnesium.move-download-folder",
+            handler: handler
+        )
+    }
 }

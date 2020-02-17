@@ -28,7 +28,8 @@ extension DelugeTorrent {
         peers: Int = 0,
         totalPeers: Int = 0,
         trackers: [String] = [],
-        label: String = ""
+        label: String = "",
+        downloadPath: String = ""
     ) -> DelugeTorrent {
         return DelugeTorrent(
             hash: hash,
@@ -47,7 +48,8 @@ extension DelugeTorrent {
             peers: peers,
             totalPeers: totalPeers,
             trackers: trackers,
-            label: label
+            label: label,
+            downloadPath: downloadPath
         )
     }
 
@@ -75,7 +77,8 @@ extension DelugeTorrent {
             peers: 0,
             totalPeers: 0,
             trackers: [],
-            label: ""
+            label: "",
+            downloadPath: ""
         )
     }
 }

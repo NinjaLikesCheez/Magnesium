@@ -78,21 +78,21 @@ final class TextInputTableViewCell: UITableViewCell {
         ])
     }
 
-    func configure(with state: TextInputTableViewCellViewState) {
-        nameLabel.text = state.name
-        textField.placeholder = state.placeholder
-        apply(configuration: state.configuration)
-        state.value
+    func configure(with item: TextInputItem) {
+        nameLabel.text = item.name
+        textField.placeholder = item.placeholder
+        apply(configuration: item.configuration)
+        item.value
             .filter { [weak textField] in textField?.text != $0 }
             .assign(to: \.text, on: textField)
             .store(in: &observers)
-        valueSubject = state.value
-        state.isEnabled
+        valueSubject = item.value
+        item.isEnabled
             .assign(to: \.isEnabled, on: textField)
             .store(in: &observers)
     }
 
-    private func apply(configuration: TextInputConfiguration) {
+    private func apply(configuration: TextInputItem.Configuration) {
         textField.isSecureTextEntry = configuration.isSecure
         textField.keyboardType = configuration.keyboardType
         textField.returnKeyType = configuration.returnKeyType
@@ -119,63 +119,5 @@ extension TextInputTableViewCell: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         proceedToNextInput?()
         return false
-    }
-}
-
-struct TextInputTableViewCell_Previews: PreviewProvider {
-    private struct Container: UIViewRepresentable {
-        let state: TextInputTableViewCellViewState
-
-        func makeUIView(
-            context: UIViewRepresentableContext<Container>
-        ) -> PreviewViewContainer<TextInputTableViewCell> {
-            return PreviewViewContainer(TextInputTableViewCell(style: .default, reuseIdentifier: nil))
-        }
-
-        func updateUIView(
-            _ uiView: PreviewViewContainer<TextInputTableViewCell>,
-            context: UIViewRepresentableContext<Container>
-        ) {
-            uiView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-            uiView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-            uiView.inner.configure(with: state)
-        }
-    }
-
-    static var previews: some View {
-        let emptyState = TextInputTableViewCellViewState(
-            name: "server",
-            placeholder: "https://example.com",
-            value: CurrentValueSubject(nil),
-            configuration: .url
-        )
-        let textState = TextInputTableViewCellViewState(
-            name: "server",
-            placeholder: "https://example.com",
-            value: CurrentValueSubject("https://example.com"),
-            configuration: .url
-        )
-        let secureState = TextInputTableViewCellViewState(
-            name: "password",
-            placeholder: "password",
-            value: CurrentValueSubject("password"),
-            configuration: .password
-        )
-        return ForEach(ColorScheme.allCases, id: \.self) { colorScheme in
-            Group {
-                Container(state: emptyState)
-                    .previewDisplayName("Empty")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, colorScheme)
-                Container(state: textState)
-                    .previewDisplayName("Text")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, colorScheme)
-                Container(state: secureState)
-                    .previewDisplayName("Secure")
-                    .previewLayout(.sizeThatFits)
-                    .environment(\.colorScheme, colorScheme)
-            }
-        }
     }
 }
