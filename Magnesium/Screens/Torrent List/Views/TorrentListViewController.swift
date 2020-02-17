@@ -401,6 +401,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         animator.addAnimations {
             self.provider?.commitPreviewForItem(at: indexPath.row)
         }
+        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
     }
 
     override func tableView(

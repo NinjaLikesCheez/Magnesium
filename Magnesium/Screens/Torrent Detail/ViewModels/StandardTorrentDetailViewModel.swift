@@ -89,7 +89,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
-        state = TorrentDetailViewState(sections: sections, isRefreshing: isRefreshingSubject.eraseToAnyPublisher())
+        state = TorrentDetailViewState(
+            hash: torrent.value.hash,
+            sections: sections,
+            isRefreshing: isRefreshingSubject.eraseToAnyPublisher()
+        )
 
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })

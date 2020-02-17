@@ -130,6 +130,16 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(values, [true, false])
     }
 
+    func test_refresh_shouldEmitTorrentsUpdatedEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.refresh)
+        guard case .torrentsUpdated = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
     // MARK: addSelected
 
     func test_addSelected_shouldEmitAddEvent() {
@@ -843,6 +853,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
 
 private final class MockDetailViewModel: ViewModel, EventEmitter {
     let state = TorrentDetailViewState(
+        hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()
     )

@@ -11,7 +11,9 @@ import Coordinator
 import UIKit
 import ViewModel
 
-protocol TorrentDetailViewControllerIdentifiable {}
+protocol TorrentDetailViewControllerIdentifiable {
+    var torrentHash: String { get }
+}
 
 // swiftlint:disable:next line_length
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable
@@ -21,6 +23,10 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
+
+    var torrentHash: String {
+        return viewModel.state.hash
+    }
 
     init(viewModel: VM) {
         self.viewModel = viewModel

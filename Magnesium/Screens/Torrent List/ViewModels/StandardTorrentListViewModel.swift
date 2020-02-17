@@ -98,6 +98,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 self?.torrents.update(with: update.0.map { ($0.hash, $0) })
             }
             .store(in: &observers)
+
+        torrents.values
+            .ui()
+            .sink { [weak self] torrents in
+                self?.eventSubject.send(.torrentsUpdated(hashes: torrents.map(\.value.hash)))
+            }
+            .store(in: &observers)
     }
 
     deinit {

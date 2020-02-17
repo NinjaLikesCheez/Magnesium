@@ -16,6 +16,7 @@ enum TorrentListCoordinatorEvent {
     case showDetail(viewModel: AnyTorrentDetailViewModel)
     case commitDetail(coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>)
     case showSettings
+    case torrentsUpdated(hashes: [String])
 }
 
 final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
@@ -64,6 +65,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             eventSubject.send(.showSettings)
         case let .moveDownloadFolder(currentPath, subject):
             showMoveDownloadFolder(currentPath: currentPath, subject: subject)
+        case let .torrentsUpdated(hashes):
+            eventSubject.send(.torrentsUpdated(hashes: hashes))
         }
     }
 

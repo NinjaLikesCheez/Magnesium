@@ -79,6 +79,8 @@ final class AppCoordinator: Coordinator, AlertPresenter {
             showTorrentDetail(for: viewModel)
         case let .commitDetail(coordinator):
             commitTorrentDetail(for: coordinator)
+        case let .torrentsUpdated(hashes):
+            handleTorrentsUpdated(hashes: hashes)
         }
     }
 
@@ -136,6 +138,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         switch event {
         case .complete:
             dismissDetailViewController(coordinator.presentable.viewController)
+            removeChildCoordinator(coordinator)
         }
     }
 
@@ -173,6 +176,22 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         })
         alert.addAction(.cancel)
         showAlert(alert, useTopViewController: true)
+    }
+
+    private func handleTorrentsUpdated(hashes: [String]) {
+        let coordinators = childCoordinators.values
+            .compactMap { $0.base as? TorrentDetailCoordinator<AnyTorrentDetailViewModel> }
+        for coordinator in coordinators {
+            let viewController = coordinator.presentable.viewController
+            guard let identifiable = viewController as? TorrentDetailViewControllerIdentifiable,
+                !hashes.contains(identifiable.torrentHash)
+            else {
+                continue
+            }
+
+            dismissDetailViewController(coordinator.presentable.viewController)
+            removeChildCoordinator(coordinator)
+        }
     }
 }
 

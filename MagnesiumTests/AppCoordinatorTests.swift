@@ -53,9 +53,9 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Add", "Cancel"])
     }
 
-    // MARK: handle - TorrentListCoordinatorEvent
+    // MARK: - Handle TorrentListCoordinatorEvent
 
-    func test_listCoordinator_showSettingsEvent_shouldShowSettings() throws {
+    func test_listCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(.showSettings)
         // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
@@ -66,7 +66,7 @@ class AppCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_listCoordinator_showDetailEvent_shouldShowDetail() throws {
+    func test_listCoordinatorEvent_showDetail_shouldShowDetail() throws {
         coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
         // swiftlint:disable:next force_cast
         let navigationController = splitViewController.detailViewController as! UINavigationController
@@ -77,7 +77,7 @@ class AppCoordinatorTests: XCTestCase {
         }
     }
 
-    func test_listCoordinator_commitDetail_shouldCommitDetail() throws {
+    func test_listCoordinatorEvent_commitDetail_shouldCommitDetail() throws {
         let viewModel = AnyTorrentDetailViewModel(MockTorrentDetailViewModel())
         let detailCoordinator = TorrentDetailCoordinator(viewModel: viewModel)
         coordinator.handle(TorrentListCoordinatorEvent.commitDetail(coordinator: detailCoordinator))
@@ -88,6 +88,22 @@ class AppCoordinatorTests: XCTestCase {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")
             return
         }
+    }
+
+    func test_listCoordinatorEvent_torrentsUpdated_whenHashNotRemoved_shouldDismissDetail() throws {
+        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        let previousDetailViewController = splitViewController.detailViewController
+        XCTAssertNotNil(previousDetailViewController)
+        coordinator.handle(.torrentsUpdated(hashes: ["A", "B"]))
+        XCTAssertEqual(splitViewController.detailViewController, previousDetailViewController)
+    }
+
+    func test_listCoordinatorEvent_torrentsUpdated_whenHashRemoved_shouldDismissDetail() throws {
+        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        let previousDetailViewController = splitViewController.detailViewController
+        XCTAssertNotNil(previousDetailViewController)
+        coordinator.handle(.torrentsUpdated(hashes: ["B"]))
+        XCTAssertNotEqual(splitViewController.detailViewController, previousDetailViewController)
     }
 
     // MARK: handle - SettingsCoordinatorEvent
@@ -109,7 +125,6 @@ class AppCoordinatorTests: XCTestCase {
             from: MockCoordinator(viewController: MockPresentableViewController())
         )
         XCTAssertNotEqual(splitViewController.detailViewController, previousDetailViewController)
-        // unfortunately not much else we can test here :(
     }
 }
 
@@ -133,10 +148,15 @@ private final class MockSplitViewController: PresentableSplitViewController {
 }
 
 private final class MockTorrentDetailViewModel: ViewModel, EventEmitter {
-    let state = TorrentDetailViewState(
-        sections: Just([]).eraseToAnyPublisher(),
-        isRefreshing: Just(false).eraseToAnyPublisher()
-    )
+    let state: TorrentDetailViewState
     let events: AnyPublisher<TorrentDetailEvent, Never> = Empty().eraseToAnyPublisher()
     func handle(_ event: TorrentDetailViewEvent) {}
+
+    init(hash: String = "") {
+        state = TorrentDetailViewState(
+            hash: hash,
+            sections: Just([]).eraseToAnyPublisher(),
+            isRefreshing: Just(false).eraseToAnyPublisher()
+        )
+    }
 }

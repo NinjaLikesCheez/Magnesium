@@ -92,6 +92,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
 private final class MockViewModel: ViewModel, EventEmitter {
     let state = TorrentDetailViewState(
+        hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()
     )

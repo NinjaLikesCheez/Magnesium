@@ -157,6 +157,16 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(textField.text, "/path")
     }
 
+    func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() {
+        var event: TorrentListCoordinatorEvent?
+        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
+        guard case .torrentsUpdated = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
     // MARK: - Handle FilterCoordinatorEvent
 
     func test_filterCoordinatorEvent_complete_shouldDismiss() {
@@ -295,6 +305,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
 
 private final class MockDetailViewModel: ViewModel, EventEmitter {
     let state = TorrentDetailViewState(
+        hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()
     )

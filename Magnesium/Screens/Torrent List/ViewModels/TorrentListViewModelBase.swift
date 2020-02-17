@@ -81,6 +81,7 @@ enum TorrentListEvent {
     case detail(viewModel: AnyTorrentDetailViewModel)
     case settings
     case moveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>)
+    case torrentsUpdated(hashes: [String])
 }
 
 enum TorrentListViewEvent {
