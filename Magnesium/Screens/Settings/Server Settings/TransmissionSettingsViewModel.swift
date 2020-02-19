@@ -126,14 +126,16 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
     func handle(_ event: ServerSettingsViewEvent) {
         switch event {
-        case .save:
-            handleSave()
-        case let .delete(source):
-            handleDelete(source: source)
+        case .saveSelected:
+            handleSaveSelected()
+        case let .deleteSelected(source):
+            handleDeleteSelected(source: source)
+        case .cancelSelected:
+            eventSubject.send(.complete)
         }
     }
 
-    private func handleSave() {
+    private func handleSaveSelected() {
         guard isSaveButtonEnabledSubject.value,
             let name = nameSubject.value,
             let urlString = serverSubject.value
@@ -197,7 +199,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         eventSubject.send(.complete)
     }
 
-    private func handleDelete(source: PopoverSource) {
+    private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
         var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet)
         alert.addAction(AlertAction(title: L10n.deleteServer, style: .destructive) {

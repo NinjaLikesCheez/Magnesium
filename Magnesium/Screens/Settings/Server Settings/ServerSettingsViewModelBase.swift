@@ -21,8 +21,9 @@ enum ServerSettingsEvent {
 }
 
 enum ServerSettingsViewEvent {
-    case save
-    case delete(source: PopoverSource)
+    case saveSelected
+    case deleteSelected(source: PopoverSource)
+    case cancelSelected
 }
 
 struct ServerSettingsViewState {

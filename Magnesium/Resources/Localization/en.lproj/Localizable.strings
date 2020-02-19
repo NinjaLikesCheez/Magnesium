@@ -14,6 +14,9 @@
 /* Delete Server */
 "action_delete_server" = "Delete Server";
 
+/* Edit Server */
+"action_edit_server" = "Edit Server";
+
 /* Move Download Folder */
 "action_move_download_folder" = "Move Download Folder";
 
@@ -190,6 +193,12 @@
 
 /* Deluge */
 "server_deluge" = "Deluge";
+
+/* Sorry, your server settings were unable to be read. Please try re-entering your server information. */
+"server_error_body" = "Sorry, your server settings were unable to be read. Please try re-entering your server information.";
+
+/* Unable to Load Server */
+"server_error_title" = "Unable to Load Server";
 
 /* name */
 "server_settings_option_name" = "name";

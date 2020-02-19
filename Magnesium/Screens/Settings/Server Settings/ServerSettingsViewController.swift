@@ -64,6 +64,35 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
             .store(in: &observers)
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if navigationController?.viewControllers.count == 1 {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                barButtonSystemItem: .cancel,
+                target: self,
+                action: #selector(cancelButtonTapped(_:))
+            )
+        }
+    }
+
+    @objc
+    private func cancelButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.handle(.cancelSelected)
+    }
+
+    @objc
+    private func performSave() {
+        viewModel.handle(.saveSelected)
+    }
+
+    private func isLoadingChanged(_ isLoading: Bool) {
+        view.endEditing(true)
+        navigationItem.hidesBackButton = isLoading
+        navigationItem.rightBarButtonItem = isLoading ? loadingBarButtonItem : saveBarButtonItem
+        tableView.isUserInteractionEnabled = !isLoading
+    }
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         return viewModel.state.canDelete ? 2 : 1
     }
@@ -123,19 +152,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
         if indexPath.section == Section.delete.rawValue {
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.handle(.delete(source: .view(cell, rect: cell.bounds)))
+            viewModel.handle(.deleteSelected(source: .view(cell, rect: cell.bounds)))
         }
-    }
-
-    @objc
-    private func performSave() {
-        viewModel.handle(.save)
-    }
-
-    private func isLoadingChanged(_ isLoading: Bool) {
-        view.endEditing(true)
-        navigationItem.hidesBackButton = isLoading
-        navigationItem.rightBarButtonItem = isLoading ? loadingBarButtonItem : saveBarButtonItem
-        tableView.isUserInteractionEnabled = !isLoading
     }
 }

@@ -1,8 +1,8 @@
 //
-//  NoServersViewController.swift
+//  ServerErrorViewController.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2020-02-17.
+//  Created by James Hurst on 2020-02-18.
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
@@ -10,7 +10,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-final class NoServersViewController<VM: ViewModel>: PresentableViewController where VM.ViewEvent == NoServersViewEvent {
+// swiftlint:disable:next line_length
+final class ServerErrorViewController<VM: ViewModel>: PresentableViewController where VM.ViewEvent == ServerErrorViewEvent {
     private let viewModel: VM
 
     private lazy var stackView: UIStackView = {
@@ -27,7 +28,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
         label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = NSLocalizedString("no_servers_title", comment: "No Servers")
+        label.text = NSLocalizedString("server_error_title", comment: "Unable to Load Server")
         label.textAlignment = .center
         return label
     }()
@@ -37,19 +38,23 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = UIColor.secondaryLabel
+        // swiftformat:disable all
         label.text = NSLocalizedString(
-            "no_servers_body",
-            comment: "You'll need to add a server before you can start using Magnesium."
+            "server_error_body",
+            comment: """
+                Sorry, your server settings were unable to be read. Please try re-entering your server information.
+                """
         )
+        // swiftformat:enable all
         label.numberOfLines = 0
         label.textAlignment = .center
         return label
     }()
 
-    private lazy var addServerButton: UIButton = {
+    private lazy var editServerButton: UIButton = {
         let button = RoundedButton()
-        button.setTitle(NSLocalizedString("action_add_server", comment: "Add Server"), for: .normal)
-        button.addTarget(self, action: #selector(addSeverButtonTapped(_:)), for: .touchUpInside)
+        button.setTitle(NSLocalizedString("action_edit_server", comment: "Edit Server"), for: .normal)
+        button.addTarget(self, action: #selector(editServerButtonTapped(_:)), for: .touchUpInside)
         return button
     }()
 
@@ -83,7 +88,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         view.backgroundColor = .systemBackground
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(bodyLabel)
-        stackView.addArrangedSubview(addServerButton)
+        stackView.addArrangedSubview(editServerButton)
         view.addSubview(stackView)
     }
 
@@ -106,7 +111,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     }
 
     @objc
-    private func addSeverButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.addServerSelected)
+    private func editServerButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.handle(.editServerSelected)
     }
 }

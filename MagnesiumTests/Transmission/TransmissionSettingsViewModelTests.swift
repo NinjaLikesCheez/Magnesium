@@ -103,7 +103,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = "web://site"
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -116,7 +116,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(alert.actions.map(\.title), ["OK"])
     }
 
-    func test_save_shouldChangeIsLoading() {
+    func test_saveSelected_shouldChangeIsLoading() {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
@@ -126,19 +126,19 @@ class TransmissionSettingsViewModelTests: XCTestCase {
             values.append($0)
         }.store(in: &observers)
 
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         XCTAssertEqual(values, [true, false])
     }
 
-    func test_save_shouldAuthenticate() {
+    func test_saveSelected_shouldAuthenticate() {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         XCTAssertEqual(client.authenticateCallCount, 1)
     }
 
-    func test_save_whenAuthenticationFails_shouldEmitError() {
+    func test_saveSelected_whenAuthenticationFails_shouldEmitError() {
         client.authenticateResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
@@ -146,7 +146,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
 
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -155,18 +155,18 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(alert.message, "Unable to authenticate. Verify that your credentials are correct.")
     }
 
-    func test_save_withoutData_shouldDoNothing() {
+    func test_saveSelected_withoutData_shouldDoNothing() {
         let viewModel = addViewModel
         let expectation = self.expectation(description: "Received value")
         expectation.isInverted = true
         viewModel.state.isLoading.dropFirst().sink { _ in
             expectation.fulfill()
         }.store(in: &observers)
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         waitForExpectations(timeout: 0)
     }
 
-    func test_save_withoutServer_shouldAddServer() throws {
+    func test_saveSelected_withoutServer_shouldAddServer() throws {
         let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
         let keychain = TransmissionKeychainData(password: "password")
         let expectedData = try JSONEncoder().encode(settings)
@@ -177,14 +177,14 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = settings.username
         viewModel.state.inputs[3].value.value = keychain.password
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
         XCTAssertEqual(server.data, expectedData)
         XCTAssertEqual(server.keychainData, expectedKeychainData)
     }
 
-    func test_save_withServer_shouldUpdateServer() throws {
+    func test_saveSelected_withServer_shouldUpdateServer() throws {
         let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
         let keychain = TransmissionKeychainData(password: "new-password")
         let expectedData = try JSONEncoder().encode(settings)
@@ -195,14 +195,14 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = settings.username
         viewModel.state.inputs[3].value.value = keychain.password
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
         XCTAssertEqual(server.data, expectedData)
         XCTAssertEqual(server.keychainData, expectedKeychainData)
     }
 
-    func test_save_withoutServer_shouldEmitCompleteEvent() {
+    func test_saveSelected_withoutServer_shouldEmitCompleteEvent() {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
@@ -210,40 +210,40 @@ class TransmissionSettingsViewModelTests: XCTestCase {
 
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
 
-    func test_save_withServer_shouldEmitCompleteEvent() {
+    func test_saveSelected_withServer_shouldEmitCompleteEvent() {
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.save)
+        viewModel.handle(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
     }
 
-    func test_delete_withoutServer_shouldDoNothing() {
+    func test_deleteSelected_withoutServer_shouldDoNothing() {
         let viewModel = addViewModel
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
         viewModel.events.first().sink { _ in
             expectation.fulfill()
         }.store(in: &observers)
-        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         waitForExpectations(timeout: 0)
     }
 
-    func test_delete_withServer_shouldEmitAlert() {
+    func test_deleteSelected_withServer_shouldEmitAlert() {
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -255,12 +255,12 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(alert.actions[1].title, "Cancel")
     }
 
-    func test_delete_whenDeleteServerSelected_shouldRemoveServer() {
+    func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -269,13 +269,13 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         XCTAssertTrue(preferences.getServers().isEmpty)
     }
 
-    func test_delete_whenDeleteServerSelected_shouldEmitCompleteEvent() {
+    func test_deleteSelected_whenDeleteServerSelected_shouldEmitCompleteEvent() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
 
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
-        viewModel.handle(.delete(source: .view(UIView(), rect: .zero)))
+        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

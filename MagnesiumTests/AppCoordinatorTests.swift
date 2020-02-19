@@ -43,6 +43,17 @@ class AppCoordinatorTests: XCTestCase {
         }
     }
 
+    func test_masterViewController_whenServerSettingsInvalid_shouldBeExpectedViewController() {
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.viewControllers[0] as! UINavigationController
+        session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === ServerErrorViewController<ServerErrorViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
     func test_masterViewController_whenServerChanged_shouldBeChanged() {
         // swiftlint:disable:next force_cast
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
@@ -61,6 +72,30 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(alertController.title, "Add Torrent")
         XCTAssertEqual(alertController.message, "Add file.torrent to Server?")
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Add", "Cancel"])
+    }
+
+    // MARK: - ServerErrorCoordinatorEvent
+
+    func test_serverErrorCoordinatorEvent_showSettings_shouldShowSettings() throws {
+        coordinator.handle(ServerErrorCoordinatorEvent.showSettings)
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.presentedViewController as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
+    func test_serverErrorCoordinatorEvent_editServer_shouldShowServerSettings() throws {
+        coordinator.handle(ServerErrorCoordinatorEvent.editServer(.transmissionMock()))
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.presentedViewController as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
     }
 
     // MARK: - NoServersCoordinatorEvent
@@ -154,6 +189,15 @@ class AppCoordinatorTests: XCTestCase {
     func test_addServerCoordinatorEvent_complete_shouldDismiss() {
         let viewController = MockPresentableViewController()
         coordinator.handle(AddServerCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
+        XCTAssertEqual(viewController.dismissCallCount, 1)
+        XCTAssertEqual(viewController.dismissParamAnimated, [true])
+    }
+
+    // MARK: - ServerSettingsCoordinatorEvent
+
+    func test_serverSettingsCoordinatorEvent_complete_shouldDismiss() {
+        let viewController = MockPresentableViewController()
+        coordinator.handle(ServerSettingsCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
         XCTAssertEqual(viewController.dismissCallCount, 1)
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }

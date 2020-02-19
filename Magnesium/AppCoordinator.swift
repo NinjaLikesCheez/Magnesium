@@ -58,10 +58,14 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     private func show(server: Server?) {
         let viewController: UIViewController
-        if let server = server {
-            let viewModel = server.listViewModel(preferences: preferences)
-                ?? AnyTorrentListViewModel(EmptyTorrentListViewModel())
+        if let server = server, let viewModel = server.listViewModel(preferences: preferences) {
             let coordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
+            addChildCoordinator(coordinator) { [weak self] _, event in
+                self?.handle(event)
+            }
+            viewController = coordinator.presentable.viewController
+        } else if let server = server {
+            let coordinator = ServerErrorCoordinator(server: server)
             addChildCoordinator(coordinator) { [weak self] _, event in
                 self?.handle(event)
             }
@@ -82,16 +86,6 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     // internal for testing
-    func handle(_ event: NoServersCoordinatorEvent) {
-        switch event {
-        case .showSettings:
-            showSettings()
-        case .addServer:
-            showAddServer()
-        }
-    }
-
-    // internal for testing
     func handle(_ event: TorrentListCoordinatorEvent) {
         switch event {
         case .showSettings:
@@ -102,6 +96,26 @@ final class AppCoordinator: Coordinator, AlertPresenter {
             commitTorrentDetail(for: coordinator)
         case let .torrentsUpdated(hashes):
             handleTorrentsUpdated(hashes: hashes)
+        }
+    }
+
+    // internal for testing
+    func handle(_ event: ServerErrorCoordinatorEvent) {
+        switch event {
+        case .showSettings:
+            showSettings()
+        case let .editServer(server):
+            showServerSettings(for: server)
+        }
+    }
+
+    // internal for testing
+    func handle(_ event: NoServersCoordinatorEvent) {
+        switch event {
+        case .showSettings:
+            showSettings()
+        case .addServer:
+            showAddServer()
         }
     }
 
@@ -137,6 +151,26 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     // internal for testing
     func handle<C: Coordinator>(_ event: AddServerCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            coordinator.presentable.viewController.dismiss(animated: true)
+        }
+    }
+
+    private func showServerSettings(for server: Server) {
+        let coordinator = ServerSettingsCoordinator(server: server, preferences: preferences)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            self?.handle(event, from: coordinator)
+        }
+        let viewController = coordinator.presentable.viewController
+        let navigationController = UINavigationController(rootViewController: viewController)
+        navigationController.navigationBar.prefersLargeTitles = false
+        navigationController.modalPresentationStyle = .formSheet
+        splitViewController.present(navigationController, animated: true, completion: nil)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: ServerSettingsCoordinatorEvent, from coordinator: C) {
         switch event {
         case .complete:
             coordinator.presentable.viewController.dismiss(animated: true)
