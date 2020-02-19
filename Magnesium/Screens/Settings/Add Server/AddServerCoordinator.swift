@@ -40,8 +40,10 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
 
     func handle(_ event: AddServerEvent) {
         switch event {
-        case let .add(type: type):
+        case let .addServer(type):
             showServerSettings(for: type)
+        case .complete:
+            eventSubject.send(.complete)
         }
     }
 

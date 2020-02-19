@@ -10,11 +10,13 @@ import Combine
 import ViewModel
 
 enum AddServerEvent {
-    case add(type: ServerType)
+    case addServer(ServerType)
+    case complete
 }
 
 enum AddServerViewEvent {
-    case selectType(index: Int)
+    case typeSelected(index: Int)
+    case cancelSelected
 }
 
 struct AddServerViewState {
@@ -36,8 +38,10 @@ final class AddServerViewModel: ViewModel, EventEmitter {
 
     func handle(_ event: AddServerViewEvent) {
         switch event {
-        case let .selectType(index: index):
-            eventSubject.send(.add(type: serverTypes[index]))
+        case let .typeSelected(index: index):
+            eventSubject.send(.addServer(serverTypes[index]))
+        case .cancelSelected:
+            eventSubject.send(.complete)
         }
     }
 }

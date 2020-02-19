@@ -34,20 +34,30 @@ class AddServerCoordinatorTests: XCTestCase {
         }
     }
 
-    // MARK: handle - AddServerEvent
+    // MARK: AddServerEvent
 
-    func test_addServerEvent_add_withDeluge_shouldPushDelugeServerSettingsViewController() {
-        coordinator.handle(.add(type: .deluge))
+    func test_addServerEvent_addServer_shouldPushViewController() {
+        coordinator.handle(.addServer(.deluge))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController.navigationController!
         XCTAssertEqual(navigationController.viewControllers.count, 2)
     }
 
-    // MARK: handle - ServerSettingsCoordinatorEvent
-
-    func test_serverSettingsCoordinator_completeEvent_shouldEmitCompleteEvent() {
+    func test_addServerEvent_complete_shouldEmitCompleteEvent() {
         var event: AddServerCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.handle(AddServerEvent.complete)
+        guard case .complete = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+    }
+
+    // MARK: ServerSettingsCoordinatorEvent
+
+    func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() {
+        var event: AddServerCoordinatorEvent?
+        coordinator.events.sink { event = $0 }.store(in: &observers)
         coordinator.handle(ServerSettingsCoordinatorEvent.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

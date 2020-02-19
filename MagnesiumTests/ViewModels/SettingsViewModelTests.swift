@@ -82,7 +82,7 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertNotEqual(session.server!.id, previousID)
     }
 
-    func test_serverSelected_shouldEmitEditEvent() {
+    func test_serverSelected_shouldEmitEditServerEvent() {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
@@ -91,7 +91,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)
         viewModel.handle(.serverSelected(index: 1))
-        guard case let .edit(server) = event else {
+        guard case let .editServer(server) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
@@ -110,13 +110,13 @@ class SettingsViewModelTests: XCTestCase {
         }
     }
 
-    func test_refreshIntervalSelected_shouldEmitRefreshIntervalEvent() {
+    func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() {
         var event: SettingsEvent?
         viewModel.events.first().sink {
             event = $0
         }.store(in: &observers)
         viewModel.handle(.refreshIntervalSelected)
-        guard case .refreshInterval = event else {
+        guard case .showRefreshIntervalSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }

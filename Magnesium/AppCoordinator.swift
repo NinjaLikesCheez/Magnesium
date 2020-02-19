@@ -57,17 +57,38 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func show(server: Server?) {
-        let viewModel = server?.listViewModel(preferences: preferences)
-            ?? AnyTorrentListViewModel(EmptyTorrentListViewModel())
-        let listCoordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
-        addChildCoordinator(listCoordinator) { [weak self] _, event in
-            self?.handle(event)
+        let viewController: UIViewController
+        if let server = server {
+            let viewModel = server.listViewModel(preferences: preferences)
+                ?? AnyTorrentListViewModel(EmptyTorrentListViewModel())
+            let coordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
+            addChildCoordinator(coordinator) { [weak self] _, event in
+                self?.handle(event)
+            }
+            viewController = coordinator.presentable.viewController
+        } else {
+            let coordinator = NoServersCoordinator()
+            addChildCoordinator(coordinator) { [weak self] _, event in
+                self?.handle(event)
+            }
+            viewController = coordinator.presentable.viewController
         }
-        masterNavigationController.setViewControllers([listCoordinator.presentable.viewController], animated: false)
+
+        masterNavigationController.setViewControllers([viewController], animated: false)
         let detailViewController = UIViewController()
         detailViewController.view.backgroundColor = .systemGroupedBackground
         let detailNavigationController = UINavigationController(rootViewController: detailViewController)
         splitViewController.viewControllers = [masterNavigationController, detailNavigationController]
+    }
+
+    // internal for testing
+    func handle(_ event: NoServersCoordinatorEvent) {
+        switch event {
+        case .showSettings:
+            showSettings()
+        case .addServer:
+            showAddServer()
+        }
     }
 
     // internal for testing
@@ -96,6 +117,26 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     // internal for testing
     func handle<C: Coordinator>(_ event: SettingsCoordinatorEvent, from coordinator: C) {
+        switch event {
+        case .complete:
+            coordinator.presentable.viewController.dismiss(animated: true)
+        }
+    }
+
+    private func showAddServer() {
+        let coordinator = AddServerCoordinator(preferences: preferences)
+        addChildCoordinator(coordinator) { [weak self] coordinator, event in
+            self?.handle(event, from: coordinator)
+        }
+        let viewController = coordinator.presentable.viewController
+        let navigationController = UINavigationController(rootViewController: viewController)
+        navigationController.navigationBar.prefersLargeTitles = false
+        navigationController.modalPresentationStyle = .formSheet
+        splitViewController.present(navigationController, animated: true, completion: nil)
+    }
+
+    // internal for testing
+    func handle<C: Coordinator>(_ event: AddServerCoordinatorEvent, from coordinator: C) {
         switch event {
         case .complete:
             coordinator.presentable.viewController.dismiss(animated: true)

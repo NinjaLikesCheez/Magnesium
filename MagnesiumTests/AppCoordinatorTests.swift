@@ -33,6 +33,16 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(splitViewController, coordinator.presentable.viewController)
     }
 
+    func test_masterViewController_whenNoServers_shouldBeExpectedViewController() {
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.viewControllers[0] as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === NoServersViewController<NoServersViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
     func test_masterViewController_whenServerChanged_shouldBeChanged() {
         // swiftlint:disable:next force_cast
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
@@ -53,10 +63,34 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Add", "Cancel"])
     }
 
-    // MARK: - Handle TorrentListCoordinatorEvent
+    // MARK: - NoServersCoordinatorEvent
+
+    func test_noServersCoordinatorEvent_showSettings_shouldShowSettings() throws {
+        coordinator.handle(NoServersCoordinatorEvent.showSettings)
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.presentedViewController as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
+    func test_noServersCoordinatorEvent_addServer_shouldShowAddServer() throws {
+        coordinator.handle(NoServersCoordinatorEvent.addServer)
+        // swiftlint:disable:next force_cast
+        let navigationController = splitViewController.presentedViewController as! UINavigationController
+        let viewController = navigationController.viewControllers[0]
+        guard type(of: viewController) === AddServerViewController<AddServerViewModel>.self else {
+            XCTFail("Unexpected view controller: \(String(describing: viewController))")
+            return
+        }
+    }
+
+    // MARK: - TorrentListCoordinatorEvent
 
     func test_listCoordinatorEvent_showSettings_shouldShowSettings() throws {
-        coordinator.handle(.showSettings)
+        coordinator.handle(TorrentListCoordinatorEvent.showSettings)
         // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
@@ -106,7 +140,7 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertNotEqual(splitViewController.detailViewController, previousDetailViewController)
     }
 
-    // MARK: handle - SettingsCoordinatorEvent
+    // MARK: - SettingsCoordinatorEvent
 
     func test_settingsCoordinator_completeEvent_shouldDismiss() {
         let viewController = MockPresentableViewController()
@@ -115,7 +149,16 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
 
-    // MARK: handle - TorrentDetailCoordinatorEvent
+    // MARK: - AddServerCoordinatorEvent
+
+    func test_addServerCoordinatorEvent_complete_shouldDismiss() {
+        let viewController = MockPresentableViewController()
+        coordinator.handle(AddServerCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
+        XCTAssertEqual(viewController.dismissCallCount, 1)
+        XCTAssertEqual(viewController.dismissParamAnimated, [true])
+    }
+
+    // MARK: - TorrentDetailCoordinatorEvent
 
     func test_detailCoordinator_completeEvent_shouldDismiss() {
         let previousDetailViewController = splitViewController.detailViewController

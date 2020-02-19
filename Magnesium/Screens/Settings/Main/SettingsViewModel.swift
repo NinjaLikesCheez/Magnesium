@@ -14,9 +14,9 @@ import ViewModel
 enum SettingsEvent {
     case complete
     case alert(Alert, source: PopoverSource?)
-    case edit(server: Server)
+    case editServer(Server)
     case addServer
-    case refreshInterval
+    case showRefreshIntervalSettings
 }
 
 enum SettingsViewEvent {
@@ -67,11 +67,11 @@ final class SettingsViewModel: ViewModel, EventEmitter {
             handleChangeServerSelected(from: source)
         case let .serverSelected(index):
             let server = preferences.getServers()[index]
-            eventSubject.send(.edit(server: server))
+            eventSubject.send(.editServer(server))
         case .addServerSelected:
             eventSubject.send(.addServer)
         case .refreshIntervalSelected:
-            eventSubject.send(.refreshInterval)
+            eventSubject.send(.showRefreshIntervalSettings)
         }
     }
 

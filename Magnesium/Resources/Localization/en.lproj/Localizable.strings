@@ -2,6 +2,9 @@
 /* Add */
 "action_add" = "Add";
 
+/* Add Server */
+"action_add_server" = "Add Server";
+
 /* Cancel */
 "action_cancel" = "Cancel";
 
@@ -160,6 +163,12 @@
 
 /* None */
 "label_none" = "None";
+
+/* You'll need to add a server before you can start using Magnesium. */
+"no_servers_body" = "You'll need to add a server before you can start using Magnesium.";
+
+/* No Servers */
+"no_servers_title" = "No Servers";
 
 /* Never */
 "refresh_interval_never" = "Never";

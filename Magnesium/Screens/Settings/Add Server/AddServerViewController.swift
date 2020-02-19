@@ -29,6 +29,23 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if navigationController?.viewControllers.count == 1 {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(
+                barButtonSystemItem: .cancel,
+                target: self,
+                action: #selector(cancelButtonTapped(_:))
+            )
+        }
+    }
+
+    @objc
+    private func cancelButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.handle(.cancelSelected)
+    }
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.state.types.count
     }
@@ -41,6 +58,6 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.handle(.selectType(index: indexPath.row))
+        viewModel.handle(.typeSelected(index: indexPath.row))
     }
 }

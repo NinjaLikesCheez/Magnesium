@@ -46,11 +46,11 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
             eventSubject.send(.complete)
         case let .alert(alert, source: source):
             showAlert(alert, from: source)
-        case let .edit(server: server):
+        case let .editServer(server: server):
             showSettings(for: server)
         case .addServer:
             showAddServer()
-        case .refreshInterval:
+        case .showRefreshIntervalSettings:
             let viewModel = RefreshIntervalViewModel(preferences: preferences)
             let viewController = RefreshIntervalViewController(viewModel: viewModel)
             return navigationController.pushViewController(viewController, animated: true)
