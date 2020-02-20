@@ -480,45 +480,54 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         return UIMenu(title: "", children: actions)
     }
 
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
         let torrent = torrents.subject(at: index).value
         if torrent.isActive {
-            let pause = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-                self.pause([torrent])
-                complete(true)
-            }
-            pause.backgroundColor = .systemBlue
-            pause.image = UIImage(systemName: "pause.fill")
-            return UISwipeActionsConfiguration(actions: [pause])
+            return SwipeActionsConfiguration(actions: [
+                SwipeAction(
+                    image: UIImage(systemName: "pause.fill"),
+                    backgroundColor: .systemBlue,
+                    style: .normal,
+                    handler: {
+                        self.pause([torrent])
+                    }
+                ),
+            ])
         } else {
-            let resume = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-                self.resume([torrent])
-                complete(true)
-            }
-            resume.backgroundColor = .systemBlue
-            resume.image = UIImage(systemName: "play.fill")
-            return UISwipeActionsConfiguration(actions: [resume])
+            return SwipeActionsConfiguration(actions: [
+                SwipeAction(
+                    image: UIImage(systemName: "play.fill"),
+                    backgroundColor: .systemBlue,
+                    style: .normal,
+                    handler: {
+                        self.resume([torrent])
+                    }
+                ),
+            ])
         }
     }
 
     func trailingSwipeActionsConfigurationForItem(
         at index: Int,
         source: PopoverSource
-    ) -> UISwipeActionsConfiguration? {
+    ) -> SwipeActionsConfiguration? {
         let torrent = torrents.subject(at: index).value
-        let remove = UIContextualAction(style: .destructive, title: nil) { _, _, complete in
-            self.presentRemoveOptions(for: [torrent], from: source)
-            complete(true)
-        }
-        remove.image = UIImage(systemName: "trash.fill")
-
-        let more = UIContextualAction(style: .normal, title: nil) { _, _, complete in
-            self.presentActivities(for: [torrent], source: source)
-            complete(true)
-        }
-        more.image = UIImage(systemName: "ellipsis.circle.fill")
-        more.backgroundColor = .systemGray
-
-        return UISwipeActionsConfiguration(actions: [remove, more])
+        return SwipeActionsConfiguration(actions: [
+            SwipeAction(
+                image: UIImage(systemName: "trash.fill"),
+                style: .destructive,
+                handler: {
+                    self.presentRemoveOptions(for: [torrent], from: source)
+                }
+            ),
+            SwipeAction(
+                image: UIImage(systemName: "ellipsis.circle.fill"),
+                backgroundColor: .systemGray,
+                style: .normal,
+                handler: {
+                    self.presentActivities(for: [torrent], source: source)
+                }
+            ),
+        ])
     }
 }

@@ -16,8 +16,8 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
     private let _handle: (ViewEvent) -> Void
     private let _viewModelForItem: (Int) -> AnyTorrentDetailViewModel?
     private let _contextMenuForItem: (Int) -> UIMenu?
-    private let _leadingSwipeActionsConfigurationForItem: (Int, PopoverSource) -> UISwipeActionsConfiguration?
-    private let _trailingSwipeActionsConfigurationForItem: (Int, PopoverSource) -> UISwipeActionsConfiguration?
+    private let _leadingSwipeActionsConfigurationForItem: (Int, PopoverSource) -> SwipeActionsConfiguration?
+    private let _trailingSwipeActionsConfigurationForItem: (Int, PopoverSource) -> SwipeActionsConfiguration?
     let base: Any
 
     var state: TorrentListViewState { _state() }
@@ -54,14 +54,14 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
         return _contextMenuForItem(index)
     }
 
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
         return _leadingSwipeActionsConfigurationForItem(index, source)
     }
 
     func trailingSwipeActionsConfigurationForItem(
         at index: Int,
         source: PopoverSource
-    ) -> UISwipeActionsConfiguration? {
+    ) -> SwipeActionsConfiguration? {
         return _trailingSwipeActionsConfigurationForItem(index, source)
     }
 }
@@ -69,8 +69,8 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
 protocol TorrentListProvider: AnyObject {
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel?
     func contextMenuForItem(at index: Int) -> UIMenu?
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
-    func trailingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
+    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration?
+    func trailingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration?
 }
 
 enum TorrentListEvent {

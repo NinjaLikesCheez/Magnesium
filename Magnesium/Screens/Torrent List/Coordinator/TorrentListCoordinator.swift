@@ -191,13 +191,15 @@ extension TorrentListCoordinator: TorrentListViewProvider {
     }
 
     func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
-        return viewModel.leadingSwipeActionsConfigurationForItem(at: index, source: source)
+        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(at: index, source: source)
+        return configuration?.createUISwipeActionsConfiguration()
     }
 
     func trailingSwipeActionsConfigurationForItem(
         at index: Int,
         source: PopoverSource
     ) -> UISwipeActionsConfiguration? {
-        return viewModel.trailingSwipeActionsConfigurationForItem(at: index, source: source)
+        let configuration = viewModel.trailingSwipeActionsConfigurationForItem(at: index, source: source)
+        return configuration?.createUISwipeActionsConfiguration()
     }
 }

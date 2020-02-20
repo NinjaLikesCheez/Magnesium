@@ -8,21 +8,23 @@
 
 /// A model describing an alert.
 struct Alert {
-    /// The style of an alert.
+    /// The presentation styles of an alert.
     enum Style {
         case actionSheet
         case alert
     }
 
-    /// The alert's title.
+    /// The title of the alert.
     var title: String?
-    /// The alert's message.
+    /// A message that provides more information about the alert.
     var message: String?
-    /// The alert's style.
+    /// The presentation style of the alert.
     var style: Style
-    /// The alert's actions.
+    /// The actions presented by the alert.
     var actions = [AlertAction]()
 
+    /// Appends an action to the alert.
+    /// - Parameter action: An action to append to the alert.
     mutating func addAction(_ action: AlertAction) {
         actions.append(action)
     }

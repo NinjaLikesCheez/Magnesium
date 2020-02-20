@@ -17,7 +17,7 @@ enum PopoverSource {
 }
 
 extension UIViewController {
-    /// Configures this viewController's the `popoverPresentationController`'s.
+    /// Configures the viewController's the `popoverPresentationController`.
     /// - Parameter source: The source for a popover presentation.
     func configure(popoverSource source: PopoverSource?) {
         switch source {

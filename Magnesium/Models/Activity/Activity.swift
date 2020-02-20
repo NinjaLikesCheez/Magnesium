@@ -10,11 +10,11 @@ import UIKit
 
 /// A model describing an activity.
 struct Activity {
-    /// The activity title.
+    /// The title of the activity.
     var title: String
-    /// The activity image.
+    /// The image displayed with the activity.
     var image: UIImage?
-    /// The activity type identifier. This is typically in reverse DNS format.
+    /// A unique identifier for the type of action. This is typically in reverse DNS format.
     var type: String
     /// The handler to run when the activity is selected.
     var handler: () -> Void

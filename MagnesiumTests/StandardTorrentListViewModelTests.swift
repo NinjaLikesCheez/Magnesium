@@ -705,11 +705,10 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsActive_shouldReturnedExpectedConfiguration() {
-        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(
-            at: 0,
-            source: .view(UIView(), rect: .zero)
-        )
-        XCTAssertEqual(configuration?.actions.map { $0.image }, [UIImage(systemName: "pause.fill")])
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        XCTAssertEqual(config?.actions.map { $0.image }, [UIImage(systemName: "pause.fill")])
+        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [.systemBlue])
+        XCTAssertEqual(config?.actions.map { $0.style }, [.normal])
     }
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsInactive_shouldReturnedExpectedConfiguration() {
@@ -718,20 +717,81 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             .eraseToAnyPublisher()
         viewModel.handle(.refresh)
 
-        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(
-            at: 0,
-            source: .view(UIView(), rect: .zero)
-        )
-        XCTAssertEqual(configuration?.actions.map { $0.image }, [UIImage(systemName: "play.fill")])
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        XCTAssertEqual(config?.actions.map { $0.image }, [UIImage(systemName: "play.fill")])
+        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [.systemBlue])
+        XCTAssertEqual(config?.actions.map { $0.style }, [.normal])
+    }
+
+    func test_pauseSwipeAction_shouldCallImplementationPauseAndRefresh() {
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        config?.actions[0].handler()
+        XCTAssertEqual(implementation.pauseCallCount, 1)
+        XCTAssertEqual(implementation.pauseParamTorrents[0].map { $0.name }, ["Mock"])
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_pauseSwipeAction_whenFails_shouldEmitAlert() {
+        implementation.pauseResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let alert = getAlert {
+            config?.actions[0].handler()
+        }!
+        XCTAssertEqual(alert.title, "Failed to Pause")
+    }
+
+    func test_resumeSwipeAction_shouldCallImplementationResumeAndRefresh() {
+        implementation.refreshResult = Just(([MockTorrent(name: "Mock", standardState: .paused)], []))
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        config?.actions[0].handler()
+        XCTAssertEqual(implementation.resumeCallCount, 1)
+        XCTAssertEqual(implementation.resumeParamTorrents[0].map { $0.name }, ["Mock"])
+        XCTAssertEqual(implementation.refreshCallCount, 3)
+    }
+
+    func test_resumeSwipeAction_whenFails_shouldEmitAlert() {
+        implementation.refreshResult = Just(([MockTorrent(name: "Mock", standardState: .paused)], []))
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+        implementation.resumeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let alert = getAlert {
+            config?.actions[0].handler()
+        }!
+        XCTAssertEqual(alert.title, "Failed to Resume")
     }
 
     func test_trailingSwipeActionsConfiguration_shouldReturnExpectedConfiguration() {
-        let configuration = viewModel.trailingSwipeActionsConfigurationForItem(
-            at: 0,
-            source: .view(UIView(), rect: .zero)
-        )
+        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
         let expected = [UIImage(systemName: "trash.fill"), UIImage(systemName: "ellipsis.circle.fill")]
-        XCTAssertEqual(configuration?.actions.map { $0.image }, expected)
+        XCTAssertEqual(config?.actions.map { $0.image }, expected)
+        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [nil, .systemGray])
+        XCTAssertEqual(config?.actions.map { $0.style }, [.destructive, .normal])
+    }
+
+    func test_moreSwipeAction_shouldEmitActivities() {
+        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let activities = getActivities {
+            config?.actions[1].handler()
+        }
+        let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
+        XCTAssertEqual(activities?.map { $0.title }, expected)
+    }
+
+    func test_removeSwipeAction_shouldCallImplementationRemoveAndRefresh() {
+        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let alert = getAlert {
+            config?.actions[0].handler()
+        }!
+        XCTAssertEqual(alert.title, "Remove")
+        XCTAssertEqual(alert.message, "Mock")
+        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
     }
 }
 

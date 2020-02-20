@@ -1,5 +1,5 @@
 //
-//  Alert+ViewController.swift
+//  Alert+UIKit.swift
 //  Magnesium
 //
 //  Created by James Hurst on 2020-01-16.

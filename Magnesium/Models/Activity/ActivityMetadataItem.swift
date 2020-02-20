@@ -9,9 +9,12 @@
 import LinkPresentation
 import UIKit
 
+/// An activity item that provides metadata to display in a share sheet.
 final class ActivityMetadataItem: NSObject, UIActivityItemSource {
     private let metadata: LPLinkMetadata
 
+    /// Creates a new `ActivityMetadataItem` with the given metadata.
+    /// - Parameter metadata: The metadata to provide to a share sheet.
     init(metadata: LPLinkMetadata) {
         self.metadata = metadata
     }
