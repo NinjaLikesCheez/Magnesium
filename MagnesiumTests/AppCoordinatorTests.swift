@@ -197,7 +197,10 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_serverSettingsCoordinatorEvent_complete_shouldDismiss() {
         let viewController = MockPresentableViewController()
-        coordinator.handle(ServerSettingsCoordinatorEvent.complete, from: MockCoordinator(viewController: viewController))
+        coordinator.handle(
+            ServerSettingsCoordinatorEvent.complete,
+            from: MockCoordinator(viewController: viewController)
+        )
         XCTAssertEqual(viewController.dismissCallCount, 1)
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
