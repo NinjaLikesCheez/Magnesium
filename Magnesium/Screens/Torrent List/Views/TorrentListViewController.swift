@@ -128,6 +128,17 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         return view
     }()
 
+    private lazy var emptyStateView: UIView = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
+            .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
+        label.font = UIFont(descriptor: descriptor, size: 0)
+        label.text = "No Torrents"
+        label.textColor = .placeholderText
+        return label
+    }()
+
     // MARK: Initialization
 
     init(viewModel: VM) {
@@ -152,6 +163,9 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         activityView.startAnimating()
         tableView.addSubview(activityView)
 
+        emptyStateView.isHidden = true
+        tableView.addSubview(emptyStateView)
+
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
@@ -169,7 +183,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.activityView.stopAnimating()
-                    self?.tableView.separatorStyle = .singleLine
                     self?.refreshControl?.endRefreshing()
                 }
             }
@@ -178,6 +191,21 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         viewModel.state.items
             .map { !$0.isEmpty }
             .assign(to: \.isEnabled, on: selectBarButtonItem)
+            .store(in: &observers)
+
+        let items = viewModel.state.items
+        let hasItems = viewModel.state.isLoading
+            .first(where: { $0 == false })
+            .flatMap { _ in items }
+            .map { !$0.isEmpty }
+
+        hasItems
+            .assign(to: \.isHidden, on: emptyStateView)
+            .store(in: &observers)
+
+        hasItems
+            .map { $0 ? UITableViewCell.SeparatorStyle.singleLine : UITableViewCell.SeparatorStyle.none }
+            .assign(to: \.separatorStyle, on: tableView)
             .store(in: &observers)
 
         viewModel.state.items
@@ -237,11 +265,14 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        activityView.sizeToFit()
-        activityView.center = CGPoint(
+        let center = CGPoint(
             x: tableView.bounds.width * 0.5,
             y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
         )
+        activityView.sizeToFit()
+        activityView.center = center
+        emptyStateView.sizeToFit()
+        emptyStateView.center = center
     }
 
     // MARK: Editing
