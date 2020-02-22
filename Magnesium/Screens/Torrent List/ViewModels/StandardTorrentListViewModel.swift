@@ -396,9 +396,9 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         isLoadingSubject.send(true)
         return implementation.refresh()
             .handleEvents(receiveOutput: { [weak self] update in
-                self?.isLoadingSubject.send(false)
                 self?.labels.send(update.1)
                 self?.torrents.update(with: update.0.map { ($0.hash, $0) })
+                self?.isLoadingSubject.send(false)
             }, receiveCompletion: { [weak self] _ in
                 self?.isLoadingSubject.send(false)
             })

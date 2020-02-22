@@ -171,7 +171,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
         statusView.configure(download: viewModel.state.totalDownloadSpeed, upload: viewModel.state.totalUploadSpeed)
-        tableView.addSubview(emptyStateView)
 
         if viewModel.state.showFilterButton {
             viewModel.state.hasActiveFilters
