@@ -103,8 +103,8 @@ final class TorrentTableViewCell: UITableViewCell {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
-        stateLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
-        progressLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        speedLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
+        ratioOrETALabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
