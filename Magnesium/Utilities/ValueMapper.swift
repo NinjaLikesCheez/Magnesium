@@ -8,6 +8,8 @@
 
 import Combine
 
+/// A `ValueMapper` takes in key/value pairs, filters them using a filter function that can change over time, and.
+/// emits the filtered values.
 class ValueMapper<K: Hashable, V> {
     typealias CurrentValueArray<T> = [CurrentValueSubject<T, Never>]
     typealias CurrentValueArraySubject<T> = CurrentValueSubject<CurrentValueArray<T>, Never>
@@ -18,20 +20,30 @@ class ValueMapper<K: Hashable, V> {
     private var observers = [AnyCancellable]()
     private let mapSubject = CurrentValueMapSubject<K, V>([:])
     private let valuesSubject = CurrentValueArraySubject<V>([])
+    /// A publisher that emits all values. This publisher does not perform deduplication.
+    let allValues: AnyPublisher<[CurrentValueSubject<V, Never>], Never>
 
+    /// A publisher that emits the deduplicated filtered values.
     var values: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
         return valuesSubject.eraseToAnyPublisher()
     }
 
+    /// Creates a new `ValueMapper` using the given filter publisher.
+    /// - Parameter filter: A publisher that emits filter functions. When this publisher emits, the values will be
+    /// updated with the new filter function.
     init(filter: AnyPublisher<FilterFunction, Never>) {
+        allValues = mapSubject.map { Array($0.values) }.eraseToAnyPublisher()
         mapSubject
-            .map { Array($0.values) }
+            .removeDuplicates { $0.keys == $1.keys }
             .combineLatest(filter)
-            .map { $0.1($0.0) }
-            .sink { [weak self] in self?.valuesSubject.value = $0 }
+            .map { $0.1(Array($0.0.values)) }
+            .multicast(subject: valuesSubject)
+            .connect()
             .store(in: &observers)
     }
 
+    /// Updates the values with the given key/value pairs.
+    /// - Parameter new: The new key/value pairs.
     func update(with new: [(K, V)]) {
         let newMap = new.reduce(into: CurrentValueMap()) {
             $0[$1.0] = CurrentValueSubject($1.1)
@@ -46,6 +58,9 @@ class ValueMapper<K: Hashable, V> {
         )
     }
 
+    /// Returns the subject at a given index.
+    /// - Parameter index: The requested index.
+    /// - Returns: The subject at the requested index.
     func subject(at index: Int) -> CurrentValueSubject<V, Never> {
         return valuesSubject.value[index]
     }

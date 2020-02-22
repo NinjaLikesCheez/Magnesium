@@ -216,7 +216,6 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
         item.label
             .map(\.isEmpty)
-            .removeDuplicates()
             .assign(to: \.isHidden, on: labelLabel)
             .store(in: &observers)
 

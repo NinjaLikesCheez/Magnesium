@@ -108,4 +108,6 @@ struct TorrentListViewState {
     var isLoading: AnyPublisher<Bool, Never>
     var hasActiveFilters: AnyPublisher<Bool, Never>
     var editActionsEnabled: AnyPublisher<Bool, Never>
+    var totalDownloadSpeed: AnyPublisher<String, Never>
+    var totalUploadSpeed: AnyPublisher<String, Never>
 }

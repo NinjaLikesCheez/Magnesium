@@ -91,6 +91,7 @@
 		E96BDBF923FB78D800EFCA86 /* NoServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */; };
 		E96BDBFB23FB845A00EFCA86 /* NoServersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */; };
 		E96BDBFD23FB860E00EFCA86 /* NoServersCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */; };
+		E97042252400A05F00ACD170 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97042242400A05F00ACD170 /* StatusView.swift */; };
 		E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */; };
 		E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233FB23CFF9C300038D30 /* AddServerViewController.swift */; };
 		E9746DF323B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */; };
@@ -261,6 +262,7 @@
 		E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewController.swift; sourceTree = "<group>"; };
 		E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewModel.swift; sourceTree = "<group>"; };
 		E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersCoordinator.swift; sourceTree = "<group>"; };
+		E97042242400A05F00ACD170 /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E97233FB23CFF9C300038D30 /* AddServerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewController.swift; sourceTree = "<group>"; };
 		E9746DF223B5B0B000F2EBC6 /* TorrentDetailTrackerTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailTrackerTableViewCell.swift; sourceTree = "<group>"; };
@@ -811,6 +813,7 @@
 		E9B40E9D23B40551009E30AE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E97042242400A05F00ACD170 /* StatusView.swift */,
 				E90366DB23AAB3BD00C6AB46 /* TorrentListViewController.swift */,
 				E90366DE23AAB46400C6AB46 /* TorrentTableViewCell.swift */,
 			);
@@ -1096,6 +1099,7 @@
 				E94FDF1723F241460052BA9A /* Activity+UIKit.swift in Sources */,
 				E9C39AE023CC27A800BB3556 /* TextInputItem.swift in Sources */,
 				E9B40EA223B4057C009E30AE /* TorrentDetailInfoTableViewCell.swift in Sources */,
+				E97042252400A05F00ACD170 /* StatusView.swift in Sources */,
 				E917B4BD23E764DA0090D490 /* AddFileFlow.swift in Sources */,
 				E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+Torrent.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,

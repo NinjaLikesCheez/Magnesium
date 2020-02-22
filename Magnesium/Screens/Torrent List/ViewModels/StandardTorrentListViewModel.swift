@@ -67,11 +67,20 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .eraseToAnyPublisher()
         let items = torrents.values
             .map { $0.map { TorrentListItem(torrent: $0) } }
-            .removeDuplicates { $0.map(\.id) == $1.map(\.id) }
             .ui()
             .eraseToAnyPublisher()
         let hasActiveFilters = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
             .map { $0 != FilterOptions() }
+            .ui()
+            .eraseToAnyPublisher()
+        let totalDownloadSpeed = torrents.allValues
+            .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
+            .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
+            .ui()
+            .eraseToAnyPublisher()
+        let totalUploadSpeed = torrents.allValues
+            .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
+            .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
         state = TorrentListViewState(
@@ -79,7 +88,9 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
             hasActiveFilters: hasActiveFilters,
-            editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher()
+            editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher(),
+            totalDownloadSpeed: totalDownloadSpeed,
+            totalUploadSpeed: totalUploadSpeed
         )
 
         refresh()

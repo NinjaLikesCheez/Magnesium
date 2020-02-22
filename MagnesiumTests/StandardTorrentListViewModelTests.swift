@@ -130,9 +130,17 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(values, [true, false])
     }
 
-    func test_refresh_shouldEmitTorrentsUpdatedEvent() {
+    func test_refresh_withNoChanges_shouldNotEmit() {
         var event: TorrentListEvent?
         viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.handle(.refresh)
+        XCTAssertNil(event)
+    }
+
+    func test_refresh_withChanges_shouldEmitTorrentsUpdatedEvent() {
+        var event: TorrentListEvent?
+        viewModel.events.sink { event = $0 }.store(in: &observers)
+        implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
         guard case .torrentsUpdated = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -589,7 +597,39 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertTrue(value!)
     }
 
-    // MARK: TorrentListProvider
+    // MARK: totalDownloadSpeed
+
+    func test_totalDownloadSpeed_shouldBeSumOfAllDownloadSpeeds() {
+        implementation.refreshResult = Just(([
+            MockTorrent(downloadRate: 100_000, label: "label1"),
+            MockTorrent(downloadRate: 200_000, label: "label2"),
+            MockTorrent(downloadRate: 400_000, label: "label1"),
+        ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+        preferences.set(FilterOptions(label: "label2"), for: PreferenceKeys.filterOptions)
+
+        var value: String?
+        viewModel.state.totalDownloadSpeed.first().sink { value = $0 }.store(in: &observers)
+        XCTAssertEqual(value, "↓ 684 KB/s")
+    }
+
+    // MARK: totalUploadSpeed
+
+    func test_totalUploadSpeed_shouldBeSumOfAllDownloadSpeeds() {
+        implementation.refreshResult = Just(([
+            MockTorrent(uploadRate: 100_000, label: "label1"),
+            MockTorrent(uploadRate: 200_000, label: "label2"),
+            MockTorrent(uploadRate: 400_000, label: "label1"),
+        ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+        viewModel.handle(.refresh)
+        preferences.set(FilterOptions(label: "label2"), for: PreferenceKeys.filterOptions)
+
+        var value: String?
+        viewModel.state.totalUploadSpeed.first().sink { value = $0 }.store(in: &observers)
+        XCTAssertEqual(value, "↑ 684 KB/s")
+    }
+
+    // MARK: - TorrentListProvider
 
     func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
         let detailViewModel = viewModel.detailViewModelForItem(at: 0)!.base as AnyObject
@@ -794,6 +834,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
     }
 }
+
+// MARK: - Mocks
 
 private final class MockImplementation: StandardTorrentListViewModelImplementation {
     typealias Torrent = MockTorrent

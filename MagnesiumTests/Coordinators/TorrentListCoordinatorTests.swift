@@ -260,7 +260,9 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher(),
         hasActiveFilters: Just(false).eraseToAnyPublisher(),
-        editActionsEnabled: Just(false).eraseToAnyPublisher()
+        editActionsEnabled: Just(false).eraseToAnyPublisher(),
+        totalDownloadSpeed: Just("").eraseToAnyPublisher(),
+        totalUploadSpeed: Just("").eraseToAnyPublisher()
     )
     let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
     var events: AnyPublisher<TorrentListEvent, Never> { eventSubject.eraseToAnyPublisher() }

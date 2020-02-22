@@ -37,6 +37,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private var dataSource: DataSource!
     fileprivate var applySnapshotInBackground = true
     weak var provider: TorrentListViewProvider?
+    private lazy var statusView = StatusView()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
         return UIBarButtonItem(
@@ -169,6 +170,9 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
+        statusView.configure(download: viewModel.state.totalDownloadSpeed, upload: viewModel.state.totalUploadSpeed)
+        tableView.addSubview(emptyStateView)
+
         if viewModel.state.showFilterButton {
             viewModel.state.hasActiveFilters
                 .sink { [weak self] in
@@ -294,6 +298,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             toolbarItems.append(filterBarButtonItem)
         }
 
+        toolbarItems.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
+        toolbarItems.append(UIBarButtonItem(customView: statusView))
         toolbarItems.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
 
         if viewModel.state.showAddButton {
