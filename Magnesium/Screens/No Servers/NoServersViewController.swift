@@ -27,7 +27,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
         label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = NSLocalizedString("no_servers_title", comment: "No Servers")
+        label.text = L10n.noServersTitle
         label.textAlignment = .center
         return label
     }()
@@ -37,10 +37,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = UIColor.secondaryLabel
-        label.text = NSLocalizedString(
-            "no_servers_body",
-            comment: "You'll need to add a server before you can start using Magnesium."
-        )
+        label.text = L10n.noServersBody
         label.numberOfLines = 0
         label.textAlignment = .center
         return label
@@ -48,7 +45,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
 
     private lazy var addServerButton: UIButton = {
         let button = RoundedButton()
-        button.setTitle(NSLocalizedString("action_add_server", comment: "Add Server"), for: .normal)
+        button.setTitle(L10n.addServer, for: .normal)
         button.addTarget(self, action: #selector(addSeverButtonTapped(_:)), for: .touchUpInside)
         return button
     }()

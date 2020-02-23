@@ -51,6 +51,14 @@ enum L10n {
         return NSLocalizedString("action_save", comment: "Save")
     }
 
+    static var addServer: String {
+        return NSLocalizedString("action_add_server", comment: "Add Server")
+    }
+
+    static var editServer: String {
+        return NSLocalizedString("action_edit_server", comment: "Edit Server")
+    }
+
     static var deleteServer: String {
         return NSLocalizedString("action_delete_server", comment: "Delete Server")
     }
@@ -524,5 +532,35 @@ enum L10n {
             "delete_server_confirmation",
             comment: "Are you sure you want to delete this server?"
         )
+    }
+
+    // MARK: No Servers
+
+    static var noServersTitle: String {
+        NSLocalizedString("no_servers_title", comment: "No Servers")
+    }
+
+    static var noServersBody: String {
+        return NSLocalizedString(
+            "no_servers_body",
+            comment: "You'll need to add a server before you can start using Magnesium."
+        )
+    }
+
+    // MARK: Server Error
+
+    static var serverErrorTitle: String {
+        return NSLocalizedString("server_error_title", comment: "Unable to Load Server")
+    }
+
+    static var serverErrorBody: String {
+        // swiftformat:disable all
+        return  NSLocalizedString(
+            "server_error_body",
+            comment: """
+                Sorry, your server settings were unable to be read. Please try re-entering your server information.
+                """
+        )
+        // swiftformat:enable all
     }
 }
