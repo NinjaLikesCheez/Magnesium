@@ -48,7 +48,7 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
     }
 
     private static func search(needle: String, haystack: String) -> Bool {
-        let delimiters = CharacterSet([" ", "."])
+        let delimiters = CharacterSet([" ", ".", "-", "_"])
         let normalizedNeedle = needle.lowercased().components(separatedBy: delimiters).joined(separator: " ")
         let normalizedHaystack = haystack.lowercased().components(separatedBy: delimiters).joined(separator: " ")
         return normalizedHaystack.contains(normalizedNeedle)
