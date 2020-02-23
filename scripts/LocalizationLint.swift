@@ -42,7 +42,7 @@ extension Error: LocalizedError {
 
 /// A representation of a localization.
 struct Localization {
-    /// A parsed localization value from either Localizable.strings or Localizable.stringsdict
+    /// A parsed localization value from either `Localizable.strings` or `Localizable.stringsdict`.
     enum LocalizedValue {
         /// A localized value from a strings file.
         case string(url: URL, value: String, lineNumber: Int)
