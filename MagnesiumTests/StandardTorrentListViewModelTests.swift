@@ -21,7 +21,11 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         super.setUp()
         preferences = MockPreferences()
         implementation = MockImplementation()
-        viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
+        viewModel = StandardTorrentListViewModel(
+            implementation: implementation,
+            server: .delugeMock(name: "Mock"),
+            preferences: preferences
+        )
     }
 
     private func getAlert(actions: () -> Void) -> Alert? {
@@ -40,7 +44,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_title_shouldBeExpectedTitle() {
         var title: String?
         viewModel.state.title.sink { title = $0 }.store(in: &observers)
-        XCTAssertEqual(title, "Torrents")
+        XCTAssertEqual(title, "Mock")
     }
 
     func test_title_whenEditing_shouldBeSelectionCount() {
@@ -63,7 +67,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         var title: String?
         viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
         viewModel.handle(.didEndEditing)
-        XCTAssertEqual(title, "Torrents")
+        XCTAssertEqual(title, "Mock")
     }
 
     // MARK: - Auto Refresh
