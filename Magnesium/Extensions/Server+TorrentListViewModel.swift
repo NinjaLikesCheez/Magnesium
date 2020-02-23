@@ -29,7 +29,7 @@ extension Server {
                 implementation: implementation,
                 server: self,
                 preferences: preferences
-             )
+            )
             return AnyTorrentListViewModel(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
