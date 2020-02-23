@@ -53,7 +53,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         return eventSubject.eraseToAnyPublisher()
     }
 
-    init(implementation: Implementation, preferences: Preferences) {
+    init(implementation: Implementation, server: Server, preferences: Preferences) {
         self.preferences = preferences
         torrents = TorrentMapper(preferences: preferences, query: querySubject)
         self.implementation = implementation
@@ -61,7 +61,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         let title = isEditingSubject
             .combineLatest(multiSelectCountSubject)
             .map { isEditing, count in
-                return isEditing ? L10n.selectedCount(count) : L10n.torrentsScreenTitle
+                return isEditing ? L10n.selectedCount(count) : server.name
             }
             .ui()
             .eraseToAnyPublisher()

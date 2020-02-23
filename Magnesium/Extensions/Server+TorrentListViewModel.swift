@@ -25,7 +25,11 @@ extension Server {
                 password: keychain.password
             )
             let implementation = DelugeTorrentListViewModelImplementation(client: client, preferences: preferences)
-            let viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
+            let viewModel = StandardTorrentListViewModel(
+                implementation: implementation,
+                server: self,
+                preferences: preferences
+             )
             return AnyTorrentListViewModel(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
@@ -44,7 +48,11 @@ extension Server {
                 client: client,
                 preferences: preferences
             )
-            let viewModel = StandardTorrentListViewModel(implementation: implementation, preferences: preferences)
+            let viewModel = StandardTorrentListViewModel(
+                implementation: implementation,
+                server: self,
+                preferences: preferences
+            )
             return AnyTorrentListViewModel(viewModel)
         }
     }

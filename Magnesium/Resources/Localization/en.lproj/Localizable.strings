@@ -337,6 +337,3 @@
 
 /* ↑ {bytes}/s */
 "torrent_upload_speed" = "↑ %@/s";
-
-/* Torrents */
-"torrents_screen_title" = "Torrents";

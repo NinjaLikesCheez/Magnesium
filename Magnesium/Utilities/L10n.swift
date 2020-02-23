@@ -65,10 +65,6 @@ enum L10n {
 
     // MARK: Screens
 
-    static var torrentsScreenTitle: String {
-        return NSLocalizedString("torrents_screen_title", comment: "Torrents")
-    }
-
     static var torrentInfoScreenTitle: String {
         return NSLocalizedString("torrent_info_screen_title", comment: "Info")
     }
