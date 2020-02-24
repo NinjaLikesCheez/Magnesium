@@ -183,7 +183,7 @@ func main() throws {
                 let range = result.range(at: result.numberOfRanges - 1)
                 let key = (contents as NSString).substring(with: range)
                 // determine the line number based on the number of newlines before the match location
-                let lineNumber = (contents[..<contents.index(contents.startIndex, offsetBy: range.location)])
+                let lineNumber = contents[..<contents.index(contents.startIndex, offsetBy: range.location)]
                     .components(separatedBy: .newlines)
                     .count
                 usedKeys.append(UsedKey(url: url, key: key, lineNumber: lineNumber + 1))
