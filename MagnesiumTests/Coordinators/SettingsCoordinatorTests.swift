@@ -9,7 +9,6 @@
 import Combine
 import Coordinator
 @testable import Magnesium
-import SwiftUI
 import XCTest
 
 class SettingsCoordinatorTests: XCTestCase {

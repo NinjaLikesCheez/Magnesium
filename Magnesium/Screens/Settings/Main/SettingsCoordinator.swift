@@ -9,7 +9,6 @@
 import Combine
 import Coordinator
 import Preferences
-import SwiftUI
 import UIKit
 
 enum SettingsCoordinatorEvent {
