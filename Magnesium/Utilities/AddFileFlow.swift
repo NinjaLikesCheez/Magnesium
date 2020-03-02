@@ -53,7 +53,7 @@ final class AddFileFlow {
                 baseURL: settings.url,
                 password: keychain.password
             )
-            client.add(fileURL: url)
+            client.request(.add(fileURL: url))
                 .ui()
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }

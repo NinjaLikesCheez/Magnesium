@@ -142,7 +142,7 @@ final class DelugeSettingsViewModel: ViewModel, EventEmitter {
 
         isLoadingSubject.send(true)
         let client = clientProvider.createClient(baseURL: url, password: password)
-        client.authenticate()
+        client.request(.authenticate)
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {

@@ -11,7 +11,7 @@ public final class UserDefaultsPreferences: Preferences {
         return valueUpdatedSubject.eraseToAnyPublisher()
     }
 
-    /// Creates a new instance with the given `UserDefaults`.
+    /// Creates a `UserDefaultsPreference` with the given `UserDefaults`.
     /// - Parameter userDefaults: The `UserDefaults` instance to use.
     public init(userDefaults: UserDefaults = UserDefaults.standard) {
         self.userDefaults = userDefaults

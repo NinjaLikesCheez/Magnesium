@@ -10,7 +10,7 @@ fi
 
 scripts/format.sh
 if [ -n "$(git ls-files --others --modified --exclude-standard)" ]; then 
-  printf "\e[1;31mErrpr: Found changes after running 'scripts/format.sh'.\e[0m\n"
+  printf "\e[1;31mError: Found changes after running 'scripts/format.sh'.\e[0m\n"
   exit -1
 fi
 

@@ -26,9 +26,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func refresh() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
-        return client.getCurrentState()
-            .mapError { $0 as Error }
-            .eraseToAnyPublisher()
+        return client.request(.currentStateForApp).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func detailViewModel(
@@ -54,9 +52,9 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         let publisher: AnyPublisher<Void, DelugeError>
 
         if url.scheme == "magnet" {
-            publisher = client.add(magnetURL: url)
+            publisher = client.request(.add(magnetURL: url))
         } else {
-            publisher = client.add(url: url)
+            publisher = client.request(.add(url: url))
         }
 
         return publisher
@@ -69,27 +67,27 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func pause(_ torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
-        return client.pause(hashes: torrents.map(\.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.request(.pause(hashes: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func resume(_ torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
-        return client.resume(hashes: torrents.map(\.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.request(.resume(hashes: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func remove(_ torrents: [DelugeTorrent], removeData: Bool) -> AnyPublisher<Void, Error> {
-        return client.remove(hashes: torrents.map(\.hash), removeData: removeData)
+        return client.request(.remove(hashes: torrents.map(\.hash), removeData: removeData))
             .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
     func verify(_ torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
-        return client.recheck(hashes: torrents.map(\.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.request(.recheck(hashes: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func setLabel(_ label: DelugeLabel, for torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
         let requests = torrents.map {
-            client.setLabel(label.name, forTorrentHash: $0.hash).mapError { $0 as Error }
+            client.request(.setLabel(hash: $0.hash, label: label.name)).mapError { $0 as Error }
         }
         return Publishers.MergeMany(requests)
             .collect()
@@ -98,17 +96,17 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func updateTrackers(for torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
-        return client.reannounce(hashes: torrents.map(\.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.request(.reannounce(hashes: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func moveDownloadFolder(for torrents: [DelugeTorrent], to path: String) -> AnyPublisher<Void, Error> {
-        return client.moveStorage(forTorrentHashes: torrents.map(\.hash), to: path)
+        return client.request(.moveStorage(hashes: torrents.map(\.hash), path: path))
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
-        return client.getCurrentState()
+        return client.request(.currentStateForApp)
             .handleEvents(receiveOutput: { [weak self] in
                 self?.updatedSubject.send($0)
             })

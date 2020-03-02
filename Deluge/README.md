@@ -1,3 +1,3 @@
 # Deluge
 
-An API client to interact with a Deluge server.
+A client to interact with a Deluge server.

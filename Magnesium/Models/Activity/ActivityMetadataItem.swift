@@ -13,7 +13,7 @@ import UIKit
 final class ActivityMetadataItem: NSObject, UIActivityItemSource {
     private let metadata: LPLinkMetadata
 
-    /// Creates a new `ActivityMetadataItem` with the given metadata.
+    /// Creates an `ActivityMetadataItem` with the given metadata.
     /// - Parameter metadata: The metadata to provide to a share sheet.
     init(metadata: LPLinkMetadata) {
         self.metadata = metadata

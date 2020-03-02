@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-/// An API client to interact with a Deluge server.
+/// A client to interact with a Deluge server.
 public final class Client {
     /// Errors that can occur during client operations.
     public enum Error: Swift.Error {
@@ -21,348 +21,189 @@ public final class Client {
         case serverError(message: String?)
     }
 
+    /// The `URLSession` to use for requests.
     private lazy var session: URLSession = {
         URLSession.shared
     }()
 
     /// The URL of the Deluge server.
     public let baseURL: URL
-    /// The password to authentication with.
+    /// The password used for authentication.
     public let password: String
 
-    /// Creates a new `Client` with the given parameters.
+    /// Creates a `Client` with the given parameters.
     /// - Parameters:
     ///   - baseURL: The URL of the Deluge server.
-    ///   - password: The password to authentication with.
+    ///   - password: The password used for authentication.
     public init(baseURL: URL, password: String) {
         self.baseURL = baseURL
         self.password = password
     }
 
-    private func request(
-        method: String,
-        params: [Any],
-        authenticateIfNeeded: Bool = true
-    ) -> AnyPublisher<[String: Any], Error> {
+    /// Sends a `Request` to the server.
+    /// - Parameter request: The request to be sent to the server.
+    /// - Returns: A publisher that emits a value when the request completes.
+    public func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, Error> {
+        switch request {
+        case let .rpc(request):
+            return self.request(request)
+        case let .upload(request):
+            return self.request(request)
+        }
+    }
+
+    /// Sends an `RPCRequest` to the server.
+    /// - Parameter request: The request to be sent to the server.
+    /// - Returns: A publisher that emits a value when the request completes.
+    private func request<Value>(_ request: RPCRequest<Value>) -> AnyPublisher<Value, Error> {
+        self.request(urlRequest(from: request.prepare(request, self)), transform: request.transform)
+    }
+
+    /// Sends an `UploadRequest` to the server.
+    /// - Parameter request: The request to be sent to the server.
+    /// - Returns: A publisher that emits a value when the request completes.
+    private func request<Value>(_ request: UploadRequest<Value>) -> AnyPublisher<Value, Error> {
+        self.request(urlRequest(from: request), transform: request.transform)
+    }
+
+    /// Attempts to send a `Result` containing `URLRequest` to the server. If the `Result` contains an error then the
+    /// request will not be performed.
+    /// - Parameters:
+    ///   - request: A `Result` containing the request to be sent to the server.
+    ///   - transform: Transforms the server response in to a new representation.
+    /// - Returns: A publisher that emits a value when the request completes.
+    private func request<Value>(
+        _ request: Result<URLRequest, Error>,
+        transform: @escaping ([String: Any]) -> Transform<Value>
+    ) -> AnyPublisher<Value, Error> {
+        request.publisher
+            .map { ($0, true) }
+            .flatMap(send(request:authenticateIfNeeded:))
+            .flatMap { response -> AnyPublisher<Value, Error> in
+                switch transform(response) {
+                case let .result(result):
+                    return result.publisher.eraseToAnyPublisher()
+                case let .request(request):
+                    return self.request(request)
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+
+    /// Creates a `URLRequest` from an `RPCRequest`.
+    /// - Parameters:
+    ///   - request: The request definition to be converted in to a `URLRequest`.
+    /// - Returns: A `Result` containing either the created `URLRequest` or an `Error` if the request body (method +
+    /// parameters) were unable to be serialized to JSON.
+    private func urlRequest<Value>(from request: RPCRequest<Value>) -> Result<URLRequest, Error> {
         let url = baseURL.appendingPathComponent("json")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
         do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: [
+            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: [
                 "id": 1,
-                "method": method,
-                "params": params,
+                "method": request.method,
+                "params": request.params,
             ], options: [])
         } catch {
-            return Fail(error: .encoding(error)).eraseToAnyPublisher()
+            return .failure(Error.encoding(error))
         }
 
-        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
-            return self.request(method: method, params: params, authenticateIfNeeded: false)
-        }
+        return .success(urlRequest)
     }
 
-    private func send(
-        request: URLRequest,
-        authenticateIfNeeded: Bool,
-        retry: @escaping () -> AnyPublisher<[String: Any], Error>
-    ) -> AnyPublisher<[String: Any], Error> {
-        return session.dataTaskPublisher(for: request)
-            .mapError { .request($0) }
-            .flatMap { data, response -> AnyPublisher<[String: Any], Error> in
-                switch self.parse(data: data, response: response) {
-                case let .success(response):
-                    return Just(response)
-                        .setFailureType(to: Error.self)
-                        .eraseToAnyPublisher()
-                case let .failure(error):
-                    return Fail(error: error).eraseToAnyPublisher()
-                }
-            }
-            .catch { error -> AnyPublisher<[String: Any], Error> in
-                guard case .unauthenticated = error, authenticateIfNeeded else {
-                    return Fail(error: error).eraseToAnyPublisher()
-                }
-
-                return self.authenticate()
-                    .flatMap { _ -> AnyPublisher<[String: Any], Error> in
-                        retry()
-                    }
-                    .eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
-    }
-
-    private func parse(data: Data, response: URLResponse) -> Result<[String: Any], Error> {
-        let dict: [String: Any]
-
-        do {
-            guard let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                return .failure(.unexpectedResponse)
-            }
-
-            dict = object
-        } catch {
-            return .failure(.decoding(error))
-        }
-
-        if let error = dict["error"] as? [String: Any] {
-            if let code = error["code"] as? Int, code == 1 {
-                return .failure(.unauthenticated)
-            }
-
-            return .failure(.serverError(message: error["message"] as? String))
-        }
-
-        return .success(dict)
-    }
-
-    /// Attempts to authenticate with the server.
-    public func authenticate() -> AnyPublisher<Void, Error> {
-        return request(method: "auth.login", params: [password], authenticateIfNeeded: false)
-            .flatMap { response -> AnyPublisher<Void, Error> in
-                let authenticated = response["result"] as? Bool ?? false
-                guard authenticated else {
-                    return Fail(error: .unauthenticated).eraseToAnyPublisher()
-                }
-
-                return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
-    }
-
-    private static func parseLabels(from response: [String: Any]) -> [Label] {
-        guard let filters = response["filters"] as? [String: Any],
-            let labels = filters["label"] as? [[AnyObject]]
-        else {
-            return []
-        }
-
-        return labels.compactMap { pair in
-            guard pair.count == 2, let name = pair[0] as? String, name != "All", let count = pair[1] as? Int else {
-                return nil
-            }
-
-            return Label(name: name, count: count)
-        }
-    }
-
-    /// Retrieves the list of torrents and labels from the server.
-    public func getCurrentState() -> AnyPublisher<([Torrent], [Label]), Error> {
-        let keys = [
-            "name",
-            "state",
-            "time_added",
-            "download_payload_rate",
-            "upload_payload_rate",
-            "eta",
-            "progress",
-            "total_done",
-            "total_uploaded",
-            "total_size",
-            "num_seeds",
-            "total_seeds",
-            "num_peers",
-            "total_peers",
-            "trackers",
-            "label",
-            "download_location",
-        ]
-
-        return request(method: "web.update_ui", params: [keys, []])
-            .flatMap { response -> AnyPublisher<([Torrent], [Label]), Error> in
-                guard let results = response["result"] as? [String: Any],
-                    let torrents = results["torrents"] as? [String: [String: Any]]
-                else {
-                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
-                }
-
-                let labels = Self.parseLabels(from: results)
-                return Just((torrents.compactMap { Torrent(hash: $0.key, dictionary: $0.value) }, labels))
-                    .setFailureType(to: Error.self)
-                    .eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
-    }
-
-    private static func parseTorrentFileResponse(_ response: [String: Any]) -> Result<[TorrentFile], Error> {
-        guard let results = response["result"] as? [String: Any],
-            let contents = results["contents"] as? [String: [String: Any]]
-        else {
-            return .failure(.unexpectedResponse)
-        }
-
-        func parseDirectory(_ contents: [String: [String: Any]]) -> [TorrentFile] {
-            var files = [TorrentFile]()
-            for (name, node) in contents {
-                guard let type = node["type"] as? String else {
-                    continue
-                }
-
-                switch type {
-                case "dir":
-                    guard let child = node["contents"] as? [String: [String: Any]] else { break }
-                    files.append(contentsOf: parseDirectory(child))
-                case "file":
-                    guard let file = TorrentFile(name: name, dictionary: node) else { break }
-                    files.append(file)
-                default:
-                    break
-                }
-            }
-            return files
-        }
-
-        return .success(parseDirectory(contents))
-    }
-
-    /// Retrieves the list of files for a torrent.
-    /// - Parameter hash: The hash of the torrent whose files should be retrieved.
-    public func getTorrentFiles(hash: String) -> AnyPublisher<[TorrentFile], Error> {
-        return request(method: "web.get_torrent_files", params: [hash])
-            .flatMap { response -> AnyPublisher<[TorrentFile], Error> in
-                switch Client.parseTorrentFileResponse(response) {
-                case let .success(files):
-                    return Just(files).setFailureType(to: Error.self).eraseToAnyPublisher()
-                case let .failure(error):
-                    return Fail(error: error).eraseToAnyPublisher()
-                }
-            }
-            .eraseToAnyPublisher()
-    }
-
-    /// Resumes the given torrents.
-    /// - Parameter hashes: The hashes of the torrents to resume.
-    public func resume(hashes: [String]) -> AnyPublisher<Void, Error> {
-        return request(method: "core.resume_torrent", params: [hashes])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Pauses the given torrents.
-    /// - Parameter hashes: The hashes of the torrents to pause.
-    public func pause(hashes: [String]) -> AnyPublisher<Void, Error> {
-        return request(method: "core.pause_torrent", params: [hashes])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Removes the given torrents from the server.
+    /// Creates a `URLRequest` from an `UploadRequest`.
     /// - Parameters:
-    ///   - hashes: The hashes of the torrents to remove.
-    ///   - removeData: If the torrents' data should be removed.
-    public func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, Error> {
-        return request(method: "core.remove_torrents", params: [hashes, removeData])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Rechecks the given torrents' data.
-    /// - Parameter hashes: The hashes of the torrents to recheck.
-    public func recheck(hashes: [String]) -> AnyPublisher<Void, Error> {
-        return request(method: "core.force_recheck", params: [hashes])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Adds a torrent using a link to a torrent file.
-    /// - Parameter url: The torrent file link.
-    public func add(url: URL) -> AnyPublisher<Void, Error> {
-        return request(method: "core.add_torrent_url", params: [url.absoluteString, [String: Any]()])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Adds a torrent using a magnet link.
-    /// - Parameter magnetURL: The magnet link to add.
-    public func add(magnetURL: URL) -> AnyPublisher<Void, Error> {
-        return request(method: "core.add_torrent_magnet", params: [magnetURL.absoluteString, [String: Any]()])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Adds a torrent using a local file URL.
-    /// - Parameter fileURL: The URL of the file to add.
-    public func add(fileURL: URL) -> AnyPublisher<Void, Error> {
-        return upload(fileURL: fileURL)
-            .flatMap { response -> AnyPublisher<[String: Any], Error> in
-                guard let path = (response["files"] as? [String])?.first else {
-                    return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
-                }
-
-                return self.request(
-                    method: "web.add_torrents",
-                    params: [[["path": path, "options": [String: Any]()]]]
-                )
-            }
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    private func upload(fileURL: URL, authenticateIfNeeded: Bool = true) -> AnyPublisher<[String: Any], Error> {
+    ///   - request: The request definition to be converted in to a `URLRequest`.
+    /// - Returns: A `Result` containing either the created `URLRequest` or an `Error` if the file could not be read.
+    private func urlRequest<Value>(from request: UploadRequest<Value>) -> Result<URLRequest, Error> {
         let url = baseURL.appendingPathComponent("upload")
         let boundary = UUID().uuidString
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-        switch multipartBody(fileURL: fileURL, boundary: boundary) {
-        case let .success(data):
-            request.httpBody = data
-        case let .failure(error):
-            return Fail(error: error).eraseToAnyPublisher()
-        }
-
-        return send(request: request, authenticateIfNeeded: authenticateIfNeeded) {
-            return self.upload(fileURL: fileURL, authenticateIfNeeded: false)
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        return multipartData(for: request, boundary: boundary).map {
+            urlRequest.httpBody = $0
+            return urlRequest
         }
     }
 
-    private func multipartBody(fileURL: URL, boundary: String) -> Result<Data, Error> {
+    /// Creates multipart data for an `UploadRequest`.
+    /// - Parameters:
+    ///   - request: The request to create multipart data for.
+    ///   - boundary: The multipart boundary value to use.
+    /// - Returns: A `Result` containing either the created multipart data or an `Error` if the file could not be read.
+    private func multipartData<Value>(for request: UploadRequest<Value>, boundary: String) -> Result<Data, Error> {
         let data: Data
         do {
-            data = try Data(contentsOf: fileURL)
+            data = try Data(contentsOf: request.fileURL)
         } catch {
             return .failure(.filesystem(error))
         }
 
+        let fileName = request.fileURL.lastPathComponent
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n"
-            .data(using: .utf8)!)
-        body.append("Content-Type: application/x-bittorrent\r\n\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(request.mimeType)\r\n\r\n".data(using: .utf8)!)
         body.append(data)
         body.append("\r\n--\(boundary)--".data(using: .utf8)!)
         return .success(body)
     }
 
-    /// Sets the label for a torrent.
+    /// Sends a `URLRequest` performing optional authentication.
+    ///
     /// - Parameters:
-    ///   - label: The label to set.
-    ///   - hash: The hash of the torrent being updated.
-    public func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, Error> {
-        return request(method: "label.set_torrent", params: [hash, label])
-            .map { _ in () }
+    ///   - request: The `URLRequest` to be sent.
+    ///   - authenticateIfNeeded: Whether authentication should be attempted if the server responds that the client is
+    ///   unauthenticated.
+    /// - Returns: A publisher that emits the decoded server response.
+    private func send(request: URLRequest, authenticateIfNeeded: Bool) -> AnyPublisher<[String: Any], Error> {
+        let retryIfNeeded = { (error: Error) -> AnyPublisher<[String: Any], Error> in
+            guard case .unauthenticated = error, authenticateIfNeeded else {
+                return Fail(error: error).eraseToAnyPublisher()
+            }
+
+            return self.request(.authenticate)
+                .flatMap { self.send(request: request, authenticateIfNeeded: false) }
+                .eraseToAnyPublisher()
+        }
+
+        return session.dataTaskPublisher(for: request)
+            .mapError { .request($0) }
+            .flatMap(decode(data:response:))
+            .catch(retryIfNeeded)
             .eraseToAnyPublisher()
     }
 
-    /// Updates the trackers for the given torrents and requests more peers.
-    /// - Parameter ids: The IDs of the torrents whose trackers should be updated.
-    public func reannounce(hashes: [String]) -> AnyPublisher<Void, Error> {
-        return request(method: "core.force_reannounce", params: [hashes])
-            .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    /// Moves the storage for the given torrents.
+    /// Attempts to decode a server response in to a dictionary.
     /// - Parameters:
-    ///   - hashes: The torrent hashes to update.
-    ///   - path: The path to the new download folder.
-    public func moveStorage(forTorrentHashes hashes: [String], to path: String) -> AnyPublisher<Void, Error> {
-        return request(method: "core.move_storage", params: [hashes, path])
-            .map { _ in () }
-            .eraseToAnyPublisher()
+    ///   - data: The data returned from the server.
+    ///   - response: The `URLResponse` describing the server response.
+    /// - Returns: A publisher that emits the decoded dictionary.
+    private func decode(data: Data, response: URLResponse) -> AnyPublisher<[String: Any], Error> {
+        let dict: [String: Any]
+
+        do {
+            guard let object = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                return Fail(error: .unexpectedResponse).eraseToAnyPublisher()
+            }
+
+            dict = object
+        } catch {
+            return Fail(error: .decoding(error)).eraseToAnyPublisher()
+        }
+
+        if let error = dict["error"] as? [String: Any] {
+            if let code = error["code"] as? Int, code == 1 {
+                return Fail(error: .unauthenticated).eraseToAnyPublisher()
+            }
+
+            return Fail(error: .serverError(message: error["message"] as? String)).eraseToAnyPublisher()
+        }
+
+        return Just(dict).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 }

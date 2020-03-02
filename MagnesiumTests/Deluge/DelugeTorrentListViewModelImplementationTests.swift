@@ -25,7 +25,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
 
     func test_refresh_shouldGetCurrentState() {
         implementation.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
-        XCTAssertEqual(client.getCurrentStateCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
     func test_detailViewModel_shouldReturnExpectedViewModelType() {
@@ -49,12 +49,15 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
 
     func test_addLink_withMagnetLink_shouldAddMagnetURL() {
         implementation.addLink("magnet:?").sink { _ in }.store(in: &observers)
-        XCTAssertEqual(client.addMagnetURLCallCount, 1)
-        XCTAssertEqual(client.addMagnetURLParamMagnetURL, [URL(string: "magnet:?")!])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_magnet"])
+        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["magnet:?",{}]"#])
     }
 
     func test_addLink_withMagnetLink_whenFails_shouldReturnError() {
-        client.addMagnetURLResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
+        client.results.append(.rpc(
+            method: "core.add_torrent_magnet",
+            response: Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
         var error: (String, String)?
         implementation.addLink("magnet:?").sink { error = $0 }.store(in: &observers)
         XCTAssertEqual(error?.0, "Failed to Add Torrent")
@@ -62,83 +65,90 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
 
     func test_addLink_withRegularLink_shouldAddMagnetURL() {
         implementation.addLink("http://example.com").sink { _ in }.store(in: &observers)
-        XCTAssertEqual(client.addURLCallCount, 1)
-        XCTAssertEqual(client.addURLParamURL, [URL(string: "http://example.com")!])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_url"])
+        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["http:\/\/example.com",{}]"#])
     }
 
     func test_addLink_withRegularLink_whenFails_shouldReturnError() {
-        client.addURLResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
+        client.results.append(.rpc(
+            method: "core.add_torrent_url",
+            response: Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
         var error: (String, String)?
         implementation.addLink("http://example.com").sink { error = $0 }.store(in: &observers)
         XCTAssertEqual(error?.0, "Failed to Add Torrent")
     }
 
     func test_pause_shouldPause() {
-        implementation.pause([.randomMock(), .randomMock()])
+        implementation.pause([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.pauseCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrent"])
     }
 
     func test_resume_shouldResume() {
-        implementation.resume([.randomMock(), .randomMock()])
+        implementation.resume([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.resumeCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrent"])
     }
 
     func test_remove_withKeepData_shouldRemove() {
-        implementation.remove([.randomMock(), .randomMock()], removeData: false)
+        implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: false)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.removeCallCount, 1)
-        XCTAssertEqual(client.removeParamRemoveData, [false])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
+        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],false]"#])
     }
 
     func test_remove_withRemoveData_shouldRemove() {
-        implementation.remove([.randomMock(), .randomMock()], removeData: true)
+        implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: true)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.removeCallCount, 1)
-        XCTAssertEqual(client.removeParamRemoveData, [true])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
+        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],true]"#])
     }
 
     func test_verify_shouldRecheck() {
-        implementation.verify([.randomMock(), .randomMock()])
+        implementation.verify([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.recheckCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_recheck"])
     }
 
     func test_setLabel_shouldSetLabels() {
-        implementation.setLabel(.mock(name: "label1"), for: [.randomMock(), .randomMock()])
+        implementation.setLabel(.mock(name: "label1"), for: [.mock(hash: "A"), .mock(hash: "B")])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.setLabelCallCount, 2)
-        XCTAssertEqual(client.setLabelParamLabel, ["label1", "label1"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["label.set_torrent", "label.set_torrent"])
+        XCTAssertEqual(client.requestParamRequest.map(\.params) as? [[String]], [["A", "label1"], ["B", "label1"]])
     }
 
     func test_updateTrackers_shouldReannounce() {
-        implementation.updateTrackers(for: [.randomMock(), .randomMock()])
+        implementation.updateTrackers(for: [.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.reannounceCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_reannounce"])
     }
 
     func test_moveDownloadFolder_shouldMoveStorage() {
-        implementation.moveDownloadFolder(for: [.randomMock(), .randomMock()], to: "/new")
+        implementation.moveDownloadFolder(for: [.mock(hash: "A"), .mock(hash: "B")], to: "/new")
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.moveStorageCallCount, 1)
-        XCTAssertEqual(client.moveStorageParamPath, ["/new"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.move_storage"])
+        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],"\/new"]"#])
     }
 
     func test_refreshDeluge_shouldGetCurrentState() {
         implementation.refreshDeluge().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
-        XCTAssertEqual(client.getCurrentStateCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
     func test_refreshDeluge_shouldEmitUpdate() {
+        client.results.append(.rpc(
+            method: "web.update_ui",
+            response: Just(([], [])).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+        ))
         let expectation = self.expectation(description: "Value received")
         implementation.updated.sink { _ in expectation.fulfill() }.store(in: &observers)
         implementation.refreshDeluge().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)

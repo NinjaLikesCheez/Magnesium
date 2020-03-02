@@ -28,7 +28,7 @@ class ValueMapper<K: Hashable, V> {
         return valuesSubject.eraseToAnyPublisher()
     }
 
-    /// Creates a new `ValueMapper` using the given filter publisher.
+    /// Creates a `ValueMapper` using the given filter publisher.
     /// - Parameter filter: A publisher that emits filter functions. When this publisher emits, the values will be
     /// updated with the new filter function.
     init(filter: AnyPublisher<FilterFunction, Never>) {

@@ -13,6 +13,7 @@ public struct TorrentFile {
     /// The file's download priority.
     public var priority: Priority
 
+    /// Creates a `TorrentFile` with the given parameters.
     public init(index: Int, name: String, path: String, size: Int64, progress: Float, priority: Priority) {
         self.index = index
         self.name = name
@@ -24,6 +25,10 @@ public struct TorrentFile {
 }
 
 extension TorrentFile {
+    /// Creates a `TorrentFile` from a response dictionary, returning nil if any required properties are missing.
+    /// - Parameters:
+    ///   - name: The file name.
+    ///   - dictionary: The response dictionary for the file.
     init?(name: String, dictionary: [String: Any]) {
         guard let index = dictionary["index"] as? Int,
             let path = dictionary["path"] as? String,

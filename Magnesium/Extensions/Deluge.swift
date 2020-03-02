@@ -12,50 +12,14 @@ import Foundation
 
 typealias DelugeError = Deluge.Client.Error
 typealias DefaultDelugeClient = Deluge.Client
-typealias DelugeTorrent = Deluge.Torrent
 typealias DelugeTorrentFile = Deluge.TorrentFile
 typealias DelugeLabel = Deluge.Label
 
 protocol DelugeClient {
-    func authenticate() -> AnyPublisher<Void, DelugeError>
-    func getCurrentState() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), DelugeError>
-    func getTorrentFiles(hash: String) -> AnyPublisher<[DelugeTorrentFile], DelugeError>
-    func pause(hashes: [String]) -> AnyPublisher<Void, DelugeError>
-    func resume(hashes: [String]) -> AnyPublisher<Void, DelugeError>
-    func remove(hashes: [String], removeData: Bool) -> AnyPublisher<Void, DelugeError>
-    func recheck(hashes: [String]) -> AnyPublisher<Void, DelugeError>
-    func add(url: URL) -> AnyPublisher<Void, DelugeError>
-    func add(magnetURL: URL) -> AnyPublisher<Void, DelugeError>
-    func add(fileURL: URL) -> AnyPublisher<Void, DelugeError>
-    func setLabel(_ label: String, forTorrentHash hash: String) -> AnyPublisher<Void, DelugeError>
-    func reannounce(hashes: [String]) -> AnyPublisher<Void, DelugeError>
-    func moveStorage(forTorrentHashes hashes: [String], to path: String) -> AnyPublisher<Void, DelugeError>
+    func request<Value>(_ request: Deluge.Request<Value>) -> AnyPublisher<Value, DefaultDelugeClient.Error>
 }
 
 extension DefaultDelugeClient: DelugeClient {}
-
-extension DelugeTorrent: StandardTorrent {
-    var standardState: TorrentState {
-        switch state {
-        case .downloading:
-            return .downloading
-        case .seeding:
-            return .seeding
-        case .paused:
-            return .paused
-        case .checking:
-            return .checking
-        case .queued:
-            return .queued
-        case .error:
-            return .error
-        }
-    }
-
-    var trackerStrings: [String] {
-        return trackers
-    }
-}
 
 extension DelugeTorrentFile: StandardTorrentFile {}
 extension DelugeLabel: StandardLabel {}

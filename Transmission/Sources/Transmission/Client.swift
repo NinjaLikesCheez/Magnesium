@@ -42,7 +42,7 @@ public final class Client {
     /// The password to authenticate with.
     public let password: String?
 
-    /// Creates a new `Client` with the given parameters.
+    /// Creates a `Client` with the given parameters.
     /// - Parameters:
     ///   - baseURL: The URL of the Transmission server.
     ///   - username: The username to authenticate with.

@@ -6,12 +6,13 @@
 //  Copyright © 2020 James Hurst. All rights reserved.
 //
 
+import Deluge
 @testable import Magnesium
 import XCTest
 
 class DelugeTorrentTests: XCTestCase {
-    func test_standardState() {
-        let pairs: [(DelugeTorrent.State, TorrentState)] = [
+    func test_init_state_shouldMapToExpectedStandardState() {
+        let pairs: [(Deluge.Torrent.State, TorrentState)] = [
             (.downloading, .downloading),
             (.seeding, .seeding),
             (.paused, .paused),
@@ -21,13 +22,16 @@ class DelugeTorrentTests: XCTestCase {
         ]
 
         for pair in pairs {
-            let torrent = DelugeTorrent.mock(state: pair.0)
-            XCTAssertEqual(torrent.standardState, pair.1)
+            let torrent = Deluge.Torrent.mock(state: pair.0)
+            let appTorrent = DelugeTorrent(torrent)
+            XCTAssertEqual(appTorrent?.standardState, pair.1)
         }
     }
 
-    func test_trackerStrings_shouldBeEqualToTrackers() {
+    func test_init_trackers_shouldMapToExpectedTrackerStrings() {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
-        XCTAssertEqual(DelugeTorrent.mock(trackers: trackers).trackerStrings, trackers)
+        let torrent = Deluge.Torrent.mock(trackers: trackers)
+        let appTorrent = DelugeTorrent(torrent)
+        XCTAssertEqual(appTorrent?.trackerStrings, trackers)
     }
 }
