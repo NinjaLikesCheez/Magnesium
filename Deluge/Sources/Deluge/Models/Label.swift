@@ -5,6 +5,7 @@ public struct Label {
     /// The number of torrents with this label.
     public var count: Int
 
+    /// Creates a `Label` with the given parameters.
     public init(name: String, count: Int) {
         self.name = name
         self.count = count
