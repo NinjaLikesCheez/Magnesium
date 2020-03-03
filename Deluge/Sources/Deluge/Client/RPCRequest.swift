@@ -2,17 +2,20 @@ import Combine
 import Foundation
 
 /// A definition for a Deluge RPC request.
+///
+/// An `RPCRequest` makes an HTTP POST request to `/json`.
+/// You can use this type of request to interact with the Deluge JSON-RPC API.
 public struct RPCRequest<Value> {
     /// The RPC method.
     public var method: String
     /// The parameters passed with the request.
     public var params: [Any]
-    /// Whether authentication should be attempted if the server indicates that the client is unauthenticated.
-    public var authenticateIfNeeded: Bool
-    /// Creates a new version of the request using information from the `Client`.
-    public var prepare: (Self, Client) -> Self
     /// Transforms the server response in to a new representation.
-    public var transform: ([String: Any]) -> Transform<Value>
+    public var transform: ([String: Any]) -> Transformed<Value>
+    /// Whether authentication should be attempted if the server indicates that the client is unauthenticated.
+    internal var authenticateIfNeeded: Bool
+    /// Creates a new version of the request using information from the `Client`.
+    internal var prepare: (Self, Client) -> Self
 
     /// Creates an `RPCRequest` with the given parameters.
     /// - Parameters:
@@ -22,18 +25,27 @@ public struct RPCRequest<Value> {
     ///    client is unauthenticated.
     ///   - prepare: Creates a new version of the request using information from the `Client`.
     ///   - transform: Transforms the server response in to a new representation.
-    public init(
+    internal init(
         method: String,
-        params: [Any] = [],
+        params: [Any],
         authenticateIfNeeded: Bool = true,
-        prepare: @escaping (Self, Client) -> Self = { request, _ in request },
-        transform: @escaping ([String: Any]) -> Transform<Value>
+        prepare: @escaping (Self, Client) -> Self,
+        transform: @escaping ([String: Any]) -> Transformed<Value>
     ) {
         self.method = method
         self.params = params
         self.authenticateIfNeeded = authenticateIfNeeded
         self.prepare = prepare
         self.transform = transform
+    }
+
+    /// Creates an `RPCRequest` with the given parameters.
+    /// - Parameters:
+    ///   - method: The RPC method.
+    ///   - params: The parameters passed with the request.
+    ///   - transform: Transforms the server response in to a new representation.
+    public init(method: String, params: [Any], transform: @escaping ([String: Any]) -> Transformed<Value>) {
+        self.init(method: method, params: params, prepare: { request, _ in request }, transform: transform)
     }
 }
 
@@ -45,11 +57,12 @@ public extension RPCRequest {
     ///   - authenticateIfNeeded: Whether authentication should be attempted if the server indicates that the
     ///    client is unauthenticated.
     ///   - prepare: Creates a new version of the request using information from the `Client`.
-    init(
+    ///   - transform: Transforms the server response in to a new representation.
+    internal init(
         method: String,
-        params: [Any] = [],
+        params: [Any],
         authenticateIfNeeded: Bool = true,
-        prepare: @escaping (Self, Client) -> Self = { request, _ in request },
+        prepare: @escaping (Self, Client) -> Self,
         transform: @escaping ([String: Any]) -> Result<Value, Client.Error>
     ) {
         self.init(
@@ -60,6 +73,15 @@ public extension RPCRequest {
             transform: { .result(transform($0)) }
         )
     }
+
+    /// A convenience initializer for `Result` transforms.
+    /// - Parameters:
+    ///   - method: The RPC method.
+    ///   - params: The parameters passed with the request.
+    ///   - transform: Transforms the server response in to a new representation.
+    init(method: String, params: [Any], transform: @escaping ([String: Any]) -> Result<Value, Client.Error>) {
+        self.init(method: method, params: params, transform: { .result(transform($0)) })
+    }
 }
 
 public extension RPCRequest where Value == Void {
@@ -68,22 +90,8 @@ public extension RPCRequest where Value == Void {
     /// - Parameters:
     ///   - method: The RPC method.
     ///   - params: The parameters passed with the request.
-    ///   - authenticateIfNeeded: Whether authentication should be attempted if the server indicates that the
-    ///    client is unauthenticated.
-    ///   - prepare: Creates a new version of the request using information from the `Client`.
-    init(
-        method: String,
-        params: [Any] = [],
-        authenticateIfNeeded: Bool = true,
-        prepare: @escaping (Self, Client) -> Self = { request, _ in request }
-    ) {
-        self.init(
-            method: method,
-            params: params,
-            authenticateIfNeeded: authenticateIfNeeded,
-            prepare: prepare,
-            transform: { _ in .success(()) }
-        )
+    init(method: String, params: [Any]) {
+        self.init(method: method, params: params, transform: { _ in .success(()) })
     }
 }
 
@@ -103,7 +111,7 @@ public extension RPCRequest {
                 request.params = prepared.params
                 return request
             },
-            transform: { (value: [String: Any]) -> Transform<NewValue> in
+            transform: { (value: [String: Any]) -> Transformed<NewValue> in
                 switch original.transform(value) {
                 case let .result(result):
                     return .result(result.map(transform))

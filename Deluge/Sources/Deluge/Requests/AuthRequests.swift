@@ -1,10 +1,11 @@
 public extension Request {
-    /// Attempts to authenticate with the server.
+    /// Attempts to authenticate with the server. This will produce a `Void` value if authenticated.
     ///
     /// This is an `auth.login` RPC request.
     static var authenticate: Request<Void> {
         return .rpc(.init(
             method: "auth.login",
+            params: [],
             authenticateIfNeeded: false,
             prepare: { request, client in
                 var request = request

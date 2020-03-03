@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-/// A client to interact with a Deluge server.
+/// A Deluge API client.
 public final class Client {
     /// Errors that can occur during client operations.
     public enum Error: Swift.Error {
@@ -27,9 +27,9 @@ public final class Client {
     }()
 
     /// The URL of the Deluge server.
-    public let baseURL: URL
+    let baseURL: URL
     /// The password used for authentication.
-    public let password: String
+    let password: String
 
     /// Creates a `Client` with the given parameters.
     /// - Parameters:
@@ -74,7 +74,7 @@ public final class Client {
     /// - Returns: A publisher that emits a value when the request completes.
     private func request<Value>(
         _ request: Result<URLRequest, Error>,
-        transform: @escaping ([String: Any]) -> Transform<Value>
+        transform: @escaping ([String: Any]) -> Transformed<Value>
     ) -> AnyPublisher<Value, Error> {
         request.publisher
             .map { ($0, true) }

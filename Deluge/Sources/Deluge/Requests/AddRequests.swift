@@ -28,7 +28,7 @@ public extension Request {
         .upload(.init(
             fileURL: fileURL,
             mimeType: "application/x-bittorrent",
-            transform: { response -> Transform<Void> in
+            transform: { response -> Transformed<Void> in
                 guard let path = (response["files"] as? [String])?.first else {
                     return .result(.failure(.unexpectedResponse))
                 }

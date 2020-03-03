@@ -2,13 +2,16 @@ import Combine
 import Foundation
 
 /// A definition for a Deluge upload request.
+///
+/// An `UploadRequest` makes an HTTP POST request to `/upload` with a multipart form.
+/// You can use this type of request to upload a torrent to the Deluge server.
 public struct UploadRequest<Value> {
     /// The local file URL of the file to upload.
     public var fileURL: URL
     /// The MIME type of the file being uploaded.
     public var mimeType: String
     /// Transforms the server response in to a new representation.
-    public var transform: ([String: Any]) -> Transform<Value>
+    public var transform: ([String: Any]) -> Transformed<Value>
 
     /// Creates an `UploadRequest` with the given parameters.
     /// - Parameters:
@@ -18,7 +21,7 @@ public struct UploadRequest<Value> {
     public init(
         fileURL: URL,
         mimeType: String,
-        transform: @escaping ([String: Any]) -> Transform<Value>
+        transform: @escaping ([String: Any]) -> Transformed<Value>
     ) {
         self.fileURL = fileURL
         self.mimeType = mimeType

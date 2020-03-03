@@ -4,7 +4,7 @@ public extension Request {
     /// This is a `web.update_ui` RPC request.
     ///
     /// - Parameter properties: The torrent properties to include.
-    static func currentState(properties: [String]) -> Request<([Torrent], [Label])> {
+    static func currentState(properties: [String]) -> Request<(torrents: [Torrent], labels: [Label])> {
         .rpc(.init(method: "web.update_ui", params: [properties, []], transform: parseUpdateUIResponse))
     }
 
@@ -42,7 +42,9 @@ private extension Request {
     /// - Parameter response: The response dictionary.
     /// - Returns: A `Result` containing either the list of torrents and labels, or an `Error` if the response
     /// dictionary could not be parsed.
-    static func parseUpdateUIResponse(_ response: [String: Any]) -> Result<([Torrent], [Label]), Client.Error> {
+    static func parseUpdateUIResponse(
+        _ response: [String: Any]
+    ) -> Result<(torrents: [Torrent], labels: [Label]), Client.Error> {
         guard let results = response["result"] as? [String: Any],
             let torrents = results["torrents"] as? [String: [String: Any]]
         else {
