@@ -54,6 +54,7 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
 
     func remove(_ torrent: DelugeTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
         return client.request(.remove(hashes: [torrent.hash], removeData: removeData))
+            .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }

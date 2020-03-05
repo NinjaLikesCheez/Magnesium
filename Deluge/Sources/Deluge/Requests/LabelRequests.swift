@@ -7,6 +7,6 @@ public extension Request {
     ///   - hash: The hash of the torrent whose label should be set.
     ///   - label: The name of the label to set.
     static func setLabel(hash: String, label: String) -> Request<Void> {
-        .rpc(.init(method: "label.set_torrent", params: [hash, label]))
+        .init(method: "label.set_torrent", params: [hash, label])
     }
 }

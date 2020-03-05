@@ -101,7 +101,7 @@ struct DelugeTorrent: StandardTorrent {
         self.totalSeeds = totalSeeds
         self.peers = peers
         self.totalPeers = totalPeers
-        trackerStrings = trackers
+        trackerStrings = trackers.map { $0.url }
         self.label = label
         self.downloadPath = downloadPath
     }

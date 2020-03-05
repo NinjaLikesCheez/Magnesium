@@ -1,20 +1,20 @@
 public extension Request {
-    /// Requests the list of torrents and labels from the server.
+    /// Requests the information required to update the web interface. This returns a list of torrents and labels.
     ///
     /// This is a `web.update_ui` RPC request.
     ///
     /// - Parameter properties: The torrent properties to include.
-    static func currentState(properties: [String]) -> Request<(torrents: [Torrent], labels: [Label])> {
-        .rpc(.init(method: "web.update_ui", params: [properties, []], transform: parseUpdateUIResponse))
+    static func updateUI(properties: [String]) -> Request<(torrents: [Torrent], labels: [Label])> {
+        .init(method: "web.update_ui", params: [properties, []], transform: parseUpdateUIResponse)
     }
 
-    /// Requests the list of items in a torrent.
+    /// Requests the list of items for a torrent.
     ///
     /// This is a `web.get_torrent_files` RPC request.
     ///
     /// - Parameter hash: The hash of the torrent whose items should be requested.
     static func torrentItems(hash: String) -> Request<[TorrentItem]> {
-        .rpc(.init(method: "web.get_torrent_files", params: [hash], transform: parseTorrentFilesResponse))
+        .init(method: "web.get_torrent_files", params: [hash], transform: parseTorrentFilesResponse)
     }
 }
 

@@ -8,15 +8,10 @@ let package = Package(
         .iOS(.v13),
     ],
     products: [
-        .library(
-            name: "Deluge",
-            targets: ["Deluge"]
-        ),
+        .library(name: "Deluge", targets: ["Deluge"]),
     ],
     targets: [
-        .target(
-            name: "Deluge",
-            dependencies: []
-        ),
+        .target(name: "Deluge"),
+        .testTarget(name: "DelugeIntegrationTests", dependencies: [.target(name: "Deluge")]),
     ]
 )

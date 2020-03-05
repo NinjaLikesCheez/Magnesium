@@ -3,7 +3,7 @@ public extension Request {
     ///
     /// This is an `auth.login` RPC request.
     static var authenticate: Request<Void> {
-        return .rpc(.init(
+        return .init(
             method: "auth.login",
             params: [],
             authenticateIfNeeded: false,
@@ -12,14 +12,11 @@ public extension Request {
                 request.params = [client.password]
                 return request
             },
-            transform: { response -> Result<Void, Client.Error> in
+            transform: { response in
                 let authenticated = response["result"] as? Bool ?? false
-                guard authenticated else {
-                    return .failure(.unauthenticated)
-                }
-
+                guard authenticated else { return .failure(.unauthenticated) }
                 return .success(())
             }
-        ))
+        )
     }
 }

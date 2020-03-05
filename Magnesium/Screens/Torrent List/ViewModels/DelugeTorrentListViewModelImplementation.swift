@@ -26,7 +26,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func refresh() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
-        return client.request(.currentStateForApp).mapError { $0 as Error }.eraseToAnyPublisher()
+        return client.request(.updateUIForApp).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
     func detailViewModel(
@@ -52,7 +52,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         let publisher: AnyPublisher<Void, DelugeError>
 
         if url.scheme == "magnet" {
-            publisher = client.request(.add(magnetURL: url))
+            publisher = client.request(.add(magnetURL: url)).map { _ in () }.eraseToAnyPublisher()
         } else {
             publisher = client.request(.add(url: url))
         }
@@ -106,7 +106,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
-        return client.request(.currentStateForApp)
+        return client.request(.updateUIForApp)
             .handleEvents(receiveOutput: { [weak self] in
                 self?.updatedSubject.send($0)
             })
