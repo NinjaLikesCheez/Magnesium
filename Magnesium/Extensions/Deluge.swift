@@ -31,8 +31,6 @@ extension DelugeError: LocalizedError {
             return error.localizedDescription
         case let .decoding(error):
             return error.localizedDescription
-        case let .filesystem(error):
-            return error.localizedDescription
         case let .request(error):
             return error.localizedDescription
         case .unauthenticated:
