@@ -9,8 +9,6 @@ public final class Client {
         case encoding(Swift.Error)
         /// An error occurred while decoding the response.
         case decoding(Swift.Error)
-        /// A filesystem error occurred.
-        case filesystem(Swift.Error)
         /// A request error occurred.
         case request(URLError)
         /// The provided authentication was not valid.
