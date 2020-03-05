@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Deluge",
+        "repositoryURL": "ssh://git@git.jameshurst.me:10022/iOS/Deluge-Swift.git",
+        "state": {
+          "branch": "master",
+          "revision": "e7f2d602d8d6121fae6d50d4fb362ef656ec20c7",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,2 +1,2 @@
 #!/bin/bash
-swiftformat Magnesium MagnesiumTests MVVM Preferences Deluge Transmission
+swiftformat Magnesium MagnesiumTests MVVM Preferences Transmission

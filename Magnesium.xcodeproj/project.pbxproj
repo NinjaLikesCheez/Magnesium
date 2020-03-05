@@ -37,6 +37,7 @@
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
 		E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */; };
+		E92A6B5524114B3B0024A8CD /* Deluge in Frameworks */ = {isa = PBXBuildFile; productRef = E92A6B5424114B3B0024A8CD /* Deluge */; };
 		E92D5CE323FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE223FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE523FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE423FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE723FB234800A4CB51 /* TransmissionTorrentFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE623FB234800A4CB51 /* TransmissionTorrentFileTests.swift */; };
@@ -345,6 +346,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E92A6B5524114B3B0024A8CD /* Deluge in Frameworks */,
 				E9282C8923CC170900776CD3 /* Preferences in Frameworks */,
 				E96B725123D3937B005E8E89 /* Transmission in Frameworks */,
 				E9CA717E23E28CCF0072522B /* MVVM in Frameworks */,
@@ -896,6 +898,7 @@
 				E9786AF723D38E6200E4157E /* Deluge */,
 				E96B725023D3937B005E8E89 /* Transmission */,
 				E9CA717D23E28CCF0072522B /* MVVM */,
+				E92A6B5424114B3B0024A8CD /* Deluge */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -947,6 +950,9 @@
 				Base,
 			);
 			mainGroup = E96B0058237A43740091FA71;
+			packageReferences = (
+				E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */,
+			);
 			productRefGroup = E96B0062237A43740091FA71 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1437,10 +1443,26 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "ssh://git@git.jameshurst.me:10022/iOS/Deluge-Swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		E9282C8823CC170900776CD3 /* Preferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Preferences;
+		};
+		E92A6B5424114B3B0024A8CD /* Deluge */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */;
+			productName = Deluge;
 		};
 		E96B725023D3937B005E8E89 /* Transmission */ = {
 			isa = XCSwiftPackageProductDependency;
