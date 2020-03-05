@@ -47,6 +47,47 @@ struct DelugeTorrent: StandardTorrent {
     /// The torrent's download path.
     var downloadPath: String
 
+    /// Creates a new `DelugeTorrent` with the given parameters.
+    init(
+        hash: String,
+        name: String,
+        standardState: TorrentState,
+        dateAdded: Date,
+        downloadRate: Int64,
+        uploadRate: Int64,
+        eta: TimeInterval,
+        progress: Float,
+        downloaded: Int64,
+        uploaded: Int64,
+        size: Int64,
+        seeds: Int,
+        totalSeeds: Int,
+        peers: Int,
+        totalPeers: Int,
+        trackerStrings: [String],
+        label: String,
+        downloadPath: String
+    ) {
+        self.hash = hash
+        self.name = name
+        self.standardState = standardState
+        self.dateAdded = dateAdded
+        self.downloadRate = downloadRate
+        self.uploadRate = uploadRate
+        self.eta = eta
+        self.progress = progress
+        self.downloaded = downloaded
+        self.uploaded = uploaded
+        self.size = size
+        self.seeds = seeds
+        self.totalSeeds = totalSeeds
+        self.peers = peers
+        self.totalPeers = totalPeers
+        self.trackerStrings = trackerStrings
+        self.label = label
+        self.downloadPath = downloadPath
+    }
+
     /// Creates a `DelugeTorrent` from a `Deluge.Torrent`, returning nil if any required properties are missing.
     /// - Parameter torrent: The `Deluge.Torrent` to create a `DelugeTorrent` from.
     init?(_ torrent: Deluge.Torrent) {

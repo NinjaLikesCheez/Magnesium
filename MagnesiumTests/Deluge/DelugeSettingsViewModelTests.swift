@@ -140,9 +140,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_save_whenAuthenticationFails_shouldEmitError() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "auth.login",
-            response: Fail(error: .unauthenticated).eraseToAnyPublisher()
+            result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
@@ -172,9 +172,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutServer_shouldAddServer() throws {
-        client.results.append(.rpc(
+        client.results.append((
             method: "auth.login",
-            response: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
         ))
 
         let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
@@ -194,9 +194,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withServer_shouldUpdateServer() throws {
-        client.results.append(.rpc(
+        client.results.append((
             method: "auth.login",
-            response: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
         ))
 
         let settings = DelugeServerSettings(url: URL(string: "http://example.com/new")!)
@@ -216,9 +216,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutServer_shouldEmitCompleteEvent() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "auth.login",
-            response: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
         ))
 
         let viewModel = addViewModel
@@ -236,9 +236,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withServer_shouldEmitCompleteEvent() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "auth.login",
-            response: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
         ))
 
         let viewModel = editViewModel

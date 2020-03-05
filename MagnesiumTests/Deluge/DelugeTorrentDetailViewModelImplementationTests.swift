@@ -32,14 +32,14 @@ class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
         implementation.pause(.mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrent"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrents"])
     }
 
     func test_resume_shouldResume() {
         implementation.resume(.mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrent"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrents"])
     }
 
     func test_remove_withKeepData_shouldRemove() {

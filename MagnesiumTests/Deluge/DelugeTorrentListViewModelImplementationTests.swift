@@ -54,9 +54,9 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     }
 
     func test_addLink_withMagnetLink_whenFails_shouldReturnError() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "core.add_torrent_magnet",
-            response: Fail(error: .unauthenticated).eraseToAnyPublisher()
+            result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         var error: (String, String)?
         implementation.addLink("magnet:?").sink { error = $0 }.store(in: &observers)
@@ -70,9 +70,9 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     }
 
     func test_addLink_withRegularLink_whenFails_shouldReturnError() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "core.add_torrent_url",
-            response: Fail(error: .unauthenticated).eraseToAnyPublisher()
+            result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         var error: (String, String)?
         implementation.addLink("http://example.com").sink { error = $0 }.store(in: &observers)
@@ -83,14 +83,14 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
         implementation.pause([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrent"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrents"])
     }
 
     func test_resume_shouldResume() {
         implementation.resume([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrent"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrents"])
     }
 
     func test_remove_withKeepData_shouldRemove() {
@@ -145,9 +145,9 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     }
 
     func test_refreshDeluge_shouldEmitUpdate() {
-        client.results.append(.rpc(
+        client.results.append((
             method: "web.update_ui",
-            response: Just(([], [])).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(([], [])).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
         ))
         let expectation = self.expectation(description: "Value received")
         implementation.updated.sink { _ in expectation.fulfill() }.store(in: &observers)

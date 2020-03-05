@@ -19,44 +19,44 @@ private func randomHash() -> String {
 
 extension Deluge.Torrent {
     static func mock(
-        hash: String = randomHash(),
-        name: String = "",
-        state: State = .downloading,
         dateAdded: Date = Date(),
-        downloadRate: Int64 = 0,
-        uploadRate: Int64 = 0,
-        eta: TimeInterval = 0,
-        progress: Float = 0,
         downloaded: Int64 = 0,
-        uploaded: Int64 = 0,
-        size: Int64 = 0,
-        seeds: Int = 0,
-        totalSeeds: Int = 0,
-        peers: Int = 0,
-        totalPeers: Int = 0,
-        trackers: [String] = [],
+        downloadPath: String = "/",
+        downloadRate: Int64 = 0,
+        eta: TimeInterval = 0,
+        hash: String = randomHash(),
         label: String = "",
-        downloadPath: String = ""
-    ) -> Deluge.Torrent {
-        return Deluge.Torrent(
-            hash: hash,
-            name: name,
-            state: state,
+        name: String = "",
+        peers: Int = 0,
+        progress: Float = 0,
+        seeds: Int = 0,
+        size: Int64 = 0,
+        state: Torrent.State = .downloading,
+        totalPeers: Int = 0,
+        totalSeeds: Int = 0,
+        trackers: [Tracker] = [],
+        uploaded: Int64 = 0,
+        uploadRate: Int64 = 0
+    ) -> Self {
+        return .init(
             dateAdded: dateAdded,
-            downloadRate: downloadRate,
-            uploadRate: uploadRate,
-            eta: eta,
-            progress: progress,
             downloaded: downloaded,
-            uploaded: uploaded,
-            size: size,
-            seeds: seeds,
-            totalSeeds: totalSeeds,
-            peers: peers,
-            totalPeers: totalPeers,
-            trackers: trackers,
+            downloadPath: downloadPath,
+            downloadRate: downloadRate,
+            eta: eta,
+            hash: hash,
             label: label,
-            downloadPath: downloadPath
+            name: name,
+            peers: peers,
+            progress: progress,
+            seeds: seeds,
+            size: size,
+            state: state,
+            totalPeers: totalPeers,
+            totalSeeds: totalSeeds,
+            trackers: trackers,
+            uploaded: uploaded,
+            uploadRate: uploadRate
         )
     }
 }
@@ -65,7 +65,7 @@ extension DelugeTorrent {
     static func mock(
         hash: String = randomHash(),
         name: String = "",
-        state: Deluge.Torrent.State = .downloading,
+        standardState: TorrentState = .downloading,
         dateAdded: Date = Date(),
         downloadRate: Int64 = 0,
         uploadRate: Int64 = 0,
@@ -78,14 +78,14 @@ extension DelugeTorrent {
         totalSeeds: Int = 0,
         peers: Int = 0,
         totalPeers: Int = 0,
-        trackers: [String] = [],
+        trackersStrings: [String] = [],
         label: String = "",
         downloadPath: String = ""
-    ) -> DelugeTorrent {
-        DelugeTorrent(Deluge.Torrent.mock(
+    ) -> Self {
+        return .init(
             hash: hash,
             name: name,
-            state: state,
+            standardState: standardState,
             dateAdded: dateAdded,
             downloadRate: downloadRate,
             uploadRate: uploadRate,
@@ -98,10 +98,10 @@ extension DelugeTorrent {
             totalSeeds: totalSeeds,
             peers: peers,
             totalPeers: totalPeers,
-            trackers: trackers,
+            trackerStrings: trackersStrings,
             label: label,
             downloadPath: downloadPath
-        ))!
+        )
     }
 }
 

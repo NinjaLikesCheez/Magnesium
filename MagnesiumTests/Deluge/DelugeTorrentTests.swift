@@ -30,7 +30,7 @@ class DelugeTorrentTests: XCTestCase {
 
     func test_init_trackers_shouldMapToExpectedTrackerStrings() {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
-        let torrent = Deluge.Torrent.mock(trackers: trackers)
+        let torrent = Deluge.Torrent.mock(trackers: trackers.map(Tracker.init(url:)))
         let appTorrent = DelugeTorrent(torrent)
         XCTAssertEqual(appTorrent?.trackerStrings, trackers)
     }
