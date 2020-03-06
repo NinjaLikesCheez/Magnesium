@@ -1,11 +1,3 @@
-//
-//  SwipeActionsConfiguration+UIKit.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-19.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import UIKit
 
 extension SwipeActionsConfiguration {

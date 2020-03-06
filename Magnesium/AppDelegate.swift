@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2019-11-11.
-//  Copyright © 2019 James Hurst. All rights reserved.
-//
-
 import UIKit
 
 @UIApplicationMain

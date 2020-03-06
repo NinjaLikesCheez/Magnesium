@@ -1,11 +1,3 @@
-//
-//  MetadataItem.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-09.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import LinkPresentation
 import UIKit
 

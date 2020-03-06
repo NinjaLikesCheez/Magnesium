@@ -1,11 +1,3 @@
-//
-//  SettingsCoordinatorTests.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-02-05.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import Coordinator
 @testable import Magnesium

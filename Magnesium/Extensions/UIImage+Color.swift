@@ -1,11 +1,3 @@
-//
-//  UIImage+Color.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2019-12-30.
-//  Copyright © 2019 James Hurst. All rights reserved.
-//
-
 import UIKit
 
 extension UIImage {

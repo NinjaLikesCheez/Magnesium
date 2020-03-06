@@ -1,11 +1,3 @@
-//
-//  MockTorrent.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-02-15.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import CryptoKit
 import Foundation
 @testable import Magnesium

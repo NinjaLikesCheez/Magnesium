@@ -1,11 +1,3 @@
-//
-//  TransmissionSettingsViewModelTests.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-02-01.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 @testable import Magnesium
 import XCTest

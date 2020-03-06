@@ -1,11 +1,3 @@
-//
-//  TorrentListViewEvent.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-03-05.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 enum TorrentListViewEvent {
     case refresh
     case addSelected(source: PopoverSource)

@@ -1,11 +1,3 @@
-//
-//  ValueMapper.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-01-31.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 
 /// A `ValueMapper` takes in key/value pairs, filters them using a filter function that can change over time, and.

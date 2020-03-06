@@ -1,11 +1,3 @@
-//
-//  Deluge+Mocks.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-01-20.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import CryptoKit
 import Deluge
 import Foundation

@@ -1,11 +1,3 @@
-//
-//  DelugeRequest+App.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-03-01.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Deluge
 
 extension Deluge.Request where Value == ([DelugeTorrent], [DelugeLabel]) {

@@ -1,11 +1,3 @@
-//
-//  L10n.swift.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-13.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Foundation
 
 enum L10n {

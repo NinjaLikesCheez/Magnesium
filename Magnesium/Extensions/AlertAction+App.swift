@@ -1,11 +1,3 @@
-//
-//  AlertAction+App.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-11.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Foundation
 
 extension AlertAction {

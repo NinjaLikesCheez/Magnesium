@@ -1,11 +1,3 @@
-//
-//  RefreshIntervalViewController.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-03.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import UIKit
 import ViewModel

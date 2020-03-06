@@ -1,11 +1,3 @@
-//
-//  SwipeAction.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-19.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import UIKit
 
 /// A model describing an action to be displayed when a cell is swiped.

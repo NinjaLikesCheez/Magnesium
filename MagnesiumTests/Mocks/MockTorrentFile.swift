@@ -1,11 +1,3 @@
-//
-//  MockTorrentFile.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-02-16.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 @testable import Magnesium
 
 struct MockTorrentFile: StandardTorrentFile {

@@ -1,11 +1,3 @@
-//
-//  StandardTorrentListViewModelTests.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2019-12-20.
-//  Copyright © 2019 James Hurst. All rights reserved.
-//
-
 import Combine
 @testable import Magnesium
 import ViewModel

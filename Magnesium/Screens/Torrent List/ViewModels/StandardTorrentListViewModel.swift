@@ -1,11 +1,3 @@
-//
-//  StandardTorrentListViewModel.swift
-//  Magnesium
-//
-//  Created by James Hurst on 2020-02-06.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import Foundation
 import Preferences

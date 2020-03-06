@@ -1,11 +1,3 @@
-//
-//  MockCoordinator.swift
-//  MagnesiumTests
-//
-//  Created by James Hurst on 2020-02-04.
-//  Copyright © 2020 James Hurst. All rights reserved.
-//
-
 import Combine
 import Coordinator
 import UIKit
