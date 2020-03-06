@@ -88,6 +88,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             .store(in: &observers)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

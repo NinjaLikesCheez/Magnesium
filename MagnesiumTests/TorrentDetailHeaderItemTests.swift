@@ -54,10 +54,10 @@ class TorrentDetailHeaderItemTests: XCTestCase {
     }
 
     func test_progress() {
-        torrent.send(MockTorrent(progress: 0.189838))
+        torrent.send(MockTorrent(progress: 0.189_838))
         var progress: Float?
         item.progress.sink { progress = $0 }.store(in: &observers)
-        XCTAssertEqual(progress, 0.189838)
+        XCTAssertEqual(progress, 0.189_838)
     }
 
     func test_progressColor() {

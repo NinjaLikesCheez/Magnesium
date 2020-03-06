@@ -10,7 +10,7 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class FilterCoordinatorCoordinator: XCTestCase {
+class FilterCoordinatorTests: XCTestCase {
     private let window = UIWindow()
     private let preferences = MockPreferences()
     private var coordinator: FilterCoordinator!

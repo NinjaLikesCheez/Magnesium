@@ -13,6 +13,7 @@ final class Session {
     private let preferences: Preferences
     private let serverSubject = CurrentValueSubject<Server?, Never>(nil)
     private var serverObserver: AnyCancellable?
+    private(set) var server: Server?
 
     var serverPublisher: AnyPublisher<Server?, Never> {
         return serverSubject
@@ -20,7 +21,6 @@ final class Session {
             .eraseToAnyPublisher()
     }
 
-    private(set) var server: Server?
     init(preferences: Preferences) {
         self.preferences = preferences
         _setServer(preferences.getSelectedServer())

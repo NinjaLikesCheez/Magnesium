@@ -10,8 +10,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-final class AddServerViewController<VM: ViewModel>: PresentableTableViewController
-    where VM.ViewEvent == AddServerViewEvent, VM.ViewState == AddServerViewState {
+// swiftlint:disable:next line_length
+final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewState == AddServerViewState {
     private let viewModel: VM
 
     init(viewModel: VM) {
@@ -20,6 +20,7 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
         title = L10n.addServerScreenTitle
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

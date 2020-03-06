@@ -66,6 +66,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         navigationItem.leftBarButtonItem = settingsBarButtonItem
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

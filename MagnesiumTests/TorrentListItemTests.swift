@@ -74,10 +74,10 @@ class TorrentListItemTests: XCTestCase {
     }
 
     func test_progress() {
-        subject.send(MockTorrent(progress: 0.189838))
+        subject.send(MockTorrent(progress: 0.189_838))
         var progress: Float?
         item.progress.sink { progress = $0 }.store(in: &observers)
-        XCTAssertEqual(progress, 0.189838)
+        XCTAssertEqual(progress, 0.189_838)
     }
 
     func test_progressColor() {
@@ -141,7 +141,7 @@ class TorrentListItemTests: XCTestCase {
     }
 
     func test_progressString() {
-        subject.send(MockTorrent(progress: 0.189838, downloaded: 130_583_716, size: 687_865_856))
+        subject.send(MockTorrent(progress: 0.189_838, downloaded: 130_583_716, size: 687_865_856))
         var progress: String?
         item.progressString.sink { progress = $0 }.store(in: &observers)
         XCTAssertEqual(progress, "124.5 MB / 656.0 MB (19%)")
@@ -151,7 +151,7 @@ class TorrentListItemTests: XCTestCase {
 
     func test_ratio() {
         for state in ratioStates {
-            subject.send(MockTorrent(standardState: state, downloaded: 10000, uploaded: 4254))
+            subject.send(MockTorrent(standardState: state, downloaded: 10_000, uploaded: 4254))
             var ratio: String?
             item.ratioOrETA.first().sink { ratio = $0 }.store(in: &observers)
             XCTAssertEqual(ratio, "Ratio: 0.4")

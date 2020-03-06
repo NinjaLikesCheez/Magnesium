@@ -30,6 +30,7 @@ final class RoundedButton: UIButton {
         titleLabel?.font = UIFont(descriptor: descriptor, size: 0)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

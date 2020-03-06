@@ -44,7 +44,8 @@ final class FilterViewModel: ViewModel, EventEmitter {
         self.labels = labels
         state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.sortOption).map { _ in () }
+        preferences.valueUpdatedPublisher(for: PreferenceKeys.sortOption)
+            .map { _ in () }
             .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.filterOptions).map { _ in () })
             .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).map { _ in () })
             .sink { [weak self] _ in

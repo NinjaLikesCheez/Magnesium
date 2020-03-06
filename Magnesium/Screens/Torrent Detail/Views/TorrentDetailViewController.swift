@@ -43,6 +43,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         ]
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

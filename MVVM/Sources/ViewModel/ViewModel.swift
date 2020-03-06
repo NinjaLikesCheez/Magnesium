@@ -1,6 +1,8 @@
 /// A `ViewModel` is able to handle incoming view events and has a view state.
 public protocol ViewModel {
+    /// The type of event being emitted by the view.
     associatedtype ViewEvent
+    /// The type representing the view's state.
     associatedtype ViewState
 
     /// The view state. Any values that can change over time will be publishers in the view state.
@@ -12,5 +14,6 @@ public protocol ViewModel {
 }
 
 public extension ViewModel where ViewEvent == Never {
+    /// A default implementation for `ViewModel`s whose view emits `Never` events.
     func handle(_ event: Never) {}
 }

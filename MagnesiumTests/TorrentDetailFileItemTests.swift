@@ -20,7 +20,7 @@ class TorrentDetailFileItemTests: XCTestCase {
         file = CurrentValueSubject(MockTorrentFile(
             index: 0,
             name: "file.rar",
-            progress: 0.189838
+            progress: 0.189_838
         ))
         item = TorrentDetailFileItem(file: file)
     }

@@ -13,6 +13,7 @@ public struct TorrentFile {
     /// Whether the file is marked as wanted or unwanted.
     public var isWanted: Bool
 
+    /// Creates a new `TorrentFile` with the given parameters.
     public init(index: Int, name: String, size: Int64, downloaded: Int64, priority: Priority, isWanted: Bool) {
         self.index = index
         self.name = name

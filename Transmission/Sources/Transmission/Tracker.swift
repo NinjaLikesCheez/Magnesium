@@ -5,6 +5,7 @@ public struct Tracker {
     /// The tracker's host.
     public let host: String
 
+    /// Creates a new `Tracker` with the given parameters.
     public init(id: Int, host: String) {
         self.id = id
         self.host = host

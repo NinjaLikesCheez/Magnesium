@@ -1,9 +1,9 @@
 //
-//  TorrentListViewModel.swift
+//  AnyTorrentListViewModel.swift
 //  Magnesium
 //
-//  Created by James Hurst on 2019-11-12.
-//  Copyright © 2019 James Hurst. All rights reserved.
+//  Created by James Hurst on 2020-03-05.
+//  Copyright © 2020 James Hurst. All rights reserved.
 //
 
 import Combine
@@ -64,50 +64,4 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
     ) -> SwipeActionsConfiguration? {
         return _trailingSwipeActionsConfigurationForItem(index, source)
     }
-}
-
-protocol TorrentListProvider: AnyObject {
-    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel?
-    func contextMenuForItem(at index: Int) -> UIMenu?
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration?
-    func trailingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration?
-}
-
-enum TorrentListEvent {
-    case alert(Alert, source: PopoverSource?)
-    case activities([Activity], torrents: [StandardTorrent], source: PopoverSource)
-    case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)
-    case filter(source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>)
-    case detail(viewModel: AnyTorrentDetailViewModel)
-    case settings
-    case moveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>)
-    case torrentsUpdated(hashes: [String])
-}
-
-enum TorrentListViewEvent {
-    case refresh
-    case addSelected(source: PopoverSource)
-    case filterSelected(source: PopoverSource)
-    case itemSelected(index: Int)
-    case settingsSelected
-    case search(query: String?)
-    case resumeSelected(indices: [Int])
-    case pauseSelected(indices: [Int])
-    case removeSelected(indices: [Int], source: PopoverSource)
-    case moreOptionsSelected(indices: [Int], source: PopoverSource)
-    case didBeginEditing
-    case didEndEditing
-    case multiSelectUpdated(indices: [Int])
-}
-
-struct TorrentListViewState {
-    var showAddButton: Bool = true
-    var showFilterButton: Bool = true
-    var title: AnyPublisher<String, Never>
-    var items: AnyPublisher<[TorrentListItem], Never>
-    var isLoading: AnyPublisher<Bool, Never>
-    var hasActiveFilters: AnyPublisher<Bool, Never>
-    var editActionsEnabled: AnyPublisher<Bool, Never>
-    var totalDownloadSpeed: AnyPublisher<String, Never>
-    var totalUploadSpeed: AnyPublisher<String, Never>
 }

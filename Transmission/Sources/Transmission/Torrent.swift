@@ -51,6 +51,7 @@ public struct Torrent {
     /// The torrent's download path.
     public var downloadPath: String
 
+    /// Creates a new `Torrent` with the given parameters.
     public init(
         id: Int,
         hash: String,

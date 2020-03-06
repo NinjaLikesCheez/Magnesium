@@ -10,7 +10,7 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class NoServersViewModelTest: XCTestCase {
+class NoServersViewModelTests: XCTestCase {
     private var viewModel: NoServersViewModel!
     private var observers = [AnyCancellable]()
 

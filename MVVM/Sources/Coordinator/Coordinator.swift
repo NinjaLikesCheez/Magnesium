@@ -75,5 +75,6 @@ public extension Coordinator {
 }
 
 public extension Coordinator where Received == Never {
+    /// A default implementation for `Coordinator`s that receive `Never` events.
     func handle(_ event: Never) {}
 }
