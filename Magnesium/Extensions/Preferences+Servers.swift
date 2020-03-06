@@ -52,16 +52,16 @@ extension Preferences {
 
     private func updateSelectedServerID() {
         guard let server = getSelectedServer() else {
-            removeValue(for: PreferenceKeys.selectedServerID)
+            removeValue(for: .selectedServerID)
             return
         }
 
-        set(server.id, for: PreferenceKeys.selectedServerID)
+        set(server.id, for: .selectedServerID)
     }
 
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
         return preferencesChanged
-            .filter { $0.isRelevant(to: PreferenceKeys.servers) }
+            .filter { $0.isRelevant(to: .servers) }
             .map { change -> Server? in
                 switch change {
                 case let .updated(_, value):
@@ -81,12 +81,12 @@ extension Preferences {
 
     func getSelectedServer() -> Server? {
         let servers = getServers()
-        guard let selectedServerID = value(for: PreferenceKeys.selectedServerID) else { return servers.first }
+        guard let selectedServerID = value(for: .selectedServerID) else { return servers.first }
         return servers.first { $0.id == selectedServerID } ?? servers.first
     }
 
     func getServers() -> [Server] {
-        var servers = value(for: PreferenceKeys.servers)
+        var servers = value(for: .servers)
         for (index, server) in servers.enumerated() {
             var server = server
             var query = keychainQuery(for: server)
@@ -145,7 +145,7 @@ extension Preferences {
             }
         }
 
-        set(servers, for: PreferenceKeys.servers)
+        set(servers, for: .servers)
         updateSelectedServerID()
     }
 
@@ -158,7 +158,7 @@ extension Preferences {
             os_log("%@: server %@: SecItemDelete -> %d", #function, server.id, status)
         }
 
-        set(servers, for: PreferenceKeys.servers)
+        set(servers, for: .servers)
         updateSelectedServerID()
     }
 
@@ -171,7 +171,7 @@ extension Preferences {
         if status != errSecSuccess, status != errSecItemNotFound {
             os_log("%@: SecItemDelete -> %d", #function, status)
         }
-        removeValue(for: PreferenceKeys.servers)
-        removeValue(for: PreferenceKeys.selectedServerID)
+        removeValue(for: .servers)
+        removeValue(for: .selectedServerID)
     }
 }

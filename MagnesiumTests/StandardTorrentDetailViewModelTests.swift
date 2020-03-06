@@ -39,7 +39,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     // MARK: Auto Refresh
 
     func test_autoRefresh_whenNotAppeared_shouldNotFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.updateFilesCallCount, 1)
@@ -49,7 +49,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_autoRefresh_whenAppeared_shouldFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
         viewModel.handle(.appear)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -60,7 +60,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_autoRefresh_whenDisappeared_shouldNotFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
         viewModel.handle(.appear)
         viewModel.handle(.disappear)
         let expectation = self.expectation(description: "Check")
@@ -72,9 +72,9 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
         viewModel.handle(.appear)
-        preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(0, for: .autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.updateFilesCallCount, 1)

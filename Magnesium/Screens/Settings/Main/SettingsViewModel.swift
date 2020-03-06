@@ -39,9 +39,9 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         self.preferences = preferences
         state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.servers).map { _ in () }
+        preferences.valueUpdatedPublisher(for: .servers).map { _ in () }
             .merge(with: session.serverPublisher.map { _ in () })
-            .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.autoRefreshInterval).map { _ in () })
+            .merge(with: preferences.valueUpdatedPublisher(for: .autoRefreshInterval).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
             }
@@ -89,7 +89,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
 
-        let refreshInterval = preferences.value(for: PreferenceKeys.autoRefreshInterval)
+        let refreshInterval = preferences.value(for: .autoRefreshInterval)
         let localizedRefresh: String
         if refreshInterval <= 0 {
             localizedRefresh = L10n.refreshIntervalNever

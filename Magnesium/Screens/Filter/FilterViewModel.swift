@@ -35,9 +35,9 @@ final class FilterViewModel: ViewModel, EventEmitter {
         self.labels = labels
         state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: PreferenceKeys.sortOption)
+        preferences.valueUpdatedPublisher(for: .sortOption)
             .map { _ in () }
-            .merge(with: preferences.valueUpdatedPublisher(for: PreferenceKeys.filterOptions).map { _ in () })
+            .merge(with: preferences.valueUpdatedPublisher(for: .filterOptions).map { _ in () })
             .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
@@ -61,16 +61,16 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleSortSelected(from source: PopoverSource) {
-        let currentSort = preferences.value(for: PreferenceKeys.sortOption)
+        let currentSort = preferences.value(for: .sortOption)
         var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet)
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.localizedString, style: .default) {
                 if property == currentSort.property {
                     let sortOption = currentSort.withOppositeDirection()
-                    self.preferences.set(sortOption, for: PreferenceKeys.sortOption)
+                    self.preferences.set(sortOption, for: .sortOption)
                 } else {
-                    self.preferences.set(SortOption(property: property), for: PreferenceKeys.sortOption)
+                    self.preferences.set(SortOption(property: property), for: .sortOption)
                 }
             })
         }
@@ -80,7 +80,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
-        var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        var filterOptions = preferences.value(for: .filterOptions)
         var alert = Alert(title: L10n.filterLabelAlertTitle, message: L10n.filterLabelAlertMessage, style: .actionSheet)
         let labels: [StandardLabel?] = [nil] + self.labels.value
 
@@ -90,7 +90,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
-                    self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+                    self.preferences.set(filterOptions, for: .filterOptions)
                 }
             ))
         }
@@ -100,7 +100,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleStateSelected(from source: PopoverSource) {
-        var filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        var filterOptions = preferences.value(for: .filterOptions)
         var alert = Alert(title: L10n.filterStateAlertTitle, message: L10n.filterStateAlertMessage, style: .actionSheet)
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
@@ -110,7 +110,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
                 style: .default,
                 handler: {
                     filterOptions.state = state
-                    self.preferences.set(filterOptions, for: PreferenceKeys.filterOptions)
+                    self.preferences.set(filterOptions, for: .filterOptions)
                 }
             ))
         }
@@ -120,8 +120,8 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func updateSections() {
-        let sortOption = preferences.value(for: PreferenceKeys.sortOption)
-        let filterOptions = preferences.value(for: PreferenceKeys.filterOptions)
+        let sortOption = preferences.value(for: .sortOption)
+        let filterOptions = preferences.value(for: .filterOptions)
         var sections = [FilterSection]()
 
         sections.append(FilterSection(type: .sort, items: [

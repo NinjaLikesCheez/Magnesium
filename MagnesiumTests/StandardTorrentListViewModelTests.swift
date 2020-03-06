@@ -65,7 +65,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     // MARK: - Auto Refresh
 
     func test_autoRefresh_shouldFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 2)
@@ -75,8 +75,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
-        preferences.set(1, for: PreferenceKeys.autoRefreshInterval)
-        preferences.set(0, for: PreferenceKeys.autoRefreshInterval)
+        preferences.set(1, for: .autoRefreshInterval)
+        preferences.set(0, for: .autoRefreshInterval)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 1)
@@ -589,7 +589,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
         var value: Bool?
         viewModel.state.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &observers)
-        preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
         XCTAssertTrue(value!)
     }
 
@@ -602,7 +602,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(downloadRate: 400_000, label: "label1"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
-        preferences.set(FilterOptions(label: "label2"), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
 
         var value: String?
         viewModel.state.totalDownloadSpeed.first().sink { value = $0 }.store(in: &observers)
@@ -618,7 +618,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(uploadRate: 400_000, label: "label1"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
-        preferences.set(FilterOptions(label: "label2"), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
 
         var value: String?
         viewModel.state.totalUploadSpeed.first().sink { value = $0 }.store(in: &observers)

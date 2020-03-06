@@ -31,7 +31,7 @@ final class RefreshIntervalViewModel: ViewModel {
 
     init(preferences: Preferences) {
         self.preferences = preferences
-        let publisher = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+        let publisher = preferences.valuePublisher(for: .autoRefreshInterval)
         state = RefreshIntervalViewState(options: options.map { option in
             RefreshIntervalOptionViewState(
                 name: option.1,
@@ -44,7 +44,7 @@ final class RefreshIntervalViewModel: ViewModel {
         switch event {
         case let .optionSelected(index: index):
             let interval = options[index].0
-            preferences.set(interval, for: PreferenceKeys.autoRefreshInterval)
+            preferences.set(interval, for: .autoRefreshInterval)
         }
     }
 }

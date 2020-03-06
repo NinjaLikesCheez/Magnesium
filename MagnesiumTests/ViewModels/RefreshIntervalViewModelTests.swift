@@ -16,7 +16,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
         let values = [0, 2, 5]
         for (index, value) in values.enumerated() {
             viewModel.handle(.optionSelected(index: index))
-            XCTAssertEqual(preferences.value(for: PreferenceKeys.autoRefreshInterval), value)
+            XCTAssertEqual(preferences.value(for: .autoRefreshInterval), value)
         }
     }
 

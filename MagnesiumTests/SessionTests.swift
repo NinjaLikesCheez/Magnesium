@@ -73,7 +73,7 @@ class SessionTests: XCTestCase {
             expectation.fulfill()
         }.store(in: &observers)
         XCTAssertEqual(session.server, firstServer)
-        preferences.set(secondServer.id, for: PreferenceKeys.selectedServerID)
+        preferences.set(secondServer.id, for: .selectedServerID)
         XCTAssertEqual(session.server, firstServer)
         waitForExpectations(timeout: 0)
     }

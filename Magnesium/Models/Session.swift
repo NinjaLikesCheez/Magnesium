@@ -27,13 +27,13 @@ final class Session {
         setupServerObserver()
         serverSubject.send(server)
         if let server = server {
-            preferences.set(server.id, for: PreferenceKeys.selectedServerID)
+            preferences.set(server.id, for: .selectedServerID)
         }
     }
 
     private func setupServerObserver() {
         guard let server = server else {
-            serverObserver = preferences.valueUpdatedPublisher(for: PreferenceKeys.servers)
+            serverObserver = preferences.valueUpdatedPublisher(for: .servers)
                 .sink(receiveValue: { [weak self] servers in
                     self?._setServer(servers.first)
                 })

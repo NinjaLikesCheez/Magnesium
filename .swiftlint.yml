@@ -99,6 +99,7 @@ file_name:
     - Publishers+AsOptional.swift
     - Deluge+Mocks.swift
     - Transmission+Mocks.swift
+    - PreferenceKeys.swift
 
 identifier_name:
   excluded:

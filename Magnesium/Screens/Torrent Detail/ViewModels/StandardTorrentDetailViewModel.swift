@@ -199,7 +199,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             return
         }
 
-        timerIntervalObserver = preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+        timerIntervalObserver = preferences.valuePublisher(for: .autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
                 self?.configureAutoRefreshTimer(interval: value)
             })

@@ -39,7 +39,7 @@ class FilterViewModelTests: XCTestCase {
     func test_sections_whenSortOptionChanged_shouldEmitNewSections() {
         var sections: [FilterSection]?
         viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
-        preferences.set(SortOption(property: .name), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .name), for: .sortOption)
         XCTAssertNotNil(sections)
         XCTAssertEqual(sections?[0].items, [.sort("↑ Name")])
     }
@@ -47,7 +47,7 @@ class FilterViewModelTests: XCTestCase {
     func test_sections_whenFilterOptionsChanged_shouldEmit() {
         var sections: [FilterSection]?
         viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
-        preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
         XCTAssertNotNil(sections)
         XCTAssertEqual(sections?[1].items[0], .state("Downloading"))
     }
@@ -97,9 +97,9 @@ class FilterViewModelTests: XCTestCase {
             alert = inner
         }.store(in: &observers)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
-        let previousOption = preferences.value(for: PreferenceKeys.sortOption)
+        let previousOption = preferences.value(for: .sortOption)
         alert?.actions.first { $0.title == previousOption.property.localizedString }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.sortOption)
+        let newOption = preferences.value(for: .sortOption)
         XCTAssertEqual(newOption, previousOption.withOppositeDirection())
     }
 
@@ -111,7 +111,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "Name" }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.sortOption)
+        let newOption = preferences.value(for: .sortOption)
         XCTAssertEqual(newOption, SortOption(property: .name))
     }
 
@@ -134,7 +134,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.stateSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "Downloading" }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.filterOptions)
+        let newOption = preferences.value(for: .filterOptions)
         XCTAssertEqual(newOption, FilterOptions(state: .downloading))
     }
 
@@ -156,7 +156,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "All" }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.filterOptions)
+        let newOption = preferences.value(for: .filterOptions)
         XCTAssertEqual(newOption, FilterOptions())
     }
 
@@ -168,7 +168,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "None" }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.filterOptions)
+        let newOption = preferences.value(for: .filterOptions)
         XCTAssertEqual(newOption, FilterOptions(label: ""))
     }
 
@@ -180,7 +180,7 @@ class FilterViewModelTests: XCTestCase {
         }.store(in: &observers)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "test" }?.handler?()
-        let newOption = preferences.value(for: PreferenceKeys.filterOptions)
+        let newOption = preferences.value(for: .filterOptions)
         XCTAssertEqual(newOption, FilterOptions(label: "test"))
     }
 }

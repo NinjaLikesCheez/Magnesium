@@ -60,7 +60,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .map { $0.map { TorrentListItem(torrent: $0) } }
             .ui()
             .eraseToAnyPublisher()
-        let hasActiveFilters = preferences.valuePublisher(for: PreferenceKeys.filterOptions)
+        let hasActiveFilters = preferences.valuePublisher(for: .filterOptions)
             .map { $0 != FilterOptions() }
             .ui()
             .eraseToAnyPublisher()
@@ -88,7 +88,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
 
-        preferences.valuePublisher(for: PreferenceKeys.autoRefreshInterval)
+        preferences.valuePublisher(for: .autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
                 self?.configureAutoRefreshTimer(interval: value)
             })

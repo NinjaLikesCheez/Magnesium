@@ -27,10 +27,10 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(SortOption(property: .name, direction: .ascending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .name, direction: .ascending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
 
-        preferences.set(SortOption(property: .name, direction: .descending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .name, direction: .descending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
@@ -52,10 +52,10 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(SortOption(property: .dateAdded, direction: .ascending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .dateAdded, direction: .ascending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
 
-        preferences.set(SortOption(property: .dateAdded, direction: .descending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .dateAdded, direction: .descending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
@@ -76,10 +76,10 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(SortOption(property: .downloadSpeed, direction: .ascending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .downloadSpeed, direction: .ascending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
 
-        preferences.set(SortOption(property: .downloadSpeed, direction: .descending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .downloadSpeed, direction: .descending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
@@ -100,10 +100,10 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(SortOption(property: .uploadSpeed, direction: .ascending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .uploadSpeed, direction: .ascending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
 
-        preferences.set(SortOption(property: .uploadSpeed, direction: .descending), for: PreferenceKeys.sortOption)
+        preferences.set(SortOption(property: .uploadSpeed, direction: .descending), for: .sortOption)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedDescending)
     }
 
@@ -119,7 +119,7 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(FilterOptions(state: .downloading), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expected)
     }
 
@@ -134,7 +134,7 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(preferences: preferences, query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences.set(FilterOptions(label: "test"), for: PreferenceKeys.filterOptions)
+        preferences.set(FilterOptions(label: "test"), for: .filterOptions)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expected)
     }
 
