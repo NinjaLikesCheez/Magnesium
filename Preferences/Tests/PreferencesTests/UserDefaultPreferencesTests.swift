@@ -40,7 +40,7 @@ class UserDefaultPreferencesTests: XCTestCase {
             if case let .updated(_, value) = change {
                 XCTAssertEqual(value as? String, "Value")
             } else {
-                XCTFail("Unxpected change")
+                XCTFail("Unexpected change")
             }
             expectation.fulfill()
         }.store(in: &observers)
