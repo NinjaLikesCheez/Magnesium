@@ -1,5 +1,3 @@
-import Foundation
-
 protocol StandardLabel {
     var name: String { get }
     var count: Int { get }

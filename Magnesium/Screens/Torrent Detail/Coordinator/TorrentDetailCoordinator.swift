@@ -8,11 +8,8 @@ enum TorrentDetailCoordinatorEvent {
     case complete
 }
 
-final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator, AlertPresenter
-    where
-    VM.Event == TorrentDetailEvent,
-    VM.ViewEvent == TorrentDetailViewEvent,
-    VM.ViewState == TorrentDetailViewState {
+// swiftlint:disable:next line_length
+final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator, AlertPresenter where VM.Event == TorrentDetailEvent, VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewController: TorrentDetailViewController<VM>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     let received: AnyPublisher<TorrentDetailEvent, Never>

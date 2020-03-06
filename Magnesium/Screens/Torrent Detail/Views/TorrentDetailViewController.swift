@@ -8,8 +8,7 @@ protocol TorrentDetailViewControllerIdentifiable {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable
-    where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
+final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
     private var observers = [AnyCancellable]()
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!

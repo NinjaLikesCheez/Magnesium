@@ -1,5 +1,3 @@
-import Foundation
-
 /// A model describing the swipe actions for a cell.
 struct SwipeActionsConfiguration {
     /// The swipe actions.

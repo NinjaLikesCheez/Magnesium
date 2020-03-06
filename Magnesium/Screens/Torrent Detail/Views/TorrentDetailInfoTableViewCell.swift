@@ -1,6 +1,5 @@
 import Combine
 import UIKit
-import ViewModel
 
 final class TorrentDetailInfoTableViewCell: UITableViewCell {
     private var observers = [AnyCancellable]()

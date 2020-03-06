@@ -1,5 +1,3 @@
-import Foundation
-
 struct SortOption: Codable, Equatable {
     var property: Property
     var direction: Direction
