@@ -13,15 +13,15 @@ preferences.value(for: key) // 1
 preferences.set(2, for: key)
 ```
 
-`Preferences` supports using any value that conforms to `Codable`. 
+`Preferences` supports using any values that conform to `Codable`. 
 
 ## Preferences Protocol
 
 The `Preferences` protocol provides a unified interface for different preference storage implementations.
 
 There are two types of `Preferences`:
-* `UserDefaultsPreferences`: This type of preferences persists values in `UserDefaults`.
-* `InMemoryPreferences`: This type of preferences stores values in memory.
+* `UserDefaultsPreferences`: This implementation persists values in `UserDefaults`.
+* `InMemoryPreferences`: This implementation stores values in memory.
 
 ## Observation
 
@@ -29,7 +29,7 @@ You can observe changes to `Preferences` using the `preferencesChanged` publishe
 
 > ⚠️ **IMPORTANT**: The publisher will only emit values for changes made through its `Preferences`. It is recommended to use dependency injection to share `Preferences` throughout your code.
 
-There are two methods provided to observe a specific preference key.
+There are two methods provided to observe specific preference keys.
 
 **`valueUpdatedPublisher(for:)`**
 
@@ -80,7 +80,7 @@ Output
 ### Xcode 11+
 
 * Select **File** > **Swift Packages** > **Add Package Dependency...**
-* Enter the package repository URL: `shttps://github.com/jameshurst/Deluge-Swift.git`
+* Enter the package repository URL: `shttps://github.com/jameshurst/Preferences-Swift.git`
 * Confirm the version and let Xcode resolve the package
 
 ## License
