@@ -5,7 +5,7 @@ public struct PreferenceKey<T: Codable> {
     /// The key's default value
     public let defaultValue: T
 
-    /// Creates a `PreferenceKey` with the given string value.
+    /// Creates a `PreferenceKey` with the given parameters.
     /// - Parameters:
     ///   - value: The string value of the key.
     ///   - defaultValue: The default value for the preference.

@@ -8,19 +8,10 @@ let package = Package(
         .iOS(.v13),
     ],
     products: [
-        .library(
-            name: "Preferences",
-            targets: ["Preferences"]
-        ),
+        .library(name: "Preferences", targets: ["Preferences"]),
     ],
     targets: [
-        .target(
-            name: "Preferences",
-            dependencies: []
-        ),
-        .testTarget(
-            name: "PreferencesTests",
-            dependencies: ["Preferences"]
-        ),
+        .target(name: "Preferences"),
+        .testTarget(name: "PreferencesTests", dependencies: [.target(name: "Preferences")]),
     ]
 )
