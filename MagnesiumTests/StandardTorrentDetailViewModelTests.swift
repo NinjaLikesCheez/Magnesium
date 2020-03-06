@@ -1,12 +1,13 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import ViewModel
 import XCTest
 
 final class StandardTorrentDetailViewModelTests: XCTestCase {
     private var torrent: CurrentValueSubject<MockTorrent, Never>!
     private var labels: CurrentValueSubject<[MockLabel], Never>!
-    private var preferences: MockPreferences!
+    private var preferences: InMemoryPreferences!
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentDetailViewModel<MockImplementation>!
     private var observers = [AnyCancellable]()
@@ -15,7 +16,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         super.setUp()
         torrent = CurrentValueSubject(MockTorrent(name: "Mock", downloadPath: "/downloads"))
         labels = CurrentValueSubject([MockLabel(), MockLabel(name: "label1"), MockLabel(name: "label2")])
-        preferences = MockPreferences()
+        preferences = InMemoryPreferences()
         implementation = MockImplementation()
         viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,

@@ -13,11 +13,21 @@ preferences.value(for: key) // 1
 preferences.set(2, for: key)
 ```
 
+`Preferences` supports using any value that conforms to `Codable`. 
+
+## Preferences Protocol
+
+The `Preferences` protocol provides a unified interface for different preference storage implementations.
+
+There are two types of `Preferences`:
+* `UserDefaultsPreferences`: This type of preferences persists values in `UserDefaults`.
+* `InMemoryPreferences`: This type of preferences stores values in memory.
+
 ## Observation
 
 You can observe changes to `Preferences` using the `preferencesChanged` publisher or the provided convenience methods.
 
-> ⚠️ **IMPORTANT**: The publisher will only emit values for changes made through its `Preferences`. It is recommended to use dependecy injection to share `Preferences` throught your code.
+> ⚠️ **IMPORTANT**: The publisher will only emit values for changes made through its `Preferences`. It is recommended to use dependency injection to share `Preferences` throughout your code.
 
 There are two methods provided to observe a specific preference key.
 

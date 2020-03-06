@@ -1,10 +1,11 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class FilterCoordinatorTests: XCTestCase {
     private let window = UIWindow()
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private var coordinator: FilterCoordinator!
     private var observers = [AnyCancellable]()
 

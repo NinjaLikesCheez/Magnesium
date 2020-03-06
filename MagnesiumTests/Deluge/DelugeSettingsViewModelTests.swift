@@ -1,10 +1,11 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class DelugeSettingsViewModelTests: XCTestCase {
     private let client = MockDelugeClient()
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private var observers = [AnyCancellable]()
     private lazy var clientProvider = MockClientProvider(client: client)
     private lazy var addViewModel = DelugeSettingsViewModel(

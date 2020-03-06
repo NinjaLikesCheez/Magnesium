@@ -1,33 +1,36 @@
 import Combine
-import Preferences
 
-final class MockPreferences: Preferences {
+/// A `Preferences` implementation that stores values in memory.
+public final class InMemoryPreferences: Preferences {
     private let preferencesChangedSubject = PassthroughSubject<PreferenceChange, Never>()
     private var storage = [String: Any]()
 
-    var preferencesChanged: AnyPublisher<PreferenceChange, Never> {
+    /// Creates an `InMemoryPreferences`.
+    public init() {}
+
+    public var preferencesChanged: AnyPublisher<PreferenceChange, Never> {
         return preferencesChangedSubject.eraseToAnyPublisher()
     }
 
-    func value<T>(for key: PreferenceKey<T>) -> T {
+    public func value<T>(for key: PreferenceKey<T>) -> T {
         return storage[key.value] as? T ?? key.defaultValue
     }
 
-    func set<T>(_ value: T, for key: PreferenceKey<T>) {
+    public func set<T>(_ value: T, for key: PreferenceKey<T>) {
         storage[key.value] = value
         preferencesChangedSubject.send(.updated(AnyPreferenceKey(key), value))
     }
 
-    func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
+    public func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
         return storage[key.value] != nil
     }
 
-    func removeValue<T>(for key: PreferenceKey<T>) {
+    public func removeValue<T>(for key: PreferenceKey<T>) {
         storage.removeValue(forKey: key.value)
         preferencesChangedSubject.send(.deleted(AnyPreferenceKey(key)))
     }
 
-    func reset() {
+    public func reset() {
         storage = [:]
         preferencesChangedSubject.send(.reset)
     }

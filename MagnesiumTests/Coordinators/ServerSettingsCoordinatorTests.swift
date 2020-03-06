@@ -1,10 +1,11 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class ServerSettingsCoordinatorTests: XCTestCase {
     private let window = UIWindow()
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private var coordinator: ServerSettingsCoordinator!
     private var observers = [AnyCancellable]()
 

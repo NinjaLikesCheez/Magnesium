@@ -1,17 +1,18 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import ViewModel
 import XCTest
 
 final class StandardTorrentListViewModelTests: XCTestCase {
-    private var preferences: MockPreferences!
+    private var preferences: InMemoryPreferences!
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentListViewModel<MockImplementation>!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
-        preferences = MockPreferences()
+        preferences = InMemoryPreferences()
         implementation = MockImplementation()
         viewModel = StandardTorrentListViewModel(
             implementation: implementation,

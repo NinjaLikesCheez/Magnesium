@@ -1,17 +1,18 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class TransmissionTorrentListViewModelImplementationTests: XCTestCase {
     private var client: MockTransmissionClient!
-    private var preferences: MockPreferences!
+    private var preferences: InMemoryPreferences!
     private var implementation: TransmissionTorrentListViewModelImplementation!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
         client = MockTransmissionClient()
-        preferences = MockPreferences()
+        preferences = InMemoryPreferences()
         implementation = TransmissionTorrentListViewModelImplementation(client: client, preferences: preferences)
     }
 

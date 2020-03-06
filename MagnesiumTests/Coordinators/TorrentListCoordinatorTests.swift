@@ -1,13 +1,14 @@
 import Combine
 import LinkPresentation
 @testable import Magnesium
+import Preferences
 import ViewModel
 import XCTest
 
 class TorrentListCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
-    private var preferences: MockPreferences!
+    private var preferences: InMemoryPreferences!
     private var session: Session!
     private var coordinator: TorrentListCoordinator!
     private var observers = [AnyCancellable]()
@@ -16,7 +17,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         super.setUp()
         window = UIWindow()
         viewModel = MockViewModel()
-        preferences = MockPreferences()
+        preferences = InMemoryPreferences()
         session = Session(preferences: preferences)
         coordinator = TorrentListCoordinator(
             viewModel: AnyTorrentListViewModel(viewModel),
@@ -264,7 +265,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
         let torrent = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
         let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
-        let preferences = MockPreferences()
+        let preferences = InMemoryPreferences()
         let client = MockDelugeClient()
         let refresher = MockDelugeRefresher()
         let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(

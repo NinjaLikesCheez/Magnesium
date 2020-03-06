@@ -1,17 +1,18 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     private var client: MockDelugeClient!
-    private var preferences: MockPreferences!
+    private var preferences: InMemoryPreferences!
     private var implementation: DelugeTorrentListViewModelImplementation!
     private var observers = [AnyCancellable]()
 
     override func setUp() {
         super.setUp()
         client = MockDelugeClient()
-        preferences = MockPreferences()
+        preferences = InMemoryPreferences()
         implementation = DelugeTorrentListViewModelImplementation(client: client, preferences: preferences)
     }
 

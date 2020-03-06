@@ -1,11 +1,12 @@
 import Combine
 import Coordinator
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class SettingsCoordinatorTests: XCTestCase {
     private let window = UIWindow()
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private lazy var session = Session(preferences: preferences)
     private var coordinator: SettingsCoordinator!
     private var observers = [AnyCancellable]()

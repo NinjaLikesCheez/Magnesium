@@ -1,9 +1,10 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class SettingsViewModelTests: XCTestCase {
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private var observers = [AnyCancellable]()
     private lazy var session = Session(preferences: preferences)
     private lazy var viewModel = SettingsViewModel(session: session, preferences: preferences)

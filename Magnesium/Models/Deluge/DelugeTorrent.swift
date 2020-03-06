@@ -39,7 +39,7 @@ struct DelugeTorrent: StandardTorrent {
     /// The torrent's download path.
     var downloadPath: String
 
-    /// Creates a new `DelugeTorrent` with the given parameters.
+    /// Creates a `DelugeTorrent` with the given parameters.
     init(
         hash: String,
         name: String,

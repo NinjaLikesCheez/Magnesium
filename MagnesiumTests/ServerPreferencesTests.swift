@@ -1,9 +1,10 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class ServerPreferencesTests: XCTestCase {
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
     private var observers = [AnyCancellable]()
 

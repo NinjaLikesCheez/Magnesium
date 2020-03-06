@@ -1,9 +1,10 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class RefreshIntervalViewModelTests: XCTestCase {
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private lazy var viewModel = RefreshIntervalViewModel(preferences: preferences)
     private var observers = [AnyCancellable]()
 

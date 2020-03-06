@@ -4,7 +4,7 @@ import Preferences
 import XCTest
 
 class SessionTests: XCTestCase {
-    private let preferences: Preferences = MockPreferences()
+    private let preferences: Preferences = InMemoryPreferences()
     private var observers = [AnyCancellable]()
     private lazy var session = Session(preferences: preferences)
 

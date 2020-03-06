@@ -1,12 +1,13 @@
 import Combine
 import Coordinator
 @testable import Magnesium
+import Preferences
 import ViewModel
 import XCTest
 
 class AppCoordinatorTests: XCTestCase {
     private let window = UIWindow()
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private lazy var session = Session(preferences: preferences)
     private let splitViewController = MockSplitViewController()
     private var coordinator: AppCoordinator!

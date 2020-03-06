@@ -1,10 +1,11 @@
 import Combine
 import CryptoKit
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class TorrentMapperTests: XCTestCase {
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
 
     private func getValues(from mapper: TorrentMapper<Int, MockTorrent>) -> [MockTorrent] {
         var values: [MockTorrent]?

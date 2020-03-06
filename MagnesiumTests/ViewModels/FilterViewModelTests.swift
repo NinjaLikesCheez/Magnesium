@@ -1,9 +1,10 @@
 import Combine
 @testable import Magnesium
+import Preferences
 import XCTest
 
 class FilterViewModelTests: XCTestCase {
-    private let preferences = MockPreferences()
+    private let preferences = InMemoryPreferences()
     private let labels = CurrentValueSubject<[MockLabel], Never>([MockLabel(), MockLabel(name: "test")])
     private var observers = [AnyCancellable]()
     private var viewModel: FilterViewModel!
