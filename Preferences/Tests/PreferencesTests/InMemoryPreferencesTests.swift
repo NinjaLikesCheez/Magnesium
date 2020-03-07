@@ -2,14 +2,14 @@ import Combine
 @testable import Preferences
 import XCTest
 
-class UserDefaultPreferencesTests: XCTestCase {
+class InMemoryPreferencesTests: XCTestCase {
     private let key = PreferenceKey<String>("_test", defaultValue: "Default")
-    private var preferences: UserDefaultsPreferences!
+    private var preferences: InMemoryPreferences!
     private var observers: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        preferences = UserDefaultsPreferences()
+        preferences = InMemoryPreferences()
         observers = Set()
         preferences.reset()
     }
@@ -26,13 +26,6 @@ class UserDefaultPreferencesTests: XCTestCase {
     func test_value_withCodable_shouldReturnDefault() {
         let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: "name"))
         XCTAssertEqual(preferences.value(for: key).name, "name")
-    }
-
-    func test_set_shouldPersistValue() {
-        preferences.set("Value", for: key)
-        XCTAssertEqual(preferences.value(for: key), "Value")
-        let newPreferenceManager = UserDefaultsPreferences()
-        XCTAssertEqual(newPreferenceManager.value(for: key), "Value")
     }
 
     func test_preferencesChanged_whenPreferenceUpdated_shouldEmitUpdate() {
