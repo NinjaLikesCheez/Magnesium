@@ -3,44 +3,6 @@ import Foundation
 import os
 import Preferences
 
-struct Server: Codable, Equatable {
-    // swiftlint:disable:next type_name
-    typealias ID = String
-    fileprivate(set) var id: ID = UUID().uuidString
-    var name: String
-    var type: ServerType
-    var data: Data
-    var keychainData: Data?
-
-    enum CodingKeys: CodingKey {
-        case id
-        case name
-        case type
-        case data
-    }
-
-    init(name: String, type: ServerType, data: Data, keychainData: Data?) {
-        self.name = name
-        self.type = type
-        self.data = data
-        self.keychainData = keychainData
-    }
-}
-
-enum ServerType: String, Codable {
-    case deluge
-    case transmission
-
-    var localizedString: String {
-        switch self {
-        case .deluge:
-            return L10n.deluge
-        case .transmission:
-            return L10n.transmission
-        }
-    }
-}
-
 extension Preferences {
     private func keychainQuery(for server: Server) -> [String: Any] {
         return [

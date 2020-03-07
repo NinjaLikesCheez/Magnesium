@@ -11,7 +11,6 @@ protocol DelugeClient {
 }
 
 extension DefaultDelugeClient: DelugeClient {}
-
 extension DelugeTorrentFile: StandardTorrentFile {}
 extension DelugeLabel: StandardLabel {}
 
