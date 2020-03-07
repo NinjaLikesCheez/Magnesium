@@ -5,6 +5,9 @@
 /* Add Server */
 "action_add_server" = "Add Server";
 
+/* Add Torrent */
+"action_add_torrent" = "Add Torrent";
+
 /* Cancel */
 "action_cancel" = "Cancel";
 
@@ -47,15 +50,6 @@
 /* Add Server */
 "add_server_screen_title" = "Add Server";
 
-/* How would you like to add the torrent? */
-"add_torrent_alert_prompt" = "How would you like to add the torrent?";
-
-/* Add Torrent */
-"add_torrent_alert_title" = "Add Torrent";
-
-/* Add {fileName} to {serverName}? */
-"add_torrent_file_to_server_confirmation" = "Add %1$@ to %2$@?";
-
 /* This can be either a link to a torrent or a magnet link. */
 "add_torrent_link_alert_message" = "This can be either a link to a torrent or a magnet link.";
 
@@ -67,6 +61,12 @@
 
 /* Add Link */
 "add_torrent_method_link" = "Add Link";
+
+/* How would you like to add the torrent? */
+"add_torrent_method_prompt" = "How would you like to add the torrent?";
+
+/* Add to {serverName} */
+"add_torrent_to_server_prompt" = "Add to %@";
 
 /* Are you sure you want to delete this server? */
 "delete_server_confirmation" = "Are you sure you want to delete this server?";
@@ -83,8 +83,17 @@
 /* Authentication Failed */
 "error_authentication" = "Authentication Failed";
 
+/* The server settings could not be read. */
+"error_corrupt_server_settings_description" = "The server settings could not be read.";
+
+/* Failed to Add Torrent */
+"error_failed_to_add_torrent" = "Failed to Add Torrent";
+
 /* Failed to Move Download Folder */
 "error_move_download_folder" = "Failed to Move Download Folder";
+
+/* There are no servers. */
+"error_no_servers_description" = "There are no servers.";
 
 /* Unable to retrieve Session ID. */
 "error_no_session_id" = "Unable to retrieve Session ID.";
@@ -104,14 +113,14 @@
 /* Unable to Save Server */
 "error_save_server" = "Unable to Save Server";
 
-/* The server URL is invalid. Ensure the URL begins with "http://" or "https://". */
-"error_server_url_validation_description" = "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\".";
-
 /* The server returned an error. */
 "error_server_description" = "The server returned an error.";
 
 /* The server returned an error: {serverMessage}. */
 "error_server_message_description" = "The server returned an error: %@.";
+
+/* The server URL is invalid. Ensure the URL begins with "http://" or "https://". */
+"error_server_url_validation_description" = "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\".";
 
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
@@ -121,6 +130,9 @@
 
 /* That link doesn't appear to be valid. */
 "error_torrent_link_validation_description" = "That link doesn't appear to be valid.";
+
+/* Unable to Add Torrent */
+"error_unable_to_add_torrent" = "Unable to Add Torrent";
 
 /* Unable to authenticate. Verify that your credentials are correct. */
 "error_unauthenticated_description" = "Unable to authenticate. Verify that your credentials are correct.";

@@ -2,13 +2,12 @@ import Combine
 import Deluge
 import Foundation
 
-typealias DelugeError = Deluge.Client.Error
-typealias DefaultDelugeClient = Deluge.Client
-typealias DelugeTorrentFile = Deluge.TorrentFile
-typealias DelugeLabel = Deluge.Label
+typealias DefaultDelugeClient = Deluge
+typealias DelugeTorrentFile = TorrentFile
+typealias DelugeLabel = Label
 
 protocol DelugeClient {
-    func request<Value>(_ request: Deluge.Request<Value>) -> AnyPublisher<Value, DefaultDelugeClient.Error>
+    func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, DelugeError>
 }
 
 extension DefaultDelugeClient: DelugeClient {}

@@ -1,4 +1,5 @@
 import Combine
+import Deluge
 import Foundation
 import Preferences
 import ViewModel

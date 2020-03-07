@@ -82,7 +82,7 @@ struct DelugeTorrent: StandardTorrent {
 
     /// Creates a `DelugeTorrent` from a `Deluge.Torrent`, returning nil if any required properties are missing.
     /// - Parameter torrent: The `Deluge.Torrent` to create a `DelugeTorrent` from.
-    init?(_ torrent: Deluge.Torrent) {
+    init?(_ torrent: Torrent) {
         guard let name = torrent.name,
             let state = torrent.state,
             let dateAdded = torrent.dateAdded,

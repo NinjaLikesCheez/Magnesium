@@ -9,7 +9,7 @@ private func randomHash() -> String {
     return hashed.compactMap { String(format: "%02x", $0) }.joined()
 }
 
-extension Deluge.Torrent {
+extension Torrent {
     static func mock(
         dateAdded: Date = Date(),
         downloaded: Int64 = 0,

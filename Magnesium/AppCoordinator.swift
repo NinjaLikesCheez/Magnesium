@@ -8,7 +8,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let session: Session
     private let splitViewController: PresentableSplitViewController
-    private lazy var addFileFlow = AddFileFlow(viewController: splitViewController, session: session)
+    private lazy var addTorrentFlow = AddTorrentFlow(viewController: splitViewController, session: session)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var observers = [AnyCancellable]()
@@ -231,15 +231,29 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         }
     }
 
-    func addTorrentFile(at url: URL) {
+    func add(fileURL: URL) {
         guard let server = session.server else { return }
         var alert = Alert(
-            title: L10n.addTorrentAlertTitle,
-            message: L10n.addTorrentToServerConfirmation(fileName: url.lastPathComponent, serverName: server.name),
+            title: L10n.addTorrentToServerPrompt(serverName: server.name),
+            message: fileURL.lastPathComponent,
             style: .alert
         )
-        alert.addAction(AlertAction(title: L10n.add, style: .default) {
-            self.addFileFlow.addFile(at: url)
+        alert.addAction(AlertAction(title: L10n.addTorrent, style: .default) {
+            self.addTorrentFlow.add(type: .file(fileURL))
+        })
+        alert.addAction(.cancel)
+        showAlert(alert, useTopViewController: true)
+    }
+
+    func add(magnetURL: URL) {
+        guard let server = session.server else { return }
+        var alert = Alert(
+            title: L10n.addTorrentToServerPrompt(serverName: server.name),
+            message: magnetURL.absoluteString,
+            style: .alert
+        )
+        alert.addAction(AlertAction(title: L10n.addTorrent, style: .default) {
+            self.addTorrentFlow.add(type: .magnet(magnetURL))
         })
         alert.addAction(.cancel)
         showAlert(alert, useTopViewController: true)

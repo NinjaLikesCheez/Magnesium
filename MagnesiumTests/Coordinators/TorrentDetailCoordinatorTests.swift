@@ -68,7 +68,6 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     func test_moveDownloadFolder_shouldPresentAlertController() {
         viewModel.eventSubject.send(.moveDownloadFolder(currentPath: "/path", subject: PassthroughSubject()))
         let viewController = coordinator.presentable.viewController
-        // swiftlint:disable:next force_cast
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Move Download Folder")
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Save", "Cancel"])

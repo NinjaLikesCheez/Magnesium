@@ -3,16 +3,6 @@ import Foundation
 import Preferences
 import ViewModel
 
-protocol TransmissionClientProvider {
-    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient
-}
-
-struct DefaultTransmissionClientProvider: TransmissionClientProvider {
-    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
-        return DefaultTransmissionClient(baseURL: baseURL, username: username, password: password)
-    }
-}
-
 final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
     private let preferences: Preferences
     private let server: Server?

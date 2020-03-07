@@ -56,12 +56,11 @@ platform :ios do
       html: true,
       output_directory: "fastlane/coverage_report/Magnesium",
       ignore: [
-        "MVVM/*", 
-        "Preferences/*", 
-        "Deluge/*", 
-        "Transmission/*", 
-        "**/Preview*.swift",
-        "Magnesium/Models/*", 
+        "fastlane/*",
+        "MVVM/*",
+        "Preferences/*",
+        "Transmission/*",
+        "**/Models/*",
         "**/*ViewController.swift",
         "**/*View.swift",
         "**/*ViewCell.swift",
@@ -70,7 +69,7 @@ platform :ios do
         "Magnesium/SceneDelegate.swift",
         "Magnesium/Extensions/UIImage+Color.swift",
         "Magnesium/Extensions/NSLayoutConstraint+Priority.swift",
-        "Magnesium/ExtensionsPublishers+UI.swift",
+        "Magnesium/Extensions/Publishers+UI.swift",
         ]
     )
   end

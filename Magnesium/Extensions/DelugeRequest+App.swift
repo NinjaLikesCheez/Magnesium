@@ -1,6 +1,6 @@
 import Deluge
 
-extension Deluge.Request where Value == ([DelugeTorrent], [DelugeLabel]) {
+extension Request where Value == ([DelugeTorrent], [DelugeLabel]) {
     private static let properties = [
         "name",
         "state",
@@ -22,7 +22,7 @@ extension Deluge.Request where Value == ([DelugeTorrent], [DelugeLabel]) {
     ]
 
     static var updateUIForApp: Self {
-        Request<([Deluge.Torrent], [Deluge.Label])>.updateUI(properties: properties)
+        Request<([Torrent], [Label])>.updateUI(properties: properties)
             .map { ($0.compactMap(DelugeTorrent.init), $1) }
     }
 }

@@ -27,7 +27,6 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_masterViewController_whenNoServers_shouldBeExpectedViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.viewControllers[0] as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === NoServersViewController<NoServersViewModel>.self else {
@@ -37,7 +36,6 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_masterViewController_whenServerSettingsInvalid_shouldBeExpectedViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.viewControllers[0] as! UINavigationController
         session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         let viewController = navigationController.viewControllers[0]
@@ -48,7 +46,6 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_masterViewController_whenServerChanged_shouldBeChanged() {
-        // swiftlint:disable:next force_cast
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
         session.setServer(.transmissionMock())
         let firstViewController = masterNavigationController.viewControllers[0]
@@ -57,21 +54,28 @@ class AppCoordinatorTests: XCTestCase {
         XCTAssertNotEqual(firstViewController, secondViewController)
     }
 
-    func test_addTorrentFile_shouldPresentAlertController() {
-        session.setServer(.transmissionMock())
-        coordinator.addTorrentFile(at: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
-        // swiftlint:disable:next force_cast
+    func test_addFileURL_shouldPresentAlertController() {
+        session.setServer(.transmissionMock(name: "ServerName"))
+        coordinator.add(fileURL: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
         let alertController = splitViewController.presentedViewController as! UIAlertController
-        XCTAssertEqual(alertController.title, "Add Torrent")
-        XCTAssertEqual(alertController.message, "Add file.torrent to Server?")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add", "Cancel"])
+        XCTAssertEqual(alertController.title, "Add to ServerName")
+        XCTAssertEqual(alertController.message, "file.torrent")
+        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
+    }
+
+    func test_addMagnetURL_shouldPresentAlertController() {
+        session.setServer(.transmissionMock(name: "ServerName"))
+        coordinator.add(magnetURL: URL(string: "magnet:?")!)
+        let alertController = splitViewController.presentedViewController as! UIAlertController
+        XCTAssertEqual(alertController.title, "Add to ServerName")
+        XCTAssertEqual(alertController.message, "magnet:?")
+        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
     }
 
     // MARK: - ServerErrorCoordinatorEvent
 
     func test_serverErrorCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(ServerErrorCoordinatorEvent.showSettings)
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
@@ -82,7 +86,6 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_serverErrorCoordinatorEvent_editServer_shouldShowServerSettings() throws {
         coordinator.handle(ServerErrorCoordinatorEvent.editServer(.transmissionMock()))
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
@@ -95,7 +98,6 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_noServersCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(NoServersCoordinatorEvent.showSettings)
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
@@ -106,7 +108,6 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_noServersCoordinatorEvent_addServer_shouldShowAddServer() throws {
         coordinator.handle(NoServersCoordinatorEvent.addServer)
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === AddServerViewController<AddServerViewModel>.self else {
@@ -119,7 +120,6 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_listCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(TorrentListCoordinatorEvent.showSettings)
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
@@ -130,7 +130,6 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_listCoordinatorEvent_showDetail_shouldShowDetail() throws {
         coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.detailViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
@@ -143,7 +142,6 @@ class AppCoordinatorTests: XCTestCase {
         let viewModel = AnyTorrentDetailViewModel(MockTorrentDetailViewModel())
         let detailCoordinator = TorrentDetailCoordinator(viewModel: viewModel)
         coordinator.handle(TorrentListCoordinatorEvent.commitDetail(coordinator: detailCoordinator))
-        // swiftlint:disable:next force_cast
         let navigationController = splitViewController.detailViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {

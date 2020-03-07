@@ -1,4 +1,5 @@
 import Combine
+import Deluge
 @testable import Magnesium
 
 final class MockDelugeRefresher: DelugeRefreshable {

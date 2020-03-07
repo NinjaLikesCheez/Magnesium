@@ -1,4 +1,5 @@
 import Combine
+import Deluge
 @testable import Magnesium
 import Preferences
 import XCTest
@@ -167,7 +168,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_saveSelected_withoutServer_shouldAddServer() throws {
         client.results.append((
             method: "auth.login",
-            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
         let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
@@ -189,7 +190,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_saveSelected_withServer_shouldUpdateServer() throws {
         client.results.append((
             method: "auth.login",
-            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
         let settings = DelugeServerSettings(url: URL(string: "http://example.com/new")!)
@@ -211,7 +212,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_saveSelected_withoutServer_shouldEmitCompleteEvent() {
         client.results.append((
             method: "auth.login",
-            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
         let viewModel = addViewModel
@@ -231,7 +232,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_saveSelected_withServer_shouldEmitCompleteEvent() {
         client.results.append((
             method: "auth.login",
-            result: Just(()).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
         let viewModel = editViewModel

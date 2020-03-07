@@ -45,7 +45,6 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_showAddLink_shouldPresentAlertController() {
         coordinator.showAddLink(subject: .init())
         let viewController = coordinator.presentable.viewController
-        // swiftlint:disable:next force_cast
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Enter a URL")
         XCTAssertEqual(alertController.message, "This can be either a link to a torrent or a magnet link.")
@@ -90,7 +89,6 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_add_shouldPresentAlertController() {
         viewModel.eventSubject.send(.add(source: .view(UIView(), rect: .zero), linkSubject: .init()))
         let viewController = coordinator.presentable.viewController
-        // swiftlint:disable:next force_cast
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Add Torrent")
         XCTAssertEqual(alertController.message, "How would you like to add the torrent?")
@@ -104,7 +102,6 @@ class TorrentListCoordinatorTests: XCTestCase {
             labels: CurrentValueSubject([])
         ))
         let viewController = coordinator.presentable.viewController
-        // swiftlint:disable:next force_cast
         let navigationController = viewController.presentedViewController as! UINavigationController
         XCTAssertEqual(navigationController.modalPresentationStyle, .popover)
         let rootViewController = navigationController.viewControllers[0]
@@ -139,7 +136,6 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_moveDownloadFolder_shouldPresentAlertController() {
         viewModel.eventSubject.send(.moveDownloadFolder(currentPath: "/path", subject: PassthroughSubject()))
         let viewController = coordinator.presentable.viewController
-        // swiftlint:disable:next force_cast
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Move Download Folder")
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Save", "Cancel"])

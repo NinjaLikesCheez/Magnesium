@@ -18,7 +18,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
     private var previewCoordinatorMap = [Int: TorrentDetailCoordinator<AnyTorrentDetailViewModel>]()
-    private lazy var addFileFlow = AddFileFlow(viewController: viewController, session: session)
+    private lazy var addTorrentFlow = AddTorrentFlow(viewController: viewController, session: session)
     let received: AnyPublisher<TorrentListEvent, Never>
     var observers = [AnyCancellable]()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
@@ -72,7 +72,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
-        var alert = Alert(title: L10n.addTorrentAlertTitle, message: L10n.addTorrentAlertPrompt, style: .actionSheet)
+        var alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet)
         alert.addAction(AlertAction(title: L10n.addTorrentMethodLink, style: .default) {
             self.showAddLink(subject: linkSubject)
         })
@@ -152,7 +152,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 extension TorrentListCoordinator: UIDocumentPickerDelegate {
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
         guard let url = urls.first else { return }
-        addFileFlow.addFile(at: url)
+        addTorrentFlow.add(type: .file(url))
     }
 }
 

@@ -63,6 +63,10 @@ enum L10n {
         return NSLocalizedString("action_move_download_folder", comment: "Move Download Folder")
     }
 
+    static var addTorrent: String {
+        return NSLocalizedString("action_add_torrent", comment: "Add Torrent")
+    }
+
     // MARK: Screens
 
     static var torrentInfoScreenTitle: String {
@@ -225,20 +229,13 @@ enum L10n {
 
     // MARK: Add Torrent
 
-    static var addTorrentAlertTitle: String {
-        return NSLocalizedString("add_torrent_alert_title", comment: "Add Torrent")
+    static func addTorrentToServerPrompt(serverName: String) -> String {
+        let format = NSLocalizedString("add_torrent_to_server_prompt", comment: "Add to {serverName}")
+        return .localizedStringWithFormat(format, serverName)
     }
 
-    static func addTorrentToServerConfirmation(fileName: String, serverName: String) -> String {
-        let format = NSLocalizedString(
-            "add_torrent_file_to_server_confirmation",
-            comment: "Add {fileName} to {serverName}?"
-        )
-        return .localizedStringWithFormat(format, fileName, serverName)
-    }
-
-    static var addTorrentAlertPrompt: String {
-        return NSLocalizedString("add_torrent_alert_prompt", comment: "How would you like to add the torrent?")
+    static var addTorrentMethodPrompt: String {
+        return NSLocalizedString("add_torrent_method_prompt", comment: "How would you like to add the torrent?")
     }
 
     static var addTorrentMethodLink: String {
@@ -554,5 +551,26 @@ enum L10n {
                 """
         )
         // swiftformat:enable all
+    }
+
+    // MARK: Add Torrent
+
+    static var unableToAddTorrentError: String {
+        return NSLocalizedString("error_unable_to_add_torrent", comment: "Unable to Add Torrent")
+    }
+
+    static var failedToAddTorrentError: String {
+        return NSLocalizedString("error_failed_to_add_torrent", comment: "Failed to Add Torrent")
+    }
+
+    static var corruptServerSettingsErrorDescription: String {
+        return NSLocalizedString(
+            "error_corrupt_server_settings_description",
+            comment: "The server settings could not be read."
+        )
+    }
+
+    static var noServersErrorDescription: String {
+        return NSLocalizedString("error_no_servers_description", comment: "There are no servers.")
     }
 }

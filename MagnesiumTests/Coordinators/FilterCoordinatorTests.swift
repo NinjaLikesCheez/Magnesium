@@ -19,7 +19,6 @@ class FilterCoordinatorTests: XCTestCase {
     }
 
     func test_presentable_shouldBeNavigationController_withFilterViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === FilterViewController<FilterViewModel>.self else {

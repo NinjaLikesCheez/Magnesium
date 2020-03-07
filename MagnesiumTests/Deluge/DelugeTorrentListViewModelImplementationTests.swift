@@ -1,4 +1,5 @@
 import Combine
+import Deluge
 @testable import Magnesium
 import Preferences
 import XCTest
@@ -140,7 +141,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_refreshDeluge_shouldEmitUpdate() {
         client.results.append((
             method: "web.update_ui",
-            result: Just(([], [])).setFailureType(to: DefaultDelugeClient.Error.self).eraseToAnyPublisher()
+            result: Just(([], [])).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
         let expectation = self.expectation(description: "Value received")
         implementation.updated.sink { _ in expectation.fulfill() }.store(in: &observers)

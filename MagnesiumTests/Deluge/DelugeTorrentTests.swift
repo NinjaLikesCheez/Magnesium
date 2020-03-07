@@ -4,7 +4,7 @@ import XCTest
 
 class DelugeTorrentTests: XCTestCase {
     func test_init_state_shouldMapToExpectedStandardState() {
-        let pairs: [(Deluge.Torrent.State, TorrentState)] = [
+        let pairs: [(Torrent.State, TorrentState)] = [
             (.downloading, .downloading),
             (.seeding, .seeding),
             (.paused, .paused),
@@ -14,7 +14,7 @@ class DelugeTorrentTests: XCTestCase {
         ]
 
         for pair in pairs {
-            let torrent = Deluge.Torrent.mock(state: pair.0)
+            let torrent = Torrent.mock(state: pair.0)
             let appTorrent = DelugeTorrent(torrent)
             XCTAssertEqual(appTorrent?.standardState, pair.1)
         }
@@ -22,7 +22,7 @@ class DelugeTorrentTests: XCTestCase {
 
     func test_init_trackers_shouldMapToExpectedTrackerStrings() {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
-        let torrent = Deluge.Torrent.mock(trackers: trackers.map(Tracker.init(url:)))
+        let torrent = Torrent.mock(trackers: trackers.map(Tracker.init(url:)))
         let appTorrent = DelugeTorrent(torrent)
         XCTAssertEqual(appTorrent?.trackerStrings, trackers)
     }

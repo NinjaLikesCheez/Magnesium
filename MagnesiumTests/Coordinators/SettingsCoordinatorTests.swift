@@ -21,7 +21,6 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_presentable_shouldBeNavigationController_withSettingsViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
@@ -54,7 +53,6 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
         coordinator.handle(.editServer(.transmissionMock()))
         RunLoop.main.run(until: Date())
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
@@ -66,7 +64,6 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_editServer_withDelugeServer_shouldPushServerSettingsViewController() {
         coordinator.handle(.editServer(.delugeMock()))
         RunLoop.main.run(until: Date())
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
@@ -78,7 +75,6 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_addServer_shouldPushAddServerViewController() {
         coordinator.handle(.addServer)
         RunLoop.main.run(until: Date())
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
         guard type(of: viewController) === AddServerViewController<AddServerViewModel>.self else {
@@ -90,7 +86,6 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_showRefreshIntervalSettings_shouldPushRefreshIntervalViewController() {
         coordinator.handle(.showRefreshIntervalSettings)
         RunLoop.main.run(until: Date())
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
         guard type(of: viewController) === RefreshIntervalViewController<RefreshIntervalViewModel>.self else {
@@ -102,7 +97,6 @@ class SettingsCoordinatorTests: XCTestCase {
     // MARK: - ServerSettingsCoordinatorEvent
 
     func test_serverSettingsCoordinatorEvent_complete_shouldPopViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
         coordinator.handle(.editServer(.transmissionMock()))
@@ -110,7 +104,6 @@ class SettingsCoordinatorTests: XCTestCase {
         XCTAssertEqual(navigationController.viewControllers.count, 2)
 
         let coordinator = MockCoordinator(
-            // swiftlint:disable:next force_cast
             viewController: navigationController.viewControllers[1] as! PresentableTableViewController
         )
         self.coordinator.handle(ServerSettingsCoordinatorEvent.complete, from: coordinator)
@@ -121,7 +114,6 @@ class SettingsCoordinatorTests: XCTestCase {
     // MARK: - AddServerCoordinatorEvent
 
     func test_addServerCoordinatorEvent_completeEvent_shouldPopRootViewController() {
-        // swiftlint:disable:next force_cast
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
         coordinator.handle(.editServer(.transmissionMock()))
@@ -130,7 +122,6 @@ class SettingsCoordinatorTests: XCTestCase {
         XCTAssertEqual(navigationController.viewControllers.count, 3)
 
         let coordinator = MockCoordinator(
-            // swiftlint:disable:next force_cast
             viewController: navigationController.viewControllers[1] as! PresentableTableViewController
         )
         self.coordinator.handle(AddServerCoordinatorEvent.complete, from: coordinator)

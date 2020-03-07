@@ -6,11 +6,11 @@ import Foundation
 final class MockDelugeClient: DelugeClient {
     private(set) var requestCallCount = 0
     private(set) var requestParamRequest = [Request<Any>]()
-    var results = [(method: String, result: AnyPublisher<Any, Client.Error>)]()
-    func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, Client.Error> {
+    var results = [(method: String, result: AnyPublisher<Any, DelugeError>)]()
+    func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, DelugeError> {
         requestCallCount += 1
         requestParamRequest.append(request.map { $0 as Any })
-        let response = results.compactMap { result -> AnyPublisher<Value, Client.Error>? in
+        let response = results.compactMap { result -> AnyPublisher<Value, DelugeError>? in
             guard result.method == request.method else { return nil }
             return result.result.map { $0 as! Value }.eraseToAnyPublisher() // swiftlint:disable:this force_cast
         }.first

@@ -186,7 +186,7 @@ func main() throws {
                 let lineNumber = contents[..<contents.index(contents.startIndex, offsetBy: range.location)]
                     .components(separatedBy: .newlines)
                     .count
-                usedKeys.append(UsedKey(url: url, key: key, lineNumber: lineNumber + 1))
+                usedKeys.append(UsedKey(url: url, key: key, lineNumber: lineNumber))
             }
         }
     }
