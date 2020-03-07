@@ -6,6 +6,8 @@ let package = Package(
     name: "Preferences",
     platforms: [
         .iOS(.v13),
+        .tvOS(.v13),
+        .macOS(.v10_15),
     ],
     products: [
         .library(name: "Preferences", targets: ["Preferences"]),
