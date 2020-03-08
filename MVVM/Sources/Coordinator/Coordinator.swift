@@ -1,9 +1,6 @@
 import Combine
 
-/**
- A `Coordinator` is used to manage the navigation layer. Coordinators require a `presentable` which provides a
- view controller to be presented by a parent coordinator.
- */
+/// A `Coordinator` is used to manage navigation.
 public protocol Coordinator: AnyObject {
     /// The type of event emitted by this coordinator.
     associatedtype Event
@@ -21,8 +18,12 @@ public protocol Coordinator: AnyObject {
     /// A publisher that emits events to be received by this coordinator.
     var received: AnyPublisher<Received, Never> { get }
 
-    /// Handle a received event. This function will automatically be called if this coordinator was added to a parent
+    /// Handles a received event.
+    ///
+    /// This function will automatically be called if this coordinator was added to a parent
     /// coordinator using `addChildCoordinator`.
+    ///
+    ///
     /// - Parameter event: The event to handle.
     func handle(_ event: Received)
 }

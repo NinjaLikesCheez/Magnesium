@@ -1,5 +1,6 @@
 import Combine
 
+/// A type-erased `Coordinator`.
 public final class AnyCoordinator: Coordinator {
     private let _presentable: () -> Presentable
     private let _events: () -> AnyPublisher<Any, Never>
@@ -10,6 +11,7 @@ public final class AnyCoordinator: Coordinator {
     private let _setChildCoordinators: ([AnyHashable: AnyCoordinator]) -> Void
     private let _handle: (Any) -> Void
 
+    /// The value wrapped by this instance.
     public let base: Any
     public var presentable: Presentable { _presentable() }
     public var events: AnyPublisher<Any, Never> { _events() }
@@ -25,6 +27,8 @@ public final class AnyCoordinator: Coordinator {
         set { _setChildCoordinators(newValue) }
     }
 
+    /// Creates an `AnyCoordinator` that wraps the given `Coordinator`.
+    /// - Parameter base: The `Coordinator` to wrap.
     public init<Base>(_ base: Base) where Base: Coordinator {
         self.base = base
         _presentable = { base.presentable }

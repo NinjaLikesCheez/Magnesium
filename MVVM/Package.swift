@@ -4,9 +4,12 @@ import PackageDescription
 
 let package = Package(
     name: "MVVM",
-    platforms: [.iOS(.v13)],
+    platforms: [
+        .iOS(.v13),
+    ],
     products: [
-        .library(name: "MVVM", targets: ["Coordinator", "ViewModel"]),
+        .library(name: "Coordinator", targets: ["Coordinator"]),
+        .library(name: "ViewModel", targets: ["ViewModel"]),
     ],
     targets: [
         .target(name: "Coordinator"),
