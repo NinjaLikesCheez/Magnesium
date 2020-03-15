@@ -34,27 +34,18 @@ public final class UserDefaultsPreferences: Preferences {
         return try JSONEncoder().encode(value)
     }
 
-    public func value<T>(for key: PreferenceKey<T>) -> T {
+    public func value<T>(for key: PreferenceKey<T>) throws -> T {
         if isNativeType(T.self) {
             return userDefaults.value(forKey: key.value) as? T ?? key.defaultValue
         } else {
-            do {
-                guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
-                return try JSONDecoder().decode(T.self, from: data)
-            } catch {
-                os_log("[UserDefaultsPreferences] Failed to decode value: %@", String(describing: error))
-                return key.defaultValue
-            }
+            guard let data = userDefaults.data(forKey: key.value) else { return key.defaultValue }
+            return try JSONDecoder().decode(T.self, from: data)
         }
     }
 
-    public func set<T>(_ value: T, for key: PreferenceKey<T>) {
-        do {
-            userDefaults.set(try encode(value), forKey: key.value)
-            valueUpdatedSubject.send(.updated(AnyPreferenceKey(key), value))
-        } catch {
-            os_log("[UserDefaultsPreferences] Failed to encode value: %@", String(describing: error))
-        }
+    public func set<T>(_ value: T, for key: PreferenceKey<T>) throws {
+        userDefaults.set(try encode(value), forKey: key.value)
+        valueUpdatedSubject.send(.updated(AnyPreferenceKey(key), value))
     }
 
     public func containsValue<T>(for key: PreferenceKey<T>) -> Bool {

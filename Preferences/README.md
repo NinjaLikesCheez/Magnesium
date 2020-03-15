@@ -9,11 +9,19 @@ import Preferences
 
 let preferences = UserDefaultsPreferences()
 let key = PreferenceKey("my-setting", defaultValue: 1)
+
+// Verbose syntax. Methods can throw errors.
 preferences.value(for: key) // 1
-preferences.set(2, for: key)
+try preferences.set(2, for: key)
+
+// Subscript syntax. Errors will be discarded.
+preferences[key] // 1
+preferences[key] = 2
 ```
 
-`Preferences` supports using any values that conform to `Codable`. 
+`Preferences` supports using any values that conform to `Codable`.
+
+The `value(for:)` and `set(_:for:)` methods will `throw` an error if the value was unable to be encoded or decoded. To access preferences without worrying about errors you can use the subscript syntax.
 
 ## Preferences Protocol
 
@@ -27,7 +35,7 @@ There are two types of `Preferences`:
 
 You can observe changes to `Preferences` using the `preferencesChanged` publisher or the provided convenience methods.
 
-> ⚠️ **IMPORTANT**: The publisher will only emit values for changes made through its `Preferences`. It is recommended to use dependency injection to share `Preferences` throughout your code.
+> ⚠️ **IMPORTANT**: The publisher will only emit values for changes made through its associated `Preferences` instance. It is recommended to use dependency injection to share `Preferences` throughout your code.
 
 There are two methods provided to observe specific preference keys.
 
@@ -44,7 +52,7 @@ var cancellables = Set<AnyCancellable>()
 let preferences = UserDefaultsPreferences()
 let key = PreferenceKey("my-setting", defaultValue: 1)
 preferences.valueUpdatedPublisher(for: key).sink { print($0) }.store(in: &cancellables)
-preferences.set(2, for: key)
+try preferences.set(2, for: key)
 ```
 
 Output
@@ -65,7 +73,7 @@ var cancellables = Set<AnyCancellable>()
 let preferences = UserDefaultsPreferences()
 let key = PreferenceKey("my-setting", defaultValue: 1)
 preferences.valuePublisher(for: key).sink { print($0) }.store(in: &cancellables)
-preferences.set(2, for: key)
+try preferences.set(2, for: key)
 ```
 
 Output

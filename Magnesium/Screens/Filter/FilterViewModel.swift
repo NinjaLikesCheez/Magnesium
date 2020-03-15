@@ -61,16 +61,16 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleSortSelected(from source: PopoverSource) {
-        let currentSort = preferences.value(for: .sortOption)
+        let currentSort = preferences[.sortOption]
         var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet)
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.localizedString, style: .default) {
                 if property == currentSort.property {
                     let sortOption = currentSort.withOppositeDirection()
-                    self.preferences.set(sortOption, for: .sortOption)
+                    self.preferences[.sortOption] = sortOption
                 } else {
-                    self.preferences.set(SortOption(property: property), for: .sortOption)
+                    self.preferences[.sortOption] = SortOption(property: property)
                 }
             })
         }
@@ -80,7 +80,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
-        var filterOptions = preferences.value(for: .filterOptions)
+        var filterOptions = preferences[.filterOptions]
         var alert = Alert(title: L10n.filterLabelAlertTitle, message: L10n.filterLabelAlertMessage, style: .actionSheet)
         let labels: [StandardLabel?] = [nil] + self.labels.value
 
@@ -90,7 +90,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
-                    self.preferences.set(filterOptions, for: .filterOptions)
+                    self.preferences[.filterOptions] = filterOptions
                 }
             ))
         }
@@ -100,7 +100,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func handleStateSelected(from source: PopoverSource) {
-        var filterOptions = preferences.value(for: .filterOptions)
+        var filterOptions = preferences[.filterOptions]
         var alert = Alert(title: L10n.filterStateAlertTitle, message: L10n.filterStateAlertMessage, style: .actionSheet)
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
@@ -110,7 +110,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
                 style: .default,
                 handler: {
                     filterOptions.state = state
-                    self.preferences.set(filterOptions, for: .filterOptions)
+                    self.preferences[.filterOptions] = filterOptions
                 }
             ))
         }
@@ -120,8 +120,8 @@ final class FilterViewModel: ViewModel, EventEmitter {
     }
 
     private func updateSections() {
-        let sortOption = preferences.value(for: .sortOption)
-        let filterOptions = preferences.value(for: .filterOptions)
+        let sortOption = preferences[.sortOption]
+        let filterOptions = preferences[.filterOptions]
         var sections = [FilterSection]()
 
         sections.append(FilterSection(type: .sort, items: [

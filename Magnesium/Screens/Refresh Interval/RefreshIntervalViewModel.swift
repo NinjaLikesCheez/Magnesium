@@ -44,7 +44,7 @@ final class RefreshIntervalViewModel: ViewModel {
         switch event {
         case let .optionSelected(index: index):
             let interval = options[index].0
-            preferences.set(interval, for: .autoRefreshInterval)
+            preferences[.autoRefreshInterval] = interval
         }
     }
 }

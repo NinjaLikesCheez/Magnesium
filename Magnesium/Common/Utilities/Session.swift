@@ -27,7 +27,7 @@ final class Session {
         setupServerObserver()
         serverSubject.send(server)
         if let server = server {
-            preferences.set(server.id, for: .selectedServerID)
+            preferences[.selectedServerID] = server.id
         }
     }
 

@@ -19,23 +19,51 @@ class UserDefaultPreferencesTests: XCTestCase {
         preferences.reset()
     }
 
-    func test_value_shouldReturnDefault() {
-        XCTAssertEqual(preferences.value(for: key), "Default")
+    func test_value_shouldReturnDefault() throws {
+        XCTAssertEqual(try preferences.value(for: key), "Default")
     }
 
-    func test_value_withCodable_shouldReturnDefault() {
+    func test_value_withCodable_shouldReturnDefault() throws {
         let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: "name"))
-        XCTAssertEqual(preferences.value(for: key).name, "name")
+        XCTAssertEqual(try preferences.value(for: key).name, "name")
     }
 
-    func test_set_shouldPersistValue() {
-        preferences.set("Value", for: key)
-        XCTAssertEqual(preferences.value(for: key), "Value")
-        let newPreferenceManager = UserDefaultsPreferences()
-        XCTAssertEqual(newPreferenceManager.value(for: key), "Value")
+    func test_subscript_get_shouldReturnDefault() {
+        XCTAssertEqual(preferences[key], "Default")
     }
 
-    func test_preferencesChanged_whenPreferenceUpdated_shouldEmitUpdate() {
+    func test_subscript_get_withCodable_shouldReturnDefault() {
+        let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: "name"))
+        XCTAssertEqual(preferences[key].name, "name")
+    }
+
+    func test_set_shouldPersistValue() throws {
+        try preferences.set("Value", for: key)
+        XCTAssertEqual(try preferences.value(for: key), "Value")
+        let newPreferences = UserDefaultsPreferences()
+        XCTAssertEqual(try newPreferences.value(for: key), "Value")
+    }
+
+    func test_set_withCodable_shouldBeStored() throws {
+        let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: ""))
+        try preferences.set(MockCodable(name: "Codable"), for: key)
+        XCTAssertEqual(try preferences.value(for: key).name, "Codable")
+    }
+
+    func test_subscript_set_shouldPersistValue() {
+        preferences[key] = "Value"
+        XCTAssertEqual(preferences[key], "Value")
+        let newPreferences = UserDefaultsPreferences()
+        XCTAssertEqual(newPreferences[key], "Value")
+    }
+
+    func test_subscription_set_withCodable_shouldBeStored() throws {
+        let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: ""))
+        try preferences.set(MockCodable(name: "Codable"), for: key)
+        XCTAssertEqual(try preferences.value(for: key).name, "Codable")
+    }
+
+    func test_preferencesChanged_whenPreferenceUpdated_shouldEmitUpdate() throws {
         let expectation = self.expectation(description: "Value received")
         preferences.preferencesChanged.first().sink { change in
             XCTAssertTrue(change.isRelevant(to: self.key))
@@ -46,12 +74,12 @@ class UserDefaultPreferencesTests: XCTestCase {
             }
             expectation.fulfill()
         }.store(in: &observers)
-        preferences.set("Value", for: key)
+        try preferences.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
 
-    func test_preferencesChanged_whenPreferenceRemoved_shouldEmitDeleted() {
-        preferences.set("Value", for: key)
+    func test_preferencesChanged_whenPreferenceRemoved_shouldEmitDeleted() throws {
+        try preferences.set("Value", for: key)
         let expectation = self.expectation(description: "Value received")
         preferences.preferencesChanged.first().sink { change in
             XCTAssertTrue(change.isRelevant(to: self.key))
@@ -79,18 +107,18 @@ class UserDefaultPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_valueUpdatedPublisher_whenValueChanged_shouldEmitNewValue() {
+    func test_valueUpdatedPublisher_whenValueChanged_shouldEmitNewValue() throws {
         let expectation = self.expectation(description: "Value received")
         preferences.valueUpdatedPublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Value")
             expectation.fulfill()
         }.store(in: &observers)
-        preferences.set("Value", for: key)
+        try preferences.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
 
-    func test_valueUpdatedPublisher_whenPreferencesReset_shouldEmitDefaultValue() {
-        preferences.set("Value", for: key)
+    func test_valueUpdatedPublisher_whenPreferencesReset_shouldEmitDefaultValue() throws {
+        try preferences.set("Value", for: key)
         let expectation = self.expectation(description: "Value received")
         preferences.valueUpdatedPublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Default")
@@ -111,8 +139,8 @@ class UserDefaultPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_valuePublisher_shouldEmitInitialValue() {
-        preferences.set("Value", for: key)
+    func test_valuePublisher_shouldEmitInitialValue() throws {
+        try preferences.set("Value", for: key)
         let expectation = self.expectation(description: "Value received")
         preferences.valuePublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Value")
@@ -121,34 +149,28 @@ class UserDefaultPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    func test_valuePublisher_shouldEmitNewValues() {
+    func test_valuePublisher_shouldEmitNewValues() throws {
         let expectation = self.expectation(description: "Value received")
         preferences.valuePublisher(for: key).dropFirst().first().sink { value in
             XCTAssertEqual(value, "New")
             expectation.fulfill()
         }.store(in: &observers)
-        preferences.set("New", for: key)
+        try preferences.set("New", for: key)
         waitForExpectations(timeout: 0)
     }
 
-    func test_containsValue() {
+    func test_containsValue() throws {
         XCTAssertFalse(preferences.containsValue(for: key))
-        preferences.set("Value", for: key)
-        XCTAssertEqual(preferences.value(for: key), "Value")
+        try preferences.set("Value", for: key)
+        XCTAssertEqual(try preferences.value(for: key), "Value")
         XCTAssertTrue(preferences.containsValue(for: key))
     }
 
-    func test_removeValue() {
-        preferences.set("Value", for: key)
-        XCTAssertEqual(preferences.value(for: key), "Value")
+    func test_removeValue() throws {
+        try preferences.set("Value", for: key)
+        XCTAssertEqual(try preferences.value(for: key), "Value")
         preferences.removeValue(for: key)
-        XCTAssertEqual(preferences.value(for: key), "Default")
-    }
-
-    func test_set_withCodable_shouldBeStored() {
-        let key = PreferenceKey<MockCodable>(self.key.value, defaultValue: MockCodable(name: ""))
-        preferences.set(MockCodable(name: "Codable"), for: key)
-        XCTAssertEqual(preferences.value(for: key).name, "Codable")
+        XCTAssertEqual(try preferences.value(for: key), "Default")
     }
 }
 

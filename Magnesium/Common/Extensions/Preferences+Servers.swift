@@ -18,7 +18,7 @@ extension Preferences {
             return
         }
 
-        set(server.id, for: .selectedServerID)
+        self[.selectedServerID] = server.id
     }
 
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
@@ -43,12 +43,12 @@ extension Preferences {
 
     func getSelectedServer() -> Server? {
         let servers = getServers()
-        guard let selectedServerID = value(for: .selectedServerID) else { return servers.first }
+        guard let selectedServerID = self[.selectedServerID] else { return servers.first }
         return servers.first { $0.id == selectedServerID } ?? servers.first
     }
 
     func getServers() -> [Server] {
-        var servers = value(for: .servers)
+        var servers = self[.servers]
         for (index, server) in servers.enumerated() {
             var server = server
             var query = keychainQuery(for: server)
@@ -107,7 +107,7 @@ extension Preferences {
             }
         }
 
-        set(servers, for: .servers)
+        self[.servers] = servers
         updateSelectedServerID()
     }
 
@@ -120,7 +120,7 @@ extension Preferences {
             os_log("%@: server %@: SecItemDelete -> %d", #function, server.id, status)
         }
 
-        set(servers, for: .servers)
+        self[.servers] = servers
         updateSelectedServerID()
     }
 

@@ -89,7 +89,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
 
-        let refreshInterval = preferences.value(for: .autoRefreshInterval)
+        let refreshInterval = preferences[.autoRefreshInterval]
         let localizedRefresh: String
         if refreshInterval <= 0 {
             localizedRefresh = L10n.refreshIntervalNever
