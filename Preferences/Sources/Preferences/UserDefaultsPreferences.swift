@@ -1,6 +1,5 @@
 import Combine
 import Foundation
-import os
 
 /// A `Preferences` implementation that uses `UserDefaults`.
 public final class UserDefaultsPreferences: Preferences {
