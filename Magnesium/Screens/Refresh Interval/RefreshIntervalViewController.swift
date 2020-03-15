@@ -5,7 +5,7 @@ import ViewModel
 // swiftlint:disable:next line_length
 final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewState == RefreshIntervalViewState {
     private let viewModel: VM
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var cells: [UITableViewCell] = {
         return viewModel.state.options.map { state in
@@ -16,7 +16,7 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
                     isSelected ? .checkmark : .none
                 }
                 .assign(to: \.accessoryType, on: cell)
-                .store(in: &observers)
+                .store(in: &cancellables)
             return cell
         }
     }()

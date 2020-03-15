@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class TorrentDetailFileTableViewCell: UITableViewCell {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -46,7 +46,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        observers = []
+        cancellables.removeAll()
     }
 
     private func setup() {
@@ -96,17 +96,17 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.size
             .asOptional()
             .assign(to: \.text, on: sizeLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progress
             .asOptional()
             .assign(to: \.text, on: progressLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         separatorView.isHidden = isLastRow
     }

@@ -6,20 +6,20 @@ import XCTest
 class FilterViewModelTests: XCTestCase {
     private let preferences = InMemoryPreferences()
     private let labels = CurrentValueSubject<[MockLabel], Never>([MockLabel(), MockLabel(name: "test")])
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var viewModel: FilterViewModel!
 
     override func setUp() {
         super.setUp()
         let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
-        labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &observers)
+        labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
         viewModel = FilterViewModel(preferences: preferences, labels: mappedLabels)
     }
 
     func test_sections_withoutLabels_shouldEmitExpectedValues() {
         labels.send([])
         var sections: [FilterSection]!
-        viewModel.state.sections.sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.sink { sections = $0 }.store(in: &cancellables)
         let expected = [
             FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
             FilterSection(type: .filters, items: [.state("All")]),
@@ -29,7 +29,7 @@ class FilterViewModelTests: XCTestCase {
 
     func test_sections_withLabels_shouldEmitExpectedValues() {
         var sections: [FilterSection]!
-        viewModel.state.sections.sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.sink { sections = $0 }.store(in: &cancellables)
         let expected = [
             FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
             FilterSection(type: .filters, items: [.state("All"), .label("All")]),
@@ -39,7 +39,7 @@ class FilterViewModelTests: XCTestCase {
 
     func test_sections_whenSortOptionChanged_shouldEmitNewSections() {
         var sections: [FilterSection]?
-        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &cancellables)
         preferences.set(SortOption(property: .name), for: .sortOption)
         XCTAssertNotNil(sections)
         XCTAssertEqual(sections?[0].items, [.sort("↑ Name")])
@@ -47,7 +47,7 @@ class FilterViewModelTests: XCTestCase {
 
     func test_sections_whenFilterOptionsChanged_shouldEmit() {
         var sections: [FilterSection]?
-        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &cancellables)
         preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
         XCTAssertNotNil(sections)
         XCTAssertEqual(sections?[1].items[0], .state("Downloading"))
@@ -55,7 +55,7 @@ class FilterViewModelTests: XCTestCase {
 
     func test_sections_whenLabelsUpdated_shouldEmit() {
         var sections: [FilterSection]?
-        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &cancellables)
         labels.send(labels.value + [MockLabel(name: "new")])
         XCTAssertNotNil(sections)
     }
@@ -63,7 +63,7 @@ class FilterViewModelTests: XCTestCase {
     func test_sections_withSameLabelsPublished_shouldNotEmit() {
         labels.send(labels.value)
         var sections: [FilterSection]?
-        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &observers)
+        viewModel.state.sections.dropFirst().sink { sections = $0 }.store(in: &cancellables)
         labels.send(labels.value)
         XCTAssertNil(sections)
     }
@@ -72,7 +72,7 @@ class FilterViewModelTests: XCTestCase {
         var event: FilterEvent?
         viewModel.events.first().sink {
             event = $0
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.doneSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -86,7 +86,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         XCTAssertEqual(alert?.actions.map { $0.title }, expected)
     }
@@ -96,7 +96,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         let previousOption = preferences.value(for: .sortOption)
         alert?.actions.first { $0.title == previousOption.property.localizedString }?.handler?()
@@ -109,7 +109,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "Name" }?.handler?()
         let newOption = preferences.value(for: .sortOption)
@@ -121,7 +121,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.stateSelected(source: .view(UIView(), rect: .zero)))
         let expected = ["All", "Downloading", "Seeding", "Paused", "Checking", "Queued", "Error", "Cancel"]
         XCTAssertEqual(alert?.actions.map { $0.title }, expected)
@@ -132,7 +132,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.stateSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "Downloading" }?.handler?()
         let newOption = preferences.value(for: .filterOptions)
@@ -144,7 +144,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         XCTAssertEqual(alert?.actions.map { $0.title }, ["All", "None", "test", "Cancel"])
     }
@@ -154,7 +154,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "All" }?.handler?()
         let newOption = preferences.value(for: .filterOptions)
@@ -166,7 +166,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "None" }?.handler?()
         let newOption = preferences.value(for: .filterOptions)
@@ -178,7 +178,7 @@ class FilterViewModelTests: XCTestCase {
         viewModel.events.first().sink { event in
             guard case let .alert(inner, _) = event else { return }
             alert = inner
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
         alert?.actions.first { $0.title == "test" }?.handler?()
         let newOption = preferences.value(for: .filterOptions)

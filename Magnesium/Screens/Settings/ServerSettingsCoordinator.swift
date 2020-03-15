@@ -11,7 +11,7 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     private let viewController: ServerSettingsViewController<AnyServerSettingsViewModel>
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
     let received: AnyPublisher<ServerSettingsEvent, Never>
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {

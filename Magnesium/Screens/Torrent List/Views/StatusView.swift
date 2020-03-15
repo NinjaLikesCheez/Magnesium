@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class StatusView: UIView {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var speedLabel: UILabel = {
         let label = UILabel()
@@ -43,11 +43,11 @@ final class StatusView: UIView {
     }
 
     func configure(download: AnyPublisher<String, Never>, upload: AnyPublisher<String, Never>) {
-        observers = []
+        cancellables.removeAll()
         Publishers.CombineLatest(download, upload)
             .map { "\($0) \($1)" }
             .asOptional()
             .assign(to: \.text, on: speedLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 }

@@ -30,7 +30,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private let labels: CurrentValueSubject<[Label], Never>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var autoRefreshTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
     let state: TorrentDetailViewState
@@ -89,7 +89,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
 
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private static func createSections(
@@ -225,7 +225,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 self?.showError(title: L10n.refreshError, message: error.localizedDescription)
             })
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func handleMoreOptions(from source: PopoverSource) {
@@ -248,7 +248,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 .sink { [weak self] path in
                     self?.moveDownloadFolder(to: path)
                 }
-                .store(in: &self.observers)
+                .store(in: &self.cancellables)
             self.eventSubject.send(.moveDownloadFolder(currentPath: torrent.downloadPath, subject: subject))
         })
 
@@ -265,14 +265,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.pauseError, message: error.localizedDescription)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func resume() {
@@ -281,14 +281,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.resumeError, message: error.localizedDescription)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func remove(removeData: Bool) {
@@ -297,7 +297,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -308,7 +308,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                     self?.showError(title: L10n.removeError, message: error.localizedDescription)
                 }
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func verify() {
@@ -317,14 +317,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
                 }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func setLabel(_ label: Label) {
@@ -333,14 +333,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func updateTrackers() {
@@ -349,14 +349,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func moveDownloadFolder(to path: String) {
@@ -365,14 +365,14 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 guard let strongSelf = self, case .finished = completion else { return }
                 strongSelf.implementation.refresh()
                     .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.observers)
+                    .store(in: &strongSelf.cancellables)
             })
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
@@ -423,7 +423,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private func refreshTimerFired(_ timer: Timer) {
         refreshFiles()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {

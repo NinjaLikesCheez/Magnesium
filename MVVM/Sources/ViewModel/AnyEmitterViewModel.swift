@@ -5,10 +5,14 @@ public class AnyEmitterViewModel<Event, ViewEvent, ViewState>: ViewModel, EventE
     private let _events: () -> AnyPublisher<Event, Never>
     private let _state: () -> ViewState
     private let _handle: (ViewEvent) -> Void
+
+    /// The value wrapped by this instance.
     public let base: Any
     public var state: ViewState { _state() }
     public var events: AnyPublisher<Event, Never> { _events() }
 
+    /// Creates a type-erased wrapper for the given value.
+    /// - Parameter base: The value to wrap.
     public init<Base: ViewModel & EventEmitter>(
         _ base: Base
     ) where Base.Event == Event, Base.ViewEvent == ViewEvent, Base.ViewState == ViewState {

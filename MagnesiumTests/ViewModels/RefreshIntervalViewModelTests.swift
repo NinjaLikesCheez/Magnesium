@@ -6,7 +6,7 @@ import XCTest
 class RefreshIntervalViewModelTests: XCTestCase {
     private let preferences = InMemoryPreferences()
     private lazy var viewModel = RefreshIntervalViewModel(preferences: preferences)
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     func test_options_names() {
         let expected = ["Never", "2 seconds", "5 seconds", "10 seconds", "30 seconds"]
@@ -25,7 +25,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
         var values = [Bool]()
         viewModel.state.options.first { $0.name == "2 seconds" }?.isSelected.sink {
             values.append($0)
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         XCTAssertEqual(values, [true])
     }
 
@@ -33,7 +33,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
         var values = [Bool]()
         viewModel.state.options.first { $0.name == "2 seconds" }?.isSelected.sink {
             values.append($0)
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         XCTAssertEqual(values, [true])
         viewModel.handle(.optionSelected(index: 0))
         XCTAssertEqual(values, [true, false])
@@ -43,7 +43,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
         var values = [Bool]()
         viewModel.state.options.first?.isSelected.sink {
             values.append($0)
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         XCTAssertEqual(values, [false])
         viewModel.handle(.optionSelected(index: 0))
         XCTAssertEqual(values, [false, true])

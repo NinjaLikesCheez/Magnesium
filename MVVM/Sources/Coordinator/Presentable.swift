@@ -1,7 +1,7 @@
 import Combine
 import UIKit
 
-/// A view controller that can be presented and dismissed.
+/// A view that can be presented and dismissed.
 public protocol Presentable {
     /// A publisher that emits an event when the view controller is dismissed.
     var didDismiss: AnyPublisher<Void, Never> { get }
@@ -10,7 +10,7 @@ public protocol Presentable {
 }
 
 public extension Presentable {
-    /// If the viewController is currently in the view hierarchy.
+    /// If the view is currently in the view hierarchy.
     var isInViewHierarchy: Bool {
         return viewController.isInViewHierarchy
     }

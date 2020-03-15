@@ -5,10 +5,12 @@ public protocol ViewModel {
     /// The type representing the view's state.
     associatedtype ViewState
 
-    /// The view state. Any values that can change over time will be publishers in the view state.
+    /// A value that represents the state of the view.
+    ///
+    /// Any values that can change over time will be publishers in the view state.
     var state: ViewState { get }
 
-    /// Handles an incoming view event.
+    /// Handles an event from the view.
     /// - Parameter event: The view event to be handled.
     func handle(_ event: ViewEvent)
 }

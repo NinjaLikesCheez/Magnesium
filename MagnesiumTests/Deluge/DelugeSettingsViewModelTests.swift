@@ -7,7 +7,7 @@ import XCTest
 class DelugeSettingsViewModelTests: XCTestCase {
     private let client = MockDelugeClient()
     private let preferences = InMemoryPreferences()
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private lazy var clientProvider = MockClientProvider(client: client)
     private lazy var addViewModel = DelugeSettingsViewModel(
         preferences: preferences,
@@ -95,7 +95,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[1].value.value = "web://site"
         viewModel.state.inputs[2].value.value = "password"
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -118,7 +118,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         var values = [Bool]()
         viewModel.state.isLoading.dropFirst().sink {
             values.append($0)
-        }.store(in: &observers)
+        }.store(in: &cancellables)
 
         viewModel.handle(.saveSelected)
         XCTAssertEqual(values, [true, false])
@@ -144,7 +144,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[2].value.value = "password"
 
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -160,7 +160,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         expectation.isInverted = true
         viewModel.state.isLoading.dropFirst().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
         waitForExpectations(timeout: 0)
     }
@@ -221,7 +221,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.state.inputs[2].value.value = "password"
 
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -237,7 +237,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -251,7 +251,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         expectation.isInverted = true
         viewModel.events.first().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         waitForExpectations(timeout: 0)
     }
@@ -259,7 +259,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_deleteSelected_withServer_shouldEmitAlert() {
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -276,7 +276,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -290,7 +290,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -298,7 +298,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         }
 
         event = nil
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         alert.actions.first { $0.title == "Delete Server" }?.handler?()
         XCTAssertTrue(preferences.getServers().isEmpty)
         guard case .complete = event else {

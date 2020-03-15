@@ -25,7 +25,7 @@ struct SettingsViewState {
 final class SettingsViewModel: ViewModel, EventEmitter {
     private let session: Session
     private let preferences: Preferences
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private let eventSubject = PassthroughSubject<SettingsEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
     let state: SettingsViewState
@@ -45,7 +45,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
             .sink { [weak self] _ in
                 self?.updateSections()
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         updateSections()
     }

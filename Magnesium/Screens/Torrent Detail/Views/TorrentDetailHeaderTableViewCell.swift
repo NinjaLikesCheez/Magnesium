@@ -9,7 +9,7 @@ protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
 }
 
 final class TorrentDetailHeaderTableViewCell: UITableViewCell {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var buttonHeightConstraint: NSLayoutConstraint?
 
     private lazy var nameLabel: UILabel = {
@@ -140,7 +140,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        observers = []
+        cancellables.removeAll()
     }
 
     private func setup() {
@@ -199,18 +199,18 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.label
             .filter { !$0.isEmpty }
             .asOptional()
             .assign(to: \.text, on: labelLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.label
             .map(\.isEmpty)
             .assign(to: \.isHidden, on: labelLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.label
             .map(\.isEmpty)
@@ -220,25 +220,25 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
                 guard let strongSelf = self else { return }
                 strongSelf.delegate?.headerDidResize(strongSelf)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.isActive
             .sink(receiveValue: { [weak self] in self?.isActive = $0 })
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progress
             .assign(to: \.progress, on: progressView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progressColor
             .asOptional()
             .assign(to: \.progressTintColor, on: progressView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.status
             .asOptional()
             .assign(to: \.text, on: statusLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     @objc

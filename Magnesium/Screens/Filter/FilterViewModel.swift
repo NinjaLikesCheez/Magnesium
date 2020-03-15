@@ -23,7 +23,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     private let labels: CurrentValueSubject<[StandardLabel], Never>
     private let eventSubject = PassthroughSubject<FilterEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     let state: FilterViewState
 
     var events: AnyPublisher<FilterEvent, Never> {
@@ -42,7 +42,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
             .sink { [weak self] _ in
                 self?.updateSections()
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         updateSections()
     }

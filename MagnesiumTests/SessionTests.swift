@@ -5,14 +5,14 @@ import XCTest
 
 class SessionTests: XCTestCase {
     private let preferences: Preferences = InMemoryPreferences()
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private lazy var session = Session(preferences: preferences)
 
     func test_serverPublisher_shouldHaveInitialValue() {
         let expectation = self.expectation(description: "Value received")
         session.serverPublisher.sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 
@@ -22,7 +22,7 @@ class SessionTests: XCTestCase {
         session.serverPublisher.dropFirst().sink { new in
             XCTAssertEqual(new, server)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(session.server, server)
         waitForExpectations(timeout: 0)
@@ -37,7 +37,7 @@ class SessionTests: XCTestCase {
             XCTAssertEqual(new?.id, server.id)
             XCTAssertEqual(new?.name, "New Name")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
         XCTAssertEqual(session.server, server)
@@ -54,7 +54,7 @@ class SessionTests: XCTestCase {
         session.serverPublisher.dropFirst().sink { new in
             XCTAssertEqual(new, secondServer)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         XCTAssertEqual(session.server, firstServer)
         preferences.remove(server: firstServer)
         XCTAssertEqual(session.server, secondServer)
@@ -71,7 +71,7 @@ class SessionTests: XCTestCase {
         expectation.isInverted = true
         session.serverPublisher.dropFirst().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         XCTAssertEqual(session.server, firstServer)
         preferences[.selectedServerID] = secondServer.id
         XCTAssertEqual(session.server, firstServer)
@@ -88,7 +88,7 @@ class SessionTests: XCTestCase {
         session.serverPublisher.dropFirst().sink { new in
             XCTAssertEqual(new, secondServer)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
 
         XCTAssertEqual(session.server, firstServer)
         session.setServer(secondServer)

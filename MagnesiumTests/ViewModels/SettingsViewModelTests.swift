@@ -5,7 +5,7 @@ import XCTest
 
 class SettingsViewModelTests: XCTestCase {
     private let preferences = InMemoryPreferences()
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private lazy var session = Session(preferences: preferences)
     private lazy var viewModel = SettingsViewModel(session: session, preferences: preferences)
 
@@ -13,7 +13,7 @@ class SettingsViewModelTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         waitForExpectations(timeout: 0)
     }
@@ -22,7 +22,7 @@ class SettingsViewModelTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         waitForExpectations(timeout: 0)
     }
@@ -31,7 +31,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink {
             event = $0
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.doneSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -46,7 +46,7 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server2)
 
         var event: SettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -64,7 +64,7 @@ class SettingsViewModelTests: XCTestCase {
         session.setServer(server1)
 
         var event: SettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -82,7 +82,7 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server2)
 
         var event: SettingsEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.serverSelected(index: 1))
         guard case let .editServer(server) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -95,7 +95,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink {
             event = $0
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.addServerSelected)
         guard case .addServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -107,7 +107,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink {
             event = $0
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         viewModel.handle(.refreshIntervalSelected)
         guard case .showRefreshIntervalSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

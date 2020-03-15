@@ -9,7 +9,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     private var preferences: InMemoryPreferences!
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentListViewModel<MockImplementation>!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -24,7 +24,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     private func getAlert(actions: () -> Void) -> Alert? {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         actions()
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -37,13 +37,13 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_title_shouldBeExpectedTitle() {
         var title: String?
-        viewModel.state.title.sink { title = $0 }.store(in: &observers)
+        viewModel.state.title.sink { title = $0 }.store(in: &cancellables)
         XCTAssertEqual(title, "Mock")
     }
 
     func test_title_whenEditing_shouldBeSelectionCount() {
         var title: String?
-        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &cancellables)
         viewModel.handle(.didBeginEditing)
         XCTAssertEqual(title, "0 Selected")
     }
@@ -51,7 +51,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_title_whenEditingSelectionChanged_shouldUpdate() {
         viewModel.handle(.didBeginEditing)
         var title: String?
-        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &cancellables)
         viewModel.handle(.multiSelectUpdated(indices: [0, 1]))
         XCTAssertEqual(title, "2 Selected")
     }
@@ -59,7 +59,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_title_whenEditingEnded_shouldBeDefault() {
         viewModel.handle(.didBeginEditing)
         var title: String?
-        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &observers)
+        viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &cancellables)
         viewModel.handle(.didEndEditing)
         XCTAssertEqual(title, "Mock")
     }
@@ -91,7 +91,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_implementation_updated_shouldUpdateItems() {
         var count = 0
-        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &observers)
+        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &cancellables)
         implementation.updatedSubject.send(([], []))
         XCTAssertEqual(count, 1)
     }
@@ -115,7 +115,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_refresh_isLoading_shouldEmitTrueThenFalse() {
         var values = [Bool]()
-        viewModel.state.isLoading.dropFirst().sink { values.append($0) }.store(in: &observers)
+        viewModel.state.isLoading.dropFirst().sink { values.append($0) }.store(in: &cancellables)
         viewModel.handle(.refresh)
         XCTAssertEqual(values, [true, false])
     }
@@ -123,21 +123,21 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_refresh_isLoading_whenFails_shouldEmitTrueThenFalse() {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
         var values = [Bool]()
-        viewModel.state.isLoading.dropFirst().sink { values.append($0) }.store(in: &observers)
+        viewModel.state.isLoading.dropFirst().sink { values.append($0) }.store(in: &cancellables)
         viewModel.handle(.refresh)
         XCTAssertEqual(values, [true, false])
     }
 
     func test_refresh_withNoChanges_shouldNotEmit() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.refresh)
         XCTAssertNil(event)
     }
 
     func test_refresh_withChanges_shouldEmitTorrentsUpdatedEvent() {
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
         guard case .torrentsUpdated = event else {
@@ -150,7 +150,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_addSelected_shouldEmitAddEvent() {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.addSelected(source: .view(UIView(), rect: .zero)))
         guard case .add = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -178,7 +178,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_filterSelected_shouldEmitFilterEvent() {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.filterSelected(source: .view(UIView(), rect: .zero)))
         guard case .filter = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -190,7 +190,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_itemSelected_shouldEmitDetailEvent() {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.itemSelected(index: 0))
         guard case .detail = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -205,7 +205,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_settingsSelected_shouldEmitSettingsEvent() {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.settingsSelected)
         guard case .settings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -223,12 +223,12 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
         var items: [TorrentListItem]?
-        viewModel.state.items.sink { items = $0 }.store(in: &observers)
+        viewModel.state.items.sink { items = $0 }.store(in: &cancellables)
         viewModel.handle(.search(query: "test tor"))
         XCTAssertEqual(items!.count, 2)
         let names: [String?] = items?.map {
             var name: String?
-            $0.name.sink { name = $0 }.store(in: &observers)
+            $0.name.sink { name = $0 }.store(in: &cancellables)
             return name
         } ?? []
         XCTAssertEqual(names, ["test torrent", "TEST.TORRENT"])
@@ -336,7 +336,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     private func getActivities(actions: () -> Void) -> [Activity]? {
         var event: TorrentListEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         actions()
         guard case let .activities(activities, _, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -447,7 +447,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case .moveDownloadFolder = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -466,7 +466,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(path, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -486,7 +486,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(path, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -501,7 +501,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(_, subject) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -518,7 +518,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             viewModel.handle(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentListEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(_, subject) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -561,20 +561,20 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let expectation = self.expectation(description: "Value received")
         viewModel.state.items.first().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 
     func test_items_shouldRemoveDuplicates() {
         var count = 0
-        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &observers)
+        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &cancellables)
         viewModel.handle(.refresh)
         XCTAssertEqual(count, 0)
     }
 
     func test_items_shouldEmitNewValues() {
         var count = 0
-        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &observers)
+        viewModel.state.items.dropFirst().sink { _ in count += 1 }.store(in: &cancellables)
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
         XCTAssertEqual(count, 1)
@@ -584,13 +584,13 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_hasActiveFilters_withNoFilters_shouldBeFalse() {
         var value: Bool?
-        viewModel.state.hasActiveFilters.sink { value = $0 }.store(in: &observers)
+        viewModel.state.hasActiveFilters.sink { value = $0 }.store(in: &cancellables)
         XCTAssertFalse(value!)
     }
 
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
         var value: Bool?
-        viewModel.state.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &observers)
+        viewModel.state.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &cancellables)
         preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
         XCTAssertTrue(value!)
     }
@@ -607,7 +607,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
 
         var value: String?
-        viewModel.state.totalDownloadSpeed.first().sink { value = $0 }.store(in: &observers)
+        viewModel.state.totalDownloadSpeed.first().sink { value = $0 }.store(in: &cancellables)
         XCTAssertEqual(value, "↓ 684 KB/s")
     }
 
@@ -623,7 +623,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
 
         var value: String?
-        viewModel.state.totalUploadSpeed.first().sink { value = $0 }.store(in: &observers)
+        viewModel.state.totalUploadSpeed.first().sink { value = $0 }.store(in: &cancellables)
         XCTAssertEqual(value, "↑ 684 KB/s")
     }
 

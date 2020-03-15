@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class TorrentTableViewCell: UITableViewCell {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -74,7 +74,7 @@ final class TorrentTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        observers = []
+        cancellables.removeAll()
     }
 
     private func setup() {
@@ -131,35 +131,35 @@ final class TorrentTableViewCell: UITableViewCell {
         item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progress
             .assign(to: \.progress, on: progressView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progressColor
             .asOptional()
             .assign(to: \.progressTintColor, on: progressView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.state
             .asOptional()
             .assign(to: \.text, on: stateLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.speed
             .asOptional()
             .assign(to: \.text, on: speedLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.progressString
             .asOptional()
             .assign(to: \.text, on: progressLabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         item.ratioOrETA
             .asOptional()
             .assign(to: \.text, on: ratioOrETALabel)
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 }

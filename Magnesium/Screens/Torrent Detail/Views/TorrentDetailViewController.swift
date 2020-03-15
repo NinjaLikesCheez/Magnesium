@@ -10,7 +10,7 @@ protocol TorrentDetailViewControllerIdentifiable {
 // swiftlint:disable:next line_length
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
     private let viewModel: VM
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
@@ -52,13 +52,13 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                     self?.refreshControl?.endRefreshing()
                 }
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         viewModel.state.sections
             .sink { [weak self] sections in
                 self?.update(with: sections)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     override func viewDidAppear(_ animated: Bool) {

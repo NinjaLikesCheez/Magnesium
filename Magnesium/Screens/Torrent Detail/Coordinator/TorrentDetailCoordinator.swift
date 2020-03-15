@@ -13,7 +13,7 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
     private let viewController: TorrentDetailViewController<VM>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
     let received: AnyPublisher<TorrentDetailEvent, Never>
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {

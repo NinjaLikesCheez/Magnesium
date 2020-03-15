@@ -25,7 +25,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }
 
     private let viewModel: VM
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
     fileprivate var applySnapshotInBackground = true
     weak var provider: TorrentListViewProvider?
@@ -137,7 +137,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
-        viewModel.state.title.sink { [weak self] in self?.title = $0 }.store(in: &observers)
+        viewModel.state.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
         navigationItem.searchController = searchController
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
@@ -172,7 +172,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                         ? "line.horizontal.3.decrease.circle.fill"
                         : "line.horizontal.3.decrease.circle")
                 }
-                .store(in: &observers)
+                .store(in: &cancellables)
         }
 
         viewModel.state.isLoading
@@ -182,12 +182,12 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                     self?.refreshControl?.endRefreshing()
                 }
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         viewModel.state.items
             .map { !$0.isEmpty }
             .assign(to: \.isEnabled, on: selectBarButtonItem)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         let items = viewModel.state.items
         let hasItems = viewModel.state.isLoading
@@ -197,23 +197,23 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
         hasItems
             .assign(to: \.isHidden, on: emptyStateView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         hasItems
             .map { $0 ? UITableViewCell.SeparatorStyle.singleLine : UITableViewCell.SeparatorStyle.none }
             .assign(to: \.separatorStyle, on: tableView)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         viewModel.state.items
             .sink { [weak self] items in
                 self?.update(with: items)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
             viewModel.state.editActionsEnabled
                 .assign(to: \.isEnabled, on: button)
-                .store(in: &observers)
+                .store(in: &cancellables)
         }
     }
 

@@ -9,7 +9,7 @@ class ValueMapper<K: Hashable, V> {
     typealias CurrentValueMapSubject<K: Hashable, V> = CurrentValueSubject<CurrentValueMap<K, V>, Never>
     typealias FilterFunction = (CurrentValueArray<V>) -> CurrentValueArray<V>
 
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private let mapSubject = CurrentValueMapSubject<K, V>([:])
     private let valuesSubject = CurrentValueArraySubject<V>([])
     /// A publisher that emits all values. This publisher does not perform deduplication.
@@ -31,7 +31,7 @@ class ValueMapper<K: Hashable, V> {
             .map { $0.1(Array($0.0.values)) }
             .multicast(subject: valuesSubject)
             .connect()
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     /// Updates the values with the given key/value pairs.

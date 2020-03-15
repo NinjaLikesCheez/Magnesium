@@ -8,7 +8,7 @@ class AddServerCoordinatorTests: XCTestCase {
     private let preferences = InMemoryPreferences()
     private var navigationController: UINavigationController!
     private var coordinator: AddServerCoordinator!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -38,7 +38,7 @@ class AddServerCoordinatorTests: XCTestCase {
 
     func test_addServerEvent_complete_shouldEmitCompleteEvent() {
         var event: AddServerCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(AddServerEvent.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -50,7 +50,7 @@ class AddServerCoordinatorTests: XCTestCase {
 
     func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() {
         var event: AddServerCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(ServerSettingsCoordinatorEvent.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

@@ -11,7 +11,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     private var preferences: InMemoryPreferences!
     private var session: Session!
     private var coordinator: TorrentListCoordinator!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -24,7 +24,7 @@ class TorrentListCoordinatorTests: XCTestCase {
             session: session,
             preferences: preferences
         )
-        coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &observers)
+        coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -113,7 +113,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_detail_shouldEmitShowDetailEvent() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         let detailViewModel = AnyEmitterViewModel(MockDetailViewModel())
         viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
         guard case let .showDetail(viewModel) = event else {
@@ -125,7 +125,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_settings_shouldEmitShowSettingsEvent() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.eventSubject.send(.settings)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -148,7 +148,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
         guard case .torrentsUpdated = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -185,7 +185,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
         var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         XCTAssertNotNil(coordinator.previewForItem(at: 0))
         let childCoordinator = coordinator.childCoordinators.values.first?.base
             as! TorrentDetailCoordinator<AnyTorrentDetailViewModel>

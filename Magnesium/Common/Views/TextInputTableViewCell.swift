@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class TextInputTableViewCell: UITableViewCell {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var valueSubject: CurrentValueSubject<String?, Never>?
 
     private lazy var nameLabel: UILabel = {
@@ -40,7 +40,7 @@ final class TextInputTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        observers = []
+        cancellables.removeAll()
     }
 
     private func setup() {
@@ -77,11 +77,11 @@ final class TextInputTableViewCell: UITableViewCell {
         item.value
             .filter { [weak textField] in textField?.text != $0 }
             .assign(to: \.text, on: textField)
-            .store(in: &observers)
+            .store(in: &cancellables)
         valueSubject = item.value
         item.isEnabled
             .assign(to: \.isEnabled, on: textField)
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func apply(configuration: TextInputItem.Configuration) {

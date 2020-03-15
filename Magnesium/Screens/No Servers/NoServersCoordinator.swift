@@ -12,7 +12,7 @@ final class NoServersCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<NoServersCoordinatorEvent, Never>()
     private let viewController: NoServersViewController<NoServersViewModel>
     let received: AnyPublisher<NoServersEvent, Never>
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {

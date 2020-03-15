@@ -11,7 +11,7 @@ final class FilterCoordinator: Coordinator, AlertPresenter {
     private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()
     let received: AnyPublisher<FilterEvent, Never>
     var childCoordinators = [AnyHashable: AnyCoordinator]()
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
 
     var presentable: Presentable {
         return navigationController

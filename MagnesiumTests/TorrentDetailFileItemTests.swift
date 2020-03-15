@@ -5,7 +5,7 @@ import XCTest
 class TorrentDetailFileItemTests: XCTestCase {
     private var file: CurrentValueSubject<MockTorrentFile, Never>!
     private var item: TorrentDetailFileItem!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -26,13 +26,13 @@ class TorrentDetailFileItemTests: XCTestCase {
 
     func test_name() {
         var name: String?
-        item.name.sink { name = $0 }.store(in: &observers)
+        item.name.sink { name = $0 }.store(in: &cancellables)
         XCTAssertEqual(name, "file.rar")
     }
 
     func test_progress() {
         var progress: String?
-        item.progress.sink { progress = $0 }.store(in: &observers)
+        item.progress.sink { progress = $0 }.store(in: &cancellables)
         XCTAssertEqual(progress, "19%")
     }
 }

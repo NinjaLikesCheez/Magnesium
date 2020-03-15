@@ -4,7 +4,7 @@ import XCTest
 
 class ServerErrorViewModelTests: XCTestCase {
     private var viewModel: ServerErrorViewModel!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -15,7 +15,7 @@ class ServerErrorViewModelTests: XCTestCase {
 
     func test_serverErrorViewEvent_settingsSelected_shouldEmitShowSettings() {
         var event: ServerErrorEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.settingsSelected)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -25,7 +25,7 @@ class ServerErrorViewModelTests: XCTestCase {
 
     func test_serverErrorViewEvent_editServerSelected_showEmitEditServer() {
         var event: ServerErrorEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.editServerSelected)
         guard case .editServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

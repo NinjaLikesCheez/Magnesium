@@ -15,7 +15,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
     private let serverSubject: CurrentValueSubject<String?, Never>
     private let usernameSubject: CurrentValueSubject<String?, Never>
     private let passwordSubject: CurrentValueSubject<String?, Never>
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     let state: ServerSettingsViewState
 
     var events: AnyPublisher<ServerSettingsEvent, Never> {
@@ -97,13 +97,13 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
             }
             .removeDuplicates()
             .assign(to: \.value, on: isSaveButtonEnabledSubject)
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         for subject in [nameEnabled, serverEnabled, passwordEnabled] {
             isLoadingSubject
                 .map { !$0 }
                 .assign(to: \.value, on: subject)
-                .store(in: &observers)
+                .store(in: &cancellables)
         }
     }
 
@@ -155,7 +155,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
                 }
                 self?.isLoadingSubject.send(false)
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func saveServer(

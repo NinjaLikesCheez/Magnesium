@@ -8,7 +8,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     private var client: MockDelugeClient!
     private var preferences: InMemoryPreferences!
     private var implementation: DelugeTorrentListViewModelImplementation!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -18,7 +18,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     }
 
     func test_refresh_shouldGetCurrentState() {
-        implementation.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        implementation.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
@@ -36,13 +36,13 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
 
     func test_addLink_withInvalidURL_shouldReturnError() {
         var error: (String, String)?
-        implementation.addLink("^").sink { error = $0 }.store(in: &observers)
+        implementation.addLink("^").sink { error = $0 }.store(in: &cancellables)
         XCTAssertEqual(error?.0, "Unable to Add Link")
         XCTAssertEqual(error?.1, "That link doesn't appear to be valid.")
     }
 
     func test_addLink_withMagnetLink_shouldAddMagnetURL() {
-        implementation.addLink("magnet:?").sink { _ in }.store(in: &observers)
+        implementation.addLink("magnet:?").sink { _ in }.store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_magnet"])
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["magnet:?",{}]"#])
     }
@@ -53,12 +53,12 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         var error: (String, String)?
-        implementation.addLink("magnet:?").sink { error = $0 }.store(in: &observers)
+        implementation.addLink("magnet:?").sink { error = $0 }.store(in: &cancellables)
         XCTAssertEqual(error?.0, "Failed to Add Torrent")
     }
 
     func test_addLink_withRegularLink_shouldAddMagnetURL() {
-        implementation.addLink("http://example.com").sink { _ in }.store(in: &observers)
+        implementation.addLink("http://example.com").sink { _ in }.store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_url"])
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["http:\/\/example.com",{}]"#])
     }
@@ -69,28 +69,28 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         var error: (String, String)?
-        implementation.addLink("http://example.com").sink { error = $0 }.store(in: &observers)
+        implementation.addLink("http://example.com").sink { error = $0 }.store(in: &cancellables)
         XCTAssertEqual(error?.0, "Failed to Add Torrent")
     }
 
     func test_pause_shouldPause() {
         implementation.pause([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrents"])
     }
 
     func test_resume_shouldResume() {
         implementation.resume([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrents"])
     }
 
     func test_remove_withKeepData_shouldRemove() {
         implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: false)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],false]"#])
     }
@@ -98,7 +98,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_remove_withRemoveData_shouldRemove() {
         implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: true)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],true]"#])
     }
@@ -106,14 +106,14 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_verify_shouldRecheck() {
         implementation.verify([.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_recheck"])
     }
 
     func test_setLabel_shouldSetLabels() {
         implementation.setLabel(.mock(name: "label1"), for: [.mock(hash: "A"), .mock(hash: "B")])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["label.set_torrent", "label.set_torrent"])
         XCTAssertEqual(client.requestParamRequest.map(\.params) as? [[String]], [["A", "label1"], ["B", "label1"]])
     }
@@ -121,20 +121,22 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_updateTrackers_shouldReannounce() {
         implementation.updateTrackers(for: [.mock(), .mock()])
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_reannounce"])
     }
 
     func test_moveDownloadFolder_shouldMoveStorage() {
         implementation.moveDownloadFolder(for: [.mock(hash: "A"), .mock(hash: "B")], to: "/new")
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.move_storage"])
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],"\/new"]"#])
     }
 
     func test_refreshDeluge_shouldGetCurrentState() {
-        implementation.refreshDeluge().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        implementation.refreshDeluge()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
@@ -144,8 +146,10 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             result: Just(([], [])).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
         let expectation = self.expectation(description: "Value received")
-        implementation.updated.sink { _ in expectation.fulfill() }.store(in: &observers)
-        implementation.refreshDeluge().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &observers)
+        implementation.updated.sink { _ in expectation.fulfill() }.store(in: &cancellables)
+        implementation.refreshDeluge()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 }

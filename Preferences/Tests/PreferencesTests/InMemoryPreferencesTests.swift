@@ -5,12 +5,12 @@ import XCTest
 class InMemoryPreferencesTests: XCTestCase {
     private let key = PreferenceKey<String>("_test", defaultValue: "Default")
     private var preferences: InMemoryPreferences!
-    private var observers: Set<AnyCancellable>!
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
         preferences = InMemoryPreferences()
-        observers = Set()
+        cancellables = Set()
         preferences.reset()
     }
 
@@ -38,7 +38,7 @@ class InMemoryPreferencesTests: XCTestCase {
                 XCTFail("Unexpected change")
             }
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
@@ -53,7 +53,7 @@ class InMemoryPreferencesTests: XCTestCase {
                 XCTFail("Unexpected change")
                 return
             }
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.removeValue(for: key)
         waitForExpectations(timeout: 0)
     }
@@ -67,7 +67,7 @@ class InMemoryPreferencesTests: XCTestCase {
                 XCTFail("Unexpected change")
                 return
             }
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.reset()
         waitForExpectations(timeout: 0)
     }
@@ -77,7 +77,7 @@ class InMemoryPreferencesTests: XCTestCase {
         preferences.valueUpdatedPublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Value")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.set("Value", for: key)
         waitForExpectations(timeout: 0)
     }
@@ -88,7 +88,7 @@ class InMemoryPreferencesTests: XCTestCase {
         preferences.valueUpdatedPublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Default")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.reset()
         waitForExpectations(timeout: 0)
     }
@@ -99,7 +99,7 @@ class InMemoryPreferencesTests: XCTestCase {
             .sink(receiveCompletion: { _ in
                 expectation.fulfill()
             }, receiveValue: { _ in })
-            .store(in: &observers)
+            .store(in: &cancellables)
         preferences.removeValue(for: key)
         waitForExpectations(timeout: 0)
     }
@@ -110,7 +110,7 @@ class InMemoryPreferencesTests: XCTestCase {
         preferences.valuePublisher(for: key).first().sink { value in
             XCTAssertEqual(value, "Value")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 
@@ -119,7 +119,7 @@ class InMemoryPreferencesTests: XCTestCase {
         preferences.valuePublisher(for: key).dropFirst().first().sink { value in
             XCTAssertEqual(value, "New")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.set("New", for: key)
         waitForExpectations(timeout: 0)
     }

@@ -20,7 +20,7 @@ final class AddTorrentFlow {
     private let session: Session
     private let delugeClientProvider: DelugeClientProvider
     private let transmissionClientProvider: TransmissionClientProvider
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     init(
         viewController: UIViewController,
@@ -84,7 +84,7 @@ final class AddTorrentFlow {
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)
                 }, receiveValue: { _ in })
-                .store(in: &observers)
+                .store(in: &cancellables)
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
@@ -116,7 +116,7 @@ final class AddTorrentFlow {
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)
                 }, receiveValue: { _ in })
-                .store(in: &observers)
+                .store(in: &cancellables)
         }
     }
 

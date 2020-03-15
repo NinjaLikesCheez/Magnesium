@@ -7,7 +7,7 @@ class FilterCoordinatorTests: XCTestCase {
     private let window = UIWindow()
     private let preferences = InMemoryPreferences()
     private var coordinator: FilterCoordinator!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -31,7 +31,7 @@ class FilterCoordinatorTests: XCTestCase {
 
     func test_filterEvent_complete_shouldEmitCompleteEvent() {
         var event: FilterCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

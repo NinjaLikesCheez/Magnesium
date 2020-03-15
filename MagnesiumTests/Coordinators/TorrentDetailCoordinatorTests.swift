@@ -8,14 +8,14 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
     private var coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
         window = UIWindow()
         viewModel = MockViewModel()
         coordinator = TorrentDetailCoordinator(viewModel: AnyEmitterViewModel(viewModel))
-        coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &observers)
+        coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -35,7 +35,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
     func test_complete_shouldEmitCompleteEvent() {
         var event: TorrentDetailCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.eventSubject.send(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

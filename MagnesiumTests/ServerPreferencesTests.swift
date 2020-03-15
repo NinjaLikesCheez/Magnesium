@@ -6,7 +6,7 @@ import XCTest
 class ServerPreferencesTests: XCTestCase {
     private let preferences = InMemoryPreferences()
     private let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -55,7 +55,7 @@ class ServerPreferencesTests: XCTestCase {
         preferences.serverUpdatedPublisher(for: server).first().sink { updated in
             XCTAssertEqual(updated, self.server)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 0)
     }
@@ -70,7 +70,7 @@ class ServerPreferencesTests: XCTestCase {
                 XCTAssertEqual(updated?.name, "New Name")
                 expectation.fulfill()
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
         var server = self.server
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
@@ -83,7 +83,7 @@ class ServerPreferencesTests: XCTestCase {
         expectation.isInverted = true
         preferences.serverUpdatedPublisher(for: server).first().sink { _ in
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 0)
     }
@@ -94,7 +94,7 @@ class ServerPreferencesTests: XCTestCase {
         preferences.serverUpdatedPublisher(for: server).first().sink { updated in
             XCTAssertNil(updated)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         preferences.remove(server: server)
         waitForExpectations(timeout: 0)
     }

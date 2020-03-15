@@ -6,7 +6,7 @@ class MockCoordinator<T: Presentable & UIViewController>: Coordinator {
     let viewController: T
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
     var presentable: Presentable { viewController }
 

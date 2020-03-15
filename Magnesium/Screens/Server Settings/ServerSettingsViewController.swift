@@ -11,7 +11,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     }
 
     private let viewModel: VM
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
         return UIBarButtonItem(
@@ -50,11 +50,11 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
             .sink { [weak self] isLoading in
                 self?.isLoadingChanged(isLoading)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         viewModel.state.isSaveButtonEnabled
             .assign(to: \.isEnabled, on: saveBarButtonItem)
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     override func viewWillAppear(_ animated: Bool) {

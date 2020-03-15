@@ -12,7 +12,7 @@ final class ServerErrorCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<ServerErrorCoordinatorEvent, Never>()
     private let viewController: ServerErrorViewController<ServerErrorViewModel>
     let received: AnyPublisher<ServerErrorEvent, Never>
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {

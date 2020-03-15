@@ -9,7 +9,7 @@ class SettingsCoordinatorTests: XCTestCase {
     private let preferences = InMemoryPreferences()
     private lazy var session = Session(preferences: preferences)
     private var coordinator: SettingsCoordinator!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -33,7 +33,7 @@ class SettingsCoordinatorTests: XCTestCase {
 
     func test_settingsEvent_complete_shouldEmitCompleteEvent() {
         var event: SettingsCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &observers)
+        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

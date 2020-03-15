@@ -4,7 +4,7 @@ import XCTest
 
 class ServerErrorCoordinatorTests: XCTestCase {
     private var coordinator: ServerErrorCoordinator!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -25,7 +25,7 @@ class ServerErrorCoordinatorTests: XCTestCase {
 
     func test_serverErrorEvent_showSettings_shouldEmitShowSettings() {
         var event: ServerErrorCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(.showSettings)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -35,7 +35,7 @@ class ServerErrorCoordinatorTests: XCTestCase {
 
     func test_serverErrorEvent_editServer_shouldEmitEditServerEvent() {
         var event: ServerErrorCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &observers)
+        coordinator.events.sink { event = $0 }.store(in: &cancellables)
         coordinator.handle(.editServer)
         guard case .editServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

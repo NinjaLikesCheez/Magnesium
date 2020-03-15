@@ -1,9 +1,9 @@
 import Combine
 
-/// An `EventEmitter` emits events over time.
+/// An `EventEmitter` can emit events over time.
 public protocol EventEmitter {
     /// The type of event being emitted.
     associatedtype Event
-    /// The event publisher.
+    /// A publisher that emits values of type `Event`.
     var events: AnyPublisher<Event, Never> { get }
 }

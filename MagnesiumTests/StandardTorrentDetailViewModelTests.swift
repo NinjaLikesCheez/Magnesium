@@ -11,7 +11,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     private var preferences: InMemoryPreferences!
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentDetailViewModel<MockImplementation>!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
@@ -29,7 +29,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getAlert(actions: () -> Void) -> Alert? {
         var event: TorrentDetailEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         actions()
         guard case let .alert(alert, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -104,7 +104,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {
         var values = [Bool]()
-        viewModel.state.isRefreshing.dropFirst().sink { values.append($0) }.store(in: &observers)
+        viewModel.state.isRefreshing.dropFirst().sink { values.append($0) }.store(in: &cancellables)
         viewModel.handle(.refresh)
         XCTAssertEqual(values, [true, false])
     }
@@ -113,7 +113,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getActivities(actions: () -> Void) -> [Activity]? {
         var event: TorrentDetailEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &observers)
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         actions()
         guard case let .activities(activities, _, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -207,7 +207,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentDetailEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(path, _) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -222,7 +222,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentDetailEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(_, subject) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -239,7 +239,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             viewModel.handle(.moreOptions(source: .view(UIView(), rect: .zero)))
         }!
         var event: TorrentDetailEvent?
-        viewModel.events.sink { event = $0 }.store(in: &observers)
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
         activities.first { $0.title == "Move Download Folder" }?.handler()
         guard case let .moveDownloadFolder(_, subject) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -367,7 +367,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             XCTAssertEqual(section.type, .header)
             XCTAssertEqual(section.items.count, 1)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 
@@ -381,7 +381,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
                 item.value.first().sink {
                     value = $0
                     expectation.fulfill()
-                }.store(in: &self.observers)
+                }.store(in: &self.cancellables)
                 self.wait(for: [expectation], timeout: 0)
                 return (item.name, value)
             default:
@@ -412,7 +412,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
                 XCTAssertEqual(row.1, expected.1, row.0)
             }
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -437,7 +437,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
             XCTAssertEqual(inner, trackers)
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -451,7 +451,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
                 switch item {
                 case let .file(item):
                     var value: String?
-                    item.name.sink { value = $0 }.store(in: &self.observers)
+                    item.name.sink { value = $0 }.store(in: &self.cancellables)
                     return value
                 default:
                     XCTFail("Unexpected item")
@@ -460,7 +460,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             }
             XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         waitForExpectations(timeout: 0)
     }
 
@@ -472,7 +472,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "ETA" }!
             XCTAssertEqual(eta.1, "∞")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -486,7 +486,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
             XCTAssertEqual(eta.1, "∞")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         wait(for: [expectation], timeout: 0)
     }
 
@@ -497,7 +497,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             let eta = self.getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }!
             XCTAssertEqual(eta.1, "∞")
             expectation.fulfill()
-        }.store(in: &observers)
+        }.store(in: &cancellables)
         wait(for: [expectation], timeout: 0)
     }
 }

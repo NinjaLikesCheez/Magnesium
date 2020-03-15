@@ -6,7 +6,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
     where VM.ViewEvent == FilterViewEvent, VM.ViewState == FilterViewState {
     private let viewModel: VM
     private var dataSource: UITableViewDiffableDataSource<FilterSection.SectionType, FilterItem>!
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -55,7 +55,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     private func update(sections: [FilterSection]) {

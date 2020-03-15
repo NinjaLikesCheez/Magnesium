@@ -18,7 +18,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     }
 
     private let viewModel: VM
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
 
     init(viewModel: VM) {
@@ -77,7 +77,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     @available(*, unavailable)

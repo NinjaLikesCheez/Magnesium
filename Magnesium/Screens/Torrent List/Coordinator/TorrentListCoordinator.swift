@@ -20,7 +20,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private var previewCoordinatorMap = [Int: TorrentDetailCoordinator<AnyTorrentDetailViewModel>]()
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: viewController, session: session)
     let received: AnyPublisher<TorrentListEvent, Never>
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {

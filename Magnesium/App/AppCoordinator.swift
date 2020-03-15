@@ -11,7 +11,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: splitViewController, session: session)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    var observers = [AnyCancellable]()
+    var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     private var masterNavigationController: PresentableNavigationController = {
@@ -42,7 +42,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
         self.session.serverPublisher
             .sink { [weak self] in self?.show(server: $0) }
-            .store(in: &observers)
+            .store(in: &cancellables)
 
         window.rootViewController = splitViewController
         window.makeKeyAndVisible()

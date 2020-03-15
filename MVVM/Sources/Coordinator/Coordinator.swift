@@ -7,13 +7,13 @@ public protocol Coordinator: AnyObject {
     /// The type of event received by this coordinator.
     associatedtype Received
 
-    /// Combine observers used for child coordinators.
-    var observers: [AnyCancellable] { get set }
+    /// The `AnyCancellable` store used for child coordinator subscriptions.
+    var cancellables: Set<AnyCancellable> { get set }
     /// The child coordinators owned by this coordinator.
     var childCoordinators: [AnyHashable: AnyCoordinator] { get set }
-    /// The view controller to be presented.
+    /// The view to be presented for this coordinator.
     var presentable: Presentable { get }
-    /// A publisher of events that this coordinator can emit.
+    /// A publisher that emits the coordinator's events.
     var events: AnyPublisher<Event, Never> { get }
     /// A publisher that emits events to be received by this coordinator.
     var received: AnyPublisher<Received, Never> { get }
@@ -22,7 +22,6 @@ public protocol Coordinator: AnyObject {
     ///
     /// This function will automatically be called if this coordinator was added to a parent
     /// coordinator using `addChildCoordinator`.
-    ///
     ///
     /// - Parameter event: The event to handle.
     func handle(_ event: Received)
@@ -40,18 +39,18 @@ public extension Coordinator {
                 guard let coordinator = coordinator else { return }
                 self?.removeChildCoordinator(coordinator)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
         coordinator.events
             .sink { [weak coordinator] event in
                 guard let coordinator = coordinator else { return }
                 eventHandler(coordinator, event)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
         coordinator.received
             .sink { [weak coordinator] event in
                 coordinator?.handle(event)
             }
-            .store(in: &observers)
+            .store(in: &cancellables)
     }
 
     /// Adds a child coordinator and automatically removes it when its presentable is dismissed.

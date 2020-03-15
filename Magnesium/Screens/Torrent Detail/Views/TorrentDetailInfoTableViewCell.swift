@@ -2,7 +2,7 @@ import Combine
 import UIKit
 
 final class TorrentDetailInfoTableViewCell: UITableViewCell {
-    private var observers = [AnyCancellable]()
+    private var cancellables = Set<AnyCancellable>()
 
     private lazy var verticalStackView: UIStackView = {
         let stackView = UIStackView()
@@ -64,7 +64,7 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        observers = []
+        cancellables.removeAll()
     }
 
     private func setup() {
@@ -111,14 +111,14 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
             expandedValue
                 .asOptional()
                 .assign(to: \.text, on: expandedValueLabel)
-                .store(in: &observers)
+                .store(in: &cancellables)
         } else {
             configureForCollapsed()
             expandImageView.isHidden = item.expandedValue == nil
             item.value
                 .asOptional()
                 .assign(to: \.text, on: valueLabel)
-                .store(in: &observers)
+                .store(in: &cancellables)
         }
     }
 
