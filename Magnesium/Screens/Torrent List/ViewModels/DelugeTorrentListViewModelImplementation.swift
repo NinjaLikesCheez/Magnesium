@@ -93,7 +93,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
     }
 
     func moveDownloadFolder(for torrents: [DelugeTorrent], to path: String) -> AnyPublisher<Void, Error> {
-        return client.request(.moveStorage(hashes: torrents.map(\.hash), path: path))
+        return client.request(.move(hashes: torrents.map(\.hash), path: path))
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }

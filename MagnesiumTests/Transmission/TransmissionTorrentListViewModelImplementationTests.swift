@@ -108,7 +108,7 @@ class TransmissionTorrentListViewModelImplementationTests: XCTestCase {
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-reannounce"])
     }
 
-    func test_moveDownloadFolder_shouldMove() {
+    func test_moveDownloadFolder_shouldSetLocation() {
         implementation.moveDownloadFolder(for: [.mock(hash: "A"), .mock(hash: "B")], to: "/new")
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)

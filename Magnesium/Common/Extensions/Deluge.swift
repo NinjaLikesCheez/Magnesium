@@ -39,24 +39,24 @@ extension DelugeError: LocalizedError {
 
 extension Request {
     static var updateUIForApp: Request<([DelugeTorrent], [DelugeLabel])> {
-        let properties = [
-            "name",
-            "state",
-            "time_added",
-            "download_payload_rate",
-            "upload_payload_rate",
-            "eta",
-            "progress",
-            "total_done",
-            "total_uploaded",
-            "total_size",
-            "num_seeds",
-            "total_seeds",
-            "num_peers",
-            "total_peers",
-            "trackers",
-            "label",
-            "download_location",
+        let properties: [Torrent.PropertyKeys] = [
+            .dateAdded,
+            .downloaded,
+            .downloadPath,
+            .downloadRate,
+            .eta,
+            .label,
+            .name,
+            .peers,
+            .progress,
+            .seeds,
+            .size,
+            .state,
+            .totalPeers,
+            .totalSeeds,
+            .trackers,
+            .uploaded,
+            .uploadRate,
         ]
 
         return Self.updateUI(properties: properties).map { ($0.compactMap(DelugeTorrent.init), $1) }
