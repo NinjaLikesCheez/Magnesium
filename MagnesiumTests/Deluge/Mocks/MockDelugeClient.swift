@@ -12,7 +12,7 @@ final class MockDelugeClient: DelugeClient {
         requestParamRequest.append(request.map { $0 as Any })
         let response = results.compactMap { result -> AnyPublisher<Value, DelugeError>? in
             guard result.method == request.method else { return nil }
-            return result.result.map { $0 as! Value }.eraseToAnyPublisher() // swiftlint:disable:this force_cast
+            return result.result.map { $0 as! Value }.eraseToAnyPublisher()
         }.first
         return response ?? Fail(error: .unexpectedResponse).eraseToAnyPublisher()
     }

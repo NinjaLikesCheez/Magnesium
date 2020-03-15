@@ -188,7 +188,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         coordinator.events.first().sink { event = $0 }.store(in: &observers)
         XCTAssertNotNil(coordinator.previewForItem(at: 0))
         let childCoordinator = coordinator.childCoordinators.values.first?.base
-            as! TorrentDetailCoordinator<AnyTorrentDetailViewModel> // swiftlint:disable:this force_cast
+            as! TorrentDetailCoordinator<AnyTorrentDetailViewModel>
         coordinator.commitPreviewForItem(at: 0)
         guard case let .commitDetail(committedCoordinator) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

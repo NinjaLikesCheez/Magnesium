@@ -25,8 +25,8 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         return Server(
             name: "Server",
             type: .deluge,
-            data: try! encoder.encode(settings), // swiftlint:disable:this force_try
-            keychainData: try! encoder.encode(keychain) // swiftlint:disable:this force_try
+            data: try! encoder.encode(settings),
+            keychainData: try! encoder.encode(keychain)
         )
     }()
 

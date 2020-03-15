@@ -1,7 +1,6 @@
 import Foundation
 @testable import Magnesium
 
-// swiftlint:disable force_try
 extension Server {
     static func delugeMock(name: String = "Server") -> Server {
         return Server(

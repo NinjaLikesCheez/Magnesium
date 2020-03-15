@@ -222,9 +222,8 @@ private final class MockSplitViewController: PresentableSplitViewController {
         }
     }
 
-    // swiftlint:disable:next identifier_name
-    override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
-        detailViewController = vc
+    override func showDetailViewController(_ viewController: UIViewController, sender: Any?) {
+        detailViewController = viewController
     }
 }
 
