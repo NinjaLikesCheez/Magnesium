@@ -59,7 +59,6 @@ platform :ios do
         "fastlane/*",
         "MVVM/*",
         "Preferences/*",
-        "Transmission/*",
         "**/Models/*",
         "**/*ViewController.swift",
         "**/*View.swift",

@@ -133,6 +133,7 @@
 		E988EDE823E7D0150011A733 /* TorrentDetailFileItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDE723E7D0150011A733 /* TorrentDetailFileItemTests.swift */; };
 		E988EDEC23E7D0710011A733 /* TransmissionTorrentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDEB23E7D0710011A733 /* TransmissionTorrentTests.swift */; };
 		E98D936123D2845D0013A1E1 /* TorrentMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D936023D2845D0013A1E1 /* TorrentMapper.swift */; };
+		E98F12A3241EA33A005545A7 /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E98F12A2241EA33A005545A7 /* Transmission */; };
 		E9999A8323BAE1BD00E8309D /* Publishers+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */; };
 		E999B0B823F62BFA000889FD /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999B0B723F62BFA000889FD /* L10n.swift */; };
 		E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */; };
@@ -383,6 +384,7 @@
 				E96B725123D3937B005E8E89 /* Transmission in Frameworks */,
 				E9786AF823D38E6200E4157E /* Deluge in Frameworks */,
 				E9AF5E6624154FBD00C3A3A4 /* Coordinator in Frameworks */,
+				E98F12A3241EA33A005545A7 /* Transmission in Frameworks */,
 				E9AF5E6824154FBD00C3A3A4 /* ViewModel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -956,6 +958,7 @@
 				E92A6B5424114B3B0024A8CD /* Deluge */,
 				E9AF5E6524154FBD00C3A3A4 /* Coordinator */,
 				E9AF5E6724154FBD00C3A3A4 /* ViewModel */,
+				E98F12A2241EA33A005545A7 /* Transmission */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1009,6 +1012,7 @@
 			mainGroup = E96B0058237A43740091FA71;
 			packageReferences = (
 				E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */,
+				E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */,
 			);
 			productRefGroup = E96B0062237A43740091FA71 /* Products */;
 			projectDirPath = "";
@@ -1525,6 +1529,14 @@
 				kind = branch;
 			};
 		};
+		E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "ssh://git@git.jameshurst.me:10022/iOS/Transmission-Swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1544,6 +1556,11 @@
 		E9786AF723D38E6200E4157E /* Deluge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Deluge;
+		};
+		E98F12A2241EA33A005545A7 /* Transmission */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */;
+			productName = Transmission;
 		};
 		E9AF5E6524154FBD00C3A3A4 /* Coordinator */ = {
 			isa = XCSwiftPackageProductDependency;

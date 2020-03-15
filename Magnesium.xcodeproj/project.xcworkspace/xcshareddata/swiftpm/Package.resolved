@@ -6,7 +6,16 @@
         "repositoryURL": "ssh://git@git.jameshurst.me:10022/iOS/Deluge-Swift.git",
         "state": {
           "branch": "master",
-          "revision": "fe1b851ab6df54ee9b32f2e45f1e7db2f4381c15",
+          "revision": "100d08d720dc6045cb3611dfb824c544f8f1d9f1",
+          "version": null
+        }
+      },
+      {
+        "package": "Transmission",
+        "repositoryURL": "ssh://git@git.jameshurst.me:10022/iOS/Transmission-Swift.git",
+        "state": {
+          "branch": "master",
+          "revision": "e037abd8a6de4d41349b7632e139f99a8fc3fd00",
           "version": null
         }
       }
