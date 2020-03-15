@@ -46,6 +46,7 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
         return normalizedHaystack.contains(normalizedNeedle)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private static func sort<T: StandardTorrent>(
         _ torrents: [CurrentValueSubject<T, Never>],
         using sortOption: SortOption

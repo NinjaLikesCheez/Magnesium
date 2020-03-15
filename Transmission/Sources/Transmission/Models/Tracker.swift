@@ -1,8 +1,8 @@
 /// A Transmission tracker.
-public struct Tracker {
+public struct Tracker: Equatable {
     /// The tracker's ID.
     public let id: Int
-    /// The tracker's host.
+    /// The tracker host URL.
     public let host: String
 
     /// Creates a `Tracker` with the given parameters.

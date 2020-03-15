@@ -1,5 +1,6 @@
 import Combine
 @testable import Magnesium
+import Transmission
 
 final class MockTransmissionRefresher: TransmissionRefreshable {
     private(set) var refreshTransmissionCallCount = 0

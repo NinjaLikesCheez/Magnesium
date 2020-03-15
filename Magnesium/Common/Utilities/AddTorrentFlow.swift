@@ -1,5 +1,6 @@
 import Combine
 import Deluge
+import Transmission
 import UIKit
 
 final class AddTorrentFlow {
@@ -33,6 +34,7 @@ final class AddTorrentFlow {
         self.transmissionClientProvider = transmissionClientProvider
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func add(type: URLType) {
         guard let server = session.server else {
             showError(title: L10n.unableToAddTorrentError, message: L10n.noServersErrorDescription)
@@ -103,9 +105,9 @@ final class AddTorrentFlow {
 
             switch type {
             case let .file(url):
-                request = client.add(fileURL: url)
+                request = client.request(.add(fileURL: url))
             case let .magnet(url):
-                request = client.add(url: url)
+                request = client.request(.add(url: url))
             }
 
             request

@@ -2,86 +2,27 @@ import Deluge
 import Foundation
 
 struct DelugeTorrent: StandardTorrent {
-    /// The torrent's hash.
     var hash: String
-    /// The torrent's name.
     var name: String
-    /// The torrent's current state.
     var standardState: TorrentState
-    /// The date the torrent was added to the server.
     var dateAdded: Date
-    /// The torrent's current download rate in bytes/s.
     var downloadRate: Int64
-    /// The torrent's current upload rate in bytes/s.
     var uploadRate: Int64
-    /// The torrent's current ETA.
     var eta: TimeInterval
-    /// The torrent's current progress. This is a value between 0 and 1.
     var progress: Float
-    /// The amount of data currently downloaded for the torrent in bytes.
     var downloaded: Int64
-    /// The amount of data currently uploaded for the torrent in bytes.
     var uploaded: Int64
-    /// The size of the torrent in bytes.
     var size: Int64
-    /// The number of connected seeds.
     var seeds: Int
-    /// The total number of seeds.
     var totalSeeds: Int
-    /// The number of connected peers.
     var peers: Int
-    /// The total number of peers.
     var totalPeers: Int
-    /// The torrent's tracker URLs.
     var trackerStrings: [String]
-    /// The torrent's label.
     var label: String
-    /// The torrent's download path.
     var downloadPath: String
+}
 
-    /// Creates a `DelugeTorrent` with the given parameters.
-    init(
-        hash: String,
-        name: String,
-        standardState: TorrentState,
-        dateAdded: Date,
-        downloadRate: Int64,
-        uploadRate: Int64,
-        eta: TimeInterval,
-        progress: Float,
-        downloaded: Int64,
-        uploaded: Int64,
-        size: Int64,
-        seeds: Int,
-        totalSeeds: Int,
-        peers: Int,
-        totalPeers: Int,
-        trackerStrings: [String],
-        label: String,
-        downloadPath: String
-    ) {
-        self.hash = hash
-        self.name = name
-        self.standardState = standardState
-        self.dateAdded = dateAdded
-        self.downloadRate = downloadRate
-        self.uploadRate = uploadRate
-        self.eta = eta
-        self.progress = progress
-        self.downloaded = downloaded
-        self.uploaded = uploaded
-        self.size = size
-        self.seeds = seeds
-        self.totalSeeds = totalSeeds
-        self.peers = peers
-        self.totalPeers = totalPeers
-        self.trackerStrings = trackerStrings
-        self.label = label
-        self.downloadPath = downloadPath
-    }
-
-    /// Creates a `DelugeTorrent` from a `Deluge.Torrent`, returning nil if any required properties are missing.
-    /// - Parameter torrent: The `Deluge.Torrent` to create a `DelugeTorrent` from.
+extension DelugeTorrent {
     init?(_ torrent: Torrent) {
         guard let name = torrent.name,
             let state = torrent.state,

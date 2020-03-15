@@ -16,6 +16,7 @@
 		E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */; };
 		E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */; };
 		E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */; };
+		E9102604241DDE94008E8F86 /* TransmissionTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9102603241DDE94008E8F86 /* TransmissionTorrent.swift */; };
 		E913FD8623DFD65E008179F1 /* DelugeKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */; };
 		E913FD8A23DFD683008179F1 /* TransmissionKeychainData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */; };
 		E916830C241415B30056D2A6 /* DefaultTransmissionClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E916830B241415B30056D2A6 /* DefaultTransmissionClientProvider.swift */; };
@@ -203,6 +204,7 @@
 		E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Server+TorrentListViewModel.swift"; sourceTree = "<group>"; };
 		E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		E9102603241DDE94008E8F86 /* TransmissionTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrent.swift; sourceTree = "<group>"; };
 		E913FD8523DFD65E008179F1 /* DelugeKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeKeychainData.swift; sourceTree = "<group>"; };
 		E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionKeychainData.swift; sourceTree = "<group>"; };
 		E916830B241415B30056D2A6 /* DefaultTransmissionClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTransmissionClientProvider.swift; sourceTree = "<group>"; };
@@ -443,6 +445,7 @@
 			children = (
 				E9624D3F23D2368A0051EA99 /* TransmissionServerSettings.swift */,
 				E913FD8923DFD683008179F1 /* TransmissionKeychainData.swift */,
+				E9102603241DDE94008E8F86 /* TransmissionTorrent.swift */,
 			);
 			path = Transmission;
 			sourceTree = "<group>";
@@ -1159,6 +1162,7 @@
 				E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
 				E95A43DF240C7337006C4B45 /* DelugeTorrent.swift in Sources */,
+				E9102604241DDE94008E8F86 /* TransmissionTorrent.swift in Sources */,
 				E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */,
 				E9682325241321360059D026 /* TransmissionClientProvider.swift in Sources */,
 				E93F5D6D23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift in Sources */,

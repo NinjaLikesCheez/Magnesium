@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import Preferences
+import Transmission
 import ViewModel
 
 final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
@@ -137,7 +138,7 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
         isLoadingSubject.send(true)
 
         let client = clientProvider.createClient(baseURL: url, username: username, password: password)
-        client.authenticate()
+        client.request(.rpcVersion)
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {

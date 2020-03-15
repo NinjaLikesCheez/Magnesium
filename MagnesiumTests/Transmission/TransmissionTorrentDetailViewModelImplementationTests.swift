@@ -24,51 +24,51 @@ class TransmissionTorrentDetailViewModelImplementationTests: XCTestCase {
         implementation.pause(.mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.stopCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-stop"])
     }
 
     func test_resume_shouldStart() {
         implementation.resume(.mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.startCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-start"])
     }
 
     func test_remove_withKeepData_shouldRemove() {
-        implementation.remove(.mock(), removeData: false)
+        implementation.remove(.mock(hash: "A"), removeData: false)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.removeCallCount, 1)
-        XCTAssertEqual(client.removeParamRemoveData, [false])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":false,"ids":["A"]}"#])
     }
 
     func test_remove_withRemoveData_shouldRemove() {
-        implementation.remove(.mock(), removeData: true)
+        implementation.remove(.mock(hash: "A"), removeData: true)
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.removeCallCount, 1)
-        XCTAssertEqual(client.removeParamRemoveData, [true])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":true,"ids":["A"]}"#])
     }
 
     func test_verify_shouldVerify() {
         implementation.verify(.mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.verifyCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-verify"])
     }
 
     func test_updateTrackers_shouldReannounce() {
         implementation.updateTrackers(for: .mock())
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.reannounceCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-reannounce"])
     }
 
-    func test_moveDownloadFolder_shouldMoveLocation() {
-        implementation.moveDownloadFolder(for: .mock(), to: "/new")
+    func test_moveDownloadFolder_shouldMove() {
+        implementation.moveDownloadFolder(for: .mock(hash: "A"), to: "/new")
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &observers)
-        XCTAssertEqual(client.moveLocationCallCount, 1)
-        XCTAssertEqual(client.moveLocationParamPath, ["/new"])
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-set-location"])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"ids":["A"],"location":"\/new","move":true}"#])
     }
 }

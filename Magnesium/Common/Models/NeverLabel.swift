@@ -1,5 +1,9 @@
-struct NeverLabel: StandardLabel {
-    let name = ""
-    let count = 0
-    private init() {}
+enum NeverLabel: StandardLabel {
+    var name: String {
+        return ""
+    }
+
+    var count: Int {
+        return 0
+    }
 }

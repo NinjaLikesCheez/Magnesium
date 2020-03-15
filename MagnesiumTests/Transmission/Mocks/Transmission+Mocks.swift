@@ -3,75 +3,84 @@ import Foundation
 @testable import Magnesium
 import Transmission
 
-extension TransmissionTorrent {
+private func randomHash() -> String {
+    let uuid = UUID().uuidString
+    let hashed = Insecure.SHA1.hash(data: uuid.data(using: .utf8)!)
+    return hashed.compactMap { String(format: "%02x", $0) }.joined()
+}
+
+extension Torrent {
     static func mock(
-        id: Int = 0,
-        hash: String = "",
-        name: String = "",
-        status: Status = .downloading,
         dateAdded: Date = Date(),
+        downloadPath: String = "/",
         downloadRate: Int64 = 0,
-        uploadRate: Int64 = 0,
         eta: TimeInterval = 0,
-        progress: Float = 0,
-        downloaded: Int64 = 0,
-        uploaded: Int64 = 0,
-        size: Int64 = 0,
-        seeds: Int = 0,
-        totalSeeds: Int = 0,
+        hash: String = randomHash(),
+        name: String = "",
         peers: Int = 0,
+        progress: Float = 0,
+        seeds: Int = 0,
+        size: Int64 = 0,
+        status: Torrent.Status = .downloading,
         totalPeers: Int = 0,
-        trackers: [Transmission.Tracker] = [],
-        downloadPath: String = ""
-    ) -> TransmissionTorrent {
-        return TransmissionTorrent(
-            id: id,
+        trackers: [Tracker] = [],
+        uploaded: Int64 = 0,
+        uploadRate: Int64 = 0
+    ) -> Self {
+        return .init(
+            dateAdded: dateAdded,
+            downloadPath: downloadPath,
+            downloadRate: downloadRate,
+            eta: eta,
             hash: hash,
             name: name,
-            status: status,
-            dateAdded: dateAdded,
-            downloadRate: downloadRate,
-            uploadRate: uploadRate,
-            eta: eta,
-            progress: progress,
-            downloaded: downloaded,
-            uploaded: uploaded,
-            size: size,
-            seeds: seeds,
-            totalSeeds: totalSeeds,
             peers: peers,
+            progress: progress,
+            seeds: seeds,
+            size: size,
+            status: status,
             totalPeers: totalPeers,
             trackers: trackers,
-            downloadPath: downloadPath
+            uploaded: uploadRate,
+            uploadRate: uploadRate
         )
     }
+}
 
-    static func randomMock() -> TransmissionTorrent {
-        let uuid = UUID().uuidString
-        let hash: String = {
-            let hashed = Insecure.SHA1.hash(data: uuid.data(using: .utf8)!)
-            return hashed.compactMap { String(format: "%02x", $0) }.joined()
-        }()
-
-        return TransmissionTorrent(
-            id: hash.hashValue,
+extension TransmissionTorrent {
+    static func mock(
+        dateAdded: Date = Date(),
+        downloadPath: String = "/",
+        downloadRate: Int64 = 0,
+        eta: TimeInterval = 0,
+        hash: String = randomHash(),
+        name: String = "",
+        peers: Int = 0,
+        progress: Float = 0,
+        seeds: Int = 0,
+        size: Int64 = 0,
+        standardState: TorrentState = .downloading,
+        totalPeers: Int = 0,
+        trackerStrings: [String] = [],
+        uploaded: Int64 = 0,
+        uploadRate: Int64 = 0
+    ) -> Self {
+        return .init(
+            dateAdded: dateAdded,
+            downloadPath: downloadPath,
+            downloadRate: downloadRate,
+            eta: eta,
             hash: hash,
-            name: uuid,
-            status: .downloading,
-            dateAdded: Date(),
-            downloadRate: 0,
-            uploadRate: 0,
-            eta: 0,
-            progress: 0,
-            downloaded: 0,
-            uploaded: 0,
-            size: 0,
-            seeds: 0,
-            totalSeeds: 0,
-            peers: 0,
-            totalPeers: 0,
-            trackers: [],
-            downloadPath: ""
+            name: name,
+            peers: peers,
+            progress: progress,
+            seeds: seeds,
+            size: size,
+            standardState: standardState,
+            totalPeers: totalPeers,
+            trackerStrings: trackerStrings,
+            uploaded: uploaded,
+            uploadRate: uploadRate
         )
     }
 }

@@ -2,6 +2,7 @@ import Combine
 import Deluge
 @testable import Magnesium
 import Preferences
+import Transmission
 import XCTest
 
 class AddTorrentFlowTests: XCTestCase {
@@ -68,13 +69,15 @@ class AddTorrentFlowTests: XCTestCase {
         session.setServer(.delugeMock())
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
-        XCTAssertEqual(delugeClient.requestCallCount, 1)
-        XCTAssertEqual(delugeClient.requestParamRequest.first?.method, "core.add_torrent_file")
-        XCTAssertEqual(delugeClient.requestParamRequest.first?.paramsJSON, #"["file.torrent","",{}]"#)
+        XCTAssertEqual(delugeClient.requestParamRequest.map(\.method), ["core.add_torrent_file"])
+        XCTAssertEqual(delugeClient.requestParamRequest.map(\.paramsJSON), [#"["file.torrent","",{}]"#])
     }
 
     func test_add_withDeluge_andFileURL_whenFails_shouldPresentAlertController() {
-        delugeClient.results.append(("core.add_torrent_file", Fail(error: .unauthenticated).eraseToAnyPublisher()))
+        delugeClient.results.append((
+            "core.add_torrent_file",
+            Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
         session.setServer(.delugeMock())
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
@@ -128,12 +131,15 @@ class AddTorrentFlowTests: XCTestCase {
 
         let url = URL(fileURLWithPath: "file.torrent")
         flow.add(type: .file(url))
-        XCTAssertEqual(transmissionClient.addFileURLCallCount, 1)
-        XCTAssertEqual(transmissionClient.addFileURLParamFileURL, [url])
+        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.method), ["torrent-add"])
+        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.argsJSON), [#"{"metainfo":""}"#])
     }
 
     func test_add_withTransmission_andFileURL_whenFails_shouldPresentAlertController() {
-        transmissionClient.addFileURLResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
+        transmissionClient.results.append((
+            "torrent-add",
+            Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
         session.setServer(.transmissionMock())
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
@@ -149,12 +155,15 @@ class AddTorrentFlowTests: XCTestCase {
 
         let url = URL(string: "magnet:?")!
         flow.add(type: .magnet(url))
-        XCTAssertEqual(transmissionClient.addURLCallCount, 1)
-        XCTAssertEqual(transmissionClient.addURLParamURL, [url])
+        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.method), ["torrent-add"])
+        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.argsJSON), [#"{"filename":"magnet:?"}"#])
     }
 
     func test_add_withTransmission_andMagnetURL_whenFails_shouldPresentAlertController() {
-        transmissionClient.addURLResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
+        transmissionClient.results.append((
+            "torrent-add",
+            Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
         session.setServer(.transmissionMock())
 
         flow.add(type: .magnet(URL(string: "magnet:?")!))

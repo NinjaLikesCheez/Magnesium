@@ -1,6 +1,7 @@
 import Combine
 @testable import Magnesium
 import Preferences
+import Transmission
 import XCTest
 
 class TransmissionSettingsViewModelTests: XCTestCase {
@@ -123,16 +124,21 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         XCTAssertEqual(values, [true, false])
     }
 
-    func test_saveSelected_shouldAuthenticate() {
+    func test_saveSelected_shouldRequestRPCVersion() {
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.handle(.saveSelected)
-        XCTAssertEqual(client.authenticateCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["session-get"])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"fields":["rpc-version"]}"#])
     }
 
     func test_saveSelected_whenAuthenticationFails_shouldEmitError() {
-        client.authenticateResult = Fail(error: .unauthenticated).eraseToAnyPublisher()
+        client.results.append((
+            "session-get",
+            Fail(error: .unauthenticated).eraseToAnyPublisher()
+        ))
+
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
@@ -160,6 +166,11 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutServer_shouldAddServer() throws {
+        client.results.append((
+            method: "session-get",
+            result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+        ))
+
         let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
         let keychain = TransmissionKeychainData(password: "password")
         let expectedData = try JSONEncoder().encode(settings)
@@ -178,6 +189,11 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withServer_shouldUpdateServer() throws {
+        client.results.append((
+            method: "session-get",
+            result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+        ))
+
         let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
         let keychain = TransmissionKeychainData(password: "new-password")
         let expectedData = try JSONEncoder().encode(settings)
@@ -196,6 +212,11 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutServer_shouldEmitCompleteEvent() {
+        client.results.append((
+            method: "session-get",
+            result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+        ))
+
         let viewModel = addViewModel
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
@@ -211,6 +232,11 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withServer_shouldEmitCompleteEvent() {
+        client.results.append((
+            method: "session-get",
+            result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+        ))
+
         let viewModel = editViewModel
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &observers)

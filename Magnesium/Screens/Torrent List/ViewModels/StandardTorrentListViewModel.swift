@@ -113,6 +113,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         autoRefreshTimer?.invalidate()
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func handle(_ event: TorrentListViewEvent) {
         switch event {
         case .refresh:

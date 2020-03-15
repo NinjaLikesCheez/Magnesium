@@ -65,11 +65,11 @@ platform :ios do
         "**/*View.swift",
         "**/*ViewCell.swift",
         "**/*Button.swift",
-        "Magnesium/AppDelegate.swift",
-        "Magnesium/SceneDelegate.swift",
-        "Magnesium/Extensions/UIImage+Color.swift",
-        "Magnesium/Extensions/NSLayoutConstraint+Priority.swift",
-        "Magnesium/Extensions/Publishers+UI.swift",
+        "Magnesium/App/AppDelegate.swift",
+        "Magnesium/App/SceneDelegate.swift",
+        "Magnesium/Common/Activity/*.swift",
+        "Magnesium/Common/Extensions/UIImage+Color.swift",
+        "Magnesium/Common/Extensions/Publishers+UI.swift",
         ]
     )
   end

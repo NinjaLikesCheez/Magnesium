@@ -1,14 +1,14 @@
 /// A Transmission torrent file.
-public struct TorrentFile {
-    /// The file's index.
+public struct TorrentFile: Equatable {
+    /// The index of the file.
     public var index: Int
-    /// The file name.
+    /// The name of the file.
     public var name: String
-    /// The file's size in bytes.
+    /// The size of the file in bytes.
     public var size: Int64
     /// The number of bytes that have been downloaded.
     public var downloaded: Int64
-    /// The file's download priority.
+    /// The download priority of the file.
     public var priority: Priority
     /// Whether the file is marked as wanted or unwanted.
     public var isWanted: Bool
