@@ -13,6 +13,9 @@
 		E9091D3423E25F580034C353 /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3323E25F580034C353 /* SettingsViewModelTests.swift */; };
 		E9091D3623E268310034C353 /* AddServerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3523E268310034C353 /* AddServerViewModelTests.swift */; };
 		E9091D3823E2698B0034C353 /* DelugeSettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3723E2698B0034C353 /* DelugeSettingsViewModelTests.swift */; };
+		E90B8B69241EC35D006768AB /* Coordinator in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B68241EC35D006768AB /* Coordinator */; };
+		E90B8B6B241EC35D006768AB /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B6A241EC35D006768AB /* Preferences */; };
+		E90B8B6D241EC35D006768AB /* ViewModel in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B6C241EC35D006768AB /* ViewModel */; };
 		E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */; };
 		E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */; };
 		E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */; };
@@ -46,7 +49,6 @@
 		E91FD7CE23FCC11F0059A21F /* RoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91FD7CD23FCC11F0059A21F /* RoundedButton.swift */; };
 		E91FD7D023FCC5240059A21F /* ServerErrorCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91FD7CF23FCC5240059A21F /* ServerErrorCoordinatorTests.swift */; };
 		E91FD7D223FCC5820059A21F /* ServerErrorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E91FD7D123FCC5820059A21F /* ServerErrorViewModelTests.swift */; };
-		E9282C8923CC170900776CD3 /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E9282C8823CC170900776CD3 /* Preferences */; };
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
 		E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */; };
@@ -157,8 +159,6 @@
 		E9AC4FC023EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */; };
 		E9AE9E5623D695120018D180 /* DelugeTorrentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AE9E5523D695120018D180 /* DelugeTorrentTests.swift */; };
 		E9AE9E5823D695BD0018D180 /* Deluge+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AE9E5723D695BD0018D180 /* Deluge+Mocks.swift */; };
-		E9AF5E6624154FBD00C3A3A4 /* Coordinator in Frameworks */ = {isa = PBXBuildFile; productRef = E9AF5E6524154FBD00C3A3A4 /* Coordinator */; };
-		E9AF5E6824154FBD00C3A3A4 /* ViewModel in Frameworks */ = {isa = PBXBuildFile; productRef = E9AF5E6724154FBD00C3A3A4 /* ViewModel */; };
 		E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */; };
 		E9B40E8E23B3FCEB009E30AE /* TorrentDetailItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B40E8D23B3FCEB009E30AE /* TorrentDetailItem.swift */; };
 		E9B40E9023B3FD64009E30AE /* TorrentDetailSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B40E8F23B3FD64009E30AE /* TorrentDetailSection.swift */; };
@@ -235,7 +235,6 @@
 		E91FD7CD23FCC11F0059A21F /* RoundedButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedButton.swift; sourceTree = "<group>"; };
 		E91FD7CF23FCC5240059A21F /* ServerErrorCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerErrorCoordinatorTests.swift; sourceTree = "<group>"; };
 		E91FD7D123FCC5820059A21F /* ServerErrorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerErrorViewModelTests.swift; sourceTree = "<group>"; };
-		E9282C8723CC16FF00776CD3 /* Preferences */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Preferences; sourceTree = "<group>"; };
 		E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewController.swift; sourceTree = "<group>"; };
 		E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputTableViewCell.swift; sourceTree = "<group>"; };
 		E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewController.swift; sourceTree = "<group>"; };
@@ -309,7 +308,6 @@
 		E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeRefreshable.swift; sourceTree = "<group>"; };
 		E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModelImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentListViewModelImplementation.swift; sourceTree = "<group>"; };
 		E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentMapperTests.swift; sourceTree = "<group>"; };
-		E9801EF323D37E8300181FFD /* MVVM */ = {isa = PBXFileReference; lastKnownFileType = folder; path = MVVM; sourceTree = "<group>"; };
 		E9801EF623D37FC200181FFD /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
 		E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertAction+App.swift"; sourceTree = "<group>"; };
 		E9843B3B23F3AACB005FBF7E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -369,6 +367,7 @@
 		E9E7037323F85BBA0095A0B3 /* MockTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTorrent.swift; sourceTree = "<group>"; };
 		E9E7037523F85CBF0095A0B3 /* MockLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockLabel.swift; sourceTree = "<group>"; };
 		E9E9F0F323807044007C6D2D /* TorrentDetailViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewState.swift; sourceTree = "<group>"; };
+		E9F1D967241EC0BF00788E71 /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
 		E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeSettingsViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeServerSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -379,12 +378,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				E92A6B5524114B3B0024A8CD /* Deluge in Frameworks */,
-				E9282C8923CC170900776CD3 /* Preferences in Frameworks */,
+				E90B8B6B241EC35D006768AB /* Preferences in Frameworks */,
+				E90B8B6D241EC35D006768AB /* ViewModel in Frameworks */,
 				E96B725123D3937B005E8E89 /* Transmission in Frameworks */,
 				E9786AF823D38E6200E4157E /* Deluge in Frameworks */,
-				E9AF5E6624154FBD00C3A3A4 /* Coordinator in Frameworks */,
 				E98F12A3241EA33A005545A7 /* Transmission in Frameworks */,
-				E9AF5E6824154FBD00C3A3A4 /* ViewModel in Frameworks */,
+				E90B8B69241EC35D006768AB /* Coordinator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -640,8 +639,7 @@
 		E96B0058237A43740091FA71 = {
 			isa = PBXGroup;
 			children = (
-				E9801EF323D37E8300181FFD /* MVVM */,
-				E9282C8723CC16FF00776CD3 /* Preferences */,
+				E9F1D967241EC0BF00788E71 /* Components */,
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
 				E96B0062237A43740091FA71 /* Products */,
@@ -950,13 +948,13 @@
 			);
 			name = Magnesium;
 			packageProductDependencies = (
-				E9282C8823CC170900776CD3 /* Preferences */,
 				E9786AF723D38E6200E4157E /* Deluge */,
 				E96B725023D3937B005E8E89 /* Transmission */,
 				E92A6B5424114B3B0024A8CD /* Deluge */,
-				E9AF5E6524154FBD00C3A3A4 /* Coordinator */,
-				E9AF5E6724154FBD00C3A3A4 /* ViewModel */,
 				E98F12A2241EA33A005545A7 /* Transmission */,
+				E90B8B68241EC35D006768AB /* Coordinator */,
+				E90B8B6A241EC35D006768AB /* Preferences */,
+				E90B8B6C241EC35D006768AB /* ViewModel */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1538,9 +1536,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E9282C8823CC170900776CD3 /* Preferences */ = {
+		E90B8B68241EC35D006768AB /* Coordinator */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Coordinator;
+		};
+		E90B8B6A241EC35D006768AB /* Preferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Preferences;
+		};
+		E90B8B6C241EC35D006768AB /* ViewModel */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ViewModel;
 		};
 		E92A6B5424114B3B0024A8CD /* Deluge */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1559,14 +1565,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */;
 			productName = Transmission;
-		};
-		E9AF5E6524154FBD00C3A3A4 /* Coordinator */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Coordinator;
-		};
-		E9AF5E6724154FBD00C3A3A4 /* ViewModel */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = ViewModel;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

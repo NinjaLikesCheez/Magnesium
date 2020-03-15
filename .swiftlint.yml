@@ -1,9 +1,7 @@
 included:
+  - Components
   - Magnesium
   - MagnesiumTests
-  - MVVM
-  - Preferences
-  - Transmission
 
 disabled_rules:
   - file_length

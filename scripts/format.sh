@@ -1,2 +1,2 @@
 #!/bin/bash
-swiftformat Magnesium MagnesiumTests MVVM Preferences
+swiftformat Components Magnesium MagnesiumTests
