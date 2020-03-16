@@ -13,9 +13,6 @@
 		E9091D3423E25F580034C353 /* SettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3323E25F580034C353 /* SettingsViewModelTests.swift */; };
 		E9091D3623E268310034C353 /* AddServerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3523E268310034C353 /* AddServerViewModelTests.swift */; };
 		E9091D3823E2698B0034C353 /* DelugeSettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9091D3723E2698B0034C353 /* DelugeSettingsViewModelTests.swift */; };
-		E90B8B69241EC35D006768AB /* Coordinator in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B68241EC35D006768AB /* Coordinator */; };
-		E90B8B6B241EC35D006768AB /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B6A241EC35D006768AB /* Preferences */; };
-		E90B8B6D241EC35D006768AB /* ViewModel in Frameworks */ = {isa = PBXBuildFile; productRef = E90B8B6C241EC35D006768AB /* ViewModel */; };
 		E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */; };
 		E90DC4F623CEC0AD00FB53E6 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F523CEC0AD00FB53E6 /* SettingsViewController.swift */; };
 		E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E90DC4F923CEC6A100FB53E6 /* SettingsViewModel.swift */; };
@@ -52,7 +49,6 @@
 		E9282C8F23CC1C4100776CD3 /* ServerSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C8E23CC1C4100776CD3 /* ServerSettingsViewController.swift */; };
 		E9282C9123CC1CBD00776CD3 /* TextInputTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */; };
 		E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E928F00523AC340B006BD6BD /* TorrentDetailViewController.swift */; };
-		E92A6B5524114B3B0024A8CD /* Deluge in Frameworks */ = {isa = PBXBuildFile; productRef = E92A6B5424114B3B0024A8CD /* Deluge */; };
 		E92D5CE323FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE223FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE523FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE423FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE723FB234800A4CB51 /* TransmissionTorrentFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE623FB234800A4CB51 /* TransmissionTorrentFileTests.swift */; };
@@ -108,7 +104,6 @@
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
 		E96B007F237A473E0091FA71 /* TorrentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B007E237A473E0091FA71 /* TorrentState.swift */; };
 		E96B724F23D39368005E8E89 /* Transmission.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B724E23D39368005E8E89 /* Transmission.swift */; };
-		E96B725123D3937B005E8E89 /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E96B725023D3937B005E8E89 /* Transmission */; };
 		E96BDBF923FB78D800EFCA86 /* NoServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */; };
 		E96BDBFB23FB845A00EFCA86 /* NoServersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */; };
 		E96BDBFD23FB860E00EFCA86 /* NoServersCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */; };
@@ -119,7 +114,6 @@
 		E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97750E923D1686F00264638 /* SettingsSection.swift */; };
 		E97750ED23D1688500264638 /* SettingsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97750EC23D1688500264638 /* SettingsItem.swift */; };
 		E9786AF623D38D5600E4157E /* Deluge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9786AF523D38D5600E4157E /* Deluge.swift */; };
-		E9786AF823D38E6200E4157E /* Deluge in Frameworks */ = {isa = PBXBuildFile; productRef = E9786AF723D38E6200E4157E /* Deluge */; };
 		E97B543123B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */; };
 		E97D971023C6A32B005FD8F3 /* DelugeRefreshable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97D970F23C6A32B005FD8F3 /* DelugeRefreshable.swift */; };
 		E97DAD8A23CE265100F3E888 /* TransmissionTorrentListViewModelImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8923CE265100F3E888 /* TransmissionTorrentListViewModelImplementation.swift */; };
@@ -135,10 +129,14 @@
 		E988EDE823E7D0150011A733 /* TorrentDetailFileItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDE723E7D0150011A733 /* TorrentDetailFileItemTests.swift */; };
 		E988EDEC23E7D0710011A733 /* TransmissionTorrentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDEB23E7D0710011A733 /* TransmissionTorrentTests.swift */; };
 		E98D936123D2845D0013A1E1 /* TorrentMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D936023D2845D0013A1E1 /* TorrentMapper.swift */; };
-		E98F12A3241EA33A005545A7 /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E98F12A2241EA33A005545A7 /* Transmission */; };
 		E9999A8323BAE1BD00E8309D /* Publishers+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */; };
 		E999B0B823F62BFA000889FD /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999B0B723F62BFA000889FD /* L10n.swift */; };
 		E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */; };
+		E99F9C032420497500DDC08B /* Coordinator in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C022420497500DDC08B /* Coordinator */; };
+		E99F9C052420497500DDC08B /* Preferences in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C042420497500DDC08B /* Preferences */; };
+		E99F9C072420497500DDC08B /* ViewModel in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C062420497500DDC08B /* ViewModel */; };
+		E99F9C092420497500DDC08B /* Deluge in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C082420497500DDC08B /* Deluge */; };
+		E99F9C0B2420497600DDC08B /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C0A2420497600DDC08B /* Transmission */; };
 		E99FC25823D13A340019A992 /* TorrentListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25723D13A340019A992 /* TorrentListCoordinator.swift */; };
 		E99FC25A23D13C270019A992 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25923D13C270019A992 /* AppCoordinator.swift */; };
 		E99FC26023D1479E0019A992 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99FC25D23D1479E0019A992 /* Alert.swift */; };
@@ -322,6 +320,9 @@
 		E9999A8223BAE1BD00E8309D /* Publishers+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publishers+UI.swift"; sourceTree = "<group>"; };
 		E999B0B723F62BFA000889FD /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LPLinkMetadata+StandardTorrent.swift"; sourceTree = "<group>"; };
+		E99F9BAB242048CB00DDC08B /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
+		E99F9BFF242048E100DDC08B /* Deluge */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Deluge; sourceTree = "<group>"; };
+		E99F9C00242048E300DDC08B /* Transmission */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Transmission; sourceTree = "<group>"; };
 		E99FC25723D13A340019A992 /* TorrentListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListCoordinator.swift; sourceTree = "<group>"; };
 		E99FC25923D13C270019A992 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		E99FC25D23D1479E0019A992 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
@@ -367,7 +368,6 @@
 		E9E7037323F85BBA0095A0B3 /* MockTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTorrent.swift; sourceTree = "<group>"; };
 		E9E7037523F85CBF0095A0B3 /* MockLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockLabel.swift; sourceTree = "<group>"; };
 		E9E9F0F323807044007C6D2D /* TorrentDetailViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewState.swift; sourceTree = "<group>"; };
-		E9F1D967241EC0BF00788E71 /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
 		E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeSettingsViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeServerSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -377,13 +377,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E92A6B5524114B3B0024A8CD /* Deluge in Frameworks */,
-				E90B8B6B241EC35D006768AB /* Preferences in Frameworks */,
-				E90B8B6D241EC35D006768AB /* ViewModel in Frameworks */,
-				E96B725123D3937B005E8E89 /* Transmission in Frameworks */,
-				E9786AF823D38E6200E4157E /* Deluge in Frameworks */,
-				E98F12A3241EA33A005545A7 /* Transmission in Frameworks */,
-				E90B8B69241EC35D006768AB /* Coordinator in Frameworks */,
+				E99F9C092420497500DDC08B /* Deluge in Frameworks */,
+				E99F9C032420497500DDC08B /* Coordinator in Frameworks */,
+				E99F9C052420497500DDC08B /* Preferences in Frameworks */,
+				E99F9C0B2420497600DDC08B /* Transmission in Frameworks */,
+				E99F9C072420497500DDC08B /* ViewModel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -608,13 +606,6 @@
 			path = "Server Settings";
 			sourceTree = "<group>";
 		};
-		E9635A5423CADC5300239239 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		E9637857241335950068E051 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
@@ -639,11 +630,11 @@
 		E96B0058237A43740091FA71 = {
 			isa = PBXGroup;
 			children = (
-				E9F1D967241EC0BF00788E71 /* Components */,
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
+				E99F9AE7242048BC00DDC08B /* Libraries */,
 				E96B0062237A43740091FA71 /* Products */,
-				E9635A5423CADC5300239239 /* Frameworks */,
+				E99F9C012420497500DDC08B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -763,6 +754,23 @@
 				E9843B2B23F390F7005FBF7E /* Localization */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		E99F9AE7242048BC00DDC08B /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				E99F9BAB242048CB00DDC08B /* Components */,
+				E99F9BFF242048E100DDC08B /* Deluge */,
+				E99F9C00242048E300DDC08B /* Transmission */,
+			);
+			path = Libraries;
+			sourceTree = "<group>";
+		};
+		E99F9C012420497500DDC08B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		E99FC26523D148290019A992 /* Alert */ = {
@@ -948,13 +956,11 @@
 			);
 			name = Magnesium;
 			packageProductDependencies = (
-				E9786AF723D38E6200E4157E /* Deluge */,
-				E96B725023D3937B005E8E89 /* Transmission */,
-				E92A6B5424114B3B0024A8CD /* Deluge */,
-				E98F12A2241EA33A005545A7 /* Transmission */,
-				E90B8B68241EC35D006768AB /* Coordinator */,
-				E90B8B6A241EC35D006768AB /* Preferences */,
-				E90B8B6C241EC35D006768AB /* ViewModel */,
+				E99F9C022420497500DDC08B /* Coordinator */,
+				E99F9C042420497500DDC08B /* Preferences */,
+				E99F9C062420497500DDC08B /* ViewModel */,
+				E99F9C082420497500DDC08B /* Deluge */,
+				E99F9C0A2420497600DDC08B /* Transmission */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1007,8 +1013,6 @@
 			);
 			mainGroup = E96B0058237A43740091FA71;
 			packageReferences = (
-				E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */,
-				E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */,
 			);
 			productRefGroup = E96B0062237A43740091FA71 /* Products */;
 			projectDirPath = "";
@@ -1516,54 +1520,25 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "ssh://git@git.jameshurst.me:10022/iOS/Deluge-Swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "ssh://git@git.jameshurst.me:10022/iOS/Transmission-Swift.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		E90B8B68241EC35D006768AB /* Coordinator */ = {
+		E99F9C022420497500DDC08B /* Coordinator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Coordinator;
 		};
-		E90B8B6A241EC35D006768AB /* Preferences */ = {
+		E99F9C042420497500DDC08B /* Preferences */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Preferences;
 		};
-		E90B8B6C241EC35D006768AB /* ViewModel */ = {
+		E99F9C062420497500DDC08B /* ViewModel */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ViewModel;
 		};
-		E92A6B5424114B3B0024A8CD /* Deluge */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E92A6B5324114B3B0024A8CD /* XCRemoteSwiftPackageReference "Deluge-Swift" */;
-			productName = Deluge;
-		};
-		E96B725023D3937B005E8E89 /* Transmission */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Transmission;
-		};
-		E9786AF723D38E6200E4157E /* Deluge */ = {
+		E99F9C082420497500DDC08B /* Deluge */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Deluge;
 		};
-		E98F12A2241EA33A005545A7 /* Transmission */ = {
+		E99F9C0A2420497600DDC08B /* Transmission */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E98F12A1241EA33A005545A7 /* XCRemoteSwiftPackageReference "Transmission-Swift" */;
 			productName = Transmission;
 		};
 /* End XCSwiftPackageProductDependency section */

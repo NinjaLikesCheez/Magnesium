@@ -1,7 +1,7 @@
 included:
-  - Components
   - Magnesium
   - MagnesiumTests
+  - Libraries
 
 disabled_rules:
   - file_length

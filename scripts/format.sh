@@ -1,2 +1,2 @@
 #!/bin/bash
-swiftformat --swiftversion 5.2 Components Magnesium MagnesiumTests
+swiftformat --swiftversion 5.2 Magnesium MagnesiumTests Libraries
