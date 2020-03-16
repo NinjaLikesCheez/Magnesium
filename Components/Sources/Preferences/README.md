@@ -81,16 +81,3 @@ Output
 1
 2
 ```
-
-
-## Installation
-
-### Xcode 11+
-
-* Select **File** > **Swift Packages** > **Add Package Dependency...**
-* Enter the package repository URL: `shttps://github.com/jameshurst/Preferences-Swift.git`
-* Confirm the version and let Xcode resolve the package
-
-## License
-
-This library is released under the MIT license. See [LICENSE](LICENSE) for details.
