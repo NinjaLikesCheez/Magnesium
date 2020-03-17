@@ -1,6 +1,7 @@
 import Combine
 import LinkPresentation
 @testable import Magnesium
+import MVVMModels
 import ViewModel
 import XCTest
 

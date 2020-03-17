@@ -1,5 +1,6 @@
 import Combine
 import Deluge
+import MVVMModels
 import Transmission
 import UIKit
 

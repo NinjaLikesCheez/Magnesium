@@ -1,3 +1,5 @@
+import MVVMModels
+
 extension AlertAction {
     static var ok: AlertAction {
         return AlertAction(title: L10n.ok, style: .default)

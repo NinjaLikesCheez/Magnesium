@@ -1,3 +1,4 @@
+import MVVMModels
 import UIKit
 
 extension Activity {

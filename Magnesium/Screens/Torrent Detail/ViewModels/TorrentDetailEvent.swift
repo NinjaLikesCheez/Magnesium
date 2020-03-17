@@ -1,4 +1,5 @@
 import Combine
+import MVVMModels
 
 enum TorrentDetailEvent {
     case complete

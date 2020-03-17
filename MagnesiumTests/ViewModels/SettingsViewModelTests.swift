@@ -1,5 +1,6 @@
 import Combine
 @testable import Magnesium
+import MVVMModels
 import Preferences
 import XCTest
 

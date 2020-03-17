@@ -1,6 +1,7 @@
 import Combine
 import Deluge
 @testable import Magnesium
+import MVVMModels
 import Preferences
 import XCTest
 

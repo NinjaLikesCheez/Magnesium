@@ -1,4 +1,5 @@
 import Combine
+import MVVMModels
 import Preferences
 import UIKit
 import ViewModel
@@ -526,7 +527,6 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             SwipeAction(
                 image: UIImage(systemName: "ellipsis.circle.fill"),
                 backgroundColor: .systemGray,
-                style: .normal,
                 handler: {
                     self.presentActivities(for: [torrent], source: source)
                 }

@@ -1,6 +1,7 @@
 import Combine
 import Deluge
 import Foundation
+import MVVMModels
 import Preferences
 import ViewModel
 

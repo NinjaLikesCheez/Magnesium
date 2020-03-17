@@ -1,3 +1,5 @@
+import MVVMModels
+
 enum ServerSettingsViewEvent {
     case saveSelected
     case deleteSelected(source: PopoverSource)
