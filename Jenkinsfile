@@ -22,11 +22,11 @@ pipeline {
         success {
             archiveArtifacts 'fastlane/build_output/*.ipa'
         }
-        failure {
+        always {
             step([
                 $class: 'Mailer',
                 notifyEveryUnstableBuild: true,
-                recipients: 'james@jameshurst.ca',
+                recipients: "$MAIL_RECIPIENTS",
                 sendToIndividuals: false
                 ])
         }
