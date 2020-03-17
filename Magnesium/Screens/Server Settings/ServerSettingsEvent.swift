@@ -2,5 +2,5 @@ import MVVMModels
 
 enum ServerSettingsEvent {
     case complete
-    case alert(Alert, source: PopoverSource?)
+    case alert(Alert)
 }

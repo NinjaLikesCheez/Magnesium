@@ -5,7 +5,7 @@ import ViewModel
 
 enum SettingsEvent {
     case complete
-    case alert(Alert, source: PopoverSource?)
+    case alert(Alert)
     case editServer(Server)
     case addServer
     case showRefreshIntervalSettings
@@ -69,14 +69,14 @@ final class SettingsViewModel: ViewModel, EventEmitter {
 
     private func handleChangeServerSelected(from source: PopoverSource) {
         let servers = preferences.getServers()
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
         for server in servers {
             alert.addAction(AlertAction(title: server.name, style: .default) {
                 self.session.setServer(server)
             })
         }
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func updateSections() {

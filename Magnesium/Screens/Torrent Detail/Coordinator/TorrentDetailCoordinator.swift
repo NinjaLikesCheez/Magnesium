@@ -34,8 +34,8 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
         switch event {
         case .complete:
             eventSubject.send(.complete)
-        case let .alert(alert, source):
-            showAlert(alert, from: source)
+        case let .alert(alert):
+            showAlert(alert)
         case let .activities(activities, torrent, source):
             showActivities(activities, torrent: torrent, source: source)
         case let .moveDownloadFolder(currentPath, subject):

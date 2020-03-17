@@ -45,7 +45,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     }
 
     func test_alert_shouldPresentAlertController() {
-        viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert), source: nil))
+        viewModel.eventSubject.send(.alert(Alert(title: "", message: nil, style: .alert)))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")

@@ -292,7 +292,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func presentRemoveOptions(for torrents: [Torrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        var alert = Alert(title: L10n.remove, message: message, style: .actionSheet)
+        var alert = Alert(title: L10n.remove, message: message, style: .actionSheet(source))
         alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
             self.remove(torrents, removeData: false)
         })
@@ -300,19 +300,19 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             self.remove(torrents, removeData: true)
         })
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func presentLabelSelection(for torrents: [Torrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        var alert = Alert(title: L10n.setLabel, message: message, style: .actionSheet)
+        var alert = Alert(title: L10n.setLabel, message: message, style: .actionSheet(source))
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(for: torrents, label: label)
             })
         }
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func presentActivities(for torrents: [Torrent], source: PopoverSource) {
@@ -353,7 +353,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             style: .alert
         )
         alert.addAction(.ok)
-        eventSubject.send(.alert(alert, source: nil))
+        eventSubject.send(.alert(alert))
     }
 
     // MARK: Auto Refresh

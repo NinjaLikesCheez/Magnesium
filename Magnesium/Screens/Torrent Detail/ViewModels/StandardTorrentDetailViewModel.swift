@@ -377,7 +377,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
         alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
             self.remove(removeData: false)
         })
@@ -385,18 +385,18 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             self.remove(removeData: true)
         })
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func presentLabelSelection(from source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet)
+        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
         for label in labels.value {
             alert.addAction(AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(label)
             })
         }
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func showError(title: String, message: String?) {
@@ -406,7 +406,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             style: .alert
         )
         alert.addAction(.ok)
-        eventSubject.send(.alert(alert, source: nil))
+        eventSubject.send(.alert(alert))
     }
 
     // MARK: Auto Refresh

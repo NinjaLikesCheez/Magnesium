@@ -52,8 +52,8 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
         switch event {
         case .complete:
             eventSubject.send(.complete)
-        case let .alert(alert, source: source):
-            showAlert(alert, from: source)
+        case let .alert(alert):
+            showAlert(alert)
         }
     }
 }

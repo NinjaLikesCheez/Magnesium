@@ -44,8 +44,8 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 
     func handle(_ event: TorrentListEvent) {
         switch event {
-        case let .alert(alert, source):
-            showAlert(alert, from: source)
+        case let .alert(alert):
+            showAlert(alert)
         case let .activities(activities, torrents, source):
             showActivities(activities, torrents: torrents, source: source)
         case let .add(source, linkSubject):
@@ -73,7 +73,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
-        var alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet)
+        var alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet(source))
         alert.addAction(AlertAction(title: L10n.addTorrentMethodLink, style: .default) {
             self.showAddLink(subject: linkSubject)
         })
@@ -81,7 +81,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             self.showAddFile()
         })
         alert.addAction(.cancel)
-        showAlert(alert, from: source)
+        showAlert(alert)
     }
 
     // internal for testing

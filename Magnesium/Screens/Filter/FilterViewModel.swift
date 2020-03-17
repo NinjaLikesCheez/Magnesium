@@ -5,7 +5,7 @@ import ViewModel
 
 enum FilterEvent {
     case complete
-    case alert(Alert, source: PopoverSource)
+    case alert(Alert)
 }
 
 enum FilterViewEvent {
@@ -63,7 +63,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
 
     private func handleSortSelected(from source: PopoverSource) {
         let currentSort = preferences[.sortOption]
-        var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet)
+        var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet(source))
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.localizedString, style: .default) {
@@ -77,12 +77,16 @@ final class FilterViewModel: ViewModel, EventEmitter {
         }
 
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
         var filterOptions = preferences[.filterOptions]
-        var alert = Alert(title: L10n.filterLabelAlertTitle, message: L10n.filterLabelAlertMessage, style: .actionSheet)
+        var alert = Alert(
+            title: L10n.filterLabelAlertTitle,
+            message: L10n.filterLabelAlertMessage,
+            style: .actionSheet(source)
+        )
         let labels: [StandardLabel?] = [nil] + self.labels.value
 
         for label in labels {
@@ -97,12 +101,16 @@ final class FilterViewModel: ViewModel, EventEmitter {
         }
 
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = preferences[.filterOptions]
-        var alert = Alert(title: L10n.filterStateAlertTitle, message: L10n.filterStateAlertMessage, style: .actionSheet)
+        var alert = Alert(
+            title: L10n.filterStateAlertTitle,
+            message: L10n.filterStateAlertMessage,
+            style: .actionSheet(source)
+        )
         let states: [TorrentState?] = [nil] + TorrentState.allCases
 
         for state in states {
@@ -117,7 +125,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
         }
 
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func updateSections() {

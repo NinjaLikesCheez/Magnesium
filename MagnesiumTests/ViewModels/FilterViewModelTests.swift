@@ -85,7 +85,7 @@ class FilterViewModelTests: XCTestCase {
         let expected = ["Date Added", "Name", "Download Speed", "Upload Speed", "Cancel"]
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
@@ -95,7 +95,7 @@ class FilterViewModelTests: XCTestCase {
     func test_sortSelected__whenExistingOptionSelected_shouldInvert() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
@@ -108,7 +108,7 @@ class FilterViewModelTests: XCTestCase {
     func test_sortSelected_withNewOption_shouldSetNewOption() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.sortSelected(source: .view(UIView(), rect: .zero)))
@@ -120,7 +120,7 @@ class FilterViewModelTests: XCTestCase {
     func test_stateSelected_shouldEmitAlert() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.stateSelected(source: .view(UIView(), rect: .zero)))
@@ -131,7 +131,7 @@ class FilterViewModelTests: XCTestCase {
     func test_stateSelected_withNewOption_shouldSetNewOption() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.stateSelected(source: .view(UIView(), rect: .zero)))
@@ -143,7 +143,7 @@ class FilterViewModelTests: XCTestCase {
     func test_labelSelected_shouldEmitAlert() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
@@ -153,7 +153,7 @@ class FilterViewModelTests: XCTestCase {
     func test_labelSelected_whenAllSelected_shouldRemoveLabelFilter() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
@@ -165,7 +165,7 @@ class FilterViewModelTests: XCTestCase {
     func test_labelSelected_whenNoneSelected_shouldSetEmptyLabel() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))
@@ -177,7 +177,7 @@ class FilterViewModelTests: XCTestCase {
     func test_labelSelected_withNewOption_shouldSetNewOption() {
         var alert: Alert?
         viewModel.events.first().sink { event in
-            guard case let .alert(inner, _) = event else { return }
+            guard case let .alert(inner) = event else { return }
             alert = inner
         }.store(in: &cancellables)
         viewModel.handle(.labelSelected(source: .view(UIView(), rect: .zero)))

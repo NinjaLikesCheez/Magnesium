@@ -185,13 +185,13 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
 
     private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
-        var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet)
+        var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet(source))
         alert.addAction(AlertAction(title: L10n.deleteServer, style: .destructive) {
             self.preferences.remove(server: server)
             self.eventSubject.send(.complete)
         })
         alert.addAction(.cancel)
-        eventSubject.send(.alert(alert, source: source))
+        eventSubject.send(.alert(alert))
     }
 
     private func showError(_ error: TransmissionError) {
@@ -213,6 +213,6 @@ final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
             style: .alert
         )
         alert.addAction(.ok)
-        eventSubject.send(.alert(alert, source: nil))
+        eventSubject.send(.alert(alert))
     }
 }

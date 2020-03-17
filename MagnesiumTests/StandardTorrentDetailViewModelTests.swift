@@ -32,7 +32,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         var event: TorrentDetailEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         actions()
-        guard case let .alert(alert, _) = event else {
+        guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return nil
         }

@@ -49,7 +49,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        guard case let .alert(alert, _) = event else {
+        guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
@@ -67,7 +67,7 @@ class SettingsViewModelTests: XCTestCase {
         var event: SettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        guard case let .alert(alert, _) = event else {
+        guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }

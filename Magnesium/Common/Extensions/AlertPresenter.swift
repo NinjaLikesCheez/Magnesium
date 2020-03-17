@@ -3,13 +3,12 @@ import MVVMModels
 import UIKit
 
 protocol AlertPresenter {
-    func showAlert(_ alert: Alert, from source: PopoverSource?, useTopViewController: Bool)
+    func showAlert(_ alert: Alert, useTopViewController: Bool)
 }
 
 extension AlertPresenter where Self: Coordinator {
-    func showAlert(_ alert: Alert, from source: PopoverSource? = nil, useTopViewController: Bool = false) {
+    func showAlert(_ alert: Alert, useTopViewController: Bool = false) {
         let alertController = alert.createAlertController()
-        alertController.configure(popoverSource: source)
 
         if useTopViewController {
             var current = presentable.viewController
