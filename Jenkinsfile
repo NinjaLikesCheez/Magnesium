@@ -5,7 +5,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'bundle config set deployment true'
-                sh 'git submodule update --init --recursive'
+                sh 'git submodule sync && git submodule update --init --recursive'
                 ansiColor('xterm') {
                     sh 'scripts/run_ci.sh'
                 }
