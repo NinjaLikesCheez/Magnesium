@@ -10,7 +10,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
     private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<[TransmissionTorrent], Never>()
 
-    var updated: AnyPublisher<([TransmissionTorrent], [NeverLabel]), Never> {
+    var updated: AnyPublisher<([TransmissionTorrent], [Never]), Never> {
         return updatedSubject.map { ($0, []) }.eraseToAnyPublisher()
     }
 
@@ -19,7 +19,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
         self.preferences = preferences
     }
 
-    func refresh() -> AnyPublisher<([TransmissionTorrent], [NeverLabel]), Error> {
+    func refresh() -> AnyPublisher<([TransmissionTorrent], [Never]), Error> {
         return client.request(.torrentsForApp)
             .map { ($0, []) }
             .mapError { $0 as Error }
@@ -28,7 +28,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
 
     func detailViewModel(
         for torrent: CurrentValueSubject<TransmissionTorrent, Never>,
-        labels: CurrentValueSubject<[NeverLabel], Never>
+        labels: CurrentValueSubject<[Never], Never>
     ) -> AnyTorrentDetailViewModel {
         let implementation = TransmissionTorrentDetailViewModelImplementation(client: client, refresher: self)
         let viewModel = StandardTorrentDetailViewModel(
@@ -73,7 +73,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
         return client.request(.verify(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
-    func setLabel(_ label: NeverLabel, for torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {}
+    func setLabel(_ label: Never, for torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {}
 
     func updateTrackers(for torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {
         return client.request(.reannounce(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()

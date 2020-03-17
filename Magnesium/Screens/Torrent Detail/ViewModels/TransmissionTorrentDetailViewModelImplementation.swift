@@ -3,7 +3,7 @@ import Transmission
 
 final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = TransmissionTorrent
-    typealias Label = NeverLabel
+    typealias Label = Never
     typealias File = TransmissionTorrentFile
 
     private let client: TransmissionClient
@@ -40,7 +40,7 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
         return client.request(.verify(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
     }
 
-    func setLabel(_ label: NeverLabel, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {}
+    func setLabel(_ label: Never, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {}
 
     func updateTrackers(for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
         return client.request(.reannounce(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()

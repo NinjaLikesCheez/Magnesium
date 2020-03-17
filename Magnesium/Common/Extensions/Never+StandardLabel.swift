@@ -1,4 +1,4 @@
-enum NeverLabel: StandardLabel {
+extension Never: StandardLabel {
     var name: String {
         return ""
     }
