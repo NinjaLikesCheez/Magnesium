@@ -86,9 +86,9 @@ opt_in_rules:
 
 file_name:
   excluded:
-    - Deluge.swift
+    - Deluge+App.swift
     - DelugeRequest+App.swift
-    - Transmission.swift
+    - Transmission+App.swift
     - Publishers+AsOptional.swift
     - Deluge+Mocks.swift
     - Transmission+Mocks.swift
