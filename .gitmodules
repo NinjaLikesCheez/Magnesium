@@ -1,3 +1,6 @@
+[submodule "Libraries/Components"]
+	path = Libraries/Components
+	url = ssh://git@git.jameshurst.me:10022/james/AppComponents.git
 [submodule "Libraries/Deluge"]
 	path = Libraries/Deluge
 	url = ssh://git@git.jameshurst.me:10022/iOS/Deluge-Swift.git
