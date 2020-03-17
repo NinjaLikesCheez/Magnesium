@@ -5,6 +5,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'bundle config set deployment true'
+                sh 'git submodule update --init --recursive'
                 ansiColor('xterm') {
                     sh 'scripts/run_ci.sh'
                 }
@@ -28,9 +29,9 @@ pipeline {
         }
         failure {
             step([
-                $class: 'Mailer', 
-                notifyEveryUnstableBuild: true, 
-                recipients: 'james@jameshurst.ca', 
+                $class: 'Mailer',
+                notifyEveryUnstableBuild: true,
+                recipients: 'james@jameshurst.ca',
                 sendToIndividuals: false
                 ])
         }
