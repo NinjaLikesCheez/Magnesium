@@ -9,34 +9,13 @@ xcversion(version: ">= 11.4")
 platform :ios do
   desc "Runs actions for CI"
   lane :run_ci do
-    test_preferences
-    test_magnesium
+    test
     build
   end
 
   desc "Runs all tests"
   lane :test do
-    test_preferences
     test_magnesium
-  end
-
-  desc "Runs Preferences tests"
-  lane :test_preferences do
-    run_tests(
-      scheme: "Preferences",
-      clean: true,
-      code_coverage: true,
-      derived_data_path: DERIVED_DATA_PATH,
-      prelaunch_simulator: true,
-      device: TEST_DEVICE
-    )
-    slather(
-      proj: "Magnesium.xcodeproj",
-      scheme: "Preferences",
-      build_directory: DERIVED_DATA_PATH,
-      html: true,
-      output_directory: "fastlane/coverage_report/Preferences"
-    )
   end
 
   desc "Runs Magnesium tests"
@@ -54,7 +33,7 @@ platform :ios do
       scheme: "Magnesium",
       build_directory: DERIVED_DATA_PATH,
       html: true,
-      output_directory: "fastlane/coverage_report/Magnesium",
+      output_directory: "fastlane/coverage_report",
       ignore: [
         "fastlane/*",
         "Libraries/*",

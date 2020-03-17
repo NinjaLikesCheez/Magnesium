@@ -1,7 +1,6 @@
 included:
   - Magnesium
   - MagnesiumTests
-  - Libraries
 
 disabled_rules:
   - file_length

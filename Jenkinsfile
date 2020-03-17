@@ -11,14 +11,9 @@ pipeline {
                 }
                 junit 'fastlane/report.xml'
                 publishHTML(target: [
-                    reportDir: 'fastlane/coverage_report/Magnesium',
+                    reportDir: 'fastlane/coverage_report',
                     reportFiles: 'index.html',
-                    reportName: "Magnesium coverage"
-                ])
-                publishHTML(target: [
-                    reportDir: 'fastlane/coverage_report/Preferences',
-                    reportFiles: 'index.html',
-                    reportName: "Preferences coverage"
+                    reportName: "Code Coverage"
                 ])
             }
         }
