@@ -3,7 +3,7 @@ import UIKit
 
 extension Activity {
     static func setLabel(handler: @escaping () -> Void) -> Activity {
-        return Activity(
+        .init(
             title: L10n.setLabel,
             image: UIImage(systemName: "tag"),
             type: "ca.jameshurst.Magnesium.set-label",
@@ -12,7 +12,7 @@ extension Activity {
     }
 
     static func verifyFiles(handler: @escaping () -> Void) -> Activity {
-        return Activity(
+        .init(
             title: L10n.verifyFiles,
             image: UIImage(systemName: "tray.full"),
             type: "ca.jameshurst.Magnesium.verify-files",
@@ -21,7 +21,7 @@ extension Activity {
     }
 
     static func updateTrackers(handler: @escaping () -> Void) -> Activity {
-        return Activity(
+        .init(
             title: L10n.updateTrackers,
             image: UIImage(systemName: "arrow.clockwise"),
             type: "ca.jameshurst.Magnesium.update-trackers",
@@ -30,7 +30,7 @@ extension Activity {
     }
 
     static func moveDownloadFolder(handler: @escaping () -> Void) -> Activity {
-        return Activity(
+        .init(
             title: L10n.moveDownloadFolder,
             image: UIImage(systemName: "tray.and.arrow.down"),
             type: "ca.jameshurst.Magnesium.move-download-folder",

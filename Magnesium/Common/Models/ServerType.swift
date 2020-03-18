@@ -1,7 +1,9 @@
 enum ServerType: String, Codable {
     case deluge
     case transmission
+}
 
+extension ServerType {
     var localizedString: String {
         switch self {
         case .deluge:

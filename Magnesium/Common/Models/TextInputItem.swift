@@ -17,32 +17,34 @@ extension TextInputItem {
         var autocapitalizationType: UITextAutocapitalizationType = .sentences
         var autocorrectionType: UITextAutocorrectionType = .default
         var textContentType: UITextContentType?
+    }
+}
 
-        static let `default` = Configuration()
+extension TextInputItem.Configuration {
+    static let `default` = Self()
 
-        static let url = Configuration(
-            keyboardType: .URL,
-            autocapitalizationType: .none,
-            autocorrectionType: .no,
-            textContentType: .URL
-        )
+    static let url = Self(
+        keyboardType: .URL,
+        autocapitalizationType: .none,
+        autocorrectionType: .no,
+        textContentType: .URL
+    )
 
-        static let username = Configuration(
-            returnKeyType: .next,
-            autocapitalizationType: .none,
-            autocorrectionType: .no,
-            textContentType: .username
-        )
+    static let username = Self(
+        returnKeyType: .next,
+        autocapitalizationType: .none,
+        autocorrectionType: .no,
+        textContentType: .username
+    )
 
-        static let password = Configuration(
-            isSecure: true,
-            textContentType: .password
-        )
+    static let password = Self(
+        isSecure: true,
+        textContentType: .password
+    )
 
-        func withReturnKeyType(_ returnKeyType: UIReturnKeyType) -> Configuration {
-            var configuration = self
-            configuration.returnKeyType = returnKeyType
-            return configuration
-        }
+    func withReturnKeyType(_ returnKeyType: UIReturnKeyType) -> Self {
+        var configuration = self
+        configuration.returnKeyType = returnKeyType
+        return configuration
     }
 }

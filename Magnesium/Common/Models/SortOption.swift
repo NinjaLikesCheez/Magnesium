@@ -2,18 +2,6 @@ struct SortOption: Codable, Equatable {
     var property: Property
     var direction: Direction
 
-    var localizedString: String {
-        let directionString: String
-        switch direction {
-        case .ascending:
-            directionString = "↑"
-        case .descending:
-            directionString = "↓"
-        }
-
-        return "\(directionString) \(property.localizedString)"
-    }
-
     init(property: Property) {
         self.property = property
         direction = property.preferredDirection
@@ -46,19 +34,6 @@ extension SortOption {
                 return .descending
             }
         }
-
-        var localizedString: String {
-            switch self {
-            case .dateAdded:
-                return L10n.sortPropertyDateAdded
-            case .name:
-                return L10n.sortPropertyName
-            case .downloadSpeed:
-                return L10n.sortPropertyDownloadSpeed
-            case .uploadSpeed:
-                return L10n.sortPropertyUploadSpeed
-            }
-        }
     }
 }
 
@@ -74,6 +49,35 @@ extension SortOption {
             case .descending:
                 return .ascending
             }
+        }
+    }
+}
+
+extension SortOption {
+    var localizedString: String {
+        let directionString: String
+        switch direction {
+        case .ascending:
+            directionString = "↑"
+        case .descending:
+            directionString = "↓"
+        }
+
+        return "\(directionString) \(property.localizedString)"
+    }
+}
+
+extension SortOption.Property {
+    var localizedString: String {
+        switch self {
+        case .dateAdded:
+            return L10n.sortPropertyDateAdded
+        case .name:
+            return L10n.sortPropertyName
+        case .downloadSpeed:
+            return L10n.sortPropertyDownloadSpeed
+        case .uploadSpeed:
+            return L10n.sortPropertyUploadSpeed
         }
     }
 }
