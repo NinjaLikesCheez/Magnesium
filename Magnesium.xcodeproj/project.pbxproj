@@ -661,9 +661,9 @@
 		E97B543423B581AC006FFCC9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */,
 				E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */,
 				E91FD7CD23FCC11F0059A21F /* RoundedButton.swift */,
+				E9282C9023CC1CBD00776CD3 /* TextInputTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
