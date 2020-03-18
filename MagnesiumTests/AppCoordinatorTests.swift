@@ -129,7 +129,7 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_listCoordinatorEvent_showDetail_shouldShowDetail() throws {
-        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel())))
+        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel())))
         let navigationController = splitViewController.detailViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
@@ -151,7 +151,7 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_listCoordinatorEvent_torrentsUpdated_whenHashNotRemoved_shouldDismissDetail() throws {
-        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(hash: "A"))))
         let previousDetailViewController = splitViewController.detailViewController
         XCTAssertNotNil(previousDetailViewController)
         coordinator.handle(.torrentsUpdated(hashes: ["A", "B"]))
@@ -159,7 +159,7 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_listCoordinatorEvent_torrentsUpdated_whenHashRemoved_shouldDismissDetail() throws {
-        coordinator.handle(.showDetail(viewModel: AnyEmitterViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(hash: "A"))))
         let previousDetailViewController = splitViewController.detailViewController
         XCTAssertNotNil(previousDetailViewController)
         coordinator.handle(.torrentsUpdated(hashes: ["B"]))
@@ -227,7 +227,7 @@ private final class MockSplitViewController: PresentableSplitViewController {
     }
 }
 
-private final class MockTorrentDetailViewModel: ViewModel, EventEmitter {
+private final class MockTorrentDetailViewModel: ViewModel {
     let state: TorrentDetailViewState
     let events: AnyPublisher<TorrentDetailEvent, Never> = Empty().eraseToAnyPublisher()
     func handle(_ event: TorrentDetailViewEvent) {}

@@ -115,7 +115,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_detail_shouldEmitShowDetailEvent() {
         var event: TorrentListCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        let detailViewModel = AnyEmitterViewModel(MockDetailViewModel())
+        let detailViewModel = AnyViewModel(MockDetailViewModel())
         viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
         guard case let .showDetail(viewModel) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -244,7 +244,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
 // MARK: - Mocks
 
-private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider {
+private final class MockViewModel: ViewModel, TorrentListProvider {
     let state = TorrentListViewState(
         title: Just("").eraseToAnyPublisher(),
         items: Just([]).eraseToAnyPublisher(),
@@ -295,7 +295,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
     }
 }
 
-private final class MockDetailViewModel: ViewModel, EventEmitter {
+private final class MockDetailViewModel: ViewModel {
     let state = TorrentDetailViewState(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),

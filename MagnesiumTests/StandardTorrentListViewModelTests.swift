@@ -862,7 +862,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var detailViewModelCallCount = 0
     private(set) var detailViewModelParamTorrent = [CurrentValueSubject<MockTorrent, Never>]()
     private(set) var detailViewModelParamLabels = [CurrentValueSubject<[MockLabel], Never>]()
-    var detailViewModelResult = AnyEmitterViewModel(MockDetailViewModel())
+    var detailViewModelResult = AnyViewModel(MockDetailViewModel())
     func detailViewModel(
         for torrent: CurrentValueSubject<MockTorrent, Never>,
         labels: CurrentValueSubject<[MockLabel], Never>
@@ -952,7 +952,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     }
 }
 
-private final class MockDetailViewModel: ViewModel, EventEmitter {
+private final class MockDetailViewModel: ViewModel {
     let state = TorrentDetailViewState(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
