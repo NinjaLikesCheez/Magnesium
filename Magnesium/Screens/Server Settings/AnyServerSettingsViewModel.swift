@@ -1,6 +1,6 @@
 import ViewModel
 
-typealias AnyServerSettingsViewModel = AnyEmitterViewModel<
+typealias AnyServerSettingsViewModel = AnyViewModel<
     ServerSettingsEvent,
     ServerSettingsViewEvent,
     ServerSettingsViewState

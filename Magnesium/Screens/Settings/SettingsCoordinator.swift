@@ -12,7 +12,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
-    let received: AnyPublisher<SettingsEvent, Never>
+    let receivedEvents: AnyPublisher<SettingsEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -29,7 +29,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
         let viewModel = SettingsViewModel(session: session, preferences: preferences)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
-        received = viewModel.events
+        receivedEvents = viewModel.events
     }
 
     func handle(_ event: SettingsEvent) {

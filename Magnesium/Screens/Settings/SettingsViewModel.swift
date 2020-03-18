@@ -23,7 +23,7 @@ struct SettingsViewState {
     var sections: AnyPublisher<[SettingsSection], Never>
 }
 
-final class SettingsViewModel: ViewModel, EventEmitter {
+final class SettingsViewModel: ViewModel {
     private let session: Session
     private let preferences: Preferences
     private var cancellables = Set<AnyCancellable>()

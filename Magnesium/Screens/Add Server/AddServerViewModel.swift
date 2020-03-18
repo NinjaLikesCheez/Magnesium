@@ -15,7 +15,7 @@ struct AddServerViewState {
     var types: [String]
 }
 
-final class AddServerViewModel: ViewModel, EventEmitter {
+final class AddServerViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<AddServerEvent, Never>()
     private let serverTypes: [ServerType] = [.deluge, .transmission]
     let state: AddServerViewState

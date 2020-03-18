@@ -11,9 +11,8 @@ enum ServerErrorViewEvent {
     case editServerSelected
 }
 
-final class ServerErrorViewModel: ViewModel, EventEmitter {
+final class ServerErrorViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<ServerErrorEvent, Never>()
-    let state: Void = ()
 
     var events: AnyPublisher<ServerErrorEvent, Never> {
         eventSubject.eraseToAnyPublisher()

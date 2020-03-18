@@ -19,8 +19,7 @@ protocol StandardTorrentDetailViewModelImplementation {
     func moveDownloadFolder(for torrent: Torrent, to path: String) -> AnyPublisher<Void, Error>
 }
 
-// swiftlint:disable:next line_length
-final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetailViewModelImplementation>: ViewModel, EventEmitter {
+final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetailViewModelImplementation>: ViewModel {
     typealias Torrent = Implementation.Torrent
     typealias Label = Implementation.Label
     typealias File = Implementation.File

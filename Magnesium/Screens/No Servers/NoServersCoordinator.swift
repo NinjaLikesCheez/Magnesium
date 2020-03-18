@@ -11,7 +11,7 @@ enum NoServersCoordinatorEvent {
 final class NoServersCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<NoServersCoordinatorEvent, Never>()
     private let viewController: NoServersViewController<NoServersViewModel>
-    let received: AnyPublisher<NoServersEvent, Never>
+    let receivedEvents: AnyPublisher<NoServersEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -26,7 +26,7 @@ final class NoServersCoordinator: Coordinator {
     init() {
         let viewModel = NoServersViewModel()
         viewController = NoServersViewController(viewModel: viewModel)
-        received = viewModel.events
+        receivedEvents = viewModel.events
     }
 
     func handle(_ event: NoServersEvent) {

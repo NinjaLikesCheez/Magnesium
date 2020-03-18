@@ -11,9 +11,8 @@ enum NoServersViewEvent {
     case addServerSelected
 }
 
-final class NoServersViewModel: ViewModel, EventEmitter {
+final class NoServersViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<NoServersEvent, Never>()
-    let state: Void = ()
 
     var events: AnyPublisher<NoServersEvent, Never> {
         eventSubject.eraseToAnyPublisher()

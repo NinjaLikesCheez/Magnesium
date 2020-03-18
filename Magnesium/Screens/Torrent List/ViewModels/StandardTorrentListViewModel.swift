@@ -24,7 +24,7 @@ protocol StandardTorrentListViewModelImplementation {
 }
 
 // swiftlint:disable:next line_length
-final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, EventEmitter, TorrentListProvider {
+final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, TorrentListProvider {
     typealias Torrent = Implementation.Torrent
     typealias Label = Implementation.Label
 

@@ -3,7 +3,7 @@ import MVVMModels
 import UIKit
 import ViewModel
 
-final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvider {
+final class AnyTorrentListViewModel: ViewModel, TorrentListProvider {
     private let _events: () -> AnyPublisher<Event, Never>
     private let _state: () -> ViewState
     private let _handle: (ViewEvent) -> Void
@@ -18,7 +18,6 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
 
     init<Base>(_ base: Base) where
         Base: ViewModel,
-        Base: EventEmitter,
         Base: TorrentListProvider,
         Base.Event == Event,
         Base.ViewEvent == ViewEvent,

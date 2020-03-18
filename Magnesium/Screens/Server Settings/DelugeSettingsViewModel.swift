@@ -5,7 +5,7 @@ import MVVMModels
 import Preferences
 import ViewModel
 
-final class DelugeSettingsViewModel: ViewModel, EventEmitter {
+final class DelugeSettingsViewModel: ViewModel {
     private let preferences: Preferences
     private let server: Server?
     private let clientProvider: DelugeClientProvider

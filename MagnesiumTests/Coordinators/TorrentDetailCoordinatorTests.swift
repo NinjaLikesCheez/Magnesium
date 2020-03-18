@@ -16,7 +16,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
         window = UIWindow()
         viewModel = MockViewModel()
         coordinator = TorrentDetailCoordinator(viewModel: AnyEmitterViewModel(viewModel))
-        coordinator.received.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
+        coordinator.receivedEvents.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()

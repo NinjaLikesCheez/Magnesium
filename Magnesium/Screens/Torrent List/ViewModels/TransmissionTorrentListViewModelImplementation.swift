@@ -37,7 +37,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             labels: labels,
             preferences: preferences
         )
-        return AnyEmitterViewModel(viewModel)
+        return AnyViewModel(viewModel)
     }
 
     func addLink(_ url: String) -> AnyPublisher<(String, String), Never> {

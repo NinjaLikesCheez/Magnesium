@@ -5,7 +5,7 @@ import Preferences
 import Transmission
 import ViewModel
 
-final class TransmissionSettingsViewModel: ViewModel, EventEmitter {
+final class TransmissionSettingsViewModel: ViewModel {
     private let preferences: Preferences
     private let server: Server?
     private let clientProvider: TransmissionClientProvider

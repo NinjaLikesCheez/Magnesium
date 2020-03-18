@@ -11,7 +11,7 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
     private let preferences: Preferences
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController<AddServerViewModel>
-    let received: AnyPublisher<AddServerEvent, Never>
+    let receivedEvents: AnyPublisher<AddServerEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -27,7 +27,7 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
         self.preferences = preferences
         let viewModel = AddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
-        received = viewModel.events
+        receivedEvents = viewModel.events
     }
 
     func handle(_ event: AddServerEvent) {

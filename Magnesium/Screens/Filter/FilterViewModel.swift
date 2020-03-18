@@ -19,7 +19,7 @@ struct FilterViewState {
     var sections: AnyPublisher<[FilterSection], Never>
 }
 
-final class FilterViewModel: ViewModel, EventEmitter {
+final class FilterViewModel: ViewModel {
     private let preferences: Preferences
     private let labels: CurrentValueSubject<[StandardLabel], Never>
     private let eventSubject = PassthroughSubject<FilterEvent, Never>()

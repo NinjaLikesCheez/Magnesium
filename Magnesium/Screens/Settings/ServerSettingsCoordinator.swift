@@ -10,7 +10,7 @@ enum ServerSettingsCoordinatorEvent {
 final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     private let viewController: ServerSettingsViewController<AnyServerSettingsViewModel>
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()
-    let received: AnyPublisher<ServerSettingsEvent, Never>
+    let receivedEvents: AnyPublisher<ServerSettingsEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -26,25 +26,25 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
         let viewModel: AnyServerSettingsViewModel
         switch server.type {
         case .deluge:
-            viewModel = AnyEmitterViewModel(DelugeSettingsViewModel(preferences: preferences, server: server))
+            viewModel = AnyViewModel(DelugeSettingsViewModel(preferences: preferences, server: server))
         case .transmission:
-            viewModel = AnyEmitterViewModel(TransmissionSettingsViewModel(preferences: preferences, server: server))
+            viewModel = AnyViewModel(TransmissionSettingsViewModel(preferences: preferences, server: server))
         }
 
         viewController = ServerSettingsViewController(viewModel: viewModel)
-        received = viewModel.events
+        receivedEvents = viewModel.events
     }
 
     init(type: ServerType, preferences: Preferences) {
         let viewModel: AnyServerSettingsViewModel
         switch type {
         case .deluge:
-            viewModel = AnyEmitterViewModel(DelugeSettingsViewModel(preferences: preferences))
+            viewModel = AnyViewModel(DelugeSettingsViewModel(preferences: preferences))
         case .transmission:
-            viewModel = AnyEmitterViewModel(TransmissionSettingsViewModel(preferences: preferences))
+            viewModel = AnyViewModel(TransmissionSettingsViewModel(preferences: preferences))
         }
 
-        received = viewModel.events
+        receivedEvents = viewModel.events
         viewController = ServerSettingsViewController(viewModel: viewModel)
     }
 

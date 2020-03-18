@@ -11,7 +11,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     private let splitViewController: PresentableSplitViewController
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: splitViewController, session: session)
     let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    let received: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let receivedEvents: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
