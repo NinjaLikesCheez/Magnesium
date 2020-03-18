@@ -619,6 +619,7 @@
 				E95C4D9623E3D20B00202CAA /* FilterOptions.swift */,
 				E9637853241334DD0068E051 /* Server.swift */,
 				E9637855241334F80068E051 /* ServerType.swift */,
+				E9624D2A23D1FF080051EA99 /* Session.swift */,
 				E9C8258723C57E47003B1D72 /* SortOption.swift */,
 				E9C39ADF23CC27A800BB3556 /* TextInputItem.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
@@ -651,7 +652,6 @@
 			children = (
 				E917B4BC23E764DA0090D490 /* AddTorrentFlow.swift */,
 				E9CE4C3323B453BE001D1C63 /* Formatters.swift */,
-				E9624D2A23D1FF080051EA99 /* Session.swift */,
 				E98D936023D2845D0013A1E1 /* TorrentMapper.swift */,
 				E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */,
 			);
