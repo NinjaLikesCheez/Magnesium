@@ -7,15 +7,15 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
     typealias File = TransmissionTorrentFile
 
     private let client: TransmissionClient
-    private let refresher: TransmissionRefreshable
+    private let refresher: TorrentRefresher
 
-    init(client: TransmissionClient, refresher: TransmissionRefreshable) {
+    init(client: TransmissionClient, refresher: TorrentRefresher) {
         self.client = client
         self.refresher = refresher
     }
 
     func refresh() -> AnyPublisher<Void, Error> {
-        refresher.refreshTransmission().mapError { $0 as Error }.eraseToAnyPublisher()
+        refresher.refreshTorrents()
     }
 
     func updateFiles(_ torrent: TransmissionTorrent) -> AnyPublisher<[TransmissionTorrentFile], Error> {

@@ -4,7 +4,7 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, DelugeRefreshable {
+final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, TorrentRefresher {
     private let client: DelugeClient
     private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<([DelugeTorrent], [DelugeLabel]), Never>()
@@ -98,12 +98,13 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
             .eraseToAnyPublisher()
     }
 
-    func refreshDeluge() -> AnyPublisher<Void, DelugeError> {
+    func refreshTorrents() -> AnyPublisher<Void, Error> {
         client.request(.updateUIForApp)
             .handleEvents(receiveOutput: { [weak self] in
                 self?.updatedSubject.send($0)
             })
             .map { _ in () }
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 }

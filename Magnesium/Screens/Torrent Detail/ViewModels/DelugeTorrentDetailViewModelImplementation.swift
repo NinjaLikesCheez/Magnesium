@@ -7,9 +7,9 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     typealias File = DelugeTorrentFile
 
     private let client: DelugeClient
-    private let refresher: DelugeRefreshable
+    private let refresher: TorrentRefresher
 
-    init(client: DelugeClient, refresher: DelugeRefreshable) {
+    init(client: DelugeClient, refresher: TorrentRefresher) {
         self.client = client
         self.refresher = refresher
     }
@@ -26,7 +26,7 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     }
 
     func refresh() -> AnyPublisher<Void, Error> {
-        refresher.refreshDeluge().mapError { $0 as Error }.eraseToAnyPublisher()
+        refresher.refreshTorrents()
     }
 
     func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {

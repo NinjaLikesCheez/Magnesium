@@ -4,20 +4,20 @@ import XCTest
 
 class TransmissionTorrentDetailViewModelImplementationTests: XCTestCase {
     private var client: MockTransmissionClient!
-    private var refresher: MockTransmissionRefresher!
+    private var refresher: MockTorrentRefresher!
     private var implementation: TransmissionTorrentDetailViewModelImplementation!
     private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
         client = MockTransmissionClient()
-        refresher = MockTransmissionRefresher()
+        refresher = MockTorrentRefresher()
         implementation = TransmissionTorrentDetailViewModelImplementation(client: client, refresher: refresher)
     }
 
     func test_refresh_shouldCallRefresher() {
         implementation.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &cancellables)
-        XCTAssertEqual(refresher.refreshTransmissionCallCount, 1)
+        XCTAssertEqual(refresher.refreshTorrentsCallCount, 1)
     }
 
     func test_pause_shouldStop() {

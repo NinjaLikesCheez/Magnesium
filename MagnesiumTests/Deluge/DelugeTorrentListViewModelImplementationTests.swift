@@ -133,21 +133,21 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
         XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],"\/new"]"#])
     }
 
-    func test_refreshDeluge_shouldGetCurrentState() {
-        implementation.refreshDeluge()
+    func test_refreshTorrents_shouldGetCurrentState() {
+        implementation.refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
-    func test_refreshDeluge_shouldEmitUpdate() {
+    func test_refreshTorrents_shouldEmitUpdate() {
         client.results.append((
             method: "web.update_ui",
             result: Just(([], [])).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
         let expectation = self.expectation(description: "Value received")
         implementation.updated.sink { _ in expectation.fulfill() }.store(in: &cancellables)
-        implementation.refreshDeluge()
+        implementation.refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         waitForExpectations(timeout: 0)

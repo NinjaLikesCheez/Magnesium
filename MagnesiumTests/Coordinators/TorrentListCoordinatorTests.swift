@@ -264,7 +264,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
         let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
         let preferences = InMemoryPreferences()
         let client = MockDelugeClient()
-        let refresher = MockDelugeRefresher()
+        let refresher = MockTorrentRefresher()
         let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
             implementation: DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher),
             torrent: torrent,

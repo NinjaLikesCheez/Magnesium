@@ -5,20 +5,20 @@ import XCTest
 
 class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
     private var client: MockDelugeClient!
-    private var refresher: MockDelugeRefresher!
+    private var refresher: MockTorrentRefresher!
     private var implementation: DelugeTorrentDetailViewModelImplementation!
     private var cancellables = Set<AnyCancellable>()
 
     override func setUp() {
         super.setUp()
         client = MockDelugeClient()
-        refresher = MockDelugeRefresher()
+        refresher = MockTorrentRefresher()
         implementation = DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher)
     }
 
     func test_refresh_shouldCallRefresher() {
         implementation.refresh().sink(receiveCompletion: { _ in }, receiveValue: { _ in }).store(in: &cancellables)
-        XCTAssertEqual(refresher.refreshDelugeCallCount, 1)
+        XCTAssertEqual(refresher.refreshTorrentsCallCount, 1)
     }
 
     func test_pause_shouldPause() {

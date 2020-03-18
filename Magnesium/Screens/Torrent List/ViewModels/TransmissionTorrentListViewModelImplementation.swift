@@ -5,7 +5,7 @@ import Transmission
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class TransmissionTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, TransmissionRefreshable {
+final class TransmissionTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, TorrentRefresher {
     private let client: TransmissionClient
     private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<[TransmissionTorrent], Never>()
@@ -85,12 +85,13 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             .eraseToAnyPublisher()
     }
 
-    func refreshTransmission() -> AnyPublisher<Void, TransmissionError> {
+    func refreshTorrents() -> AnyPublisher<Void, Error> {
         client.request(.torrentsForApp)
             .handleEvents(receiveOutput: { [weak self] torrents in
                 self?.updatedSubject.send(torrents)
             })
             .map { _ in () }
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 }

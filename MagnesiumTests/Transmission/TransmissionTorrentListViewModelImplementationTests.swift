@@ -119,14 +119,14 @@ class TransmissionTorrentListViewModelImplementationTests: XCTestCase {
         )
     }
 
-    func test_refreshTransmission_shouldGetTorrents() {
-        implementation.refreshTransmission()
+    func test_refreshTorrents_shouldGetTorrents() {
+        implementation.refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-get"])
     }
 
-    func test_refreshTransmission_shouldEmitUpdate() {
+    func test_refreshTorrents_shouldEmitUpdate() {
         client.results.append((
             method: "torrent-get",
             result: Just([]).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
@@ -134,7 +134,7 @@ class TransmissionTorrentListViewModelImplementationTests: XCTestCase {
 
         let expectation = self.expectation(description: "Value received")
         implementation.updated.sink { _ in expectation.fulfill() }.store(in: &cancellables)
-        implementation.refreshTransmission()
+        implementation.refreshTorrents()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         waitForExpectations(timeout: 0)
