@@ -10,11 +10,6 @@ extension StandardLabel {
 }
 
 extension Never: StandardLabel {
-    var name: String {
-        ""
-    }
-
-    var count: Int {
-        0
-    }
+    var name: String {  "" }
+    var count: Int { 0 }
 }
