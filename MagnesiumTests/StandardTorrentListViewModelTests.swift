@@ -655,7 +655,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             }
             return output
         }
-        // swiftformat:disable all
+        // swiftformat:disable indent
         let expected = """
 
               Pause
@@ -667,7 +667,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
                 Remove Data
 
             """
-        // swiftformat:enable all
+        // swiftformat:enable indent
         XCTAssertEqual(menuString(menu), expected)
     }
 
@@ -683,7 +683,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             }
             return output
         }
-        // swiftformat:disable all
+        // swiftformat:disable indent
         let expected = """
 
               Pause
@@ -699,7 +699,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
                 Remove Data
 
             """
-        // swiftformat:enable all
+        // swiftformat:enable indent
         XCTAssertEqual(menuString(menu), expected)
     }
 
@@ -723,7 +723,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             }
             return output
         }
-        // swiftformat:disable all
+        // swiftformat:disable indent
         let expected = """
 
               Resume
@@ -739,7 +739,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
                 Remove Data
 
             """
-        // swiftformat:enable all
+        // swiftformat:enable indent
         XCTAssertEqual(menuString(menu), expected)
     }
 
