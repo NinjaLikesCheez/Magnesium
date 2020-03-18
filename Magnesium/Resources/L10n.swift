@@ -544,7 +544,7 @@ enum L10n {
 
     static var serverErrorBody: String {
         // swiftformat:disable indent
-        return  NSLocalizedString(
+        NSLocalizedString(
             "server_error_body",
             comment: """
                 Sorry, your server settings were unable to be read. Please try re-entering your server information.
