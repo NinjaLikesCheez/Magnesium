@@ -17,11 +17,11 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return navigationController
+        navigationController
     }
 
     var events: AnyPublisher<SettingsCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(session: Session, preferences: Preferences) {

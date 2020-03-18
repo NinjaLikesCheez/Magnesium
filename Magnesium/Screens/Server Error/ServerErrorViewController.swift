@@ -44,7 +44,7 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController 
     }()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "gear"),
             style: .plain,
             target: self,

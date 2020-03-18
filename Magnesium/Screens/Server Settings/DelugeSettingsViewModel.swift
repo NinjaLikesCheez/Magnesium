@@ -19,7 +19,7 @@ final class DelugeSettingsViewModel: ViewModel, EventEmitter {
     let state: ServerSettingsViewState
 
     var events: AnyPublisher<ServerSettingsEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(

@@ -13,7 +13,7 @@ extension DefaultTransmissionClient: TransmissionClient {}
 
 extension TransmissionTorrentFile: StandardTorrentFile {
     var progress: Float {
-        return Float(downloaded) / Float(size)
+        Float(downloaded) / Float(size)
     }
 }
 

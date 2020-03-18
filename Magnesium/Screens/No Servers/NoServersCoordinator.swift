@@ -16,11 +16,11 @@ final class NoServersCoordinator: Coordinator {
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return viewController
+        viewController
     }
 
     var events: AnyPublisher<NoServersCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init() {

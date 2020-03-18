@@ -16,7 +16,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
 
     var torrentHash: String {
-        return viewModel.state.hash
+        viewModel.state.hash
     }
 
     init(viewModel: VM) {
@@ -201,11 +201,11 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     }
 
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return .leastNormalMagnitude
+        .leastNormalMagnitude
     }
 
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return UIView()
+        UIView()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

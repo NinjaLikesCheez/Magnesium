@@ -316,6 +316,6 @@ private struct MockClientProvider: TransmissionClientProvider {
     let client: TransmissionClient
 
     func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
-        return client
+        client
     }
 }

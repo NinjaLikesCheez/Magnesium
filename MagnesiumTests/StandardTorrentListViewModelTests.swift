@@ -843,7 +843,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     let updatedSubject = PassthroughSubject<([MockTorrent], [MockLabel]), Never>()
 
     var updated: AnyPublisher<([MockTorrent], [MockLabel]), Never> {
-        return updatedSubject.eraseToAnyPublisher()
+        updatedSubject.eraseToAnyPublisher()
     }
 
     private(set) var refreshCallCount = 0

@@ -20,7 +20,7 @@ final class RefreshIntervalViewModel: ViewModel {
     let state: RefreshIntervalViewState
 
     private let options: [(Int, String)] = {
-        return [
+        [
             (0, L10n.refreshIntervalNever),
             (2, L10n.refreshIntervalSeconds(2)),
             (5, L10n.refreshIntervalSeconds(5)),

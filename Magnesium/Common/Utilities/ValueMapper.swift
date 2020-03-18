@@ -17,7 +17,7 @@ class ValueMapper<K: Hashable, V> {
 
     /// A publisher that emits the deduplicated filtered values.
     var values: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
-        return valuesSubject.eraseToAnyPublisher()
+        valuesSubject.eraseToAnyPublisher()
     }
 
     /// Creates a `ValueMapper` using the given filter publisher.
@@ -54,6 +54,6 @@ class ValueMapper<K: Hashable, V> {
     /// - Parameter index: The requested index.
     /// - Returns: The subject at the requested index.
     func subject(at index: Int) -> CurrentValueSubject<V, Never> {
-        return valuesSubject.value[index]
+        valuesSubject.value[index]
     }
 }

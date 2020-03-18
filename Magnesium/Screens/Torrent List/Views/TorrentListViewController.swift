@@ -21,7 +21,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     private class DataSource: UITableViewDiffableDataSource<Section, TorrentListItem> {
         override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-            return true
+            true
         }
     }
 
@@ -33,7 +33,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private lazy var statusView = StatusView()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "gear"),
             style: .plain,
             target: self,
@@ -42,7 +42,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var selectBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             title: "Select",
             style: .plain,
             target: self,
@@ -51,11 +51,11 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var doneBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped(_:)))
+        UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped(_:)))
     }()
 
     private lazy var addBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "plus"),
             style: .plain,
             target: self,
@@ -64,7 +64,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var filterBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: nil,
             style: .plain,
             target: self,
@@ -73,7 +73,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var resumeBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "play.circle"),
             style: .plain,
             target: self,
@@ -82,7 +82,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var pauseBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "pause.circle"),
             style: .plain,
             target: self,
@@ -91,7 +91,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var removeBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "trash.circle"),
             style: .plain,
             target: self,
@@ -100,7 +100,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var moreBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "ellipsis.circle"),
             style: .plain,
             target: self,
@@ -403,7 +403,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
+        UITableView.automaticDimension
     }
 
     override func tableView(
@@ -411,7 +411,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        return UIContextMenuConfiguration(
+        UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: { [weak self] in
                 self?.provider?.previewForItem(at: indexPath.row)

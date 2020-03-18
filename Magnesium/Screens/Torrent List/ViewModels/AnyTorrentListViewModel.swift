@@ -40,21 +40,21 @@ final class AnyTorrentListViewModel: ViewModel, EventEmitter, TorrentListProvide
     }
 
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        return _viewModelForItem(index)
+        _viewModelForItem(index)
     }
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
-        return _contextMenuForItem(index)
+        _contextMenuForItem(index)
     }
 
     func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
-        return _leadingSwipeActionsConfigurationForItem(index, source)
+        _leadingSwipeActionsConfigurationForItem(index, source)
     }
 
     func trailingSwipeActionsConfigurationForItem(
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        return _trailingSwipeActionsConfigurationForItem(index, source)
+        _trailingSwipeActionsConfigurationForItem(index, source)
     }
 }

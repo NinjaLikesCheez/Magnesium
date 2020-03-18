@@ -3,7 +3,7 @@ import Foundation
 
 extension Server {
     static func delugeMock(name: String = "Server") -> Server {
-        return Server(
+        Server(
             name: name,
             type: .deluge,
             data: try! JSONEncoder().encode(DelugeServerSettings(url: URL(string: "http://localhost")!)),
@@ -12,7 +12,7 @@ extension Server {
     }
 
     static func transmissionMock(name: String = "Server") -> Server {
-        return Server(
+        Server(
             name: name,
             type: .transmission,
             data: try! JSONEncoder().encode(TransmissionServerSettings(

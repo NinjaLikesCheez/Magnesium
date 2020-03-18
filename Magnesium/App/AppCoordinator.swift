@@ -22,7 +22,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }()
 
     var presentable: Presentable {
-        return splitViewController
+        splitViewController
     }
 
     // splitViewController needs to be injected for testing because the detail view controller is difficult to obtain

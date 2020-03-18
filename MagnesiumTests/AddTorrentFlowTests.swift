@@ -180,10 +180,10 @@ private struct MockClientProvider: DelugeClientProvider, TransmissionClientProvi
     let transmission = MockTransmissionClient()
 
     func createClient(baseURL: URL, password: String) -> DelugeClient {
-        return deluge
+        deluge
     }
 
     func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
-        return transmission
+        transmission
     }
 }

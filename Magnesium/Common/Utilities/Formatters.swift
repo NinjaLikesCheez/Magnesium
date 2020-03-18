@@ -22,7 +22,7 @@ enum Formatters {
     }
 
     static var number: NumberFormatter {
-        return number(precision: 0)
+        number(precision: 0)
     }
 
     private static var percentageFormatters = [Int: NumberFormatter]()
@@ -40,7 +40,7 @@ enum Formatters {
     }
 
     static var percentage: NumberFormatter {
-        return percentage(precision: 0)
+        percentage(precision: 0)
     }
 
     static var bytes: ByteCountFormatter = {

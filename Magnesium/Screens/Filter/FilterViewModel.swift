@@ -28,7 +28,7 @@ final class FilterViewModel: ViewModel, EventEmitter {
     let state: FilterViewState
 
     var events: AnyPublisher<FilterEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(preferences: Preferences, labels: CurrentValueSubject<[StandardLabel], Never>) {

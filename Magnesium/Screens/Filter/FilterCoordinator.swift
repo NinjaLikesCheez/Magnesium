@@ -14,11 +14,11 @@ final class FilterCoordinator: Coordinator, AlertPresenter {
     var cancellables = Set<AnyCancellable>()
 
     var presentable: Presentable {
-        return navigationController
+        navigationController
     }
 
     var events: AnyPublisher<FilterCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(preferences: Preferences, labels: CurrentValueSubject<[StandardLabel], Never>) {

@@ -23,7 +23,7 @@ struct TorrentListItem: Identifiable, Hashable {
     }
 
     static func == (lhs: TorrentListItem, rhs: TorrentListItem) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 
     func hash(into hasher: inout Hasher) {

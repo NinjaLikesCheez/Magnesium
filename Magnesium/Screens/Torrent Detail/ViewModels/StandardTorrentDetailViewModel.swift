@@ -56,7 +56,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }()
 
     var events: AnyPublisher<TorrentDetailEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(
@@ -428,7 +428,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        return implementation.updateFiles(torrent.value)
+        implementation.updateFiles(torrent.value)
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.files.update(with: new.map { ($0.index, $0) })
             })

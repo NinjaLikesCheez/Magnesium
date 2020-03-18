@@ -18,11 +18,11 @@ final class TorrentDetailCoordinator<VM: ViewModel & EventEmitter>: Coordinator,
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return viewController
+        viewController
     }
 
     var events: AnyPublisher<TorrentDetailCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(viewModel: VM) {

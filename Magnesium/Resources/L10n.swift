@@ -4,175 +4,175 @@ enum L10n {
     // MARK: Actions
 
     static var ok: String {
-        return NSLocalizedString("action_ok", comment: "OK")
+        NSLocalizedString("action_ok", comment: "OK")
     }
 
     static var add: String {
-        return NSLocalizedString("action_add", comment: "Add")
+        NSLocalizedString("action_add", comment: "Add")
     }
 
     static var cancel: String {
-        return NSLocalizedString("action_cancel", comment: "Cancel")
+        NSLocalizedString("action_cancel", comment: "Cancel")
     }
 
     static var pause: String {
-        return NSLocalizedString("action_pause", comment: "Pause")
+        NSLocalizedString("action_pause", comment: "Pause")
     }
 
     static var resume: String {
-        return NSLocalizedString("action_resume", comment: "Resume")
+        NSLocalizedString("action_resume", comment: "Resume")
     }
 
     static var setLabel: String {
-        return NSLocalizedString("action_set_label", comment: "Set Label")
+        NSLocalizedString("action_set_label", comment: "Set Label")
     }
 
     static var verifyFiles: String {
-        return NSLocalizedString("action_verify_files", comment: "Verify Files")
+        NSLocalizedString("action_verify_files", comment: "Verify Files")
     }
 
     static var updateTrackers: String {
-        return NSLocalizedString("action_update_trackers", comment: "Update Trackers")
+        NSLocalizedString("action_update_trackers", comment: "Update Trackers")
     }
 
     static var remove: String {
-        return NSLocalizedString("action_remove", comment: "Remove")
+        NSLocalizedString("action_remove", comment: "Remove")
     }
 
     static var save: String {
-        return NSLocalizedString("action_save", comment: "Save")
+        NSLocalizedString("action_save", comment: "Save")
     }
 
     static var addServer: String {
-        return NSLocalizedString("action_add_server", comment: "Add Server")
+        NSLocalizedString("action_add_server", comment: "Add Server")
     }
 
     static var editServer: String {
-        return NSLocalizedString("action_edit_server", comment: "Edit Server")
+        NSLocalizedString("action_edit_server", comment: "Edit Server")
     }
 
     static var deleteServer: String {
-        return NSLocalizedString("action_delete_server", comment: "Delete Server")
+        NSLocalizedString("action_delete_server", comment: "Delete Server")
     }
 
     static var delete: String {
-        return NSLocalizedString("action_delete", comment: "Delete")
+        NSLocalizedString("action_delete", comment: "Delete")
     }
 
     static var moveDownloadFolder: String {
-        return NSLocalizedString("action_move_download_folder", comment: "Move Download Folder")
+        NSLocalizedString("action_move_download_folder", comment: "Move Download Folder")
     }
 
     static var addTorrent: String {
-        return NSLocalizedString("action_add_torrent", comment: "Add Torrent")
+        NSLocalizedString("action_add_torrent", comment: "Add Torrent")
     }
 
     // MARK: Screens
 
     static var torrentInfoScreenTitle: String {
-        return NSLocalizedString("torrent_info_screen_title", comment: "Info")
+        NSLocalizedString("torrent_info_screen_title", comment: "Info")
     }
 
     static var filterScreenTitle: String {
-        return NSLocalizedString("filter_screen_title", comment: "Filter")
+        NSLocalizedString("filter_screen_title", comment: "Filter")
     }
 
     static var settingsScreenTitle: String {
-        return NSLocalizedString("settings_screen_title", comment: "Settings")
+        NSLocalizedString("settings_screen_title", comment: "Settings")
     }
 
     static var addServerScreenTitle: String {
-        return NSLocalizedString("add_server_screen_title", comment: "Add Server")
+        NSLocalizedString("add_server_screen_title", comment: "Add Server")
     }
 
     static var editServerScreenTitle: String {
-        return NSLocalizedString("edit_server_screen_title", comment: "Edit Server")
+        NSLocalizedString("edit_server_screen_title", comment: "Edit Server")
     }
 
     static var refreshIntervalScreenTitle: String {
-        return NSLocalizedString("refresh_interval_screen_title", comment: "Refresh Interval")
+        NSLocalizedString("refresh_interval_screen_title", comment: "Refresh Interval")
     }
 
     // MARK: Error
 
     static var pauseError: String {
-        return NSLocalizedString("error_pause", comment: "Failed to Pause")
+        NSLocalizedString("error_pause", comment: "Failed to Pause")
     }
 
     static var resumeError: String {
-        return NSLocalizedString("error_resume", comment: "Failed to Resume")
+        NSLocalizedString("error_resume", comment: "Failed to Resume")
     }
 
     static var removeError: String {
-        return NSLocalizedString("error_remove", comment: "Failed to Remove")
+        NSLocalizedString("error_remove", comment: "Failed to Remove")
     }
 
     static var verifyFilesError: String {
-        return NSLocalizedString("error_verify_files", comment: "Failed to Verify Files")
+        NSLocalizedString("error_verify_files", comment: "Failed to Verify Files")
     }
 
     static var setLabelError: String {
-        return NSLocalizedString("error_set_label", comment: "Failed to Set Label")
+        NSLocalizedString("error_set_label", comment: "Failed to Set Label")
     }
 
     static var updateTrackersError: String {
-        return NSLocalizedString("error_update_trackers", comment: "Failed to Update Trackers")
+        NSLocalizedString("error_update_trackers", comment: "Failed to Update Trackers")
     }
 
     static var refreshError: String {
-        return NSLocalizedString("error_refresh", comment: "Update Failed")
+        NSLocalizedString("error_refresh", comment: "Update Failed")
     }
 
     static var torrentLinkValidationError: String {
-        return NSLocalizedString("error_torrent_link_validation", comment: "Unable to Add Link")
+        NSLocalizedString("error_torrent_link_validation", comment: "Unable to Add Link")
     }
 
     static var torrentLinkValidationErrorDescription: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "error_torrent_link_validation_description",
             comment: "That link doesn't appear to be valid."
         )
     }
 
     static var addTorrentError: String {
-        return NSLocalizedString("error_add_torrent", comment: "Failed to Add Torrent")
+        NSLocalizedString("error_add_torrent", comment: "Failed to Add Torrent")
     }
 
     static var addServerError: String {
-        return NSLocalizedString("error_add_server", comment: "Unable to Add Server")
+        NSLocalizedString("error_add_server", comment: "Unable to Add Server")
     }
 
     static var saveServerError: String {
-        return NSLocalizedString("error_save_server", comment: "Unable to Save Server")
+        NSLocalizedString("error_save_server", comment: "Unable to Save Server")
     }
 
     static var authenticationError: String {
-        return NSLocalizedString("error_authentication", comment: "Authentication Failed")
+        NSLocalizedString("error_authentication", comment: "Authentication Failed")
     }
 
     static var serverURLValidationErrorDescription: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "error_server_url_validation_description",
             comment: "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
         )
     }
 
     static var unauthenticatedErrorDescription: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "error_unauthenticated_description",
             comment: "Unable to authenticate. Verify that your credentials are correct."
         )
     }
 
     static var unexpectedResponseErrorDescription: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "error_unexpected_response_description",
             comment: "The server returned an unexpected response."
         )
     }
 
     static var serverErrorDescription: String {
-        return NSLocalizedString("error_server_description", comment: "The server returned an error.")
+        NSLocalizedString("error_server_description", comment: "The server returned an error.")
     }
 
     static func serverMessageErrorDescription(_ message: String) -> String {
@@ -184,7 +184,7 @@ enum L10n {
     }
 
     static var noSessionIDErrorDescription: String {
-        return NSLocalizedString("error_no_session_id", comment: "Unable to retrieve Session ID.")
+        NSLocalizedString("error_no_session_id", comment: "Unable to retrieve Session ID.")
     }
 
     static func unexpectedStatusCodeErrorDescription(_ statusCode: Int) -> String {
@@ -196,17 +196,17 @@ enum L10n {
     }
 
     static var moveDownloadFolderError: String {
-        return NSLocalizedString("error_move_download_folder", comment: "Failed to Move Download Folder")
+        NSLocalizedString("error_move_download_folder", comment: "Failed to Move Download Folder")
     }
 
     // MARK: Servers
 
     static var deluge: String {
-        return NSLocalizedString("server_deluge", comment: "Deluge")
+        NSLocalizedString("server_deluge", comment: "Deluge")
     }
 
     static var transmission: String {
-        return NSLocalizedString("server_transmission", comment: "Transmission")
+        NSLocalizedString("server_transmission", comment: "Transmission")
     }
 
     // MARK: Sort Properties
@@ -216,15 +216,15 @@ enum L10n {
     }
 
     static var sortPropertyName: String {
-        return NSLocalizedString("sort_property_name", comment: "Name")
+        NSLocalizedString("sort_property_name", comment: "Name")
     }
 
     static var sortPropertyDownloadSpeed: String {
-        return NSLocalizedString("sort_property_download_speed", comment: "Download Speed")
+        NSLocalizedString("sort_property_download_speed", comment: "Download Speed")
     }
 
     static var sortPropertyUploadSpeed: String {
-        return NSLocalizedString("sort_property_upload_speed", comment: "Upload Speed")
+        NSLocalizedString("sort_property_upload_speed", comment: "Upload Speed")
     }
 
     // MARK: Add Torrent
@@ -235,23 +235,23 @@ enum L10n {
     }
 
     static var addTorrentMethodPrompt: String {
-        return NSLocalizedString("add_torrent_method_prompt", comment: "How would you like to add the torrent?")
+        NSLocalizedString("add_torrent_method_prompt", comment: "How would you like to add the torrent?")
     }
 
     static var addTorrentMethodLink: String {
-        return NSLocalizedString("add_torrent_method_link", comment: "Add Link")
+        NSLocalizedString("add_torrent_method_link", comment: "Add Link")
     }
 
     static var addTorrentMethodFile: String {
-        return NSLocalizedString("add_torrent_method_file", comment: "Add File")
+        NSLocalizedString("add_torrent_method_file", comment: "Add File")
     }
 
     static var addTorrentLinkAlertTitle: String {
-        return NSLocalizedString("add_torrent_link_alert_title", comment: "Enter a URL")
+        NSLocalizedString("add_torrent_link_alert_title", comment: "Enter a URL")
     }
 
     static var addTorrentLinkAlertMessage: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "add_torrent_link_alert_message",
             comment: "This can be either a link to a torrent or a magnet link."
         )
@@ -292,37 +292,37 @@ enum L10n {
     // MARK: Torrent State
 
     static var downloadingState: String {
-        return NSLocalizedString("torrent_state_downloading", comment: "Downloading")
+        NSLocalizedString("torrent_state_downloading", comment: "Downloading")
     }
 
     static var seedingState: String {
-        return NSLocalizedString("torrent_state_seeding", comment: "Seeding")
+        NSLocalizedString("torrent_state_seeding", comment: "Seeding")
     }
 
     static var pausedState: String {
-        return NSLocalizedString("torrent_state_paused", comment: "Paused")
+        NSLocalizedString("torrent_state_paused", comment: "Paused")
     }
 
     static var queuedState: String {
-        return NSLocalizedString("torrent_state_queued", comment: "Queued")
+        NSLocalizedString("torrent_state_queued", comment: "Queued")
     }
 
     static var checkingState: String {
-        return NSLocalizedString("torrent_state_checking", comment: "Checking")
+        NSLocalizedString("torrent_state_checking", comment: "Checking")
     }
 
     static var errorState: String {
-        return NSLocalizedString("torrent_state_error", comment: "Error")
+        NSLocalizedString("torrent_state_error", comment: "Error")
     }
 
     // MARK: Remove Torrent
 
     static var removeTorrentOptionKeepData: String {
-        return NSLocalizedString("remove_torrent_option_keep_data", comment: "Keep Data")
+        NSLocalizedString("remove_torrent_option_keep_data", comment: "Keep Data")
     }
 
     static var removeTorrentOptionRemoveData: String {
-        return NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data")
+        NSLocalizedString("remove_torrent_option_remove_data", comment: "Remove Data")
     }
 
     // MARK: Torrent List
@@ -340,109 +340,109 @@ enum L10n {
     // MARK: Torrent Info
 
     static var torrentInfoSectionInfo: String {
-        return NSLocalizedString("torrent_info_section_info", comment: "Information")
+        NSLocalizedString("torrent_info_section_info", comment: "Information")
     }
 
     static var torrentInfoSectionTrackers: String {
-        return NSLocalizedString("torrent_info_section_trackers", comment: "Trackers")
+        NSLocalizedString("torrent_info_section_trackers", comment: "Trackers")
     }
 
     static var torrentInfoSectionFiles: String {
-        return NSLocalizedString("torrent_info_section_files", comment: "Files")
+        NSLocalizedString("torrent_info_section_files", comment: "Files")
     }
 
     static var torrentInfoSize: String {
-        return NSLocalizedString("torrent_info_size", comment: "Size")
+        NSLocalizedString("torrent_info_size", comment: "Size")
     }
 
     static var torrentInfoDownloadSpeed: String {
-        return NSLocalizedString("torrent_info_download_speed", comment: "Download Speed")
+        NSLocalizedString("torrent_info_download_speed", comment: "Download Speed")
     }
 
     static var torrentInfoUploadSpeed: String {
-        return NSLocalizedString("torrent_info_upload_speed", comment: "Upload Speed")
+        NSLocalizedString("torrent_info_upload_speed", comment: "Upload Speed")
     }
 
     static var torrentInfoDownloaded: String {
-        return NSLocalizedString("torrent_info_downloaded", comment: "Downloaded")
+        NSLocalizedString("torrent_info_downloaded", comment: "Downloaded")
     }
 
     static var torrentInfoUploaded: String {
-        return NSLocalizedString("torrent_info_uploaded", comment: "Uploaded")
+        NSLocalizedString("torrent_info_uploaded", comment: "Uploaded")
     }
 
     static var torrentInfoETA: String {
-        return NSLocalizedString("torrent_info_eta", comment: "ETA")
+        NSLocalizedString("torrent_info_eta", comment: "ETA")
     }
 
     static var torrentInfoRatio: String {
-        return NSLocalizedString("torrent_info_ratio", comment: "Ratio")
+        NSLocalizedString("torrent_info_ratio", comment: "Ratio")
     }
 
     static var torrentInfoPeers: String {
-        return NSLocalizedString("torrent_info_peers", comment: "Peers")
+        NSLocalizedString("torrent_info_peers", comment: "Peers")
     }
 
     static var torrentInfoSeed: String {
-        return NSLocalizedString("torrent_info_seeds", comment: "Seeds")
+        NSLocalizedString("torrent_info_seeds", comment: "Seeds")
     }
 
     static var torrentInfoDownloadFolder: String {
-        return NSLocalizedString("torrent_info_download_folder", comment: "Download Folder")
+        NSLocalizedString("torrent_info_download_folder", comment: "Download Folder")
     }
 
     // MARK: Label
 
     static var noneLabel: String {
-        return NSLocalizedString("label_none", comment: "None")
+        NSLocalizedString("label_none", comment: "None")
     }
 
     // MARK: Filter
 
     static var allFilter: String {
-        return NSLocalizedString("filter_all", comment: "All")
+        NSLocalizedString("filter_all", comment: "All")
     }
 
     static var filterOptionSort: String {
-        return NSLocalizedString("filter_option_sort", comment: "Sort")
+        NSLocalizedString("filter_option_sort", comment: "Sort")
     }
 
     static var filterOptionState: String {
-        return NSLocalizedString("filter_option_state", comment: "State")
+        NSLocalizedString("filter_option_state", comment: "State")
     }
 
     static var filterOptionLabel: String {
-        return NSLocalizedString("filter_option_label", comment: "Label")
+        NSLocalizedString("filter_option_label", comment: "Label")
     }
 
     static var sortByAlertTitle: String {
-        return NSLocalizedString("sort_by_alert_title", comment: "Sort by")
+        NSLocalizedString("sort_by_alert_title", comment: "Sort by")
     }
 
     static var sortByAlertMessage: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "sort_by_alert_message",
             comment: "Select the current sort option to sort in the opposite direction."
         )
     }
 
     static var filterLabelAlertTitle: String {
-        return NSLocalizedString("filter_label_alert_title", comment: "Filter by Label")
+        NSLocalizedString("filter_label_alert_title", comment: "Filter by Label")
     }
 
     static var filterLabelAlertMessage: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "filter_label_alert_message",
             comment: "Only display torrents with the selected label."
         )
     }
 
     static var filterStateAlertTitle: String {
-        return NSLocalizedString("filter_state_alert_title", comment: "Filter by State")
+        NSLocalizedString("filter_state_alert_title", comment: "Filter by State")
     }
 
     static var filterStateAlertMessage: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "filter_state_alert_message",
             comment: "Only display torrents with the selected state."
         )
@@ -451,29 +451,29 @@ enum L10n {
     // MARK: Settings
 
     static var settingsSectionServers: String {
-        return NSLocalizedString("settings_section_servers", comment: "Servers")
+        NSLocalizedString("settings_section_servers", comment: "Servers")
     }
 
     static var settingsSectionGeneral: String {
-        return NSLocalizedString("settings_section_general", comment: "General")
+        NSLocalizedString("settings_section_general", comment: "General")
     }
 
     static var settingsOptionCurrentServer: String {
-        return NSLocalizedString("settings_option_current_server", comment: "Current Server")
+        NSLocalizedString("settings_option_current_server", comment: "Current Server")
     }
 
     static var settingsOptionAddServer: String {
-        return NSLocalizedString("settings_option_add_server", comment: "Add Server")
+        NSLocalizedString("settings_option_add_server", comment: "Add Server")
     }
 
     static var settingsOptionRefreshInterval: String {
-        return NSLocalizedString("settings_option_refresh_interval", comment: "Refresh Interval")
+        NSLocalizedString("settings_option_refresh_interval", comment: "Refresh Interval")
     }
 
     // MARK: Refresh Interval
 
     static var refreshIntervalNever: String {
-        return NSLocalizedString("refresh_interval_never", comment: "Never")
+        NSLocalizedString("refresh_interval_never", comment: "Never")
     }
 
     static func refreshIntervalSeconds(_ seconds: Int) -> String {
@@ -484,40 +484,40 @@ enum L10n {
     // MARK: Server Settings
 
     static var serverSettingsOptionName: String {
-        return NSLocalizedString("server_settings_option_name", comment: "name")
+        NSLocalizedString("server_settings_option_name", comment: "name")
     }
 
     static var serverSettingsOptionServer: String {
-        return NSLocalizedString("server_settings_option_server", comment: "server")
+        NSLocalizedString("server_settings_option_server", comment: "server")
     }
 
     static var serverSettingsOptionPassword: String {
-        return NSLocalizedString("server_settings_option_password", comment: "password")
+        NSLocalizedString("server_settings_option_password", comment: "password")
     }
 
     static var serverSettingsOptionPasswordHint: String {
-        return NSLocalizedString("server_settings_option_password_hint", comment: "password")
+        NSLocalizedString("server_settings_option_password_hint", comment: "password")
     }
 
     static var serverSettingsOptionPasswordHintOptional: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "server_settings_option_password_hint_optional",
             comment: "password (optional)"
         )
     }
 
     static var serverSettingsOptionUsername: String {
-        return NSLocalizedString("server_settings_option_username", comment: "username")
+        NSLocalizedString("server_settings_option_username", comment: "username")
     }
 
     static var serverSettingsOptionUsernameHintOptional: String {
-        return NSLocalizedString("server_settings_option_username_hint_optional", comment: "user (optional)")
+        NSLocalizedString("server_settings_option_username_hint_optional", comment: "user (optional)")
     }
 
     // MARK: Delete Server
 
     static var deleteServerConfirmation: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "delete_server_confirmation",
             comment: "Are you sure you want to delete this server?"
         )
@@ -530,7 +530,7 @@ enum L10n {
     }
 
     static var noServersBody: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "no_servers_body",
             comment: "You'll need to add a server before you can start using Magnesium."
         )
@@ -539,7 +539,7 @@ enum L10n {
     // MARK: Server Error
 
     static var serverErrorTitle: String {
-        return NSLocalizedString("server_error_title", comment: "Unable to Load Server")
+        NSLocalizedString("server_error_title", comment: "Unable to Load Server")
     }
 
     static var serverErrorBody: String {
@@ -556,21 +556,21 @@ enum L10n {
     // MARK: Add Torrent
 
     static var unableToAddTorrentError: String {
-        return NSLocalizedString("error_unable_to_add_torrent", comment: "Unable to Add Torrent")
+        NSLocalizedString("error_unable_to_add_torrent", comment: "Unable to Add Torrent")
     }
 
     static var failedToAddTorrentError: String {
-        return NSLocalizedString("error_failed_to_add_torrent", comment: "Failed to Add Torrent")
+        NSLocalizedString("error_failed_to_add_torrent", comment: "Failed to Add Torrent")
     }
 
     static var corruptServerSettingsErrorDescription: String {
-        return NSLocalizedString(
+        NSLocalizedString(
             "error_corrupt_server_settings_description",
             comment: "The server settings could not be read."
         )
     }
 
     static var noServersErrorDescription: String {
-        return NSLocalizedString("error_no_servers_description", comment: "There are no servers.")
+        NSLocalizedString("error_no_servers_description", comment: "There are no servers.")
     }
 }

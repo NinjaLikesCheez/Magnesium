@@ -5,7 +5,7 @@ import Preferences
 
 extension Preferences {
     private func keychainQuery(for server: Server) -> [String: Any] {
-        return [
+        [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: "servers",
             kSecAttrAccount as String: server.id,
@@ -22,7 +22,7 @@ extension Preferences {
     }
 
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
-        return preferencesChanged
+        preferencesChanged
             .filter { $0.isRelevant(to: .servers) }
             .map { change -> Server? in
                 switch change {

@@ -16,7 +16,7 @@ final class NoServersViewModel: ViewModel, EventEmitter {
     let state: Void = ()
 
     var events: AnyPublisher<NoServersEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     func handle(_ event: NoServersViewEvent) {

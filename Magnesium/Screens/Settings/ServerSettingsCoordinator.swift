@@ -15,11 +15,11 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return viewController
+        viewController
     }
 
     var events: AnyPublisher<ServerSettingsCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(server: Server, preferences: Preferences) {

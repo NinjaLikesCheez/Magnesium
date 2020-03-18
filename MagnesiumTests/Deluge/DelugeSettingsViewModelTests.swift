@@ -313,6 +313,6 @@ private struct MockClientProvider: DelugeClientProvider {
     let client: DelugeClient
 
     func createClient(baseURL: URL, password: String) -> DelugeClient {
-        return client
+        client
     }
 }

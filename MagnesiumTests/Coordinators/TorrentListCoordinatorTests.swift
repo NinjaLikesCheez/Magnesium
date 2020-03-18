@@ -276,11 +276,11 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
     }
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
-        return UIMenu(title: "Menu", identifier: UIMenu.Identifier(rawValue: "mock"))
+        UIMenu(title: "Menu", identifier: UIMenu.Identifier(rawValue: "mock"))
     }
 
     func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
-        return SwipeActionsConfiguration(actions: [
+        SwipeActionsConfiguration(actions: [
             SwipeAction(title: "leadingMock", handler: {}),
         ])
     }
@@ -289,7 +289,7 @@ private final class MockViewModel: ViewModel, EventEmitter, TorrentListProvider 
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        return SwipeActionsConfiguration(actions: [
+        SwipeActionsConfiguration(actions: [
             SwipeAction(title: "trailingMock", handler: {}),
         ])
     }

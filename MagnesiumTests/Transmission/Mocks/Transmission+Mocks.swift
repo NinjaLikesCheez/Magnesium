@@ -27,7 +27,7 @@ extension Torrent {
         uploaded: Int64 = 0,
         uploadRate: Int64 = 0
     ) -> Self {
-        return .init(
+        .init(
             dateAdded: dateAdded,
             downloadPath: downloadPath,
             downloadRate: downloadRate,
@@ -65,7 +65,7 @@ extension TransmissionTorrent {
         uploaded: Int64 = 0,
         uploadRate: Int64 = 0
     ) -> Self {
-        return .init(
+        .init(
             dateAdded: dateAdded,
             downloadPath: downloadPath,
             downloadRate: downloadRate,
@@ -94,7 +94,7 @@ extension TransmissionTorrentFile {
         priority: Priority = .normal,
         isWanted: Bool = true
     ) -> TransmissionTorrentFile {
-        return TransmissionTorrentFile(
+        TransmissionTorrentFile(
             index: index,
             name: name,
             size: size,

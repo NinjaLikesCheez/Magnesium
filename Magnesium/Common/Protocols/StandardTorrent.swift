@@ -23,11 +23,11 @@ protocol StandardTorrent {
 
 extension StandardTorrent {
     var ratio: Double {
-        return Double(uploaded) / Double(downloaded)
+        Double(uploaded) / Double(downloaded)
     }
 
     var isActive: Bool {
-        return standardState == .downloading || standardState == .seeding
+        standardState == .downloading || standardState == .seeding
     }
 
     var localizedSpeed: String {
@@ -43,7 +43,7 @@ extension StandardTorrent {
     }
 
     var localizedProgress: String {
-        return L10n.torrentProgress(
+        L10n.torrentProgress(
             downloaded: Formatters.bytes.string(fromByteCount: downloaded),
             size: Formatters.bytes.string(fromByteCount: size),
             progress: Formatters.percentage.string(for: progress) ?? ""
@@ -51,7 +51,7 @@ extension StandardTorrent {
     }
 
     var formattedETA: String {
-        return eta > 0 ? Formatters.eta.string(from: eta) ?? "" : "∞"
+        eta > 0 ? Formatters.eta.string(from: eta) ?? "" : "∞"
     }
 
     func formattedRatio(precision: Int = 1) -> String {

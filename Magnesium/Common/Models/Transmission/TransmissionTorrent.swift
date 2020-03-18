@@ -20,15 +20,15 @@ struct TransmissionTorrent: StandardTorrent {
     var uploadRate: Int64
 
     var downloaded: Int64 {
-        return Int64(Float(size) * progress)
+        Int64(Float(size) * progress)
     }
 
     var totalSeeds: Int {
-        return totalPeers
+        totalPeers
     }
 
     var label: String {
-        return ""
+        ""
     }
 }
 

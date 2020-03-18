@@ -25,7 +25,7 @@ final class AddServerViewModel: ViewModel, EventEmitter {
     }
 
     var events: AnyPublisher<AddServerEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     func handle(_ event: AddServerViewEvent) {

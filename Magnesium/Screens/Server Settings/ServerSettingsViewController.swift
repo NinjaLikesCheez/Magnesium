@@ -14,7 +14,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             title: viewModel.state.saveButtonTitle,
             style: .done,
             target: self,
@@ -87,7 +87,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.state.canDelete ? 2 : 1
+        viewModel.state.canDelete ? 2 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

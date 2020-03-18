@@ -51,7 +51,7 @@ final class TorrentTableViewCell: UITableViewCell {
     }()
 
     static var estimatedHeight: CGFloat {
-        return 8
+        8
             + UIFont.preferredFont(forTextStyle: .callout).lineHeight
             + 8
             + 2.5

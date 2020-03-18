@@ -5,7 +5,7 @@ import Foundation
 
 extension Publisher {
     func ui() -> Publishers.UI<Self> {
-        return .init(upstream: self)
+        .init(upstream: self)
     }
 }
 
@@ -50,11 +50,11 @@ extension Publishers.UI {
         private var state: State
 
         var description: String {
-            return "UI"
+            "UI"
         }
 
         var customMirror: Mirror {
-            return Mirror(self, children: EmptyCollection())
+            Mirror(self, children: EmptyCollection())
         }
 
         init(downstream: Downstream) {

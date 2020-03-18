@@ -16,7 +16,7 @@ final class ServerErrorViewModel: ViewModel, EventEmitter {
     let state: Void = ()
 
     var events: AnyPublisher<ServerErrorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     func handle(_ event: ServerErrorViewEvent) {

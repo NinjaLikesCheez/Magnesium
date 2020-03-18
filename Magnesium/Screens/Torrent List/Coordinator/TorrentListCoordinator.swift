@@ -25,11 +25,11 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
     var presentable: Presentable {
-        return viewController
+        viewController
     }
 
     var events: AnyPublisher<TorrentListCoordinatorEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(viewModel: AnyTorrentListViewModel, session: Session, preferences: Preferences) {
@@ -167,7 +167,7 @@ extension TorrentListCoordinator: TorrentListViewProvider {
     }
 
     func contextMenuForItem(at index: Int) -> UIMenu? {
-        return viewModel.contextMenuForItem(at: index)
+        viewModel.contextMenuForItem(at: index)
     }
 
     func commitPreviewForItem(at index: Int) {

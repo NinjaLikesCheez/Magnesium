@@ -8,7 +8,7 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var cells: [UITableViewCell] = {
-        return viewModel.state.options.map { state in
+        viewModel.state.options.map { state in
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.textLabel?.text = state.name
             state.isSelected
@@ -33,11 +33,11 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cells.count
+        cells.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return cells[indexPath.row]
+        cells[indexPath.row]
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

@@ -2,7 +2,7 @@ import UIKit
 
 extension Activity {
     func createUIActivity() -> UIActivity {
-        return _UIActivity(activity: self)
+        _UIActivity(activity: self)
     }
 }
 
@@ -10,19 +10,19 @@ private class _UIActivity: UIActivity {
     private let activity: Activity
 
     override var activityTitle: String? {
-        return activity.title
+        activity.title
     }
 
     override var activityImage: UIImage? {
-        return activity.image
+        activity.image
     }
 
     override var activityType: UIActivity.ActivityType? {
-        return .init(activity.type)
+        .init(activity.type)
     }
 
     override class var activityCategory: UIActivity.Category {
-        return .action
+        .action
     }
 
     init(activity: Activity) {
@@ -30,7 +30,7 @@ private class _UIActivity: UIActivity {
     }
 
     override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-        return true
+        true
     }
 
     override func perform() {

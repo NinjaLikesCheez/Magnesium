@@ -43,7 +43,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     }()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        return UIBarButtonItem(
+        UIBarButtonItem(
             image: UIImage(systemName: "gear"),
             style: .plain,
             target: self,

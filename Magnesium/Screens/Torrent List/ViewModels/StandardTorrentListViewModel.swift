@@ -42,7 +42,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     var cancellables = Set<AnyCancellable>()
 
     var events: AnyPublisher<TorrentListEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(implementation: Implementation, server: Server, preferences: Preferences) {
@@ -53,7 +53,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         let title = isEditingSubject
             .combineLatest(multiSelectCountSubject)
             .map { isEditing, count in
-                return isEditing ? L10n.selectedCount(count) : server.name
+                isEditing ? L10n.selectedCount(count) : server.name
             }
             .ui()
             .eraseToAnyPublisher()
@@ -375,7 +375,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func refresh() -> AnyPublisher<Void, Error> {
-        return performRefresh()
+        performRefresh()
             .mapError { $0 as Error }
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in

@@ -32,7 +32,7 @@ final class SettingsViewModel: ViewModel, EventEmitter {
     let state: SettingsViewState
 
     var events: AnyPublisher<SettingsEvent, Never> {
-        return eventSubject.eraseToAnyPublisher()
+        eventSubject.eraseToAnyPublisher()
     }
 
     init(session: Session, preferences: Preferences) {

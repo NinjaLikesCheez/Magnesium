@@ -6,6 +6,6 @@ struct TorrentDetailInfoItem: Identifiable {
     var expandedValue: AnyPublisher<String, Never>?
 
     var id: String {
-        return name
+        name
     }
 }

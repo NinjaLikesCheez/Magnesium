@@ -8,18 +8,19 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
         let filterOptions = preferences.valuePublisher(for: .filterOptions)
         let filter = Publishers.CombineLatest3(sortOption, filterOptions, query)
             .map { sort, filter, query -> FilterFunction in
+                // swiftformat:disable:next redundantReturn
                 return { subjects in
                     var filtered = subjects
 
                     if let state = filter.state {
                         filtered = filtered.filter { subject in
-                            return subject.value.standardState == state
+                            subject.value.standardState == state
                         }
                     }
 
                     if let label = filter.label {
                         filtered = filtered.filter { subject in
-                            return subject.value.label == label
+                            subject.value.label == label
                         }
                     }
 
