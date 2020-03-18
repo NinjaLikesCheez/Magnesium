@@ -70,7 +70,7 @@ class AddTorrentFlowTests: XCTestCase {
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
         XCTAssertEqual(delugeClient.requestParamRequest.map(\.method), ["core.add_torrent_file"])
-        XCTAssertEqual(delugeClient.requestParamRequest.map(\.paramsJSON), [#"["file.torrent","",{}]"#])
+        XCTAssertEqual(delugeClient.requestParamRequest.map(\.argsJSON), [#"["file.torrent","",{}]"#])
     }
 
     func test_add_withDeluge_andFileURL_whenFails_shouldPresentAlertController() {
@@ -98,7 +98,7 @@ class AddTorrentFlowTests: XCTestCase {
         flow.add(type: .magnet(URL(string: "magnet:?")!))
         XCTAssertEqual(delugeClient.requestCallCount, 1)
         XCTAssertEqual(delugeClient.requestParamRequest.first?.method, "core.add_torrent_magnet")
-        XCTAssertEqual(delugeClient.requestParamRequest.first?.paramsJSON, #"["magnet:?",{}]"#)
+        XCTAssertEqual(delugeClient.requestParamRequest.first?.argsJSON, #"["magnet:?",{}]"#)
     }
 
     func test_add_withDeluge_andMagnetURL_whenFails_shouldPresentAlertController() {

@@ -44,7 +44,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_addLink_withMagnetLink_shouldAddMagnetURL() {
         implementation.addLink("magnet:?").sink { _ in }.store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_magnet"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["magnet:?",{}]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"["magnet:?",{}]"#])
     }
 
     func test_addLink_withMagnetLink_whenFails_shouldReturnError() {
@@ -60,7 +60,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     func test_addLink_withRegularLink_shouldAddMagnetURL() {
         implementation.addLink("http://example.com").sink { _ in }.store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.add_torrent_url"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"["http:\/\/example.com",{}]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"["http:\/\/example.com",{}]"#])
     }
 
     func test_addLink_withRegularLink_whenFails_shouldReturnError() {
@@ -92,7 +92,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],false]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A","B"],false]"#])
     }
 
     func test_remove_withRemoveData_shouldRemove() {
@@ -100,7 +100,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],true]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A","B"],true]"#])
     }
 
     func test_verify_shouldRecheck() {
@@ -115,7 +115,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["label.set_torrent", "label.set_torrent"])
-        XCTAssertEqual(client.requestParamRequest.map(\.params) as? [[String]], [["A", "label1"], ["B", "label1"]])
+        XCTAssertEqual(client.requestParamRequest.map(\.args) as? [[String]], [["A", "label1"], ["B", "label1"]])
     }
 
     func test_updateTrackers_shouldReannounce() {
@@ -130,7 +130,7 @@ class DelugeTorrentListViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.move_storage"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A","B"],"\/new"]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A","B"],"\/new"]"#])
     }
 
     func test_refreshTorrents_shouldGetCurrentState() {

@@ -19,9 +19,9 @@ final class MockDelugeClient: DelugeClient {
 }
 
 extension Request {
-    var paramsJSON: String {
+    var argsJSON: String {
         // swiftlint:disable:next force_try
-        let data = try! JSONSerialization.data(withJSONObject: params, options: [.sortedKeys])
+        let data = try! JSONSerialization.data(withJSONObject: args, options: [.sortedKeys])
         return String(data: data, encoding: .utf8)!
     }
 }

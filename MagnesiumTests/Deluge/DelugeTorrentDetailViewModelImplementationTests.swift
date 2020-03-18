@@ -40,7 +40,7 @@ class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A"],false]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],false]"#])
     }
 
     func test_remove_withRemoveData_shouldRemove() {
@@ -48,7 +48,7 @@ class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A"],true]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],true]"#])
     }
 
     func test_verify_shouldRecheck() {
@@ -77,6 +77,6 @@ class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.move_storage"])
-        XCTAssertEqual(client.requestParamRequest.map(\.paramsJSON), [#"[["A"],"\/new"]"#])
+        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],"\/new"]"#])
     }
 }
