@@ -19,9 +19,6 @@ pipeline {
         }
     }
     post {
-        success {
-            archiveArtifacts 'fastlane/build_output/*.ipa'
-        }
         always {
             step([
                 $class: 'Mailer',
@@ -29,6 +26,10 @@ pipeline {
                 recipients: "$MAIL_RECIPIENTS",
                 sendToIndividuals: false
                 ])
+        }
+
+        success {
+            archiveArtifacts 'fastlane/build_output/*.ipa'
         }
     }
 }
