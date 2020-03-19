@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Deluge",
+        "repositoryURL": "https://github.com/jameshurst/Deluge-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "87ad92aba703502a57ce43466d046ba3080f2287",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "Transmission",
+        "repositoryURL": "https://github.com/jameshurst/Transmission-Swift.git",
+        "state": {
+          "branch": null,
+          "revision": "507866e502760a42debf8fb0ab718d7ba50d412c",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
