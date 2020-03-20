@@ -1,6 +1,5 @@
 import Combine
 import Foundation
-import MVVMModels
 import Preferences
 import Transmission
 import ViewModel

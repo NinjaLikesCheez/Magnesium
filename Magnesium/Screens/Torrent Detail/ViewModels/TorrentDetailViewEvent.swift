@@ -1,5 +1,3 @@
-import MVVMModels
-
 enum TorrentDetailViewEvent {
     case appear
     case disappear

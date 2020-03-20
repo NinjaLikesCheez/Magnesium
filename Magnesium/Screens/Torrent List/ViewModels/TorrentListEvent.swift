@@ -1,5 +1,4 @@
 import Combine
-import MVVMModels
 
 enum TorrentListEvent {
     case alert(Alert)

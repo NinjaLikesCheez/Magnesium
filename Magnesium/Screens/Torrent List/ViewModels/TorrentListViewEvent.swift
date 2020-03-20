@@ -1,5 +1,3 @@
-import MVVMModels
-
 enum TorrentListViewEvent {
     case refresh
     case addSelected(source: PopoverSource)
