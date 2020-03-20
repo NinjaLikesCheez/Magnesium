@@ -1,6 +1,30 @@
+# -- PROJECT -- #
+
 included:
   - Magnesium
   - MagnesiumTests
+
+file_name:
+  excluded:
+    - Deluge+App.swift
+    - DelugeRequest+App.swift
+    - Transmission+App.swift
+    - Publishers+AsOptional.swift
+    - Deluge+Mocks.swift
+    - Transmission+Mocks.swift
+    - PreferenceKeys.swift
+
+identifier_name:
+  excluded:
+    - id
+    - ID
+    - ui
+    - ok
+
+type_name:
+  max_length: 60
+
+# -- STANDARD -- #
 
 analyzer_rules:
   - unused_declaration
@@ -85,23 +109,6 @@ opt_in_rules:
   - xct_specific_matcher
   - yoda_condition
 
-file_name:
-  excluded:
-    - Deluge+App.swift
-    - DelugeRequest+App.swift
-    - Transmission+App.swift
-    - Publishers+AsOptional.swift
-    - Deluge+Mocks.swift
-    - Transmission+Mocks.swift
-    - PreferenceKeys.swift
-
-identifier_name:
-  excluded:
-    - id
-    - ID
-    - ui
-    - ok
-
 line_length:
   warning: 120
 
@@ -110,6 +117,3 @@ number_separator:
 
 trailing_comma:
   mandatory_comma: true
-
-type_name:
-  max_length: 60
