@@ -14,7 +14,7 @@ if [ -n "$(git ls-files --others --modified --exclude-standard)" ]; then
   exit -1
 fi
 
-scripts/swiftlint.sh --strict
+tools/swiftlint --strict
 
 bundle install
 bundle exec fastlane run_ci

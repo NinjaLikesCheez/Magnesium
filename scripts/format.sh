@@ -1,1 +1,1 @@
-./scripts/swiftformat.sh Magnesium MagnesiumTests
+tools/swiftformat Magnesium MagnesiumTests

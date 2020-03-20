@@ -2,4 +2,4 @@ xcuserdata/
 fastlane/
 .bundle/
 vendor/
-scripts/.bin/
+tools/.bin/

@@ -1003,7 +1003,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "./scripts/swiftlint.sh\n";
+			shellScript = "tools/swiftlint\n";
 		};
 		E9E1840323F6523D00F93E0F /* Localization Lint */ = {
 			isa = PBXShellScriptBuildPhase;
