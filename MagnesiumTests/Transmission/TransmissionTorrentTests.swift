@@ -7,7 +7,7 @@ class TransmissionTorrentTests: XCTestCase {
         super.setUp()
         Current = .mock
     }
-    
+
     func test_init_state_shouldMapToExpectedStandardState() {
         let pairs: [(Torrent.Status, TorrentState)] = [
             (.downloading, .downloading),

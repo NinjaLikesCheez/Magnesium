@@ -1,17 +1,8 @@
 import Combine
 import Foundation
-import os
 import Preferences
 
 extension Preferences {
-    private func keychainQuery(for server: Server) -> [String: Any] {
-        [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "servers",
-            kSecAttrAccount as String: server.id,
-        ]
-    }
-
     private func updateSelectedServerID() {
         guard let server = getSelectedServer() else {
             removeValue(for: .selectedServerID)
@@ -51,30 +42,7 @@ extension Preferences {
         var servers = self[.servers]
         for (index, server) in servers.enumerated() {
             var server = server
-            var query = keychainQuery(for: server)
-            query[kSecMatchLimit as String] = kSecMatchLimitOne
-            query[kSecReturnData as String] = true
-            var result: AnyObject?
-
-            let status = withUnsafeMutablePointer(to: &result) {
-                SecItemCopyMatching(query as CFDictionary, $0)
-            }
-
-            guard status != errSecItemNotFound else {
-                continue
-            }
-
-            if status != errSecSuccess {
-                os_log("%@: server %@: SecItemCopyMatching -> %d", #function, server.id, status)
-                continue
-            }
-
-            guard let data = result as? Data else {
-                os_log("%@: server %@: unable to cast result to data", #function, server.id, status)
-                continue
-            }
-
-            server.keychainData = data
+            server.keychainData = Current.keychain.fetchServerData(server)
             servers[index] = server
         }
 
@@ -91,20 +59,8 @@ extension Preferences {
         }
 
         for server in servers {
-            var query = keychainQuery(for: server)
-
-            let status = SecItemDelete(query as CFDictionary)
-            if status != errSecSuccess, status != errSecItemNotFound {
-                os_log("%@: server %@: SecItemDelete -> %d", #function, server.id, status)
-            }
-
-            if let data = server.keychainData {
-                query[kSecValueData as String] = data
-                let status = SecItemAdd(query as CFDictionary, nil)
-                if status != errSecSuccess {
-                    os_log("%@: server %@: SecItemAdd -> %d", #function, server.id, status)
-                }
-            }
+            Current.keychain.deleteServerData(server)
+            Current.keychain.updateServerData(server)
         }
 
         self[.servers] = servers
@@ -114,25 +70,13 @@ extension Preferences {
     func remove(server: Server) {
         var servers = getServers()
         servers.removeAll { $0.id == server.id }
-
-        let status = SecItemDelete(keychainQuery(for: server) as CFDictionary)
-        if status != errSecSuccess {
-            os_log("%@: server %@: SecItemDelete -> %d", #function, server.id, status)
-        }
-
+        Current.keychain.deleteServerData(server)
         self[.servers] = servers
         updateSelectedServerID()
     }
 
     func removeServers() {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "servers",
-        ]
-        let status = SecItemDelete(query as CFDictionary)
-        if status != errSecSuccess, status != errSecItemNotFound {
-            os_log("%@: SecItemDelete -> %d", #function, status)
-        }
+        Current.keychain.deleteAllServerData()
         removeValue(for: .servers)
         removeValue(for: .selectedServerID)
     }

@@ -58,7 +58,7 @@ class TorrentMapperTests: XCTestCase {
         let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
         mapper.update(with: Array(torrents.enumerated()))
 
-        preferences[.sortOption] =  SortOption(property: .dateAdded, direction: .ascending)
+        preferences[.sortOption] = SortOption(property: .dateAdded, direction: .ascending)
         XCTAssertEqual(getValues(from: mapper).map { $0.hash }, expectedAscending)
 
         preferences[.sortOption] = SortOption(property: .dateAdded, direction: .descending)

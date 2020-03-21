@@ -8,12 +8,14 @@ extension Environment {
     static func mock(
         deluge: @escaping (URL, String) -> DelugeClient = { _, _ in MockDelugeClient() },
         transmission: @escaping (URL, String?, String?) -> TransmissionClient = { _, _, _ in MockTransmissionClient() },
-        preferences: Preferences = InMemoryPreferences()
+        preferences: Preferences = InMemoryPreferences(),
+        keychain: Keychain = .mock
     ) -> Environment {
         Environment(
             deluge: deluge,
             transmission: transmission,
-            preferences: preferences
+            preferences: preferences,
+            keychain: keychain
         )
     }
 }

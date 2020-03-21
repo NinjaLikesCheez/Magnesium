@@ -5,25 +5,16 @@ import XCTest
 
 class ServerPreferencesTests: XCTestCase {
     private var server: Server!
+    private var keychainStore: Keychain.MockStore!
     private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        clearKeychain()
-        Current = .mock
+        keychainStore = .init()
+        Current = .mock(keychain: .mock(store: keychainStore))
         server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         cancellables = Set()
-    }
-
-    override func tearDown() {
-        super.tearDown()
-        clearKeychain()
-    }
-
-    private func clearKeychain() {
-        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword]
-        SecItemDelete(query as CFDictionary)
     }
 
     func test_addOrUpdate_withNewServer() {
@@ -102,56 +93,27 @@ class ServerPreferencesTests: XCTestCase {
         waitForExpectations(timeout: 0)
     }
 
-    private func getKeychainCount() -> Int {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecReturnAttributes as String: true,
-            kSecMatchLimit as String: kSecMatchLimitAll,
-        ]
-
-        var result: AnyObject?
-        let status = withUnsafeMutablePointer(to: &result) {
-            SecItemCopyMatching(query as CFDictionary, $0)
-        }
-
-        if status == errSecItemNotFound {
-            return 0
-        }
-
-        guard status == errSecSuccess else {
-            XCTFail("SecItemCopyMatching returned \(status)")
-            return -1
-        }
-
-        guard let items = result as? [[String: Any]] else {
-            XCTFail("Unable to cast result")
-            return -1
-        }
-
-        return items.count
-    }
-
     func test_addOrUpdate_withKeychainData_shouldPersistToKeychain() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
         let fetched = preferences.getServers().first!
-        XCTAssertEqual(getKeychainCount(), 1)
+        XCTAssertEqual(keychainStore.values.count, 1)
         XCTAssertEqual(fetched.keychainData, server.keychainData)
     }
 
     func test_removeServer_withKeychainData_shouldRemoveFromKeychain() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
-        XCTAssertEqual(getKeychainCount(), 1)
+        XCTAssertEqual(keychainStore.values.count, 1)
         preferences.remove(server: server)
-        XCTAssertEqual(getKeychainCount(), 0)
+        XCTAssertEqual(keychainStore.values.count, 0)
     }
 
     func test_removeServers_shouldRemoveKeychainData() {
         let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: Data(count: 1024))
         preferences.addOrUpdate(server: server)
-        XCTAssertEqual(getKeychainCount(), 1)
+        XCTAssertEqual(keychainStore.values.count, 1)
         preferences.removeServers()
-        XCTAssertEqual(getKeychainCount(), 0)
+        XCTAssertEqual(keychainStore.values.count, 0)
     }
 }
