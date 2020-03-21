@@ -31,42 +31,42 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {
         client.request(.torrentItems(hash: torrent.hash))
             .map(torrentFiles(in:))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
     func pause(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.pause(hashes: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.pause(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func resume(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.resume(hashes: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.resume(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func remove(_ torrent: DelugeTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
         client.request(.remove(hashes: [torrent.hash], removeData: removeData))
-            .map { _ in () }
-            .mapError { $0 as Error }
+            .asVoid()
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
     func verify(_ torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.recheck(hashes: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.recheck(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func setLabel(_ label: DelugeLabel, for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
         client.request(.setLabel(hash: torrent.hash, label: label.name))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
     func updateTrackers(for torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.reannounce(hashes: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.reannounce(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func moveDownloadFolder(for torrent: DelugeTorrent, to path: String) -> AnyPublisher<Void, Error> {
         client.request(.move(hashes: [torrent.hash], path: path))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 }

@@ -209,7 +209,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private func handleRefresh() {
         isRefreshingSubject.send(true)
         implementation.refresh()
-            .mapError { $0 as Error }
+            .eraseError()
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
                 guard let strongSelf = self else { return Empty(completeImmediately: true).eraseToAnyPublisher() }
                 return strongSelf.refreshFiles()
@@ -424,7 +424,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.files.update(with: new.map { ($0.index, $0) })
             })
-            .map { _ in () }
+            .asVoid()
             .eraseToAnyPublisher()
     }
 }

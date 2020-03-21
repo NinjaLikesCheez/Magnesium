@@ -34,9 +34,9 @@ final class FilterViewModel: ViewModel {
         state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
-            .map { _ in () }
-            .merge(with: Current.preferences.valueUpdatedPublisher(for: .filterOptions).map { _ in () })
-            .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).map { _ in () })
+            .asVoid()
+            .merge(with: Current.preferences.valueUpdatedPublisher(for: .filterOptions).asVoid())
+            .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).asVoid())
             .sink { [weak self] _ in
                 self?.updateSections()
             }

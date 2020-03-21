@@ -37,9 +37,9 @@ final class SettingsViewModel: ViewModel {
         self.session = session
         state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        Current.preferences.valueUpdatedPublisher(for: .servers).map { _ in () }
-            .merge(with: session.serverPublisher.map { _ in () })
-            .merge(with: Current.preferences.valueUpdatedPublisher(for: .autoRefreshInterval).map { _ in () })
+        Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
+            .merge(with: session.serverPublisher.asVoid())
+            .merge(with: Current.preferences.valueUpdatedPublisher(for: .autoRefreshInterval).asVoid())
             .sink { [weak self] _ in
                 self?.updateSections()
             }

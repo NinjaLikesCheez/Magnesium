@@ -19,7 +19,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
     func refresh() -> AnyPublisher<([TransmissionTorrent], [Never]), Error> {
         client.request(.torrentsForApp)
             .map { ($0, []) }
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
@@ -52,32 +52,32 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
     }
 
     func pause(_ torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {
-        client.request(.stop(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.stop(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     func resume(_ torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {
-        client.request(.start(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.start(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     func remove(_ torrents: [TransmissionTorrent], removeData: Bool) -> AnyPublisher<Void, Error> {
         client.request(.remove(ids: torrents.map(\.hash), removeData: removeData))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
     func verify(_ torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {
-        client.request(.verify(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.verify(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     func setLabel(_ label: Never, for torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {}
 
     func updateTrackers(for torrents: [TransmissionTorrent]) -> AnyPublisher<Void, Error> {
-        client.request(.reannounce(ids: torrents.map(\.hash))).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.reannounce(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     func moveDownloadFolder(for torrents: [TransmissionTorrent], to path: String) -> AnyPublisher<Void, Error> {
         client.request(.move(ids: torrents.map(\.hash), path: path))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
@@ -86,8 +86,8 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
             .handleEvents(receiveOutput: { [weak self] torrents in
                 self?.updatedSubject.send(torrents)
             })
-            .map { _ in () }
-            .mapError { $0 as Error }
+            .asVoid()
+            .eraseError()
             .eraseToAnyPublisher()
     }
 }

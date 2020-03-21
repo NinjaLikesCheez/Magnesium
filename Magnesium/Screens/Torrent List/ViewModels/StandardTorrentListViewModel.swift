@@ -375,7 +375,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func refresh() -> AnyPublisher<Void, Error> {
         performRefresh()
-            .mapError { $0 as Error }
+            .eraseError()
             .ui()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -394,7 +394,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             }, receiveCompletion: { [weak self] _ in
                 self?.isLoadingSubject.send(false)
             })
-            .map { _ in () }
+            .asVoid()
             .eraseToAnyPublisher()
     }
 

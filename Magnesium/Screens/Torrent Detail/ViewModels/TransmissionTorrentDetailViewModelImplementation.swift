@@ -18,36 +18,36 @@ final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDet
     }
 
     func updateFiles(_ torrent: TransmissionTorrent) -> AnyPublisher<[TransmissionTorrentFile], Error> {
-        client.request(.torrentFiles(id: torrent.hash)).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.torrentFiles(id: torrent.hash)).eraseError().eraseToAnyPublisher()
     }
 
     func pause(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.stop(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.stop(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func resume(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.start(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.start(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func remove(_ torrent: TransmissionTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
         client.request(.remove(ids: [torrent.hash], removeData: removeData))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 
     func verify(_ torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.verify(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.verify(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func setLabel(_ label: Never, for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {}
 
     func updateTrackers(for torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
-        client.request(.reannounce(ids: [torrent.hash])).mapError { $0 as Error }.eraseToAnyPublisher()
+        client.request(.reannounce(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     func moveDownloadFolder(for torrent: TransmissionTorrent, to path: String) -> AnyPublisher<Void, Error> {
         client.request(.move(ids: [torrent.hash], path: path))
-            .mapError { $0 as Error }
+            .eraseError()
             .eraseToAnyPublisher()
     }
 }

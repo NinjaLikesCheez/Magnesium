@@ -63,13 +63,13 @@ final class AddTorrentFlow {
             switch type {
             case let .file(url):
                 request = client.request(.add(fileURL: url))
-                    .map { _ in () }
-                    .mapError { $0 as Error }
+                    .asVoid()
+                    .eraseError()
                     .eraseToAnyPublisher()
             case let .magnet(url):
                 request = client.request(.add(magnetURL: url))
-                    .map { _ in () }
-                    .mapError { $0 as Error }
+                    .asVoid()
+                    .eraseError()
                     .eraseToAnyPublisher()
             }
 
@@ -96,9 +96,9 @@ final class AddTorrentFlow {
 
             switch type {
             case let .file(url):
-                request = client.request(.add(fileURL: url)).mapError { $0 as Error }.eraseToAnyPublisher()
+                request = client.request(.add(fileURL: url)).eraseError().eraseToAnyPublisher()
             case let .magnet(url):
-                request = client.request(.add(url: url)).mapError { $0 as Error }.eraseToAnyPublisher()
+                request = client.request(.add(url: url)).eraseError().eraseToAnyPublisher()
             }
 
             request
