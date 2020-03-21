@@ -5,15 +5,16 @@ import XCTest
 
 class AddServerCoordinatorTests: XCTestCase {
     private let window = UIWindow()
-    private let preferences = InMemoryPreferences()
     private var navigationController: UINavigationController!
     private var coordinator: AddServerCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        coordinator = AddServerCoordinator(preferences: preferences)
+        Current = .mock
+        coordinator = AddServerCoordinator()
         navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
+        cancellables = Set()
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = navigationController
         window.makeKeyAndVisible()

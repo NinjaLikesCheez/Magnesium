@@ -4,11 +4,13 @@ import XCTest
 
 class ServerErrorCoordinatorTests: XCTestCase {
     private var coordinator: ServerErrorCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        coordinator = ServerErrorCoordinator(server: .transmissionMock())
+        Current = .mock
+        coordinator = ServerErrorCoordinator(server: .mock(.transmission))
+        cancellables = Set()
     }
 
     // MARK: - Presentable

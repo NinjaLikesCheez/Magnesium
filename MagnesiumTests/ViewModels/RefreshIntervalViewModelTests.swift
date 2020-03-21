@@ -4,9 +4,16 @@ import Preferences
 import XCTest
 
 class RefreshIntervalViewModelTests: XCTestCase {
-    private let preferences = InMemoryPreferences()
-    private lazy var viewModel = RefreshIntervalViewModel(preferences: preferences)
-    private var cancellables = Set<AnyCancellable>()
+    private var viewModel: RefreshIntervalViewModel!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
+
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+        viewModel = RefreshIntervalViewModel()
+        cancellables = Set()
+    }
 
     func test_options_names() {
         let expected = ["Never", "2 seconds", "5 seconds", "10 seconds", "30 seconds"]
@@ -17,7 +24,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
         let values = [0, 2, 5]
         for (index, value) in values.enumerated() {
             viewModel.handle(.optionSelected(index: index))
-            XCTAssertEqual(preferences.value(for: .autoRefreshInterval), value)
+            XCTAssertEqual(preferences[.autoRefreshInterval], value)
         }
     }
 

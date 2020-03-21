@@ -3,6 +3,11 @@ import Deluge
 import XCTest
 
 class DelugeTorrentTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+    }
+
     func test_init_state_shouldMapToExpectedStandardState() {
         let pairs: [(Torrent.State, TorrentState)] = [
             (.downloading, .downloading),

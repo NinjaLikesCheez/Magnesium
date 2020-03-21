@@ -1,17 +1,18 @@
 import Combine
 @testable import Magnesium
-import Preferences
 import XCTest
 
 class FilterCoordinatorTests: XCTestCase {
-    private let window = UIWindow()
-    private let preferences = InMemoryPreferences()
+    private var window: UIWindow!
     private var coordinator: FilterCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        coordinator = FilterCoordinator(preferences: preferences, labels: CurrentValueSubject([]))
+        Current = .mock
+        window = UIWindow()
+        coordinator = FilterCoordinator(labels: CurrentValueSubject([]))
+        cancellables = Set()
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController

@@ -4,13 +4,16 @@ import Preferences
 import XCTest
 
 class ServerPreferencesTests: XCTestCase {
-    private let preferences = InMemoryPreferences()
-    private let server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
-    private var cancellables = Set<AnyCancellable>()
+    private var server: Server!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
         clearKeychain()
+        Current = .mock
+        server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
+        cancellables = Set()
     }
 
     override func tearDown() {
@@ -71,7 +74,7 @@ class ServerPreferencesTests: XCTestCase {
                 expectation.fulfill()
             }
             .store(in: &cancellables)
-        var server = self.server
+        var server = self.server!
         server.name = "New Name"
         preferences.addOrUpdate(server: server)
         waitForExpectations(timeout: 0)

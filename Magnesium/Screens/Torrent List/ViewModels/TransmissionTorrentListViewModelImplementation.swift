@@ -7,16 +7,14 @@ import ViewModel
 // swiftlint:disable:next line_length
 final class TransmissionTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, TorrentRefresher {
     private let client: TransmissionClient
-    private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<[TransmissionTorrent], Never>()
 
     var updated: AnyPublisher<([TransmissionTorrent], [Never]), Never> {
         updatedSubject.map { ($0, []) }.eraseToAnyPublisher()
     }
 
-    init(client: TransmissionClient, preferences: Preferences) {
+    init(client: TransmissionClient) {
         self.client = client
-        self.preferences = preferences
     }
 
     func refresh() -> AnyPublisher<([TransmissionTorrent], [Never]), Error> {
@@ -34,8 +32,7 @@ final class TransmissionTorrentListViewModelImplementation: StandardTorrentListV
         let viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
             torrent: torrent,
-            labels: labels,
-            preferences: preferences
+            labels: labels
         )
         return AnyViewModel(viewModel)
     }

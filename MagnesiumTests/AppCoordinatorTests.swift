@@ -6,20 +6,18 @@ import ViewModel
 import XCTest
 
 class AppCoordinatorTests: XCTestCase {
-    private let window = UIWindow()
-    private let preferences = InMemoryPreferences()
-    private lazy var session = Session(preferences: preferences)
-    private let splitViewController = MockSplitViewController()
+    private var window: UIWindow!
+    private var session: Session!
+    private var splitViewController: MockSplitViewController!
     private var coordinator: AppCoordinator!
 
     override func setUp() {
         super.setUp()
-        coordinator = AppCoordinator(
-            window: window,
-            preferences: preferences,
-            session: session,
-            splitViewController: splitViewController
-        )
+        Current = .mock
+        window = UIWindow()
+        session = Session()
+        splitViewController = MockSplitViewController()
+        coordinator = AppCoordinator(window: window, session: session, splitViewController: splitViewController)
     }
 
     func test_presentable_shouldBeSplitViewController() {
@@ -47,27 +45,27 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_masterViewController_whenServerChanged_shouldBeChanged() {
         let masterNavigationController = splitViewController.viewControllers[0] as! UINavigationController
-        session.setServer(.transmissionMock())
+        session.setServer(.mock(.transmission))
         let firstViewController = masterNavigationController.viewControllers[0]
-        session.setServer(.delugeMock())
+        session.setServer(.mock(.deluge))
         let secondViewController = masterNavigationController.viewControllers[0]
         XCTAssertNotEqual(firstViewController, secondViewController)
     }
 
     func test_addFileURL_shouldPresentAlertController() {
-        session.setServer(.transmissionMock(name: "ServerName"))
+        session.setServer(.mock(.transmission))
         coordinator.add(fileURL: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
         let alertController = splitViewController.presentedViewController as! UIAlertController
-        XCTAssertEqual(alertController.title, "Add to ServerName")
+        XCTAssertEqual(alertController.title, "Add to MockServer")
         XCTAssertEqual(alertController.message, "file.torrent")
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
     }
 
     func test_addMagnetURL_shouldPresentAlertController() {
-        session.setServer(.transmissionMock(name: "ServerName"))
+        session.setServer(.mock(.transmission))
         coordinator.add(magnetURL: URL(string: "magnet:?")!)
         let alertController = splitViewController.presentedViewController as! UIAlertController
-        XCTAssertEqual(alertController.title, "Add to ServerName")
+        XCTAssertEqual(alertController.title, "Add to MockServer")
         XCTAssertEqual(alertController.message, "magnet:?")
         XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
     }
@@ -85,7 +83,7 @@ class AppCoordinatorTests: XCTestCase {
     }
 
     func test_serverErrorCoordinatorEvent_editServer_shouldShowServerSettings() throws {
-        coordinator.handle(ServerErrorCoordinatorEvent.editServer(.transmissionMock()))
+        coordinator.handle(ServerErrorCoordinatorEvent.editServer(.mock(.transmission)))
         let navigationController = splitViewController.presentedViewController as! UINavigationController
         let viewController = navigationController.viewControllers[0]
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {

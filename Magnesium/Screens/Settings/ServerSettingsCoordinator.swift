@@ -1,6 +1,5 @@
 import Combine
 import Coordinator
-import Preferences
 import ViewModel
 
 enum ServerSettingsCoordinatorEvent {
@@ -22,26 +21,26 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(server: Server, preferences: Preferences) {
+    init(server: Server) {
         let viewModel: AnyServerSettingsViewModel
         switch server.type {
         case .deluge:
-            viewModel = AnyViewModel(DelugeSettingsViewModel(preferences: preferences, server: server))
+            viewModel = AnyViewModel(DelugeSettingsViewModel(server: server))
         case .transmission:
-            viewModel = AnyViewModel(TransmissionSettingsViewModel(preferences: preferences, server: server))
+            viewModel = AnyViewModel(TransmissionSettingsViewModel(server: server))
         }
 
         viewController = ServerSettingsViewController(viewModel: viewModel)
         receivedEvents = viewModel.events
     }
 
-    init(type: ServerType, preferences: Preferences) {
+    init(type: ServerType) {
         let viewModel: AnyServerSettingsViewModel
         switch type {
         case .deluge:
-            viewModel = AnyViewModel(DelugeSettingsViewModel(preferences: preferences))
+            viewModel = AnyViewModel(DelugeSettingsViewModel())
         case .transmission:
-            viewModel = AnyViewModel(TransmissionSettingsViewModel(preferences: preferences))
+            viewModel = AnyViewModel(TransmissionSettingsViewModel())
         }
 
         receivedEvents = viewModel.events

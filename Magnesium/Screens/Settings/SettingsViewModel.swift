@@ -24,7 +24,6 @@ struct SettingsViewState {
 
 final class SettingsViewModel: ViewModel {
     private let session: Session
-    private let preferences: Preferences
     private var cancellables = Set<AnyCancellable>()
     private let eventSubject = PassthroughSubject<SettingsEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
@@ -34,14 +33,13 @@ final class SettingsViewModel: ViewModel {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(session: Session, preferences: Preferences) {
+    init(session: Session) {
         self.session = session
-        self.preferences = preferences
         state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: .servers).map { _ in () }
+        Current.preferences.valueUpdatedPublisher(for: .servers).map { _ in () }
             .merge(with: session.serverPublisher.map { _ in () })
-            .merge(with: preferences.valueUpdatedPublisher(for: .autoRefreshInterval).map { _ in () })
+            .merge(with: Current.preferences.valueUpdatedPublisher(for: .autoRefreshInterval).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
             }
@@ -57,7 +55,7 @@ final class SettingsViewModel: ViewModel {
         case let .changeServerSelected(source):
             handleChangeServerSelected(from: source)
         case let .serverSelected(index):
-            let server = preferences.getServers()[index]
+            let server = Current.preferences.getServers()[index]
             eventSubject.send(.editServer(server))
         case .addServerSelected:
             eventSubject.send(.addServer)
@@ -67,7 +65,7 @@ final class SettingsViewModel: ViewModel {
     }
 
     private func handleChangeServerSelected(from source: PopoverSource) {
-        let servers = preferences.getServers()
+        let servers = Current.preferences.getServers()
         var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
         for server in servers {
             alert.addAction(AlertAction(title: server.name, style: .default) {
@@ -79,7 +77,7 @@ final class SettingsViewModel: ViewModel {
     }
 
     private func updateSections() {
-        let servers = preferences.getServers()
+        let servers = Current.preferences.getServers()
         var sections = [SettingsSection]()
 
         if servers.count > 1, let server = session.server {
@@ -89,7 +87,7 @@ final class SettingsViewModel: ViewModel {
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
         sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
 
-        let refreshInterval = preferences[.autoRefreshInterval]
+        let refreshInterval = Current.preferences[.autoRefreshInterval]
         let localizedRefresh: String
         if refreshInterval <= 0 {
             localizedRefresh = L10n.refreshIntervalNever

@@ -19,7 +19,6 @@ struct FilterViewState {
 }
 
 final class FilterViewModel: ViewModel {
-    private let preferences: Preferences
     private let labels: CurrentValueSubject<[StandardLabel], Never>
     private let eventSubject = PassthroughSubject<FilterEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
@@ -30,14 +29,13 @@ final class FilterViewModel: ViewModel {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences, labels: CurrentValueSubject<[StandardLabel], Never>) {
-        self.preferences = preferences
+    init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.labels = labels
         state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
 
-        preferences.valueUpdatedPublisher(for: .sortOption)
+        Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .map { _ in () }
-            .merge(with: preferences.valueUpdatedPublisher(for: .filterOptions).map { _ in () })
+            .merge(with: Current.preferences.valueUpdatedPublisher(for: .filterOptions).map { _ in () })
             .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).map { _ in () })
             .sink { [weak self] _ in
                 self?.updateSections()
@@ -61,16 +59,16 @@ final class FilterViewModel: ViewModel {
     }
 
     private func handleSortSelected(from source: PopoverSource) {
-        let currentSort = preferences[.sortOption]
+        let currentSort = Current.preferences[.sortOption]
         var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet(source))
 
         for property in SortOption.Property.allCases {
             alert.addAction(AlertAction(title: property.localizedString, style: .default) {
                 if property == currentSort.property {
                     let sortOption = currentSort.withOppositeDirection()
-                    self.preferences[.sortOption] = sortOption
+                    Current.preferences[.sortOption] = sortOption
                 } else {
-                    self.preferences[.sortOption] = SortOption(property: property)
+                    Current.preferences[.sortOption] = SortOption(property: property)
                 }
             })
         }
@@ -80,7 +78,7 @@ final class FilterViewModel: ViewModel {
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
-        var filterOptions = preferences[.filterOptions]
+        var filterOptions = Current.preferences[.filterOptions]
         var alert = Alert(
             title: L10n.filterLabelAlertTitle,
             message: L10n.filterLabelAlertMessage,
@@ -94,7 +92,7 @@ final class FilterViewModel: ViewModel {
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
-                    self.preferences[.filterOptions] = filterOptions
+                    Current.preferences[.filterOptions] = filterOptions
                 }
             ))
         }
@@ -104,7 +102,7 @@ final class FilterViewModel: ViewModel {
     }
 
     private func handleStateSelected(from source: PopoverSource) {
-        var filterOptions = preferences[.filterOptions]
+        var filterOptions = Current.preferences[.filterOptions]
         var alert = Alert(
             title: L10n.filterStateAlertTitle,
             message: L10n.filterStateAlertMessage,
@@ -118,7 +116,7 @@ final class FilterViewModel: ViewModel {
                 style: .default,
                 handler: {
                     filterOptions.state = state
-                    self.preferences[.filterOptions] = filterOptions
+                    Current.preferences[.filterOptions] = filterOptions
                 }
             ))
         }
@@ -128,8 +126,8 @@ final class FilterViewModel: ViewModel {
     }
 
     private func updateSections() {
-        let sortOption = preferences[.sortOption]
-        let filterOptions = preferences[.filterOptions]
+        let sortOption = Current.preferences[.sortOption]
+        let filterOptions = Current.preferences[.filterOptions]
         var sections = [FilterSection]()
 
         sections.append(FilterSection(type: .sort, items: [

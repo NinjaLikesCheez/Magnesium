@@ -5,15 +5,19 @@ import Preferences
 import XCTest
 
 class SettingsCoordinatorTests: XCTestCase {
-    private let window = UIWindow()
-    private let preferences = InMemoryPreferences()
-    private lazy var session = Session(preferences: preferences)
+    private var window: UIWindow!
+    private var session: Session!
     private var coordinator: SettingsCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        coordinator = SettingsCoordinator(session: session, preferences: preferences)
+        Current = .mock
+        window = UIWindow()
+        session = Session()
+        coordinator = SettingsCoordinator(session: session)
+        cancellables = Set()
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
@@ -51,7 +55,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
-        coordinator.handle(.editServer(.transmissionMock()))
+        coordinator.handle(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -62,7 +66,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_editServer_withDelugeServer_shouldPushServerSettingsViewController() {
-        coordinator.handle(.editServer(.delugeMock()))
+        coordinator.handle(.editServer(.mock(.deluge)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -99,7 +103,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_serverSettingsCoordinatorEvent_complete_shouldPopViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.handle(.editServer(.transmissionMock()))
+        coordinator.handle(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         XCTAssertEqual(navigationController.viewControllers.count, 2)
 
@@ -116,7 +120,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_addServerCoordinatorEvent_completeEvent_shouldPopRootViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.handle(.editServer(.transmissionMock()))
+        coordinator.handle(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         navigationController.pushViewController(UIViewController(), animated: false)
         XCTAssertEqual(navigationController.viewControllers.count, 3)

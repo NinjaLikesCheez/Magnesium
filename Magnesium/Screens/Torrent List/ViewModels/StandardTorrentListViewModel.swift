@@ -28,7 +28,6 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     typealias Label = Implementation.Label
 
     private let implementation: Implementation
-    private let preferences: Preferences
     private let torrents: TorrentMapper<String, Torrent>
     private let labels = CurrentValueSubject<[Label], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
@@ -44,9 +43,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(implementation: Implementation, server: Server, preferences: Preferences) {
-        self.preferences = preferences
-        torrents = TorrentMapper(preferences: preferences, query: querySubject)
+    init(implementation: Implementation, server: Server) {
+        torrents = TorrentMapper(query: querySubject)
         self.implementation = implementation
 
         let title = isEditingSubject
@@ -60,7 +58,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .map { $0.map { TorrentListItem(torrent: $0) } }
             .ui()
             .eraseToAnyPublisher()
-        let hasActiveFilters = preferences.valuePublisher(for: .filterOptions)
+        let hasActiveFilters = Current.preferences.valuePublisher(for: .filterOptions)
             .map { $0 != FilterOptions() }
             .ui()
             .eraseToAnyPublisher()
@@ -88,7 +86,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
 
-        preferences.valuePublisher(for: .autoRefreshInterval)
+        Current.preferences.valuePublisher(for: .autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
                 self?.configureAutoRefreshTimer(interval: value)
             })

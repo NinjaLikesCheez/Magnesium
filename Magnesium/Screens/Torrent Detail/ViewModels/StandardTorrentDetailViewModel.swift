@@ -24,7 +24,6 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     typealias File = Implementation.File
 
     private let implementation: Implementation
-    private let preferences: Preferences
     private let torrent: CurrentValueSubject<Torrent, Never>
     private let labels: CurrentValueSubject<[Label], Never>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
@@ -60,13 +59,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     init(
         implementation: Implementation,
         torrent: CurrentValueSubject<Torrent, Never>,
-        labels: CurrentValueSubject<[Label], Never>,
-        preferences: Preferences
+        labels: CurrentValueSubject<[Label], Never>
     ) {
         self.implementation = implementation
         self.torrent = torrent
         self.labels = labels
-        self.preferences = preferences
 
         let sections = torrent
             .combineLatest(files.values)
@@ -198,7 +195,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             return
         }
 
-        timerIntervalObserver = preferences.valuePublisher(for: .autoRefreshInterval)
+        timerIntervalObserver = Current.preferences.valuePublisher(for: .autoRefreshInterval)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] value in
                 self?.configureAutoRefreshTimer(interval: value)
             })

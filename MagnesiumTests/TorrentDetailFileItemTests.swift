@@ -5,16 +5,18 @@ import XCTest
 class TorrentDetailFileItemTests: XCTestCase {
     private var file: CurrentValueSubject<MockTorrentFile, Never>!
     private var item: TorrentDetailFileItem!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         file = CurrentValueSubject(MockTorrentFile(
             index: 0,
             name: "file.rar",
             progress: 0.189_838
         ))
         item = TorrentDetailFileItem(file: file)
+        cancellables = Set()
     }
 
     func test_id_shouldBeEqualToIndex() {

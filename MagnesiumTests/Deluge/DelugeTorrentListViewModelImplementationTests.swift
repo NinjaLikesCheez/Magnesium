@@ -6,15 +6,16 @@ import XCTest
 
 class DelugeTorrentListViewModelImplementationTests: XCTestCase {
     private var client: MockDelugeClient!
-    private var preferences: InMemoryPreferences!
     private var implementation: DelugeTorrentListViewModelImplementation!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         client = MockDelugeClient()
-        preferences = InMemoryPreferences()
-        implementation = DelugeTorrentListViewModelImplementation(client: client, preferences: preferences)
+        implementation = DelugeTorrentListViewModelImplementation(client: client)
+        cancellables = Set()
     }
 
     func test_refresh_shouldGetCurrentState() {

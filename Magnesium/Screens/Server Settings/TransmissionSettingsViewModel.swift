@@ -5,9 +5,7 @@ import Transmission
 import ViewModel
 
 final class TransmissionSettingsViewModel: ViewModel {
-    private let preferences: Preferences
     private let server: Server?
-    private let clientProvider: TransmissionClientProvider
     private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
@@ -22,14 +20,8 @@ final class TransmissionSettingsViewModel: ViewModel {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(
-        preferences: Preferences,
-        server: Server? = nil,
-        clientProvider: TransmissionClientProvider = DefaultTransmissionClientProvider()
-    ) {
-        self.preferences = preferences
+    init(server: Server? = nil) {
         self.server = server
-        self.clientProvider = clientProvider
 
         let settings = (server?.data).flatMap { data in
             try? JSONDecoder().decode(TransmissionServerSettings.self, from: data)
@@ -137,7 +129,7 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         isLoadingSubject.send(true)
 
-        let client = clientProvider.createClient(baseURL: url, username: username, password: password)
+        let client = Current.transmission(url, username, password)
         client.request(.rpcVersion)
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -170,9 +162,9 @@ final class TransmissionSettingsViewModel: ViewModel {
             server.name = name
             server.data = data
             server.keychainData = keychainData
-            preferences.addOrUpdate(server: server)
+            Current.preferences.addOrUpdate(server: server)
         } else {
-            preferences.addOrUpdate(server: Server(
+            Current.preferences.addOrUpdate(server: Server(
                 name: name,
                 type: .transmission,
                 data: data,
@@ -186,7 +178,7 @@ final class TransmissionSettingsViewModel: ViewModel {
         guard let server = server else { return }
         var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet(source))
         alert.addAction(AlertAction(title: L10n.deleteServer, style: .destructive) {
-            self.preferences.remove(server: server)
+            Current.preferences.remove(server: server)
             self.eventSubject.send(.complete)
         })
         alert.addAction(.cancel)

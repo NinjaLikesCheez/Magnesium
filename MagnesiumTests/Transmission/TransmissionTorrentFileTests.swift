@@ -2,6 +2,11 @@
 import XCTest
 
 class TransmissionTorrentFileTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+    }
+
     func test_progress_shouldEqualDownloadedOverSize() {
         let file = TransmissionTorrentFile.mock(size: 100_000_000, downloaded: 10_000_000)
         XCTAssertEqual(file.progress, 0.1)

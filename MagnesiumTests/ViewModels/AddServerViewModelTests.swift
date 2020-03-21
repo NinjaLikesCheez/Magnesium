@@ -3,8 +3,15 @@ import Combine
 import XCTest
 
 class AddServerViewModelTests: XCTestCase {
-    private var cancellables = Set<AnyCancellable>()
-    private let viewModel = AddServerViewModel()
+    private var viewModel: AddServerViewModel!
+    private var cancellables: Set<AnyCancellable>!
+
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+        viewModel = AddServerViewModel()
+        cancellables = Set()
+    }
 
     func test_types() {
         XCTAssertEqual(viewModel.state.types, ["Deluge", "Transmission"])

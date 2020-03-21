@@ -4,10 +4,18 @@ import Preferences
 import XCTest
 
 class SettingsViewModelTests: XCTestCase {
-    private let preferences = InMemoryPreferences()
-    private var cancellables = Set<AnyCancellable>()
-    private lazy var session = Session(preferences: preferences)
-    private lazy var viewModel = SettingsViewModel(session: session, preferences: preferences)
+    private var session: Session!
+    private var viewModel: SettingsViewModel!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
+
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+        session = Session()
+        viewModel = SettingsViewModel(session: session)
+        cancellables = Set()
+    }
 
     func test_sections_whenServersChanged_shouldEmit() {
         let expectation = self.expectation(description: "Value received")

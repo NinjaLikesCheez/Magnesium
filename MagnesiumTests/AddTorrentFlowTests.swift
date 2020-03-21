@@ -8,32 +8,24 @@ import XCTest
 class AddTorrentFlowTests: XCTestCase {
     private var window: UIWindow!
     private var viewController: UIViewController!
-    private var preferences: Preferences!
     private var session: Session!
-    private var clientProvider: MockClientProvider!
     private var flow: AddTorrentFlow!
-
-    private var delugeClient: MockDelugeClient {
-        clientProvider.deluge
-    }
-
-    private var transmissionClient: MockTransmissionClient {
-        clientProvider.transmission
-    }
+    private var delugeClient: MockDelugeClient!
+    private var transmissionClient: MockTransmissionClient!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
+        delugeClient = MockDelugeClient()
+        transmissionClient = MockTransmissionClient()
+        Current = .mock(
+            deluge: { _, _ in self.delugeClient },
+            transmission: { _, _, _ in self.transmissionClient }
+        )
         window = UIWindow()
         viewController = UIViewController()
-        preferences = InMemoryPreferences()
-        session = Session(preferences: preferences)
-        clientProvider = MockClientProvider()
-        flow = AddTorrentFlow(
-            viewController: viewController,
-            session: session,
-            delugeClientProvider: clientProvider,
-            transmissionClientProvider: clientProvider
-        )
+        session = Session()
+        flow = AddTorrentFlow(viewController: viewController, session: session)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = viewController
         window.makeKeyAndVisible()
@@ -66,7 +58,7 @@ class AddTorrentFlowTests: XCTestCase {
             "core.add_torrent_file",
             Just("").setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
-        session.setServer(.delugeMock())
+        session.setServer(.mock(.deluge))
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
         XCTAssertEqual(delugeClient.requestParamRequest.map(\.method), ["core.add_torrent_file"])
@@ -78,7 +70,7 @@ class AddTorrentFlowTests: XCTestCase {
             "core.add_torrent_file",
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        session.setServer(.delugeMock())
+        session.setServer(.mock(.deluge))
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
         let alertController = viewController.presentedViewController as! UIAlertController
@@ -93,7 +85,7 @@ class AddTorrentFlowTests: XCTestCase {
             "core.add_torrent_magnet",
             Just("").setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
-        session.setServer(.delugeMock())
+        session.setServer(.mock(.deluge))
 
         flow.add(type: .magnet(URL(string: "magnet:?")!))
         XCTAssertEqual(delugeClient.requestCallCount, 1)
@@ -103,7 +95,7 @@ class AddTorrentFlowTests: XCTestCase {
 
     func test_add_withDeluge_andMagnetURL_whenFails_shouldPresentAlertController() {
         delugeClient.results.append(("core.add_torrent_magnet", Fail(error: .unauthenticated).eraseToAnyPublisher()))
-        session.setServer(.delugeMock())
+        session.setServer(.mock(.deluge))
 
         flow.add(type: .magnet(URL(string: "magnet:?")!))
         let alertController = viewController.presentedViewController as! UIAlertController
@@ -127,7 +119,7 @@ class AddTorrentFlowTests: XCTestCase {
     }
 
     func test_add_withTransmission_andFileURL_shouldPerformRequest() {
-        session.setServer(.transmissionMock())
+        session.setServer(.mock(.transmission))
 
         let url = URL(fileURLWithPath: "file.torrent")
         flow.add(type: .file(url))
@@ -140,7 +132,7 @@ class AddTorrentFlowTests: XCTestCase {
             "torrent-add",
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        session.setServer(.transmissionMock())
+        session.setServer(.mock(.transmission))
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
         let alertController = viewController.presentedViewController as! UIAlertController
@@ -151,7 +143,7 @@ class AddTorrentFlowTests: XCTestCase {
     }
 
     func test_add_withTransmission_andMagnetURL_shouldPerformRequest() {
-        session.setServer(.transmissionMock())
+        session.setServer(.mock(.transmission))
 
         let url = URL(string: "magnet:?")!
         flow.add(type: .magnet(url))
@@ -164,7 +156,7 @@ class AddTorrentFlowTests: XCTestCase {
             "torrent-add",
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        session.setServer(.transmissionMock())
+        session.setServer(.mock(.transmission))
 
         flow.add(type: .magnet(URL(string: "magnet:?")!))
         let alertController = viewController.presentedViewController as! UIAlertController
@@ -172,18 +164,5 @@ class AddTorrentFlowTests: XCTestCase {
         XCTAssertEqual(alertController.message, TransmissionError.unauthenticated.localizedDescription)
         XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
-    }
-}
-
-private struct MockClientProvider: DelugeClientProvider, TransmissionClientProvider {
-    let deluge = MockDelugeClient()
-    let transmission = MockTransmissionClient()
-
-    func createClient(baseURL: URL, password: String) -> DelugeClient {
-        deluge
-    }
-
-    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
-        transmission
     }
 }

@@ -4,14 +4,17 @@ import Preferences
 import XCTest
 
 class ServerSettingsCoordinatorTests: XCTestCase {
-    private let window = UIWindow()
-    private let preferences = InMemoryPreferences()
+    private var window: UIWindow!
     private var coordinator: ServerSettingsCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        coordinator = ServerSettingsCoordinator(type: .transmission, preferences: preferences)
+        Current = .mock
+        window = UIWindow()
+        coordinator = ServerSettingsCoordinator(type: .transmission)
+        cancellables = Set()
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -20,7 +23,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     // MARK: presentable
 
     func test_presentable_withDelugeServer_shouldBeServerSettingsViewController() {
-        let coordinator = ServerSettingsCoordinator(server: .delugeMock(), preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(server: .mock(.deluge))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")
@@ -29,7 +32,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     }
 
     func test_presentable_withTransmissionServer_shouldBeServerSettingsViewController() {
-        let coordinator = ServerSettingsCoordinator(server: .transmissionMock(), preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(server: .mock(.transmission))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")
@@ -38,7 +41,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     }
 
     func test_presentable_withDelugeServerType_shouldBeServerSettingsViewController() {
-        let coordinator = ServerSettingsCoordinator(type: .deluge, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(type: .deluge)
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")
@@ -47,7 +50,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     }
 
     func test_presentable_withTransmissionServerType_shouldBeServerSettingsViewController() {
-        let coordinator = ServerSettingsCoordinator(type: .transmission, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(type: .transmission)
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")

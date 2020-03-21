@@ -3,6 +3,11 @@ import Transmission
 import XCTest
 
 class TransmissionTorrentTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+    }
+    
     func test_init_state_shouldMapToExpectedStandardState() {
         let pairs: [(Torrent.Status, TorrentState)] = [
             (.downloading, .downloading),

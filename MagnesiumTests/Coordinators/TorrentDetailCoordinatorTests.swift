@@ -8,13 +8,15 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
     private var coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         window = UIWindow()
         viewModel = MockViewModel()
         coordinator = TorrentDetailCoordinator(viewModel: AnyViewModel(viewModel))
+        cancellables = Set()
         coordinator.receivedEvents.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController

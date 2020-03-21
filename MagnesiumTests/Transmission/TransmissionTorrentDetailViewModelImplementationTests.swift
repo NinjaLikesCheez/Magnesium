@@ -6,13 +6,15 @@ class TransmissionTorrentDetailViewModelImplementationTests: XCTestCase {
     private var client: MockTransmissionClient!
     private var refresher: MockTorrentRefresher!
     private var implementation: TransmissionTorrentDetailViewModelImplementation!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         client = MockTransmissionClient()
         refresher = MockTorrentRefresher()
         implementation = TransmissionTorrentDetailViewModelImplementation(client: client, refresher: refresher)
+        cancellables = Set()
     }
 
     func test_refresh_shouldCallRefresher() {

@@ -5,12 +5,14 @@ import XCTest
 class TorrentListItemTests: XCTestCase {
     private var subject: CurrentValueSubject<MockTorrent, Never>!
     private var item: TorrentListItem!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         subject = CurrentValueSubject(MockTorrent())
         item = TorrentListItem(torrent: subject)
+        cancellables = Set()
     }
 
     func test_identity_shouldBeEqualToHash() {

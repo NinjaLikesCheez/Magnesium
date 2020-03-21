@@ -7,13 +7,15 @@ class DelugeTorrentDetailViewModelImplementationTests: XCTestCase {
     private var client: MockDelugeClient!
     private var refresher: MockTorrentRefresher!
     private var implementation: DelugeTorrentDetailViewModelImplementation!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         client = MockDelugeClient()
         refresher = MockTorrentRefresher()
         implementation = DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher)
+        cancellables = Set()
     }
 
     func test_refresh_shouldCallRefresher() {

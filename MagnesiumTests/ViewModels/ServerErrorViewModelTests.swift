@@ -4,11 +4,13 @@ import XCTest
 
 class ServerErrorViewModelTests: XCTestCase {
     private var viewModel: ServerErrorViewModel!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         viewModel = ServerErrorViewModel()
+        cancellables = Set()
     }
 
     // MARK: ServerErrorViewEvent

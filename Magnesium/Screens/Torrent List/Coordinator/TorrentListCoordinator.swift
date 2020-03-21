@@ -14,7 +14,6 @@ enum TorrentListCoordinatorEvent {
 final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     private let viewModel: AnyTorrentListViewModel
     private let session: Session
-    private let preferences: Preferences
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
     private var previewCoordinatorMap = [Int: TorrentDetailCoordinator<AnyTorrentDetailViewModel>]()
@@ -31,10 +30,9 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(viewModel: AnyTorrentListViewModel, session: Session, preferences: Preferences) {
+    init(viewModel: AnyTorrentListViewModel, session: Session) {
         self.viewModel = viewModel
         self.session = session
-        self.preferences = preferences
         viewController = TorrentListViewController(viewModel: viewModel)
         receivedEvents = viewModel.events
         super.init()
@@ -110,7 +108,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     }
 
     private func showFilter(from source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>) {
-        let coordinator = FilterCoordinator(preferences: preferences, labels: labels)
+        let coordinator = FilterCoordinator(labels: labels)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }

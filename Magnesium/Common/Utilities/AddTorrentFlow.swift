@@ -18,20 +18,11 @@ final class AddTorrentFlow {
 
     private let viewController: UIViewController
     private let session: Session
-    private let delugeClientProvider: DelugeClientProvider
-    private let transmissionClientProvider: TransmissionClientProvider
     private var cancellables = Set<AnyCancellable>()
 
-    init(
-        viewController: UIViewController,
-        session: Session,
-        delugeClientProvider: DelugeClientProvider = DefaultDelugeClientProvider(),
-        transmissionClientProvider: TransmissionClientProvider = DefaultTransmissionClientProvider()
-    ) {
+    init(viewController: UIViewController, session: Session) {
         self.viewController = viewController
         self.session = session
-        self.delugeClientProvider = delugeClientProvider
-        self.transmissionClientProvider = transmissionClientProvider
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -68,7 +59,7 @@ final class AddTorrentFlow {
                 return
             }
 
-            let client = delugeClientProvider.createClient(baseURL: settings.url, password: keychain.password)
+            let client = Current.deluge(settings.url, keychain.password)
             let request: AnyPublisher<Void, DelugeError>
 
             switch type {
@@ -96,11 +87,7 @@ final class AddTorrentFlow {
                 return
             }
 
-            let client = transmissionClientProvider.createClient(
-                baseURL: settings.url,
-                username: settings.username,
-                password: keychain.password
-            )
+            let client = Current.transmission(settings.url, settings.username, keychain.password)
             let request: AnyPublisher<Void, TransmissionError>
 
             switch type {

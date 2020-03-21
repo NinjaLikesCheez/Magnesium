@@ -8,7 +8,6 @@ enum AddServerCoordinatorEvent {
 }
 
 final class AddServerCoordinator: Coordinator, AlertPresenter {
-    private let preferences: Preferences
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController<AddServerViewModel>
     let receivedEvents: AnyPublisher<AddServerEvent, Never>
@@ -23,8 +22,7 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(preferences: Preferences) {
-        self.preferences = preferences
+    init() {
         let viewModel = AddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
         receivedEvents = viewModel.events
@@ -40,7 +38,7 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showServerSettings(for type: ServerType) {
-        let coordinator = ServerSettingsCoordinator(type: type, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(type: type)
         addChildCoordinator(coordinator) { [weak self] _, event in
             self?.handle(event)
         }

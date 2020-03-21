@@ -8,7 +8,6 @@ enum SettingsCoordinatorEvent {
 }
 
 final class SettingsCoordinator: Coordinator, AlertPresenter {
-    private let preferences: Preferences
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
     let receivedEvents: AnyPublisher<SettingsEvent, Never>
@@ -23,9 +22,8 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(session: Session, preferences: Preferences) {
-        self.preferences = preferences
-        let viewModel = SettingsViewModel(session: session, preferences: preferences)
+    init(session: Session) {
+        let viewModel = SettingsViewModel(session: session)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = PresentableNavigationController(rootViewController: viewController)
         receivedEvents = viewModel.events
@@ -42,14 +40,14 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
         case .addServer:
             showAddServer()
         case .showRefreshIntervalSettings:
-            let viewModel = RefreshIntervalViewModel(preferences: preferences)
+            let viewModel = RefreshIntervalViewModel()
             let viewController = RefreshIntervalViewController(viewModel: viewModel)
             return navigationController.pushViewController(viewController, animated: true)
         }
     }
 
     private func showSettings(for server: Server) {
-        let coordinator = ServerSettingsCoordinator(server: server, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(server: server)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }
@@ -65,7 +63,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showAddServer() {
-        let coordinator = AddServerCoordinator(preferences: preferences)
+        let coordinator = AddServerCoordinator()
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }

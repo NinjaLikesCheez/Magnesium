@@ -4,9 +4,16 @@ import Preferences
 import XCTest
 
 class SessionTests: XCTestCase {
-    private let preferences: Preferences = InMemoryPreferences()
-    private var cancellables = Set<AnyCancellable>()
-    private lazy var session = Session(preferences: preferences)
+    private var session: Session!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
+
+    override func setUp() {
+        super.setUp()
+        Current = .mock
+        session = Session()
+        cancellables = Set()
+    }
 
     func test_serverPublisher_shouldHaveInitialValue() {
         let expectation = self.expectation(description: "Value received")

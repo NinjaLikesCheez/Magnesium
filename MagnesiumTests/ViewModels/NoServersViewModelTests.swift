@@ -4,11 +4,13 @@ import XCTest
 
 class NoServersViewModelTests: XCTestCase {
     private var viewModel: NoServersViewModel!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         viewModel = NoServersViewModel()
+        cancellables = Set()
     }
 
     // MARK: NoServersViewEvent

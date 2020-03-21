@@ -6,16 +6,14 @@ import ViewModel
 
 final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewModelImplementation, TorrentRefresher {
     private let client: DelugeClient
-    private let preferences: Preferences
     private let updatedSubject = PassthroughSubject<([DelugeTorrent], [DelugeLabel]), Never>()
 
     var updated: AnyPublisher<([DelugeTorrent], [DelugeLabel]), Never> {
         updatedSubject.eraseToAnyPublisher()
     }
 
-    init(client: DelugeClient, preferences: Preferences) {
+    init(client: DelugeClient) {
         self.client = client
-        self.preferences = preferences
     }
 
     func refresh() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
@@ -30,8 +28,7 @@ final class DelugeTorrentListViewModelImplementation: StandardTorrentListViewMod
         let viewModel = StandardTorrentDetailViewModel(
             implementation: implementation,
             torrent: torrent,
-            labels: labels,
-            preferences: preferences
+            labels: labels
         )
         return AnyViewModel(viewModel)
     }

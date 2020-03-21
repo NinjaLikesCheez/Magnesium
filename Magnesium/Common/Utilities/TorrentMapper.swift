@@ -3,9 +3,9 @@ import Foundation
 import Preferences
 
 final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
-    init(preferences: Preferences, query: CurrentValueSubject<String?, Never>) {
-        let sortOption = preferences.valuePublisher(for: .sortOption)
-        let filterOptions = preferences.valuePublisher(for: .filterOptions)
+    init(query: CurrentValueSubject<String?, Never>) {
+        let sortOption = Current.preferences.valuePublisher(for: .sortOption)
+        let filterOptions = Current.preferences.valuePublisher(for: .filterOptions)
         let filter = Publishers.CombineLatest3(sortOption, filterOptions, query)
             .map { sort, filter, query -> FilterFunction in
                 // swiftformat:disable:next redundantReturn

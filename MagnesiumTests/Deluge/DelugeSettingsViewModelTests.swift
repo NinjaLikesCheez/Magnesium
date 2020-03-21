@@ -5,45 +5,37 @@ import Preferences
 import XCTest
 
 class DelugeSettingsViewModelTests: XCTestCase {
-    private let client = MockDelugeClient()
-    private let preferences = InMemoryPreferences()
-    private var cancellables = Set<AnyCancellable>()
-    private lazy var clientProvider = MockClientProvider(client: client)
-    private lazy var addViewModel = DelugeSettingsViewModel(
-        preferences: preferences,
-        clientProvider: clientProvider
-    )
-    private lazy var editViewModel = DelugeSettingsViewModel(
-        preferences: preferences,
-        server: server,
-        clientProvider: clientProvider
-    )
-    private lazy var server: Server = {
-        let settings = DelugeServerSettings(url: URL(string: "http://example.com")!)
-        let keychain = DelugeKeychainData(password: "password")
-        let encoder = JSONEncoder()
-        return Server(
-            name: "Server",
-            type: .deluge,
-            data: try! encoder.encode(settings),
-            keychainData: try! encoder.encode(keychain)
-        )
-    }()
+    private var client: MockDelugeClient!
+    private var addViewModel: DelugeSettingsViewModel!
+    private var server: Server!
+    private var editViewModel: DelugeSettingsViewModel!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
+
+    override func setUp() {
+        super.setUp()
+        client = MockDelugeClient()
+        Current = .mock(deluge: { _, _ in self.client })
+        addViewModel = DelugeSettingsViewModel()
+        server = .mock(.deluge)
+        editViewModel = DelugeSettingsViewModel(server: server)
+        cancellables = Set()
+    }
 
     func test_inputs() {
         XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[0].value.value, "Server")
+        XCTAssertEqual(editViewModel.state.inputs[0].value.value, "MockServer")
     }
 
     func test_serverURL_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://example.com")
+        XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://mock.mock")
     }
 
     func test_password_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "password")
+        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "mockpassword")
     }
 
     func test_title_withoutServer() {
@@ -79,7 +71,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
         viewModel.state.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
@@ -90,7 +82,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withInvalidServer_shouldEmitAlert() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "web://site"
         viewModel.state.inputs[2].value.value = "password"
@@ -110,7 +102,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_shouldChangeIsLoading() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
@@ -125,7 +117,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_shouldAuthenticate() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
@@ -138,7 +130,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             method: "auth.login",
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
@@ -155,7 +147,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutData_shouldDoNothing() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         let expectation = self.expectation(description: "Received value")
         expectation.isInverted = true
         viewModel.state.isLoading.dropFirst().sink { _ in
@@ -176,7 +168,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = keychain.password
@@ -198,7 +190,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         viewModel.state.inputs[0].value.value = "new name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = keychain.password
@@ -215,7 +207,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
@@ -235,7 +227,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
             result: Just(()).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
 
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
@@ -246,7 +238,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_deleteSelected_withoutServer_shouldDoNothing() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
         viewModel.events.first().sink { _ in
@@ -257,7 +249,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_deleteSelected_withServer_shouldEmitAlert() {
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
@@ -274,7 +266,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() {
         preferences.addOrUpdate(server: server)
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
@@ -288,7 +280,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
     func test_deleteSelected_whenDeleteServerSelected_shouldEmitCompleteEvent() {
         preferences.addOrUpdate(server: server)
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
@@ -305,13 +297,5 @@ class DelugeSettingsViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-    }
-}
-
-private struct MockClientProvider: DelugeClientProvider {
-    let client: DelugeClient
-
-    func createClient(baseURL: URL, password: String) -> DelugeClient {
-        client
     }
 }

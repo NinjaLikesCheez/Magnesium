@@ -6,15 +6,16 @@ import XCTest
 
 class TransmissionTorrentListViewModelImplementationTests: XCTestCase {
     private var client: MockTransmissionClient!
-    private var preferences: InMemoryPreferences!
     private var implementation: TransmissionTorrentListViewModelImplementation!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         client = MockTransmissionClient()
-        preferences = InMemoryPreferences()
-        implementation = TransmissionTorrentListViewModelImplementation(client: client, preferences: preferences)
+        implementation = TransmissionTorrentListViewModelImplementation(client: client)
+        cancellables = Set()
     }
 
     func test_refresh_shouldGetTorrents() {

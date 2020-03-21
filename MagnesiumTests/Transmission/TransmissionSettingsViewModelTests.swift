@@ -5,30 +5,30 @@ import Transmission
 import XCTest
 
 class TransmissionSettingsViewModelTests: XCTestCase {
-    private let client = MockTransmissionClient()
-    private let preferences = InMemoryPreferences()
-    private var cancellables = Set<AnyCancellable>()
-    private lazy var clientProvider = MockClientProvider(client: client)
-    private lazy var addViewModel = TransmissionSettingsViewModel(
-        preferences: preferences,
-        clientProvider: clientProvider
-    )
-    private lazy var editViewModel = TransmissionSettingsViewModel(
-        preferences: preferences,
-        server: server,
-        clientProvider: clientProvider
-    )
-    private lazy var server: Server = {
+    private var client: MockTransmissionClient!
+    private var addViewModel: TransmissionSettingsViewModel!
+    private var server: Server!
+    private var editViewModel: TransmissionSettingsViewModel!
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
+
+    override func setUp() {
+        super.setUp()
+        client = MockTransmissionClient()
+        Current = .mock(transmission: { _, _, _ in self.client })
+        addViewModel = TransmissionSettingsViewModel()
         let settings = TransmissionServerSettings(url: URL(string: "http://example.com")!, username: "username")
         let keychain = TransmissionKeychainData(password: "password")
         let encoder = JSONEncoder()
-        return Server(
+        server = Server(
             name: "Server",
-            type: .deluge,
+            type: .transmission,
             data: try! encoder.encode(settings),
             keychainData: try! encoder.encode(keychain)
         )
-    }()
+        editViewModel = TransmissionSettingsViewModel(server: server)
+        cancellables = Set()
+    }
 
     func test_inputs() {
         XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "username", "password"])
@@ -83,7 +83,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
         viewModel.state.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
@@ -92,7 +92,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_isSaveButtonEnabled_withInvalidServer_shouldBeFalse() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "web://site"
         var event: ServerSettingsEvent?
@@ -111,7 +111,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_shouldChangeIsLoading() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
 
@@ -125,7 +125,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_shouldRequestRPCVersion() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.handle(.saveSelected)
@@ -139,7 +139,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
 
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
 
@@ -155,7 +155,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_saveSelected_withoutData_shouldDoNothing() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         let expectation = self.expectation(description: "Received value")
         expectation.isInverted = true
         viewModel.state.isLoading.dropFirst().sink { _ in
@@ -176,7 +176,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = settings.username
@@ -199,7 +199,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
         let expectedData = try JSONEncoder().encode(settings)
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         viewModel.state.inputs[0].value.value = "new name"
         viewModel.state.inputs[1].value.value = settings.url.absoluteString
         viewModel.state.inputs[2].value.value = settings.username
@@ -217,7 +217,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
             result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
         ))
 
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         viewModel.state.inputs[0].value.value = "name"
         viewModel.state.inputs[1].value.value = "http://example.com"
         viewModel.state.inputs[2].value.value = "password"
@@ -237,7 +237,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
             result: Just(-1).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
         ))
 
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.saveSelected)
@@ -248,7 +248,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_deleteSelected_withoutServer_shouldDoNothing() {
-        let viewModel = addViewModel
+        let viewModel = addViewModel!
         let expectation = self.expectation(description: "Value received")
         expectation.isInverted = true
         viewModel.events.first().sink { _ in
@@ -259,7 +259,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
     }
 
     func test_deleteSelected_withServer_shouldEmitAlert() {
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
@@ -276,7 +276,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
 
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() {
         preferences.addOrUpdate(server: server)
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
         viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
@@ -290,7 +290,7 @@ class TransmissionSettingsViewModelTests: XCTestCase {
 
     func test_deleteSelected_whenDeleteServerSelected_shouldEmitCompleteEvent() {
         preferences.addOrUpdate(server: server)
-        let viewModel = editViewModel
+        let viewModel = editViewModel!
 
         var event: ServerSettingsEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
@@ -308,13 +308,5 @@ class TransmissionSettingsViewModelTests: XCTestCase {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
         }
-    }
-}
-
-private struct MockClientProvider: TransmissionClientProvider {
-    let client: TransmissionClient
-
-    func createClient(baseURL: URL, username: String?, password: String?) -> TransmissionClient {
-        client
     }
 }

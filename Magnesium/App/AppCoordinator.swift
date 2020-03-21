@@ -5,7 +5,6 @@ import UIKit
 
 final class AppCoordinator: Coordinator, AlertPresenter {
     private let window: UIWindow
-    private let preferences: Preferences
     private let session: Session
     private let splitViewController: PresentableSplitViewController
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: splitViewController, session: session)
@@ -28,13 +27,11 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     // for testing
     init(
         window: UIWindow,
-        preferences: Preferences = UserDefaultsPreferences(),
         session: Session? = nil,
         splitViewController: PresentableSplitViewController = PresentableSplitViewController()
     ) {
         self.window = window
-        self.preferences = preferences
-        self.session = session ?? Session(preferences: preferences)
+        self.session = session ?? Session()
         self.splitViewController = splitViewController
 
         self.splitViewController.delegate = self
@@ -50,8 +47,8 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     private func show(server: Server?) {
         let viewController: UIViewController
-        if let server = server, let viewModel = server.listViewModel(preferences: preferences) {
-            let coordinator = TorrentListCoordinator(viewModel: viewModel, session: session, preferences: preferences)
+        if let server = server, let viewModel = server.listViewModel() {
+            let coordinator = TorrentListCoordinator(viewModel: viewModel, session: session)
             addChildCoordinator(coordinator) { [weak self] _, event in
                 self?.handle(event)
             }
@@ -112,7 +109,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showSettings() {
-        let coordinator = SettingsCoordinator(session: session, preferences: preferences)
+        let coordinator = SettingsCoordinator(session: session)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }
@@ -130,7 +127,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showAddServer() {
-        let coordinator = AddServerCoordinator(preferences: preferences)
+        let coordinator = AddServerCoordinator()
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }
@@ -150,7 +147,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
     }
 
     private func showServerSettings(for server: Server) {
-        let coordinator = ServerSettingsCoordinator(server: server, preferences: preferences)
+        let coordinator = ServerSettingsCoordinator(server: server)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }

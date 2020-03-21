@@ -6,20 +6,17 @@ import ViewModel
 import XCTest
 
 final class StandardTorrentListViewModelTests: XCTestCase {
-    private var preferences: InMemoryPreferences!
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentListViewModel<MockImplementation>!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        preferences = InMemoryPreferences()
+        Current = .mock
         implementation = MockImplementation()
-        viewModel = StandardTorrentListViewModel(
-            implementation: implementation,
-            server: .delugeMock(name: "Mock"),
-            preferences: preferences
-        )
+        viewModel = StandardTorrentListViewModel(implementation: implementation, server: .mock(.deluge))
+        cancellables = Set()
     }
 
     private func getAlert(actions: () -> Void) -> Alert? {
@@ -38,7 +35,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_title_shouldBeExpectedTitle() {
         var title: String?
         viewModel.state.title.sink { title = $0 }.store(in: &cancellables)
-        XCTAssertEqual(title, "Mock")
+        XCTAssertEqual(title, "MockServer")
     }
 
     func test_title_whenEditing_shouldBeSelectionCount() {
@@ -61,13 +58,13 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         var title: String?
         viewModel.state.title.dropFirst().sink { title = $0 }.store(in: &cancellables)
         viewModel.handle(.didEndEditing)
-        XCTAssertEqual(title, "Mock")
+        XCTAssertEqual(title, "MockServer")
     }
 
     // MARK: - Auto Refresh
 
     func test_autoRefresh_shouldFire() {
-        preferences.set(1, for: .autoRefreshInterval)
+        preferences[.autoRefreshInterval] = 1
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 2)
@@ -77,8 +74,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
-        preferences.set(1, for: .autoRefreshInterval)
-        preferences.set(0, for: .autoRefreshInterval)
+        preferences[.autoRefreshInterval] = 1
+        preferences[.autoRefreshInterval] = 0
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 1)
@@ -591,7 +588,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
         var value: Bool?
         viewModel.state.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &cancellables)
-        preferences.set(FilterOptions(state: .downloading), for: .filterOptions)
+        preferences[.filterOptions] = FilterOptions(state: .downloading)
         XCTAssertTrue(value!)
     }
 
@@ -604,7 +601,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(downloadRate: 400_000, label: "label1"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
-        preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
+        preferences[.filterOptions] = FilterOptions(label: "label2")
 
         var value: String?
         viewModel.state.totalDownloadSpeed.first().sink { value = $0 }.store(in: &cancellables)
@@ -620,7 +617,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(uploadRate: 400_000, label: "label1"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.handle(.refresh)
-        preferences.set(FilterOptions(label: "label2"), for: .filterOptions)
+        preferences[.filterOptions] = FilterOptions(label: "label2")
 
         var value: String?
         viewModel.state.totalUploadSpeed.first().sink { value = $0 }.store(in: &cancellables)

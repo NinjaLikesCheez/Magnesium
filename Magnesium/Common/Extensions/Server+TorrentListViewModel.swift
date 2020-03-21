@@ -2,7 +2,7 @@ import Foundation
 import Preferences
 
 extension Server {
-    func listViewModel(preferences: Preferences) -> AnyTorrentListViewModel? {
+    func listViewModel() -> AnyTorrentListViewModel? {
         switch type {
         case .deluge:
             let decoder = JSONDecoder()
@@ -16,12 +16,8 @@ extension Server {
                 baseURL: settings.url,
                 password: keychain.password
             )
-            let implementation = DelugeTorrentListViewModelImplementation(client: client, preferences: preferences)
-            let viewModel = StandardTorrentListViewModel(
-                implementation: implementation,
-                server: self,
-                preferences: preferences
-            )
+            let implementation = DelugeTorrentListViewModelImplementation(client: client)
+            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: self)
             return AnyTorrentListViewModel(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
@@ -36,15 +32,8 @@ extension Server {
                 username: settings.username,
                 password: keychain.password
             )
-            let implementation = TransmissionTorrentListViewModelImplementation(
-                client: client,
-                preferences: preferences
-            )
-            let viewModel = StandardTorrentListViewModel(
-                implementation: implementation,
-                server: self,
-                preferences: preferences
-            )
+            let implementation = TransmissionTorrentListViewModelImplementation(client: client)
+            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: self)
             return AnyTorrentListViewModel(viewModel)
         }
     }

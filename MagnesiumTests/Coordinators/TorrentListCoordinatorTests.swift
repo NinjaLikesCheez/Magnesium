@@ -8,22 +8,19 @@ import XCTest
 class TorrentListCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
-    private var preferences: InMemoryPreferences!
     private var session: Session!
     private var coordinator: TorrentListCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
+    private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         window = UIWindow()
         viewModel = MockViewModel()
-        preferences = InMemoryPreferences()
-        session = Session(preferences: preferences)
-        coordinator = TorrentListCoordinator(
-            viewModel: AnyTorrentListViewModel(viewModel),
-            session: session,
-            preferences: preferences
-        )
+        session = Session()
+        coordinator = TorrentListCoordinator(viewModel: AnyTorrentListViewModel(viewModel), session: session)
+        cancellables = Set()
         coordinator.receivedEvents.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
@@ -261,14 +258,12 @@ private final class MockViewModel: ViewModel, TorrentListProvider {
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
         let torrent = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
         let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
-        let preferences = InMemoryPreferences()
         let client = MockDelugeClient()
         let refresher = MockTorrentRefresher()
         let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
             implementation: DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher),
             torrent: torrent,
-            labels: labels,
-            preferences: preferences
+            labels: labels
         ))
         previewViewModels.append(viewModel)
         return viewModel

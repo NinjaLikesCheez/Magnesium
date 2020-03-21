@@ -4,11 +4,13 @@ import XCTest
 
 class NoServersCoordinatorTests: XCTestCase {
     private var coordinator: NoServersCoordinator!
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
+        Current = .mock
         coordinator = NoServersCoordinator()
+        cancellables = Set()
     }
 
     // MARK: - Presentable
