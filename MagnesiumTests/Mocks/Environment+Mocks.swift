@@ -11,8 +11,9 @@ extension Environment {
         transmission: @escaping (URL, String?, String?) -> TransmissionClient = { _, _, _ in MockTransmissionClient() },
         preferences: Preferences = InMemoryPreferences(),
         keychain: Keychain = InMemoryKeychain(),
-        locale: Locale = .init(identifier: "en_US"),
-        calendar: Calendar = mockCalendar()
+        locale: Locale = .mock,
+        calendar: Calendar = .mock,
+        fileSystem: FileSystem = .mock
     ) -> Environment {
         Environment(
             deluge: deluge,
@@ -20,13 +21,32 @@ extension Environment {
             preferences: preferences,
             keychain: keychain,
             locale: locale,
-            calendar: calendar
+            calendar: calendar,
+            fileSystem: fileSystem
         )
     }
+}
 
-    static func mockCalendar() -> Calendar {
+extension Locale {
+    static var mock: Locale {
+        .init(identifier: "en_US")
+    }
+}
+
+extension Calendar {
+    static var mock: Calendar {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = .init(identifier: "en_US")
+        calendar.locale = .mock
         return calendar
+    }
+}
+
+extension FileSystem {
+    static var mock: FileSystem {
+        .init(
+            isReadable: { _ in true },
+            startAccessingSecurityScopedResource: { _ in true },
+            stopAccessingSecurityScopedResource: { _ in }
+        )
     }
 }

@@ -60,6 +60,7 @@
 		E951873423C80FC00060636A /* Preferences+Servers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E951873323C80FC00060636A /* Preferences+Servers.swift */; };
 		E951CA0623E4FC3F008A7D1F /* FilterViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */; };
 		E951CA0C23E50BC4008A7D1F /* ValueMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */; };
+		E952A13524268A690050F108 /* FileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E952A13424268A690050F108 /* FileSystem.swift */; };
 		E959FA9E23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E959FA9D23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift */; };
 		E95A43DF240C7337006C4B45 /* DelugeTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95A43DE240C7337006C4B45 /* DelugeTorrent.swift */; };
 		E95AB87423EA56BC00827A94 /* TorrentListCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95AB87323EA56BC00827A94 /* TorrentListCoordinatorTests.swift */; };
@@ -237,6 +238,7 @@
 		E951873323C80FC00060636A /* Preferences+Servers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+Servers.swift"; sourceTree = "<group>"; };
 		E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewModelTests.swift; sourceTree = "<group>"; };
 		E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueMapper.swift; sourceTree = "<group>"; };
+		E952A13424268A690050F108 /* FileSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystem.swift; sourceTree = "<group>"; };
 		E959FA9D23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailHeaderTableViewCell.swift; sourceTree = "<group>"; };
 		E95A43DE240C7337006C4B45 /* DelugeTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrent.swift; sourceTree = "<group>"; };
 		E95AB87323EA56BC00827A94 /* TorrentListCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -426,13 +428,12 @@
 		E9168309241414A80056D2A6 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				E952A13824268A840050F108 /* Dependencies */,
 				E90366E023AAC44700C6AB46 /* Extensions */,
 				E96B0080237A478E0091FA71 /* Models */,
 				E9637857241335950068E051 /* Protocols */,
 				E976FA42237E3634006B9DA9 /* Utilities */,
 				E97B543423B581AC006FFCC9 /* Views */,
-				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
-				E9918120242445E000AA4743 /* Prelude.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -479,6 +480,16 @@
 				E91FD7CB23FCBEBC0059A21F /* ServerErrorCoordinator.swift */,
 			);
 			path = "Server Error";
+			sourceTree = "<group>";
+		};
+		E952A13824268A840050F108 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
+				E952A13424268A690050F108 /* FileSystem.swift */,
+				E9918120242445E000AA4743 /* Prelude.swift */,
+			);
+			path = Dependencies;
 			sourceTree = "<group>";
 		};
 		E959FA9A23AC3C3E002CB8F8 /* Screens */ = {
@@ -1089,6 +1100,7 @@
 				E91DDEBB2411DD9B0024908B /* ServerSettingsViewModelEvent.swift in Sources */,
 				E9460D1D237BB3B100A08E68 /* TorrentListViewRepresentation.swift in Sources */,
 				E9624D4023D2368A0051EA99 /* TransmissionServerSettings.swift in Sources */,
+				E952A13524268A690050F108 /* FileSystem.swift in Sources */,
 				E96B724F23D39368005E8E89 /* Transmission+App.swift in Sources */,
 				E9C8258623C579E9003B1D72 /* DelugeTorrentListViewModelImplementation.swift in Sources */,
 				E99FC26823D148CC0019A992 /* TorrentDetailCoordinator.swift in Sources */,

@@ -33,15 +33,15 @@ final class AddTorrentFlow {
         var isAccessingSecurityScopedResource = false
 
         if case .file = type {
-            if !FileManager.default.isReadableFile(atPath: type.url.absoluteString) {
-                _ = type.url.startAccessingSecurityScopedResource()
+            if !Current.fileSystem.isReadable(type.url) {
+                _ = Current.fileSystem.startAccessingSecurityScopedResource(type.url)
                 isAccessingSecurityScopedResource = true
             }
         }
 
         defer {
             if isAccessingSecurityScopedResource {
-                type.url.stopAccessingSecurityScopedResource()
+                Current.fileSystem.stopAccessingSecurityScopedResource(type.url)
             }
         }
 
