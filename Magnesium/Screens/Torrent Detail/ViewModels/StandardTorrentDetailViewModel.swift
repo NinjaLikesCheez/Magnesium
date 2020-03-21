@@ -80,7 +80,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         view = .init(
             hash: torrent.value.hash,
             sections: sections,
-            isRefreshing: isRefreshingSubject.eraseToAnyPublisher()
+            isRefreshing: isRefreshingSubject.ui().eraseToAnyPublisher()
         )
 
         refreshFiles()

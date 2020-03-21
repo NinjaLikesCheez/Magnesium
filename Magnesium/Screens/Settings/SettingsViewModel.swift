@@ -35,7 +35,7 @@ final class SettingsViewModel: ViewModel {
 
     init(session: Session) {
         self.session = session
-        view = .init(sections: sectionsSubject.eraseToAnyPublisher())
+        view = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())

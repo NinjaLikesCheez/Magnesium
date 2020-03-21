@@ -31,7 +31,7 @@ final class FilterViewModel: ViewModel {
 
     init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.labels = labels
-        view = .init(sections: sectionsSubject.eraseToAnyPublisher())
+        view = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .asVoid()

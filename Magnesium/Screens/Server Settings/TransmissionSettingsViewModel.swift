@@ -41,7 +41,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionName,
             placeholder: L10n.transmission,
             value: nameSubject,
-            isEnabled: nameEnabled.eraseToAnyPublisher(),
+            isEnabled: nameEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.default.withReturnKeyType(.next)
         )
 
@@ -50,7 +50,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionServer,
             placeholder: "https://example.com",
             value: serverSubject,
-            isEnabled: serverEnabled.eraseToAnyPublisher(),
+            isEnabled: serverEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.url.withReturnKeyType(.next)
         )
 
@@ -59,7 +59,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionUsername,
             placeholder: L10n.serverSettingsOptionUsernameHintOptional,
             value: usernameSubject,
-            isEnabled: usernameEnabled.eraseToAnyPublisher(),
+            isEnabled: usernameEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.username.withReturnKeyType(.next)
         )
 
@@ -68,7 +68,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionPassword,
             placeholder: L10n.serverSettingsOptionPasswordHintOptional,
             value: passwordSubject,
-            isEnabled: passwordEnabled.eraseToAnyPublisher(),
+            isEnabled: passwordEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 

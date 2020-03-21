@@ -39,7 +39,7 @@ final class DelugeSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionName,
             placeholder: L10n.deluge,
             value: nameSubject,
-            isEnabled: nameEnabled.eraseToAnyPublisher(),
+            isEnabled: nameEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.default.withReturnKeyType(.next)
         )
 
@@ -48,7 +48,7 @@ final class DelugeSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionServer,
             placeholder: "https://example.com",
             value: serverSubject,
-            isEnabled: serverEnabled.eraseToAnyPublisher(),
+            isEnabled: serverEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.url.withReturnKeyType(.next)
         )
 
@@ -57,7 +57,7 @@ final class DelugeSettingsViewModel: ViewModel {
             name: L10n.serverSettingsOptionPassword,
             placeholder: L10n.serverSettingsOptionPasswordHint,
             value: passwordSubject,
-            isEnabled: passwordEnabled.eraseToAnyPublisher(),
+            isEnabled: passwordEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
@@ -66,7 +66,7 @@ final class DelugeSettingsViewModel: ViewModel {
             saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
-            isSaveButtonEnabled: isSaveButtonEnabledSubject.eraseToAnyPublisher(),
+            isSaveButtonEnabled: isSaveButtonEnabledSubject.ui().eraseToAnyPublisher(),
             inputs: [nameInput, serverInput, passwordInput]
         )
 
