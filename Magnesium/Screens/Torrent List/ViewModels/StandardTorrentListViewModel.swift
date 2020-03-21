@@ -177,12 +177,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func pause(_ torrents: [Torrent]) {
         implementation.pause(torrents)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -193,12 +188,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func resume(_ torrents: [Torrent]) {
         implementation.resume(torrents)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -209,12 +199,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func remove(_ torrents: [Torrent], removeData: Bool) {
         implementation.remove(torrents, removeData: removeData)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -225,12 +210,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func setLabel(for torrents: [Torrent], label: Label) {
         implementation.setLabel(label, for: torrents)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -241,12 +221,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func verify(_ torrents: [Torrent]) {
         implementation.verify(torrents)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -257,12 +232,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func updateTrackers(for torrents: [Torrent]) {
         implementation.updateTrackers(for: torrents)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -273,12 +243,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func moveDownloadFolder(for torrents: [Torrent], to path: String) {
         implementation.moveDownloadFolder(for: torrents, to: path)
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard let strongSelf = self, case .finished = completion else { return }
-                strongSelf.implementation.refresh()
-                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                    .store(in: &strongSelf.cancellables)
-            })
+            .append(implementation.refresh().asVoid())
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
