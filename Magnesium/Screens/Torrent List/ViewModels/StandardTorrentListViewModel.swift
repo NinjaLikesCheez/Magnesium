@@ -289,26 +289,33 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func presentRemoveOptions(for torrents: [Torrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        var alert = Alert(title: L10n.remove, message: message, style: .actionSheet(source))
-        alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
-            self.remove(torrents, removeData: false)
-        })
-        alert.addAction(AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
-            self.remove(torrents, removeData: true)
-        })
-        alert.addAction(.cancel)
+        let alert = Alert(title: L10n.remove, message: message, style: .actionSheet(source)) {
+            AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
+                self.remove(torrents, removeData: false)
+            }
+
+            AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+                self.remove(torrents, removeData: true)
+            }
+
+            AlertAction.cancel
+        }
         eventSubject.send(.alert(alert))
     }
 
     private func presentLabelSelection(for torrents: [Torrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        var alert = Alert(title: L10n.setLabel, message: message, style: .actionSheet(source))
-        for label in labels.value {
-            alert.addAction(AlertAction(title: label.displayName, style: .default) {
+        let labelActions = labels.value.map { label in
+            AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(for: torrents, label: label)
-            })
+            }
         }
-        alert.addAction(.cancel)
+        let alert = Alert(
+            title: L10n.setLabel,
+            message: message,
+            style: .actionSheet(source),
+            actions: labelActions + [.cancel]
+        )
         eventSubject.send(.alert(alert))
     }
 
@@ -344,12 +351,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(.ok)
+        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
         eventSubject.send(.alert(alert))
     }
 

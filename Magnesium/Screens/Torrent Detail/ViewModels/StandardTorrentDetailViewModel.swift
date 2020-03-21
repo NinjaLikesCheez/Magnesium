@@ -372,35 +372,33 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
-        alert.addAction(AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
-            self.remove(removeData: false)
-        })
-        alert.addAction(AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
-            self.remove(removeData: true)
-        })
-        alert.addAction(.cancel)
+        let alert = Alert(title: nil, message: nil, style: .actionSheet(source)) { () -> [AlertAction] in
+            AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
+                self.remove(removeData: false)
+            }
+
+            AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+                self.remove(removeData: true)
+            }
+
+            AlertAction.cancel
+        }
         eventSubject.send(.alert(alert))
     }
 
     private func presentLabelSelection(from source: PopoverSource) {
-        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
-        for label in labels.value {
-            alert.addAction(AlertAction(title: label.displayName, style: .default) {
-                self.setLabel(label)
-            })
+        let alert = Alert(title: nil, message: nil, style: .actionSheet(source)) {
+            labels.value.map { label in
+                AlertAction(title: label.displayName, style: .default) {
+                    self.setLabel(label)
+                }
+            }
         }
-        alert.addAction(.cancel)
         eventSubject.send(.alert(alert))
     }
 
     private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(.ok)
+        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
         eventSubject.send(.alert(alert))
     }
 

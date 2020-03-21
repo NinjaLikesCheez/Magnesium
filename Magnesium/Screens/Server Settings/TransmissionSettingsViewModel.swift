@@ -176,12 +176,14 @@ final class TransmissionSettingsViewModel: ViewModel {
 
     private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
-        var alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet(source))
-        alert.addAction(AlertAction(title: L10n.deleteServer, style: .destructive) {
-            Current.preferences.remove(server: server)
-            self.eventSubject.send(.complete)
-        })
-        alert.addAction(.cancel)
+        let alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet(source)) {
+            AlertAction(title: L10n.deleteServer, style: .destructive) {
+                Current.preferences.remove(server: server)
+                self.eventSubject.send(.complete)
+            }
+
+            AlertAction.cancel
+        }
         eventSubject.send(.alert(alert))
     }
 
@@ -198,12 +200,7 @@ final class TransmissionSettingsViewModel: ViewModel {
     }
 
     private func showError(title: String, message: String?) {
-        var alert = Alert(
-            title: title,
-            message: message,
-            style: .alert
-        )
-        alert.addAction(.ok)
+        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
         eventSubject.send(.alert(alert))
     }
 }

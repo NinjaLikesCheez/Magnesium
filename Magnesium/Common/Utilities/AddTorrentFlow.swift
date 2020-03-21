@@ -112,12 +112,11 @@ final class AddTorrentFlow {
     }
 
     private func showError(title: String, message: String?) {
-        var alert = Alert(title: title, message: message, style: .alert)
-        alert.addAction(.ok)
         var current = viewController
         while let next = current.presentedViewController {
             current = next
         }
+        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
         current.present(alert.createAlertController(), animated: true)
     }
 }

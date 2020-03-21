@@ -60,68 +60,67 @@ final class FilterViewModel: ViewModel {
 
     private func handleSortSelected(from source: PopoverSource) {
         let currentSort = Current.preferences[.sortOption]
-        var alert = Alert(title: L10n.sortByAlertTitle, message: L10n.sortByAlertMessage, style: .actionSheet(source))
-
-        for property in SortOption.Property.allCases {
-            alert.addAction(AlertAction(title: property.localizedString, style: .default) {
+        let sortActions = SortOption.Property.allCases.map { property in
+            AlertAction(title: property.localizedString, style: .default) {
                 if property == currentSort.property {
                     let sortOption = currentSort.withOppositeDirection()
                     Current.preferences[.sortOption] = sortOption
                 } else {
                     Current.preferences[.sortOption] = SortOption(property: property)
                 }
-            })
+            }
         }
-
-        alert.addAction(.cancel)
+        let alert = Alert(
+            title: L10n.sortByAlertTitle,
+            message: L10n.sortByAlertMessage,
+            style: .actionSheet(source),
+            actions: sortActions + [.cancel]
+        )
         eventSubject.send(.alert(alert))
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
         var filterOptions = Current.preferences[.filterOptions]
-        var alert = Alert(
-            title: L10n.filterLabelAlertTitle,
-            message: L10n.filterLabelAlertMessage,
-            style: .actionSheet(source)
-        )
         let labels: [StandardLabel?] = [nil] + self.labels.value
-
-        for label in labels {
-            alert.addAction(AlertAction(
+        let labelActions = labels.map { label in
+            AlertAction(
                 title: label.map(\.displayName) ?? L10n.allFilter,
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
                     Current.preferences[.filterOptions] = filterOptions
                 }
-            ))
+            )
         }
 
-        alert.addAction(.cancel)
+        let alert = Alert(
+            title: L10n.filterLabelAlertTitle,
+            message: L10n.filterLabelAlertMessage,
+            style: .actionSheet(source),
+            actions: labelActions + [.cancel]
+        )
         eventSubject.send(.alert(alert))
     }
 
     private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = Current.preferences[.filterOptions]
-        var alert = Alert(
-            title: L10n.filterStateAlertTitle,
-            message: L10n.filterStateAlertMessage,
-            style: .actionSheet(source)
-        )
         let states: [TorrentState?] = [nil] + TorrentState.allCases
-
-        for state in states {
-            alert.addAction(AlertAction(
+        let filterActions = states.map { state in
+            AlertAction(
                 title: state?.localizedString ?? L10n.allFilter,
                 style: .default,
                 handler: {
                     filterOptions.state = state
                     Current.preferences[.filterOptions] = filterOptions
                 }
-            ))
+            )
         }
-
-        alert.addAction(.cancel)
+        let alert = Alert(
+            title: L10n.filterStateAlertTitle,
+            message: L10n.filterStateAlertMessage,
+            style: .actionSheet(source),
+            actions: filterActions + [.cancel]
+        )
         eventSubject.send(.alert(alert))
     }
 

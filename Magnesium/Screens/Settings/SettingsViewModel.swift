@@ -66,13 +66,12 @@ final class SettingsViewModel: ViewModel {
 
     private func handleChangeServerSelected(from source: PopoverSource) {
         let servers = Current.preferences.getServers()
-        var alert = Alert(title: nil, message: nil, style: .actionSheet(source))
-        for server in servers {
-            alert.addAction(AlertAction(title: server.name, style: .default) {
+        let serverActions = servers.map { server in
+            AlertAction(title: server.name, style: .default) {
                 self.session.setServer(server)
-            })
+            }
         }
-        alert.addAction(.cancel)
+        let alert = Alert(title: nil, message: nil, style: .actionSheet(source), actions: serverActions + [.cancel])
         eventSubject.send(.alert(alert))
     }
 

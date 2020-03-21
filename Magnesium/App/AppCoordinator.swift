@@ -230,29 +230,35 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     func add(fileURL: URL) {
         guard let server = session.server else { return }
-        var alert = Alert(
+        let alert = Alert(
             title: L10n.addTorrentToServerPrompt(serverName: server.name),
             message: fileURL.lastPathComponent,
-            style: .alert
+            style: .alert,
+            actions: {
+                AlertAction(title: L10n.addTorrent, style: .default) {
+                    self.addTorrentFlow.add(type: .file(fileURL))
+                }
+
+                AlertAction.cancel
+            }
         )
-        alert.addAction(AlertAction(title: L10n.addTorrent, style: .default) {
-            self.addTorrentFlow.add(type: .file(fileURL))
-        })
-        alert.addAction(.cancel)
         showAlert(alert, useTopViewController: true)
     }
 
     func add(magnetURL: URL) {
         guard let server = session.server else { return }
-        var alert = Alert(
+        let alert = Alert(
             title: L10n.addTorrentToServerPrompt(serverName: server.name),
             message: magnetURL.absoluteString,
-            style: .alert
+            style: .alert,
+            actions: {
+                AlertAction(title: L10n.addTorrent, style: .default) {
+                    self.addTorrentFlow.add(type: .magnet(magnetURL))
+                }
+
+                AlertAction.cancel
+            }
         )
-        alert.addAction(AlertAction(title: L10n.addTorrent, style: .default) {
-            self.addTorrentFlow.add(type: .magnet(magnetURL))
-        })
-        alert.addAction(.cancel)
         showAlert(alert, useTopViewController: true)
     }
 

@@ -70,14 +70,17 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
-        var alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet(source))
-        alert.addAction(AlertAction(title: L10n.addTorrentMethodLink, style: .default) {
-            self.showAddLink(subject: linkSubject)
-        })
-        alert.addAction(AlertAction(title: L10n.addTorrentMethodFile, style: .default) {
-            self.showAddFile()
-        })
-        alert.addAction(.cancel)
+        let alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet(source)) {
+            AlertAction(title: L10n.addTorrentMethodLink, style: .default) {
+                self.showAddLink(subject: linkSubject)
+            }
+
+            AlertAction(title: L10n.addTorrentMethodFile, style: .default) {
+                self.showAddFile()
+            }
+
+            AlertAction.cancel
+        }
         showAlert(alert)
     }
 
