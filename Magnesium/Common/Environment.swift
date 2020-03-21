@@ -5,14 +5,27 @@ import Preferences
 import Transmission
 
 struct Environment {
-    var deluge: (URL, String) -> DelugeClient = Deluge.init
-    var transmission: (URL, String?, String?) -> TransmissionClient = Transmission.init
-    var preferences: Preferences = UserDefaultsPreferences()
-    var keychain: Keychain = SystemKeychain()
+    let deluge: (URL, String) -> DelugeClient
+    let transmission: (URL, String?, String?) -> TransmissionClient
+    let preferences: Preferences
+    let keychain: Keychain
+    let locale: Locale
+    let calendar: Calendar
+}
+
+extension Environment {
+    static let live: Environment = .init(
+        deluge: Deluge.init,
+        transmission: Transmission.init,
+        preferences: UserDefaultsPreferences(),
+        keychain: SystemKeychain(),
+        locale: .autoupdatingCurrent,
+        calendar: .autoupdatingCurrent
+    )
 }
 
 #if DEBUG
-    var Current = Environment() // swiftlint:disable:this identifier_name
+    var Current: Environment = .live // swiftlint:disable:this identifier_name
 #else
-    let Current = Environment() // swiftlint:disable:this identifier_name
+    var Current: Environment = .live // swiftlint:disable:this identifier_name
 #endif

@@ -10,13 +10,23 @@ extension Environment {
         deluge: @escaping (URL, String) -> DelugeClient = { _, _ in MockDelugeClient() },
         transmission: @escaping (URL, String?, String?) -> TransmissionClient = { _, _, _ in MockTransmissionClient() },
         preferences: Preferences = InMemoryPreferences(),
-        keychain: Keychain = InMemoryKeychain()
+        keychain: Keychain = InMemoryKeychain(),
+        locale: Locale = .init(identifier: "en_US"),
+        calendar: Calendar = mockCalendar()
     ) -> Environment {
         Environment(
             deluge: deluge,
             transmission: transmission,
             preferences: preferences,
-            keychain: keychain
+            keychain: keychain,
+            locale: locale,
+            calendar: calendar
         )
+    }
+
+    static func mockCalendar() -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = .init(identifier: "en_US")
+        return calendar
     }
 }

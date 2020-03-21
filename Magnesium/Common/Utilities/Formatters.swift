@@ -3,6 +3,7 @@ import Foundation
 enum Formatters {
     static var eta: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
+        formatter.calendar = Current.calendar
         formatter.allowedUnits = [.day, .hour, .minute, .second]
         formatter.unitsStyle = .abbreviated
         return formatter
@@ -15,6 +16,7 @@ enum Formatters {
         }
 
         let formatter = NumberFormatter()
+        formatter.locale = Current.locale
         formatter.minimumFractionDigits = precision
         formatter.maximumFractionDigits = precision
         numberFormatters[precision] = formatter
@@ -32,6 +34,7 @@ enum Formatters {
         }
 
         let formatter = NumberFormatter()
+        formatter.locale = Current.locale
         formatter.numberStyle = .percent
         formatter.minimumFractionDigits = precision
         formatter.maximumFractionDigits = precision
