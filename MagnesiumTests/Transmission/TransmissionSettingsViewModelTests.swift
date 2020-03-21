@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 @testable import Magnesium
 import Preferences
 import Transmission

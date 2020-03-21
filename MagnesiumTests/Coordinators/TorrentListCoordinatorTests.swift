@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 import LinkPresentation
 @testable import Magnesium
 import Preferences

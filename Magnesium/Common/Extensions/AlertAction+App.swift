@@ -1,3 +1,5 @@
+import CommonModels
+
 extension AlertAction {
     static var ok: AlertAction {
         .init(title: L10n.ok, style: .default)

@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 import Coordinator
 @testable import Magnesium
 import Preferences

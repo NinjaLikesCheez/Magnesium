@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 import UIKit
 
 final class AddTorrentFlow {

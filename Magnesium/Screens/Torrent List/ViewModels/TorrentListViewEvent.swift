@@ -1,3 +1,5 @@
+import CommonModels
+
 enum TorrentListViewEvent {
     case refresh
     case addSelected(source: PopoverSource)

@@ -1,3 +1,4 @@
+import CommonModels
 import UIKit
 
 extension Activity {

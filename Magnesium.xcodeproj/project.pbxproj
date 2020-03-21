@@ -84,6 +84,9 @@
 		E96908FF23E9092A00A95D31 /* RefreshIntervalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */; };
 		E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */; };
 		E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090223E9135900A95D31 /* AppCoordinatorTests.swift */; };
+		E96A4EF32426A93200D00131 /* CommonModels in Frameworks */ = {isa = PBXBuildFile; productRef = E96A4EF22426A93200D00131 /* CommonModels */; };
+		E96A4EF52426AA2600D00131 /* Prelude in Frameworks */ = {isa = PBXBuildFile; productRef = E96A4EF42426AA2600D00131 /* Prelude */; };
+		E96A4EF72426AA4E00D00131 /* Prelude.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96A4EF62426AA4E00D00131 /* Prelude.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
 		E96B006B237A43760091FA71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E96B006A237A43760091FA71 /* Assets.xcassets */; };
@@ -114,14 +117,10 @@
 		E9847C5223E6474C00B05D3A /* Transmission+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */; };
 		E9847C5423E64EE600B05D3A /* MockTransmissionClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9847C5323E64EE600B05D3A /* MockTransmissionClient.swift */; };
 		E9847C5823E6605900B05D3A /* TransmissionSettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9847C5723E6605900B05D3A /* TransmissionSettingsViewModelTests.swift */; };
-		E98654FB24245DEF00066665 /* CombineExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = E98654FA24245DEF00066665 /* CombineExtensions */; };
-		E98654FD24245DEF00066665 /* PreludeModels in Frameworks */ = {isa = PBXBuildFile; productRef = E98654FC24245DEF00066665 /* PreludeModels */; };
-		E98654FF24245DEF00066665 /* UIKitExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = E98654FE24245DEF00066665 /* UIKitExtensions */; };
 		E988EDE223E7CA080011A733 /* TorrentDetailHeaderItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDE123E7CA080011A733 /* TorrentDetailHeaderItemTests.swift */; };
 		E988EDE823E7D0150011A733 /* TorrentDetailFileItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDE723E7D0150011A733 /* TorrentDetailFileItemTests.swift */; };
 		E988EDEC23E7D0710011A733 /* TransmissionTorrentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E988EDEB23E7D0710011A733 /* TransmissionTorrentTests.swift */; };
 		E98D936123D2845D0013A1E1 /* TorrentMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98D936023D2845D0013A1E1 /* TorrentMapper.swift */; };
-		E9918121242445E000AA4743 /* Imports.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9918120242445E000AA4743 /* Imports.swift */; };
 		E999B0B823F62BFA000889FD /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999B0B723F62BFA000889FD /* L10n.swift */; };
 		E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */; };
 		E99F9C032420497500DDC08B /* Coordinator in Frameworks */ = {isa = PBXBuildFile; productRef = E99F9C022420497500DDC08B /* Coordinator */; };
@@ -265,6 +264,7 @@
 		E96908FE23E9092A00A95D31 /* RefreshIntervalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewController.swift; sourceTree = "<group>"; };
 		E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshIntervalViewModelTests.swift; sourceTree = "<group>"; };
 		E969090223E9135900A95D31 /* AppCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinatorTests.swift; sourceTree = "<group>"; };
+		E96A4EF62426AA4E00D00131 /* Prelude.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prelude.swift; sourceTree = "<group>"; };
 		E96B0061237A43740091FA71 /* Magnesium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B0064237A43740091FA71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E96B0066237A43740091FA71 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -298,7 +298,6 @@
 		E988EDE723E7D0150011A733 /* TorrentDetailFileItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailFileItemTests.swift; sourceTree = "<group>"; };
 		E988EDEB23E7D0710011A733 /* TransmissionTorrentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentTests.swift; sourceTree = "<group>"; };
 		E98D936023D2845D0013A1E1 /* TorrentMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentMapper.swift; sourceTree = "<group>"; };
-		E9918120242445E000AA4743 /* Imports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Imports.swift; sourceTree = "<group>"; };
 		E999B0B723F62BFA000889FD /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LPLinkMetadata+StandardTorrent.swift"; sourceTree = "<group>"; };
 		E99F9BAB242048CB00DDC08B /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
@@ -357,17 +356,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E98654FD24245DEF00066665 /* PreludeModels in Frameworks */,
-				E98654FF24245DEF00066665 /* UIKitExtensions in Frameworks */,
 				E99F9C092420497500DDC08B /* Deluge in Frameworks */,
 				E981B52D2423293A002C96D6 /* Deluge in Frameworks */,
 				E99F9C032420497500DDC08B /* Coordinator in Frameworks */,
 				E99F9C052420497500DDC08B /* Preferences in Frameworks */,
 				E99F9C0B2420497600DDC08B /* Transmission in Frameworks */,
 				E981B53024232945002C96D6 /* Transmission in Frameworks */,
-				E98654FB24245DEF00066665 /* CombineExtensions in Frameworks */,
 				E96E25A72425BCFC007DB2A0 /* Keychain in Frameworks */,
 				E99F9C072420497500DDC08B /* ViewModel in Frameworks */,
+				E96A4EF52426AA2600D00131 /* Prelude in Frameworks */,
+				E96A4EF32426A93200D00131 /* CommonModels in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,7 +492,7 @@
 			children = (
 				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
 				E952A13424268A690050F108 /* FileSystem.swift */,
-				E9918120242445E000AA4743 /* Imports.swift */,
+				E96A4EF62426AA4E00D00131 /* Prelude.swift */,
 			);
 			path = Dependencies;
 			sourceTree = "<group>";
@@ -895,10 +893,9 @@
 				E99F9C0A2420497600DDC08B /* Transmission */,
 				E981B52C2423293A002C96D6 /* Deluge */,
 				E981B52F24232945002C96D6 /* Transmission */,
-				E98654FA24245DEF00066665 /* CombineExtensions */,
-				E98654FC24245DEF00066665 /* PreludeModels */,
-				E98654FE24245DEF00066665 /* UIKitExtensions */,
 				E96E25A62425BCFC007DB2A0 /* Keychain */,
+				E96A4EF22426A93200D00131 /* CommonModels */,
+				E96A4EF42426AA2600D00131 /* Prelude */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1099,7 +1096,7 @@
 				E96E25A52425BC3D007DB2A0 /* KeychainGroupKey+App.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
 				E96E25A32425B9F2007DB2A0 /* KeychainKey+App.swift in Sources */,
-				E9918121242445E000AA4743 /* Imports.swift in Sources */,
+				E96A4EF72426AA4E00D00131 /* Prelude.swift in Sources */,
 				E95A43DF240C7337006C4B45 /* DelugeTorrent.swift in Sources */,
 				E9102604241DDE94008E8F86 /* TransmissionTorrent.swift in Sources */,
 				E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */,
@@ -1468,6 +1465,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E96A4EF22426A93200D00131 /* CommonModels */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CommonModels;
+		};
+		E96A4EF42426AA2600D00131 /* Prelude */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Prelude;
+		};
 		E96E25A62425BCFC007DB2A0 /* Keychain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Keychain;
@@ -1481,18 +1486,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E981B52E24232945002C96D6 /* XCRemoteSwiftPackageReference "Transmission-Swift" */;
 			productName = Transmission;
-		};
-		E98654FA24245DEF00066665 /* CombineExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = CombineExtensions;
-		};
-		E98654FC24245DEF00066665 /* PreludeModels */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PreludeModels;
-		};
-		E98654FE24245DEF00066665 /* UIKitExtensions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UIKitExtensions;
 		};
 		E99F9C022420497500DDC08B /* Coordinator */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 
 enum TorrentDetailViewModelEvent {
     case complete

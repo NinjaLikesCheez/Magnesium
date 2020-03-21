@@ -1,3 +1,5 @@
+import CommonModels
+
 enum TorrentDetailViewEvent {
     case appear
     case disappear
