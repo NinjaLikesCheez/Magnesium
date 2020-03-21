@@ -2,7 +2,7 @@ import Preferences
 
 extension PreferenceKey {
     static var autoRefreshInterval: PreferenceKey<Int> {
-        .init("autoRefreshInterval", defaultValue: 2)
+        .init("autoRefreshInterval", defaultValue: Current.defaults.autoRefreshInterval)
     }
 
     static var servers: PreferenceKey<[Server]> {

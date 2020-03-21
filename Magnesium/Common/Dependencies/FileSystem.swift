@@ -7,7 +7,7 @@ struct FileSystem {
 }
 
 extension FileSystem {
-    static let live: FileSystem = .init(
+    static let live = FileSystem(
         isReadable: { FileManager.default.isReadableFile(atPath: $0.path) },
         startAccessingSecurityScopedResource: { $0.startAccessingSecurityScopedResource() },
         stopAccessingSecurityScopedResource: { $0.stopAccessingSecurityScopedResource() }

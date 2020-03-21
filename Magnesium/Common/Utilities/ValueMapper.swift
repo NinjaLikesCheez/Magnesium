@@ -29,8 +29,7 @@ class ValueMapper<K: Hashable, V> {
             .removeDuplicates { $0.keys == $1.keys }
             .combineLatest(filter)
             .map { $0.1(Array($0.0.values)) }
-            .multicast(subject: valuesSubject)
-            .connect()
+            .subscribe(valuesSubject)
             .store(in: &cancellables)
     }
 

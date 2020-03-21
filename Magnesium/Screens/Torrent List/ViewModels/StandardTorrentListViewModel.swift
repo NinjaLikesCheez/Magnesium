@@ -178,7 +178,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func pause(_ torrents: [Torrent]) {
         implementation.pause(torrents)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -189,7 +189,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func resume(_ torrents: [Torrent]) {
         implementation.resume(torrents)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -200,7 +200,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func remove(_ torrents: [Torrent], removeData: Bool) {
         implementation.remove(torrents, removeData: removeData)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -211,7 +211,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func setLabel(for torrents: [Torrent], label: Label) {
         implementation.setLabel(label, for: torrents)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -222,7 +222,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func verify(_ torrents: [Torrent]) {
         implementation.verify(torrents)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -233,7 +233,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func updateTrackers(for torrents: [Torrent]) {
         implementation.updateTrackers(for: torrents)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
@@ -244,7 +244,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
 
     private func moveDownloadFolder(for torrents: [Torrent], to path: String) {
         implementation.moveDownloadFolder(for: torrents, to: path)
-            .append(implementation.refresh().asVoid())
+            .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }

@@ -11,6 +11,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         Current = .mock
+        preferences[.autoRefreshInterval] = 2
         viewModel = RefreshIntervalViewModel()
         cancellables = Set()
     }

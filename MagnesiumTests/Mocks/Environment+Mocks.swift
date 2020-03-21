@@ -13,7 +13,8 @@ extension Environment {
         keychain: Keychain = InMemoryKeychain(),
         locale: Locale = .mock,
         calendar: Calendar = .mock,
-        fileSystem: FileSystem = .mock
+        fileSystem: FileSystem = .mock,
+        defaults: Defaults = .mock
     ) -> Environment {
         Environment(
             deluge: deluge,
@@ -22,7 +23,8 @@ extension Environment {
             keychain: keychain,
             locale: locale,
             calendar: calendar,
-            fileSystem: fileSystem
+            fileSystem: fileSystem,
+            defaults: defaults
         )
     }
 }
@@ -48,5 +50,11 @@ extension FileSystem {
             startAccessingSecurityScopedResource: { _ in true },
             stopAccessingSecurityScopedResource: { _ in }
         )
+    }
+}
+
+extension Defaults {
+    static var mock: Defaults {
+        .init(autoRefreshInterval: 0)
     }
 }

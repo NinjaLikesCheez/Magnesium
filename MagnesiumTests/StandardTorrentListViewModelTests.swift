@@ -66,6 +66,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_autoRefresh_shouldFire() {
         preferences[.autoRefreshInterval] = 1
+
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 2)
@@ -77,6 +78,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_autoRefresh_whenPreferenceDisabled_shouldNotFire() {
         preferences[.autoRefreshInterval] = 1
         preferences[.autoRefreshInterval] = 0
+
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             XCTAssertEqual(self.implementation.refreshCallCount, 1)
@@ -105,6 +107,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_refresh_whenFails_shouldShowError() {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let alert = getAlert {
             viewModel.receive(.refresh)
         }!
@@ -120,6 +123,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_refresh_isLoading_whenFails_shouldEmitTrueThenFalse() {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         var values = [Bool]()
         viewModel.view.isLoading.dropFirst().sink { values.append($0) }.store(in: &cancellables)
         viewModel.receive(.refresh)
@@ -164,6 +168,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_addLink_whenFails_shouldEmitAlert() {
         implementation.addLinkResult = Just(("ErrorTitle", "ErrorMessage")).eraseToAnyPublisher()
+
         let alert = getAlert {
             viewModel.addLink("http://example.com")
         }!
@@ -219,6 +224,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(hash: "B", name: "example", dateAdded: Date(timeIntervalSinceNow: -1)),
             MockTorrent(hash: "C", name: "TEST.TORRENT", dateAdded: Date(timeIntervalSinceNow: -2)),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+
         viewModel.receive(.refresh)
         var items: [TorrentListItem]?
         viewModel.view.items.sink { items = $0 }.store(in: &cancellables)
@@ -243,10 +249,20 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_resumeSelected_whenFails_shouldEmitAlert() {
         implementation.resumeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let alert = getAlert {
             viewModel.receive(.resumeSelected(indices: [0, 1]))
         }!
         XCTAssertEqual(alert.title, "Failed to Resume")
+    }
+
+    func test_resumeSelected_whenRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        viewModel.receive(.resumeSelected(indices: [0, 1]))
+        XCTAssertNil(event)
     }
 
     // MARK: pauseSelected
@@ -260,10 +276,20 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_pauseSelected_whenFails_shouldEmitAlert() {
         implementation.pauseResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let alert = getAlert {
             viewModel.receive(.pauseSelected(indices: [0, 1]))
         }!
         XCTAssertEqual(alert.title, "Failed to Pause")
+    }
+
+    func test_pauseSelected_whenRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        viewModel.receive(.pauseSelected(indices: [0, 1]))
+        XCTAssertNil(event)
     }
 
     // MARK: removeSelected
@@ -298,6 +324,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_removeSelected_whenKeepDataSelected_andFails_shouldEmitAlert() {
         implementation.removeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let optionsAlert = getAlert {
             viewModel.receive(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -306,6 +333,19 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             optionsAlert.actions.first { $0.title == "Keep Data" }?.handler?()
         }!
         XCTAssertEqual(errorAlert.title, "Failed to Remove")
+    }
+
+    func test_removeSelected_whenKeepDataSelected_andRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let optionsAlert = getAlert {
+            viewModel.receive(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        optionsAlert.actions.first { $0.title == "Keep Data" }?.handler?()
+        XCTAssertNil(event)
     }
 
     func test_removeSelected_whenRemoveDataSelected_shouldCallImplementationRemoveAndRefresh() {
@@ -320,6 +360,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_removeSelected_whenRemoveDataSelected_andFails_shouldEmitAlert() {
         implementation.removeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let optionsAlert = getAlert {
             viewModel.receive(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -328,6 +369,19 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             optionsAlert.actions.first { $0.title == "Remove Data" }?.handler?()
         }!
         XCTAssertEqual(errorAlert.title, "Failed to Remove")
+    }
+
+    func test_removeSelected_whenRemoveDataSelected_andRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let optionsAlert = getAlert {
+            viewModel.receive(.removeSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        optionsAlert.actions.first { $0.title == "Remove Data" }?.handler?()
+        XCTAssertNil(event)
     }
 
     // MARK: moreOptionsSelected
@@ -353,6 +407,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() {
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
+
         viewModel.receive(.refresh)
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
@@ -403,6 +458,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_setLabelActivity_whenOptionSelected_andFails_shouldEmitAlert() {
         implementation.setLabelResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -413,6 +469,22 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             optionsAlert.actions.first { $0.title == "label1" }?.handler?()
         }!
         XCTAssertEqual(errorAlert.title, "Failed to Set Label")
+    }
+
+    func test_setLabelActivity_whenOptionSelected_andRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let activities = getActivities {
+            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        let optionsAlert = getAlert {
+            activities.first { $0.title == "Set Label" }?.handler()
+        }!
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        optionsAlert.actions.first { $0.title == "label1" }?.handler?()
+        XCTAssertNil(event)
     }
 
     // MARK: moreOptionsSelected - Verify Files
@@ -429,6 +501,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_verifyFilesActivity_whenFails_shouldEmitAlert() {
         implementation.verifyResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -436,6 +509,19 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             activities.first { $0.title == "Verify Files" }?.handler()
         }!
         XCTAssertEqual(alert.title, "Failed to Verify Files")
+    }
+
+    func test_verifyFilesActivity_whenRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let activities = getActivities {
+            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        activities.first { $0.title == "Verify Files" }?.handler()
+        XCTAssertNil(event)
     }
 
     // MARK: moreOptionsSelected - Move Download Folder
@@ -458,8 +544,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(downloadPath: "/downloads"),
             MockTorrent(downloadPath: "/downloads"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
-        viewModel.receive(.refresh)
 
+        viewModel.receive(.refresh)
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -478,8 +564,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             MockTorrent(downloadPath: "/downloads"),
             MockTorrent(downloadPath: "/downloads2"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
-        viewModel.receive(.refresh)
 
+        viewModel.receive(.refresh)
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -512,6 +598,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andFails_shouldEmitAlert() {
         implementation.moveDownloadFolderResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
         let activities = getActivities {
             viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }!
@@ -526,6 +613,26 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             subject.send("/new")
         }!
         XCTAssertEqual(alert.title, "Failed to Move Download Folder")
+    }
+
+    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let activities = getActivities {
+            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+        var event: TorrentListViewModelEvent?
+        viewModel.events.sink { event = $0 }.store(in: &cancellables)
+        activities.first { $0.title == "Move Download Folder" }?.handler()
+        guard case let .moveDownloadFolder(_, subject) = event else {
+            XCTFail("Unexpected event: \(String(describing: event))")
+            return
+        }
+
+        event = nil
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        subject.send("/new")
+        XCTAssertNil(event)
     }
 
     // MARK: moreOptionsSelected - Update Trackers
@@ -549,6 +656,19 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             activities.first { $0.title == "Update Trackers" }?.handler()
         }!
         XCTAssertEqual(alert.title, "Failed to Update Trackers")
+    }
+
+    func test_updateTrackersActivity_whenRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+
+        let activities = getActivities {
+            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }!
+
+        var event: TorrentListViewModelEvent?
+        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
+        activities.first { $0.title == "Update Trackers" }?.handler()
+        XCTAssertNil(event)
     }
 
     // MARK: - State

@@ -12,6 +12,7 @@ struct Environment {
     let locale: Locale
     let calendar: Calendar
     let fileSystem: FileSystem
+    let defaults: Defaults
 }
 
 extension Environment {
@@ -22,7 +23,8 @@ extension Environment {
         keychain: SystemKeychain(),
         locale: .autoupdatingCurrent,
         calendar: .autoupdatingCurrent,
-        fileSystem: .live
+        fileSystem: .live,
+        defaults: .live
     )
 }
 
