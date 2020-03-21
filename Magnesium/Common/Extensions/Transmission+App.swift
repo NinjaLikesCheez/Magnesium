@@ -2,14 +2,13 @@ import Combine
 import Foundation
 import Transmission
 
-typealias DefaultTransmissionClient = Transmission
 typealias TransmissionTorrentFile = TorrentFile
 
 protocol TransmissionClient {
     func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, TransmissionError>
 }
 
-extension DefaultTransmissionClient: TransmissionClient {}
+extension Transmission: TransmissionClient {}
 
 extension TransmissionTorrentFile: StandardTorrentFile {
     var progress: Float {

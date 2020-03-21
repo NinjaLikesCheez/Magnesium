@@ -42,7 +42,7 @@ extension Preferences {
         var servers = self[.servers]
         for (index, server) in servers.enumerated() {
             var server = server
-            server.keychainData = Current.keychain.fetchServerData(server)
+            server.keychainData = Current.keychain.fetch(.server(server))
             servers[index] = server
         }
 
@@ -59,8 +59,11 @@ extension Preferences {
         }
 
         for server in servers {
-            Current.keychain.deleteServerData(server)
-            Current.keychain.updateServerData(server)
+            Current.keychain.delete(.server(server))
+
+            if let data = server.keychainData {
+                Current.keychain.update(.server(server), data: data)
+            }
         }
 
         self[.servers] = servers
@@ -70,13 +73,13 @@ extension Preferences {
     func remove(server: Server) {
         var servers = getServers()
         servers.removeAll { $0.id == server.id }
-        Current.keychain.deleteServerData(server)
+        Current.keychain.delete(.server(server))
         self[.servers] = servers
         updateSelectedServerID()
     }
 
     func removeServers() {
-        Current.keychain.deleteAllServerData()
+        Current.keychain.delete(.servers)
         removeValue(for: .servers)
         removeValue(for: .selectedServerID)
     }

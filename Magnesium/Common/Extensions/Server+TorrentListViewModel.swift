@@ -12,10 +12,7 @@ extension Server {
             else {
                 return nil
             }
-            let client = DefaultDelugeClient(
-                baseURL: settings.url,
-                password: keychain.password
-            )
+            let client = Current.deluge(settings.url, keychain.password)
             let implementation = DelugeTorrentListViewModelImplementation(client: client)
             let viewModel = StandardTorrentListViewModel(implementation: implementation, server: self)
             return AnyTorrentListViewModel(viewModel)
@@ -27,11 +24,7 @@ extension Server {
             else {
                 return nil
             }
-            let client = DefaultTransmissionClient(
-                baseURL: settings.url,
-                username: settings.username,
-                password: keychain.password
-            )
+            let client = Current.transmission(settings.url, settings.username, keychain.password)
             let implementation = TransmissionTorrentListViewModelImplementation(client: client)
             let viewModel = StandardTorrentListViewModel(implementation: implementation, server: self)
             return AnyTorrentListViewModel(viewModel)

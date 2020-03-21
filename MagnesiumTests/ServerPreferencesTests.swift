@@ -1,18 +1,19 @@
 import Combine
+import Keychain
 @testable import Magnesium
 import Preferences
 import XCTest
 
 class ServerPreferencesTests: XCTestCase {
     private var server: Server!
-    private var keychainStore: Keychain.MockStore!
+    private var keychainStore: InMemoryKeychain.Store!
     private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
         keychainStore = .init()
-        Current = .mock(keychain: .mock(store: keychainStore))
+        Current = .mock(keychain: InMemoryKeychain(store: keychainStore))
         server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         cancellables = Set()
     }

@@ -1,4 +1,5 @@
 import Foundation
+import Keychain
 @testable import Magnesium
 import Preferences
 
@@ -9,7 +10,7 @@ extension Environment {
         deluge: @escaping (URL, String) -> DelugeClient = { _, _ in MockDelugeClient() },
         transmission: @escaping (URL, String?, String?) -> TransmissionClient = { _, _, _ in MockTransmissionClient() },
         preferences: Preferences = InMemoryPreferences(),
-        keychain: Keychain = .mock
+        keychain: Keychain = InMemoryKeychain()
     ) -> Environment {
         Environment(
             deluge: deluge,

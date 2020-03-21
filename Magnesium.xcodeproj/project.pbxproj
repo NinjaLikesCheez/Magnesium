@@ -91,6 +91,9 @@
 		E96BDBF923FB78D800EFCA86 /* NoServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */; };
 		E96BDBFB23FB845A00EFCA86 /* NoServersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */; };
 		E96BDBFD23FB860E00EFCA86 /* NoServersCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */; };
+		E96E25A32425B9F2007DB2A0 /* KeychainKey+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */; };
+		E96E25A52425BC3D007DB2A0 /* KeychainGroupKey+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */; };
+		E96E25A72425BCFC007DB2A0 /* Keychain in Frameworks */ = {isa = PBXBuildFile; productRef = E96E25A62425BCFC007DB2A0 /* Keychain */; };
 		E97042252400A05F00ACD170 /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97042242400A05F00ACD170 /* StatusView.swift */; };
 		E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */; };
 		E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233FB23CFF9C300038D30 /* AddServerViewController.swift */; };
@@ -160,8 +163,6 @@
 		E9CE4C3423B453BE001D1C63 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CE4C3323B453BE001D1C63 /* Formatters.swift */; };
 		E9CF491F23E3B18200026723 /* FilterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CF491E23E3B18200026723 /* FilterViewModel.swift */; };
 		E9DF151423D4085500FB9F4D /* TorrentListItemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9DF151323D4085500FB9F4D /* TorrentListItemTests.swift */; };
-		E9E022152425A460005CF2BD /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E022142425A460005CF2BD /* Keychain.swift */; };
-		E9E022172425A65F005CF2BD /* Keychain+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E022162425A65F005CF2BD /* Keychain+Mocks.swift */; };
 		E9E1840A23F6550500F93E0F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E9E1840923F6550500F93E0F /* LaunchScreen.storyboard */; };
 		E9E411B523D932EE00A7EFED /* StandardTorrentDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E411B423D932EE00A7EFED /* StandardTorrentDetailViewModelTests.swift */; };
 		E9E411B723D933AD00A7EFED /* StandardTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E411B623D933AD00A7EFED /* StandardTorrentListViewModelTests.swift */; };
@@ -269,6 +270,8 @@
 		E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewController.swift; sourceTree = "<group>"; };
 		E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewModel.swift; sourceTree = "<group>"; };
 		E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersCoordinator.swift; sourceTree = "<group>"; };
+		E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainKey+App.swift"; sourceTree = "<group>"; };
+		E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainGroupKey+App.swift"; sourceTree = "<group>"; };
 		E97042242400A05F00ACD170 /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E97233FB23CFF9C300038D30 /* AddServerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewController.swift; sourceTree = "<group>"; };
@@ -331,8 +334,6 @@
 		E9CE4C3323B453BE001D1C63 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
 		E9CF491E23E3B18200026723 /* FilterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewModel.swift; sourceTree = "<group>"; };
 		E9DF151323D4085500FB9F4D /* TorrentListItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListItemTests.swift; sourceTree = "<group>"; };
-		E9E022142425A460005CF2BD /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
-		E9E022162425A65F005CF2BD /* Keychain+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Keychain+Mocks.swift"; sourceTree = "<group>"; };
 		E9E1840923F6550500F93E0F /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E9E411B423D932EE00A7EFED /* StandardTorrentDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTorrentDetailViewModelTests.swift; sourceTree = "<group>"; };
 		E9E411B623D933AD00A7EFED /* StandardTorrentListViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StandardTorrentListViewModelTests.swift; sourceTree = "<group>"; };
@@ -357,6 +358,7 @@
 				E99F9C0B2420497600DDC08B /* Transmission in Frameworks */,
 				E981B53024232945002C96D6 /* Transmission in Frameworks */,
 				E98654FB24245DEF00066665 /* CombineExtensions in Frameworks */,
+				E96E25A72425BCFC007DB2A0 /* Keychain in Frameworks */,
 				E99F9C072420497500DDC08B /* ViewModel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -382,6 +384,8 @@
 				E951873323C80FC00060636A /* Preferences+Servers.swift */,
 				E90DC4F123CEBE4100FB53E6 /* Server+TorrentListViewModel.swift */,
 				E96B724E23D39368005E8E89 /* Transmission+App.swift */,
+				E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */,
+				E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -530,7 +534,6 @@
 				E9847C5323E64EE600B05D3A /* MockTransmissionClient.swift */,
 				E9AC4FB623EB9F2200E6BC65 /* Server+Mocks.swift */,
 				E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */,
-				E9E022162425A65F005CF2BD /* Keychain+Mocks.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -850,7 +853,6 @@
 			isa = PBXGroup;
 			children = (
 				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
-				E9E022142425A460005CF2BD /* Keychain.swift */,
 			);
 			path = Environment;
 			sourceTree = "<group>";
@@ -884,6 +886,7 @@
 				E98654FA24245DEF00066665 /* CombineExtensions */,
 				E98654FC24245DEF00066665 /* PreludeModels */,
 				E98654FE24245DEF00066665 /* UIKitExtensions */,
+				E96E25A62425BCFC007DB2A0 /* Keychain */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1031,7 +1034,6 @@
 				E97D971023C6A32B005FD8F3 /* TorrentRefresher.swift in Sources */,
 				E99FC25A23D13C270019A992 /* AppCoordinator.swift in Sources */,
 				E90366DC23AAB3BD00C6AB46 /* TorrentListViewController.swift in Sources */,
-				E9E022152425A460005CF2BD /* Keychain.swift in Sources */,
 				E913FD8623DFD65E008179F1 /* DelugeKeychainData.swift in Sources */,
 				E90DC4F223CEBE4100FB53E6 /* Server+TorrentListViewModel.swift in Sources */,
 				E9A8AFE523ECE9D800865986 /* StandardTorrentListViewModel.swift in Sources */,
@@ -1081,7 +1083,9 @@
 				E917B4BD23E764DA0090D490 /* AddTorrentFlow.swift in Sources */,
 				E91DDEC82411E0CD0024908B /* TorrentListProvider.swift in Sources */,
 				E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */,
+				E96E25A52425BC3D007DB2A0 /* KeychainGroupKey+App.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
+				E96E25A32425B9F2007DB2A0 /* KeychainKey+App.swift in Sources */,
 				E9918121242445E000AA4743 /* Prelude.swift in Sources */,
 				E95A43DF240C7337006C4B45 /* DelugeTorrent.swift in Sources */,
 				E9102604241DDE94008E8F86 /* TransmissionTorrent.swift in Sources */,
@@ -1146,7 +1150,6 @@
 				E95AB87423EA56BC00827A94 /* TorrentListCoordinatorTests.swift in Sources */,
 				E9C5B59823F879080054D7EE /* DelugeTorrentListViewModelImplementationTests.swift in Sources */,
 				E9AC4FB923EBA95600E6BC65 /* FilterCoordinatorTests.swift in Sources */,
-				E9E022172425A65F005CF2BD /* Keychain+Mocks.swift in Sources */,
 				E9AB4B22242591D50058FFD4 /* Environment+Mocks.swift in Sources */,
 				E9170B9A23FA540100399672 /* TorrentDetailInfoItemTests.swift in Sources */,
 				E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */,
@@ -1449,6 +1452,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E96E25A62425BCFC007DB2A0 /* Keychain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Keychain;
+		};
 		E981B52C2423293A002C96D6 /* Deluge */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E981B52B2423293A002C96D6 /* XCRemoteSwiftPackageReference "Deluge-Swift" */;

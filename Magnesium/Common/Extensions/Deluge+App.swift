@@ -2,7 +2,6 @@ import Combine
 import Deluge
 import Foundation
 
-typealias DefaultDelugeClient = Deluge
 typealias DelugeTorrentFile = TorrentFile
 typealias DelugeLabel = Label
 typealias DelugeTorrentItem = TorrentItem
@@ -11,7 +10,7 @@ protocol DelugeClient {
     func request<Value>(_ request: Request<Value>) -> AnyPublisher<Value, DelugeError>
 }
 
-extension DefaultDelugeClient: DelugeClient {}
+extension Deluge: DelugeClient {}
 extension DelugeTorrentFile: StandardTorrentFile {}
 extension DelugeLabel: StandardLabel {}
 
