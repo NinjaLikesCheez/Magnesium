@@ -387,13 +387,12 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func presentLabelSelection(from source: PopoverSource) {
-        let alert = Alert(title: nil, message: nil, style: .actionSheet(source)) {
-            labels.value.map { label in
-                AlertAction(title: label.displayName, style: .default) {
-                    self.setLabel(label)
-                }
+        let labelActions = labels.value.map { label in
+            AlertAction(title: label.displayName, style: .default) {
+                self.setLabel(label)
             }
         }
+        let alert = Alert(title: nil, message: nil, style: .actionSheet(source), actions: labelActions + [.cancel])
         eventSubject.send(.alert(alert))
     }
 
