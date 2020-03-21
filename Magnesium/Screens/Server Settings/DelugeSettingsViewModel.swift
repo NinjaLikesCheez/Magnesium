@@ -6,16 +6,16 @@ import ViewModel
 
 final class DelugeSettingsViewModel: ViewModel {
     private let server: Server?
-    private let eventSubject = PassthroughSubject<ServerSettingsEvent, Never>()
+    private let eventSubject = PassthroughSubject<ServerSettingsViewModelEvent, Never>()
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let isSaveButtonEnabledSubject = CurrentValueSubject<Bool, Never>(false)
     private let nameSubject: CurrentValueSubject<String?, Never>
     private let serverSubject: CurrentValueSubject<String?, Never>
     private let passwordSubject: CurrentValueSubject<String?, Never>
     private var cancellables = Set<AnyCancellable>()
-    let state: ServerSettingsViewState
+    let view: ServerSettingsViewRepresentation
 
-    var events: AnyPublisher<ServerSettingsEvent, Never> {
+    var events: AnyPublisher<ServerSettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -61,7 +61,7 @@ final class DelugeSettingsViewModel: ViewModel {
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
-        state = ServerSettingsViewState(
+        view = ServerSettingsViewRepresentation(
             title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
             saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,
@@ -88,7 +88,7 @@ final class DelugeSettingsViewModel: ViewModel {
         }
     }
 
-    func handle(_ event: ServerSettingsViewEvent) {
+    func receive(_ event: ServerSettingsViewEvent) {
         switch event {
         case .saveSelected:
             handleSaveSelected()

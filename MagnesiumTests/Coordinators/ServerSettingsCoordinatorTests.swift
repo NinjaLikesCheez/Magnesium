@@ -63,7 +63,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     func test_serverSettings_completeEvent_shouldEmitCompleteEvent() {
         var event: ServerSettingsCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(.complete)
+        coordinator.receive(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -71,7 +71,7 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     }
 
     func test_serverSettings_alertEvent_shouldPresentAlertController() {
-        coordinator.handle(.alert(Alert(title: "", message: nil, style: .alert)))
+        coordinator.receive(.alert(Alert(title: "", message: nil, style: .alert)))
         let viewController = coordinator.presentable.viewController.presentedViewController!
         guard type(of: viewController) == UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")

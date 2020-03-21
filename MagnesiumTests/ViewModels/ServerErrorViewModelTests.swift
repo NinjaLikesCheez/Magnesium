@@ -16,9 +16,9 @@ class ServerErrorViewModelTests: XCTestCase {
     // MARK: ServerErrorViewEvent
 
     func test_serverErrorViewEvent_settingsSelected_shouldEmitShowSettings() {
-        var event: ServerErrorEvent?
+        var event: ServerErrorViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.settingsSelected)
+        viewModel.receive(.settingsSelected)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -26,9 +26,9 @@ class ServerErrorViewModelTests: XCTestCase {
     }
 
     func test_serverErrorViewEvent_editServerSelected_showEmitEditServer() {
-        var event: ServerErrorEvent?
+        var event: ServerErrorViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.editServerSelected)
+        viewModel.receive(.editServerSelected)
         guard case .editServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

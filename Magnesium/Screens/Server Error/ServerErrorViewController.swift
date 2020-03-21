@@ -93,11 +93,11 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController 
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.settingsSelected)
+        viewModel.receive(.settingsSelected)
     }
 
     @objc
     private func editServerButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.editServerSelected)
+        viewModel.receive(.editServerSelected)
     }
 }

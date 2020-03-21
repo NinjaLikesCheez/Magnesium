@@ -1,7 +1,7 @@
 import ViewModel
 
 typealias AnyTorrentDetailViewModel = AnyViewModel<
-    TorrentDetailEvent,
+    TorrentDetailViewModelEvent,
     TorrentDetailViewEvent,
-    TorrentDetailViewState
+    TorrentDetailViewRepresentation
 >

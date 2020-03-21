@@ -6,17 +6,17 @@ enum RefreshIntervalViewEvent {
     case optionSelected(index: Int)
 }
 
-struct RefreshIntervalViewState {
-    var options: [RefreshIntervalOptionViewState]
+struct RefreshIntervalViewRepresentation {
+    var options: [RefreshIntervalOptionViewRepresentation]
 }
 
-struct RefreshIntervalOptionViewState {
+struct RefreshIntervalOptionViewRepresentation {
     var name: String
     var isSelected: AnyPublisher<Bool, Never>
 }
 
 final class RefreshIntervalViewModel: ViewModel {
-    let state: RefreshIntervalViewState
+    let view: RefreshIntervalViewRepresentation
 
     private let options: [(Int, String)] = {
         [
@@ -30,15 +30,15 @@ final class RefreshIntervalViewModel: ViewModel {
 
     init() {
         let publisher = Current.preferences.valuePublisher(for: .autoRefreshInterval)
-        state = RefreshIntervalViewState(options: options.map { option in
-            RefreshIntervalOptionViewState(
+        view = RefreshIntervalViewRepresentation(options: options.map { option in
+            RefreshIntervalOptionViewRepresentation(
                 name: option.1,
                 isSelected: publisher.map { Int($0) == option.0 }.ui().eraseToAnyPublisher()
             )
         })
     }
 
-    func handle(_ event: RefreshIntervalViewEvent) {
+    func receive(_ event: RefreshIntervalViewEvent) {
         switch event {
         case let .optionSelected(index: index):
             let interval = options[index].0

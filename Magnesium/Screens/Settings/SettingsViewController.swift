@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 final class SettingsViewController<VM: ViewModel>: UITableViewController
-    where VM.ViewEvent == SettingsViewEvent, VM.ViewState == SettingsViewState {
+    where VM.ViewEvent == SettingsViewEvent, VM.ViewRepresentation == SettingsViewRepresentation {
     private class DataSource: UITableViewDiffableDataSource<SettingsSection.SectionType, SettingsItem> {
         override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
             switch snapshot().sectionIdentifiers[section] {
@@ -73,7 +73,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
 
         tableView.dataSource = dataSource
 
-        viewModel.state.sections
+        viewModel.view.sections
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }
@@ -96,7 +96,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.doneSelected)
+        viewModel.receive(.doneSelected)
     }
 
     // MARK: UITableViewDelegate
@@ -106,13 +106,13 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
         case .changeServer:
             tableView.deselectRow(at: indexPath, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.handle(.changeServerSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.receive(.changeServerSelected(source: .view(cell, rect: cell.bounds)))
         case .server:
-            viewModel.handle(.serverSelected(index: indexPath.row))
+            viewModel.receive(.serverSelected(index: indexPath.row))
         case .addServer:
-            viewModel.handle(.addServerSelected)
+            viewModel.receive(.addServerSelected)
         case .refreshInterval:
-            viewModel.handle(.refreshIntervalSelected)
+            viewModel.receive(.refreshIntervalSelected)
         case .none:
             break
         }

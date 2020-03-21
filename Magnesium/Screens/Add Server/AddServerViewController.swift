@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewState == AddServerViewState {
+final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewRepresentation == AddServerViewRepresentation {
     private let viewModel: VM
 
     init(viewModel: VM) {
@@ -36,21 +36,21 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
 
     @objc
     private func cancelButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.cancelSelected)
+        viewModel.receive(.cancelSelected)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.state.types.count
+        viewModel.view.types.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-        cell.textLabel?.text = viewModel.state.types[indexPath.row]
+        cell.textLabel?.text = viewModel.view.types[indexPath.row]
         cell.accessoryType = .disclosureIndicator
         return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.handle(.typeSelected(index: indexPath.row))
+        viewModel.receive(.typeSelected(index: indexPath.row))
     }
 }

@@ -3,12 +3,12 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewState == RefreshIntervalViewState {
+final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewRepresentation == RefreshIntervalViewRepresentation {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var cells: [UITableViewCell] = {
-        viewModel.state.options.map { state in
+        viewModel.view.options.map { state in
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.textLabel?.text = state.name
             state.isSelected
@@ -42,6 +42,6 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        viewModel.handle(.optionSelected(index: indexPath.row))
+        viewModel.receive(.optionSelected(index: indexPath.row))
     }
 }

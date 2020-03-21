@@ -13,7 +13,7 @@ protocol TorrentListViewProvider: AnyObject {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewState == TorrentListViewState {
+final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewRepresentation == TorrentListViewRepresentation {
     private enum Section {
         case main
     }
@@ -137,7 +137,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
-        viewModel.state.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
+        viewModel.view.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
         navigationItem.searchController = searchController
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
@@ -163,10 +163,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        statusView.configure(download: viewModel.state.totalDownloadSpeed, upload: viewModel.state.totalUploadSpeed)
+        statusView.configure(download: viewModel.view.totalDownloadSpeed, upload: viewModel.view.totalUploadSpeed)
 
-        if viewModel.state.showFilterButton {
-            viewModel.state.hasActiveFilters
+        if viewModel.view.showFilterButton {
+            viewModel.view.hasActiveFilters
                 .sink { [weak self] in
                     self?.filterBarButtonItem.image = UIImage(systemName: $0
                         ? "line.horizontal.3.decrease.circle.fill"
@@ -175,7 +175,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 .store(in: &cancellables)
         }
 
-        viewModel.state.isLoading
+        viewModel.view.isLoading
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.activityView.stopAnimating()
@@ -184,13 +184,13 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             }
             .store(in: &cancellables)
 
-        viewModel.state.items
+        viewModel.view.items
             .map { !$0.isEmpty }
             .assign(to: \.isEnabled, on: selectBarButtonItem)
             .store(in: &cancellables)
 
-        let items = viewModel.state.items
-        let hasItems = viewModel.state.isLoading
+        let items = viewModel.view.items
+        let hasItems = viewModel.view.isLoading
             .first(where: { $0 == false })
             .flatMap { _ in items }
             .map { !$0.isEmpty }
@@ -204,14 +204,14 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             .assign(to: \.separatorStyle, on: tableView)
             .store(in: &cancellables)
 
-        viewModel.state.items
+        viewModel.view.items
             .sink { [weak self] items in
                 self?.update(with: items)
             }
             .store(in: &cancellables)
 
         for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
-            viewModel.state.editActionsEnabled
+            viewModel.view.editActionsEnabled
                 .assign(to: \.isEnabled, on: button)
                 .store(in: &cancellables)
         }
@@ -286,7 +286,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private func configureNormalToolbarItems() {
         var toolbarItems = [UIBarButtonItem]()
 
-        if viewModel.state.showFilterButton {
+        if viewModel.view.showFilterButton {
             toolbarItems.append(filterBarButtonItem)
         }
 
@@ -294,7 +294,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         toolbarItems.append(UIBarButtonItem(customView: statusView))
         toolbarItems.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
 
-        if viewModel.state.showAddButton {
+        if viewModel.view.showAddButton {
             toolbarItems.append(addBarButtonItem)
         }
 
@@ -317,22 +317,22 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.settingsSelected)
+        viewModel.receive(.settingsSelected)
     }
 
     @objc
     private func filterButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.filterSelected(source: .barButton(sender)))
+        viewModel.receive(.filterSelected(source: .barButton(sender)))
     }
 
     @objc
     private func addButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.addSelected(source: .barButton(sender)))
+        viewModel.receive(.addSelected(source: .barButton(sender)))
     }
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        viewModel.handle(.refresh)
+        viewModel.receive(.refresh)
     }
 
     @objc
@@ -342,7 +342,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             tableView.beginUpdates()
             tableView.endUpdates()
         }
-        viewModel.handle(.didBeginEditing)
+        viewModel.receive(.didBeginEditing)
         configureEditingBarButtonItems()
         configureEditingToolbarItems()
     }
@@ -354,8 +354,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             tableView.beginUpdates()
             tableView.endUpdates()
         }
-        viewModel.handle(.didEndEditing)
-        viewModel.handle(.multiSelectUpdated(indices: []))
+        viewModel.receive(.didEndEditing)
+        viewModel.receive(.multiSelectUpdated(indices: []))
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
     }
@@ -363,41 +363,41 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     @objc
     private func resumeButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.handle(.resumeSelected(indices: indices))
+        viewModel.receive(.resumeSelected(indices: indices))
     }
 
     @objc
     private func pauseButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.handle(.pauseSelected(indices: indices))
+        viewModel.receive(.pauseSelected(indices: indices))
     }
 
     @objc
     private func removeButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.handle(.removeSelected(indices: indices, source: .barButton(sender)))
+        viewModel.receive(.removeSelected(indices: indices, source: .barButton(sender)))
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.handle(.moreOptionsSelected(indices: indices, source: .barButton(sender)))
+        viewModel.receive(.moreOptionsSelected(indices: indices, source: .barButton(sender)))
     }
 
     // MARK: UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard !isEditing else {
-            viewModel.handle(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
+            viewModel.receive(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
             return
         }
 
-        viewModel.handle(.itemSelected(index: indexPath.row))
+        viewModel.receive(.itemSelected(index: indexPath.row))
     }
 
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if isEditing {
-            viewModel.handle(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
+            viewModel.receive(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
         }
     }
 
@@ -467,6 +467,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     // MARK: UISearchResultsUpdating
 
     func updateSearchResults(for searchController: UISearchController) {
-        viewModel.handle(.search(query: searchController.searchBar.text))
+        viewModel.receive(.search(query: searchController.searchBar.text))
     }
 }

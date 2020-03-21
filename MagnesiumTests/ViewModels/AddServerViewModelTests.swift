@@ -14,13 +14,13 @@ class AddServerViewModelTests: XCTestCase {
     }
 
     func test_types() {
-        XCTAssertEqual(viewModel.state.types, ["Deluge", "Transmission"])
+        XCTAssertEqual(viewModel.view.types, ["Deluge", "Transmission"])
     }
 
     func test_typeSelected_withDeluge_shouldEmitDelugeAddServerType() {
-        var event: AddServerEvent?
+        var event: AddServerViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.typeSelected(index: 0))
+        viewModel.receive(.typeSelected(index: 0))
         guard case let .addServer(type) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -29,9 +29,9 @@ class AddServerViewModelTests: XCTestCase {
     }
 
     func test_typeSelected_withTransmission_shouldEmitTransmissionAddServerType() {
-        var event: AddServerEvent?
+        var event: AddServerViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.typeSelected(index: 1))
+        viewModel.receive(.typeSelected(index: 1))
         guard case let .addServer(type) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -40,9 +40,9 @@ class AddServerViewModelTests: XCTestCase {
     }
 
     func test_cancelSelected_shouldEmitCompleteEvent() {
-        var event: AddServerEvent?
+        var event: AddServerViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.cancelSelected)
+        viewModel.receive(.cancelSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

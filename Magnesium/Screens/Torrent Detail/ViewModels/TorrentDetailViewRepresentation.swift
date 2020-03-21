@@ -1,6 +1,6 @@
 import Combine
 
-struct TorrentDetailViewState {
+struct TorrentDetailViewRepresentation {
     var hash: String
     var sections: AnyPublisher<[TorrentDetailSection], Never>
     var isRefreshing: AnyPublisher<Bool, Never>

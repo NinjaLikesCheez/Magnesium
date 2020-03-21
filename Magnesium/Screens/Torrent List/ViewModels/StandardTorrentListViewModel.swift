@@ -33,13 +33,13 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
     private let isEditingSubject = CurrentValueSubject<Bool, Never>(false)
     private let multiSelectCountSubject = CurrentValueSubject<Int, Never>(0)
-    private let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
+    private let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
-    let state: TorrentListViewState
+    let view: TorrentListViewRepresentation
     var cancellables = Set<AnyCancellable>()
 
-    var events: AnyPublisher<TorrentListEvent, Never> {
+    var events: AnyPublisher<TorrentListViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -72,7 +72,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
-        state = TorrentListViewState(
+        view = TorrentListViewRepresentation(
             title: title,
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
@@ -112,7 +112,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    func handle(_ event: TorrentListViewEvent) {
+    func receive(_ event: TorrentListViewEvent) {
         switch event {
         case .refresh:
             refresh()

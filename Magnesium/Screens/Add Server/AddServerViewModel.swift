@@ -1,7 +1,7 @@
 import Combine
 import ViewModel
 
-enum AddServerEvent {
+enum AddServerViewModelEvent {
     case addServer(ServerType)
     case complete
 }
@@ -11,24 +11,24 @@ enum AddServerViewEvent {
     case cancelSelected
 }
 
-struct AddServerViewState {
+struct AddServerViewRepresentation {
     var types: [String]
 }
 
 final class AddServerViewModel: ViewModel {
-    private let eventSubject = PassthroughSubject<AddServerEvent, Never>()
+    private let eventSubject = PassthroughSubject<AddServerViewModelEvent, Never>()
     private let serverTypes: [ServerType] = [.deluge, .transmission]
-    let state: AddServerViewState
+    let view: AddServerViewRepresentation
 
     init() {
-        state = AddServerViewState(types: serverTypes.map(\.localizedString))
+        view = AddServerViewRepresentation(types: serverTypes.map(\.localizedString))
     }
 
-    var events: AnyPublisher<AddServerEvent, Never> {
+    var events: AnyPublisher<AddServerViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
-    func handle(_ event: AddServerViewEvent) {
+    func receive(_ event: AddServerViewEvent) {
         switch event {
         case let .typeSelected(index: index):
             eventSubject.send(.addServer(serverTypes[index]))

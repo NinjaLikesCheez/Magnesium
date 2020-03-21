@@ -1,6 +1,6 @@
 import Combine
 
-enum TorrentListEvent {
+enum TorrentListViewModelEvent {
     case alert(Alert)
     case activities([Activity], torrents: [StandardTorrent], source: PopoverSource)
     case add(source: PopoverSource, linkSubject: PassthroughSubject<String, Never>)

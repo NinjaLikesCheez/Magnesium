@@ -10,7 +10,7 @@ enum AddServerCoordinatorEvent {
 final class AddServerCoordinator: Coordinator, AlertPresenter {
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController<AddServerViewModel>
-    let receivedEvents: AnyPublisher<AddServerEvent, Never>
+    let viewModelEvents: AnyPublisher<AddServerViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -25,10 +25,10 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
     init() {
         let viewModel = AddServerViewModel()
         viewController = AddServerViewController(viewModel: viewModel)
-        receivedEvents = viewModel.events
+        viewModelEvents = viewModel.events
     }
 
-    func handle(_ event: AddServerEvent) {
+    func receive(_ event: AddServerViewModelEvent) {
         switch event {
         case let .addServer(type):
             showServerSettings(for: type)

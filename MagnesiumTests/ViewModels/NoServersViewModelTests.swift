@@ -16,9 +16,9 @@ class NoServersViewModelTests: XCTestCase {
     // MARK: NoServersViewEvent
 
     func test_noServersViewEvent_settingsSelected_shouldEmitShowSettings() {
-        var event: NoServersEvent?
+        var event: NoServersViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.settingsSelected)
+        viewModel.receive(.settingsSelected)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -26,9 +26,9 @@ class NoServersViewModelTests: XCTestCase {
     }
 
     func test_noServersViewEvent_addServerSelected_showEmitAddServer() {
-        var event: NoServersEvent?
+        var event: NoServersViewModelEvent?
         viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.addServerSelected)
+        viewModel.receive(.addServerSelected)
         guard case .addServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

@@ -23,48 +23,48 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.state.inputs.map { $0.name }, ["name", "server", "password"])
+        XCTAssertEqual(addViewModel.view.inputs.map { $0.name }, ["name", "server", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[0].value.value, "MockServer")
+        XCTAssertEqual(editViewModel.view.inputs[0].value.value, "MockServer")
     }
 
     func test_serverURL_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[1].value.value, "http://mock.mock")
+        XCTAssertEqual(editViewModel.view.inputs[1].value.value, "http://mock.mock")
     }
 
     func test_password_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.state.inputs[2].value.value, "mockpassword")
+        XCTAssertEqual(editViewModel.view.inputs[2].value.value, "mockpassword")
     }
 
     func test_title_withoutServer() {
-        XCTAssertEqual(addViewModel.state.title, "Add Server")
+        XCTAssertEqual(addViewModel.view.title, "Add Server")
     }
 
     func test_title_withServer() {
-        XCTAssertEqual(editViewModel.state.title, "Edit Server")
+        XCTAssertEqual(editViewModel.view.title, "Edit Server")
     }
 
     func test_saveButtonTitle_withoutServer() {
-        XCTAssertEqual(addViewModel.state.saveButtonTitle, "Add")
+        XCTAssertEqual(addViewModel.view.saveButtonTitle, "Add")
     }
 
     func test_saveButtonTitle_withServer() {
-        XCTAssertEqual(editViewModel.state.saveButtonTitle, "Save")
+        XCTAssertEqual(editViewModel.view.saveButtonTitle, "Save")
     }
 
     func test_canDelete_withoutServer() {
-        XCTAssertFalse(addViewModel.state.canDelete)
+        XCTAssertFalse(addViewModel.view.canDelete)
     }
 
     func test_canDelete_withServer() {
-        XCTAssertTrue(editViewModel.state.canDelete)
+        XCTAssertTrue(editViewModel.view.canDelete)
     }
 
     private func isSaveButtonEnabled(_ viewModel: DelugeSettingsViewModel) -> Bool {
         var value: Bool!
-        _ = viewModel.state.isSaveButtonEnabled.sink {
+        _ = viewModel.view.isSaveButtonEnabled.sink {
             value = $0
         }
         return value
@@ -73,22 +73,22 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
         let viewModel = addViewModel!
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.state.inputs[0].value.value = "name"
+        viewModel.view.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.state.inputs[1].value.value = "http://example.com"
+        viewModel.view.inputs[1].value.value = "http://example.com"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.state.inputs[2].value.value = "password"
+        viewModel.view.inputs[2].value.value = "password"
         XCTAssertTrue(isSaveButtonEnabled(viewModel))
     }
 
     func test_saveSelected_withInvalidServer_shouldEmitAlert() {
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = "web://site"
-        viewModel.state.inputs[2].value.value = "password"
-        var event: ServerSettingsEvent?
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = "web://site"
+        viewModel.view.inputs[2].value.value = "password"
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -103,25 +103,25 @@ class DelugeSettingsViewModelTests: XCTestCase {
 
     func test_saveSelected_shouldChangeIsLoading() {
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.view.inputs[2].value.value = "password"
 
         var values = [Bool]()
-        viewModel.state.isLoading.dropFirst().sink {
+        viewModel.view.isLoading.dropFirst().sink {
             values.append($0)
         }.store(in: &cancellables)
 
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         XCTAssertEqual(values, [true, false])
     }
 
     func test_saveSelected_shouldAuthenticate() {
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
-        viewModel.handle(.saveSelected)
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.view.inputs[2].value.value = "password"
+        viewModel.receive(.saveSelected)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["auth.login"])
     }
 
@@ -131,13 +131,13 @@ class DelugeSettingsViewModelTests: XCTestCase {
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.view.inputs[2].value.value = "password"
 
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -150,10 +150,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let viewModel = addViewModel!
         let expectation = self.expectation(description: "Received value")
         expectation.isInverted = true
-        viewModel.state.isLoading.dropFirst().sink { _ in
+        viewModel.view.isLoading.dropFirst().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         waitForExpectations(timeout: 0)
     }
 
@@ -169,10 +169,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = settings.url.absoluteString
-        viewModel.state.inputs[2].value.value = keychain.password
-        viewModel.handle(.saveSelected)
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = settings.url.absoluteString
+        viewModel.view.inputs[2].value.value = keychain.password
+        viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
         XCTAssertEqual(server.data, expectedData)
@@ -191,10 +191,10 @@ class DelugeSettingsViewModelTests: XCTestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = editViewModel!
-        viewModel.state.inputs[0].value.value = "new name"
-        viewModel.state.inputs[1].value.value = settings.url.absoluteString
-        viewModel.state.inputs[2].value.value = keychain.password
-        viewModel.handle(.saveSelected)
+        viewModel.view.inputs[0].value.value = "new name"
+        viewModel.view.inputs[1].value.value = settings.url.absoluteString
+        viewModel.view.inputs[2].value.value = keychain.password
+        viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
         XCTAssertEqual(server.data, expectedData)
@@ -208,13 +208,13 @@ class DelugeSettingsViewModelTests: XCTestCase {
         ))
 
         let viewModel = addViewModel!
-        viewModel.state.inputs[0].value.value = "name"
-        viewModel.state.inputs[1].value.value = "http://example.com"
-        viewModel.state.inputs[2].value.value = "password"
+        viewModel.view.inputs[0].value.value = "name"
+        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.view.inputs[2].value.value = "password"
 
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -228,9 +228,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
         ))
 
         let viewModel = editViewModel!
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -244,15 +244,15 @@ class DelugeSettingsViewModelTests: XCTestCase {
         viewModel.events.first().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)
-        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
         waitForExpectations(timeout: 0)
     }
 
     func test_deleteSelected_withServer_shouldEmitAlert() {
         let viewModel = editViewModel!
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -267,9 +267,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -281,9 +281,9 @@ class DelugeSettingsViewModelTests: XCTestCase {
     func test_deleteSelected_whenDeleteServerSelected_shouldEmitCompleteEvent() {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
-        var event: ServerSettingsEvent?
+        var event: ServerSettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

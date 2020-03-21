@@ -2,7 +2,7 @@ import Combine
 import Preferences
 import ViewModel
 
-enum FilterEvent {
+enum FilterViewModelEvent {
     case complete
     case alert(Alert)
 }
@@ -14,24 +14,24 @@ enum FilterViewEvent {
     case labelSelected(source: PopoverSource)
 }
 
-struct FilterViewState {
+struct FilterViewRepresentation {
     var sections: AnyPublisher<[FilterSection], Never>
 }
 
 final class FilterViewModel: ViewModel {
     private let labels: CurrentValueSubject<[StandardLabel], Never>
-    private let eventSubject = PassthroughSubject<FilterEvent, Never>()
+    private let eventSubject = PassthroughSubject<FilterViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
     private var cancellables = Set<AnyCancellable>()
-    let state: FilterViewState
+    let view: FilterViewRepresentation
 
-    var events: AnyPublisher<FilterEvent, Never> {
+    var events: AnyPublisher<FilterViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.labels = labels
-        state = FilterViewState(sections: sectionsSubject.eraseToAnyPublisher())
+        view = FilterViewRepresentation(sections: sectionsSubject.eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .asVoid()
@@ -45,7 +45,7 @@ final class FilterViewModel: ViewModel {
         updateSections()
     }
 
-    func handle(_ event: FilterViewEvent) {
+    func receive(_ event: FilterViewEvent) {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)

@@ -19,7 +19,7 @@ class SettingsViewModelTests: XCTestCase {
 
     func test_sections_whenServersChanged_shouldEmit() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.dropFirst().first().sink { _ in
+        viewModel.view.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)
         preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
@@ -28,7 +28,7 @@ class SettingsViewModelTests: XCTestCase {
 
     func test_sections_whenCurrentServerChanged_shouldEmit() {
         let expectation = self.expectation(description: "Value received")
-        viewModel.state.sections.dropFirst().first().sink { _ in
+        viewModel.view.sections.dropFirst().first().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)
         session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
@@ -36,11 +36,11 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() {
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink {
             event = $0
         }.store(in: &cancellables)
-        viewModel.handle(.doneSelected)
+        viewModel.receive(.doneSelected)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -53,9 +53,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -71,9 +71,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.changeServerSelected(source: .view(UIView(), rect: .zero)))
+        viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -89,9 +89,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.handle(.serverSelected(index: 1))
+        viewModel.receive(.serverSelected(index: 1))
         guard case let .editServer(server) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -100,11 +100,11 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_addServerSelected_shouldEmitAddServerEvent() {
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink {
             event = $0
         }.store(in: &cancellables)
-        viewModel.handle(.addServerSelected)
+        viewModel.receive(.addServerSelected)
         guard case .addServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -112,11 +112,11 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() {
-        var event: SettingsEvent?
+        var event: SettingsViewModelEvent?
         viewModel.events.first().sink {
             event = $0
         }.store(in: &cancellables)
-        viewModel.handle(.refreshIntervalSelected)
+        viewModel.receive(.refreshIntervalSelected)
         guard case .showRefreshIntervalSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

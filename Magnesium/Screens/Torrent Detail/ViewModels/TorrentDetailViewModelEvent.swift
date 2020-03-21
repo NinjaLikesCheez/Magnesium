@@ -1,6 +1,6 @@
 import Combine
 
-enum TorrentDetailEvent {
+enum TorrentDetailViewModelEvent {
     case complete
     case alert(Alert)
     case activities([Activity], torrent: StandardTorrent, source: PopoverSource)

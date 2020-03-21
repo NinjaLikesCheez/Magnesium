@@ -21,7 +21,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         session = Session()
         coordinator = TorrentListCoordinator(viewModel: AnyTorrentListViewModel(viewModel), session: session)
         cancellables = Set()
-        coordinator.receivedEvents.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
+        coordinator.viewModelEvents.sink { [weak coordinator] in coordinator?.receive($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -241,7 +241,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel, TorrentListProvider {
-    let state = TorrentListViewState(
+    let view = TorrentListViewRepresentation(
         title: Just("").eraseToAnyPublisher(),
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher(),
@@ -250,9 +250,9 @@ private final class MockViewModel: ViewModel, TorrentListProvider {
         totalDownloadSpeed: Just("").eraseToAnyPublisher(),
         totalUploadSpeed: Just("").eraseToAnyPublisher()
     )
-    let eventSubject = PassthroughSubject<TorrentListEvent, Never>()
-    var events: AnyPublisher<TorrentListEvent, Never> { eventSubject.eraseToAnyPublisher() }
-    func handle(_ event: TorrentListViewEvent) {}
+    let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
+    var events: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
+    func receive(_ event: TorrentListViewEvent) {}
 
     private(set) var previewViewModels = [AnyTorrentDetailViewModel]()
     func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
@@ -290,11 +290,11 @@ private final class MockViewModel: ViewModel, TorrentListProvider {
 }
 
 private final class MockDetailViewModel: ViewModel {
-    let state = TorrentDetailViewState(
+    let view = TorrentDetailViewRepresentation(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()
     )
-    let events: AnyPublisher<TorrentDetailEvent, Never> = Empty().eraseToAnyPublisher()
-    func handle(_ event: TorrentDetailViewEvent) {}
+    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
+    func receive(_ event: TorrentDetailViewEvent) {}
 }

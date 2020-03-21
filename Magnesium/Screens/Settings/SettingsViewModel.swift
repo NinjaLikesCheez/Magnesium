@@ -2,7 +2,7 @@ import Combine
 import Preferences
 import ViewModel
 
-enum SettingsEvent {
+enum SettingsViewModelEvent {
     case complete
     case alert(Alert)
     case editServer(Server)
@@ -18,24 +18,24 @@ enum SettingsViewEvent {
     case refreshIntervalSelected
 }
 
-struct SettingsViewState {
+struct SettingsViewRepresentation {
     var sections: AnyPublisher<[SettingsSection], Never>
 }
 
 final class SettingsViewModel: ViewModel {
     private let session: Session
     private var cancellables = Set<AnyCancellable>()
-    private let eventSubject = PassthroughSubject<SettingsEvent, Never>()
+    private let eventSubject = PassthroughSubject<SettingsViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
-    let state: SettingsViewState
+    let view: SettingsViewRepresentation
 
-    var events: AnyPublisher<SettingsEvent, Never> {
+    var events: AnyPublisher<SettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init(session: Session) {
         self.session = session
-        state = SettingsViewState(sections: sectionsSubject.eraseToAnyPublisher())
+        view = SettingsViewRepresentation(sections: sectionsSubject.eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())
@@ -48,7 +48,7 @@ final class SettingsViewModel: ViewModel {
         updateSections()
     }
 
-    func handle(_ event: SettingsViewEvent) {
+    func receive(_ event: SettingsViewEvent) {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)

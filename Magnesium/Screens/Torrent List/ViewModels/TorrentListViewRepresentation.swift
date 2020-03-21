@@ -1,6 +1,6 @@
 import Combine
 
-struct TorrentListViewState {
+struct TorrentListViewRepresentation {
     var showAddButton: Bool = true
     var showFilterButton: Bool = true
     var title: AnyPublisher<String, Never>

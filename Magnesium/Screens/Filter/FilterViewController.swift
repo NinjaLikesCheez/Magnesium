@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 final class FilterViewController<VM: ViewModel>: UITableViewController
-    where VM.ViewEvent == FilterViewEvent, VM.ViewState == FilterViewState {
+    where VM.ViewEvent == FilterViewEvent, VM.ViewRepresentation == FilterViewRepresentation {
     private let viewModel: VM
     private var dataSource: UITableViewDiffableDataSource<FilterSection.SectionType, FilterItem>!
     private var cancellables = Set<AnyCancellable>()
@@ -51,7 +51,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
 
         tableView.dataSource = dataSource
 
-        viewModel.state.sections
+        viewModel.view.sections
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }
@@ -69,7 +69,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.doneSelected)
+        viewModel.receive(.doneSelected)
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -81,11 +81,11 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
 
         switch dataSource.itemIdentifier(for: indexPath) {
         case .sort:
-            viewModel.handle(.sortSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.receive(.sortSelected(source: .view(cell, rect: cell.bounds)))
         case .state:
-            viewModel.handle(.stateSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.receive(.stateSelected(source: .view(cell, rect: cell.bounds)))
         case .label:
-            viewModel.handle(.labelSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.receive(.labelSelected(source: .view(cell, rect: cell.bounds)))
         case .none:
             break
         }

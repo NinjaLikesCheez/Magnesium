@@ -92,11 +92,11 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.settingsSelected)
+        viewModel.receive(.settingsSelected)
     }
 
     @objc
     private func addSeverButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.addServerSelected)
+        viewModel.receive(.addServerSelected)
     }
 }

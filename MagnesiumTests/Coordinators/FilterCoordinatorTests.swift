@@ -33,7 +33,7 @@ class FilterCoordinatorTests: XCTestCase {
     func test_filterEvent_complete_shouldEmitCompleteEvent() {
         var event: FilterCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(.complete)
+        coordinator.receive(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -41,7 +41,7 @@ class FilterCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.handle(.alert(Alert(title: "", message: nil, style: .alert)))
+        coordinator.receive(.alert(Alert(title: "", message: nil, style: .alert)))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")

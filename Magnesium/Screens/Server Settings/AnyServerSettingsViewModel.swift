@@ -1,7 +1,7 @@
 import ViewModel
 
 typealias AnyServerSettingsViewModel = AnyViewModel<
-    ServerSettingsEvent,
+    ServerSettingsViewModelEvent,
     ServerSettingsViewEvent,
-    ServerSettingsViewState
+    ServerSettingsViewRepresentation
 >

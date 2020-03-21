@@ -1,7 +1,7 @@
 import Combine
 import ViewModel
 
-enum ServerErrorEvent {
+enum ServerErrorViewModelEvent {
     case showSettings
     case editServer
 }
@@ -12,13 +12,13 @@ enum ServerErrorViewEvent {
 }
 
 final class ServerErrorViewModel: ViewModel {
-    private let eventSubject = PassthroughSubject<ServerErrorEvent, Never>()
+    private let eventSubject = PassthroughSubject<ServerErrorViewModelEvent, Never>()
 
-    var events: AnyPublisher<ServerErrorEvent, Never> {
+    var events: AnyPublisher<ServerErrorViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
-    func handle(_ event: ServerErrorViewEvent) {
+    func receive(_ event: ServerErrorViewEvent) {
         switch event {
         case .settingsSelected:
             eventSubject.send(.showSettings)

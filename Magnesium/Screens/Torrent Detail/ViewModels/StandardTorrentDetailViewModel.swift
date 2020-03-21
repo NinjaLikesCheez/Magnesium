@@ -27,11 +27,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private let torrent: CurrentValueSubject<Torrent, Never>
     private let labels: CurrentValueSubject<[Label], Never>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
-    private let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
+    private let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var autoRefreshTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
-    let state: TorrentDetailViewState
+    let view: TorrentDetailViewRepresentation
 
     let files: ValueMapper<Int, File> = {
         ValueMapper(filter: Just {
@@ -52,7 +52,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         }.eraseToAnyPublisher())
     }()
 
-    var events: AnyPublisher<TorrentDetailEvent, Never> {
+    var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -77,7 +77,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
-        state = TorrentDetailViewState(
+        view = TorrentDetailViewRepresentation(
             hash: torrent.value.hash,
             sections: sections,
             isRefreshing: isRefreshingSubject.eraseToAnyPublisher()
@@ -171,7 +171,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         autoRefreshTimer?.invalidate()
     }
 
-    func handle(_ event: TorrentDetailViewEvent) {
+    func receive(_ event: TorrentDetailViewEvent) {
         switch event {
         case .appear:
             handleAppear()

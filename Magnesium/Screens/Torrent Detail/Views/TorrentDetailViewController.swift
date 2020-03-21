@@ -8,7 +8,7 @@ protocol TorrentDetailViewControllerIdentifiable {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
+final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewRepresentation == TorrentDetailViewRepresentation {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
@@ -16,7 +16,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
 
     var torrentHash: String {
-        viewModel.state.hash
+        viewModel.view.hash
     }
 
     init(viewModel: VM) {
@@ -46,7 +46,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         refreshControl = UIRefreshControl()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        viewModel.state.isRefreshing
+        viewModel.view.isRefreshing
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.refreshControl?.endRefreshing()
@@ -54,7 +54,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             }
             .store(in: &cancellables)
 
-        viewModel.state.sections
+        viewModel.view.sections
             .sink { [weak self] sections in
                 self?.update(with: sections)
             }
@@ -63,12 +63,12 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        viewModel.handle(.appear)
+        viewModel.receive(.appear)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.handle(.disappear)
+        viewModel.receive(.disappear)
     }
 
     private func configureTableView() {
@@ -163,12 +163,12 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        viewModel.handle(.refresh)
+        viewModel.receive(.refresh)
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.moreOptions(source: .barButton(sender)))
+        viewModel.receive(.moreOptions(source: .barButton(sender)))
     }
 
     // MARK: UITableViewDelegate
@@ -238,15 +238,15 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.handle(.pause)
+        viewModel.receive(.pause)
     }
 
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.handle(.resume)
+        viewModel.receive(.resume)
     }
 
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
-        viewModel.handle(.remove(source: .view(sender, rect: sender.bounds)))
+        viewModel.receive(.remove(source: .view(sender, rect: sender.bounds)))
     }
 
     func headerDidResize(_ header: TorrentDetailHeaderTableViewCell) {

@@ -1,4 +1,4 @@
-enum ServerSettingsEvent {
+enum ServerSettingsViewModelEvent {
     case complete
     case alert(Alert)
 }

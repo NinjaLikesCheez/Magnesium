@@ -28,7 +28,7 @@ class ServerErrorCoordinatorTests: XCTestCase {
     func test_serverErrorEvent_showSettings_shouldEmitShowSettings() {
         var event: ServerErrorCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(.showSettings)
+        coordinator.receive(.showSettings)
         guard case .showSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -38,7 +38,7 @@ class ServerErrorCoordinatorTests: XCTestCase {
     func test_serverErrorEvent_editServer_shouldEmitEditServerEvent() {
         var event: ServerErrorCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(.editServer)
+        coordinator.receive(.editServer)
         guard case .editServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

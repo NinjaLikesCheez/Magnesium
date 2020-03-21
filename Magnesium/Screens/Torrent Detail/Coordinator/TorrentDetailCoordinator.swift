@@ -9,10 +9,10 @@ enum TorrentDetailCoordinatorEvent {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter where VM.Event == TorrentDetailEvent, VM.ViewEvent == TorrentDetailViewEvent, VM.ViewState == TorrentDetailViewState {
+final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter where VM.Event == TorrentDetailViewModelEvent, VM.ViewEvent == TorrentDetailViewEvent, VM.ViewRepresentation == TorrentDetailViewRepresentation {
     private let viewController: TorrentDetailViewController<VM>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
-    let receivedEvents: AnyPublisher<TorrentDetailEvent, Never>
+    let viewModelEvents: AnyPublisher<TorrentDetailViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -26,10 +26,10 @@ final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter
 
     init(viewModel: VM) {
         viewController = TorrentDetailViewController(viewModel: viewModel)
-        receivedEvents = viewModel.events
+        viewModelEvents = viewModel.events
     }
 
-    func handle(_ event: TorrentDetailEvent) {
+    func receive(_ event: TorrentDetailViewModelEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

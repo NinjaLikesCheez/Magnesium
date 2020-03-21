@@ -4,7 +4,7 @@ import UIKit
 import ViewModel
 
 final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
-    where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewState == ServerSettingsViewState {
+    where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewRepresentation == ServerSettingsViewRepresentation {
     private enum Section: Int {
         case settings
         case delete
@@ -15,7 +15,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
         UIBarButtonItem(
-            title: viewModel.state.saveButtonTitle,
+            title: viewModel.view.saveButtonTitle,
             style: .done,
             target: self,
             action: #selector(performSave)
@@ -32,7 +32,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         isModalInPresentation = true
-        navigationItem.title = viewModel.state.title
+        navigationItem.title = viewModel.view.title
         navigationItem.largeTitleDisplayMode = .never
     }
 
@@ -46,13 +46,13 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
 
-        viewModel.state.isLoading
+        viewModel.view.isLoading
             .sink { [weak self] isLoading in
                 self?.isLoadingChanged(isLoading)
             }
             .store(in: &cancellables)
 
-        viewModel.state.isSaveButtonEnabled
+        viewModel.view.isSaveButtonEnabled
             .assign(to: \.isEnabled, on: saveBarButtonItem)
             .store(in: &cancellables)
     }
@@ -71,12 +71,12 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
     @objc
     private func cancelButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.handle(.cancelSelected)
+        viewModel.receive(.cancelSelected)
     }
 
     @objc
     private func performSave() {
-        viewModel.handle(.saveSelected)
+        viewModel.receive(.saveSelected)
     }
 
     private func isLoadingChanged(_ isLoading: Bool) {
@@ -87,13 +87,13 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        viewModel.state.canDelete ? 2 : 1
+        viewModel.view.canDelete ? 2 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .settings:
-            return viewModel.state.inputs.count
+            return viewModel.view.inputs.count
         case .delete:
             return 1
         case .none:
@@ -110,10 +110,10 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
                 return UITableViewCell()
             }
 
-            cell.configure(with: viewModel.state.inputs[indexPath.row])
+            cell.configure(with: viewModel.view.inputs[indexPath.row])
             cell.proceedToNextInput = { [weak self] in
                 guard let strongSelf = self else { return }
-                if indexPath.row < strongSelf.viewModel.state.inputs.count - 1 {
+                if indexPath.row < strongSelf.viewModel.view.inputs.count - 1 {
                     let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
                     strongSelf.tableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
                 } else {
@@ -145,7 +145,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
         if indexPath.section == Section.delete.rawValue {
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.handle(.deleteSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.receive(.deleteSelected(source: .view(cell, rect: cell.bounds)))
         }
     }
 }

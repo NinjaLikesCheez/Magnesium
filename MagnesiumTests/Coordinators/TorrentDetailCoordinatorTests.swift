@@ -17,7 +17,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
         viewModel = MockViewModel()
         coordinator = TorrentDetailCoordinator(viewModel: AnyViewModel(viewModel))
         cancellables = Set()
-        coordinator.receivedEvents.sink { [weak coordinator] in coordinator?.handle($0) }.store(in: &cancellables)
+        coordinator.viewModelEvents.sink { [weak coordinator] in coordinator?.receive($0) }.store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -84,12 +84,12 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel {
-    let state = TorrentDetailViewState(
+    let view = TorrentDetailViewRepresentation(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()
     )
-    let eventSubject = PassthroughSubject<TorrentDetailEvent, Never>()
-    var events: AnyPublisher<TorrentDetailEvent, Never> { eventSubject.eraseToAnyPublisher() }
-    func handle(_ event: TorrentDetailViewEvent) {}
+    let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
+    var events: AnyPublisher<TorrentDetailViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
+    func receive(_ event: TorrentDetailViewEvent) {}
 }

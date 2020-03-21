@@ -1,7 +1,7 @@
 import Combine
 import ViewModel
 
-enum NoServersEvent {
+enum NoServersViewModelEvent {
     case showSettings
     case addServer
 }
@@ -12,13 +12,13 @@ enum NoServersViewEvent {
 }
 
 final class NoServersViewModel: ViewModel {
-    private let eventSubject = PassthroughSubject<NoServersEvent, Never>()
+    private let eventSubject = PassthroughSubject<NoServersViewModelEvent, Never>()
 
-    var events: AnyPublisher<NoServersEvent, Never> {
+    var events: AnyPublisher<NoServersViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
-    func handle(_ event: NoServersViewEvent) {
+    func receive(_ event: NoServersViewEvent) {
         switch event {
         case .settingsSelected:
             eventSubject.send(.showSettings)

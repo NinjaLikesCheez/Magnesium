@@ -38,7 +38,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_complete_shouldEmitCompleteEvent() {
         var event: SettingsCoordinatorEvent?
         coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(.complete)
+        coordinator.receive(.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
@@ -46,7 +46,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.handle(.alert(Alert(title: "", message: nil, style: .alert)))
+        coordinator.receive(.alert(Alert(title: "", message: nil, style: .alert)))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")
@@ -55,7 +55,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
-        coordinator.handle(.editServer(.mock(.transmission)))
+        coordinator.receive(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -66,7 +66,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_editServer_withDelugeServer_shouldPushServerSettingsViewController() {
-        coordinator.handle(.editServer(.mock(.deluge)))
+        coordinator.receive(.editServer(.mock(.deluge)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -77,7 +77,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_addServer_shouldPushAddServerViewController() {
-        coordinator.handle(.addServer)
+        coordinator.receive(.addServer)
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -88,7 +88,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_showRefreshIntervalSettings_shouldPushRefreshIntervalViewController() {
-        coordinator.handle(.showRefreshIntervalSettings)
+        coordinator.receive(.showRefreshIntervalSettings)
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -103,7 +103,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_serverSettingsCoordinatorEvent_complete_shouldPopViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.handle(.editServer(.mock(.transmission)))
+        coordinator.receive(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         XCTAssertEqual(navigationController.viewControllers.count, 2)
 
@@ -120,7 +120,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_addServerCoordinatorEvent_completeEvent_shouldPopRootViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.handle(.editServer(.mock(.transmission)))
+        coordinator.receive(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         navigationController.pushViewController(UIViewController(), animated: false)
         XCTAssertEqual(navigationController.viewControllers.count, 3)

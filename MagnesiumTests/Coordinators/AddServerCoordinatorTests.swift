@@ -28,10 +28,10 @@ class AddServerCoordinatorTests: XCTestCase {
         }
     }
 
-    // MARK: AddServerEvent
+    // MARK: AddServerViewModelEvent
 
     func test_addServerEvent_addServer_shouldPushViewController() {
-        coordinator.handle(.addServer(.deluge))
+        coordinator.receive(.addServer(.deluge))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController.navigationController!
         XCTAssertEqual(navigationController.viewControllers.count, 2)
@@ -40,7 +40,7 @@ class AddServerCoordinatorTests: XCTestCase {
     func test_addServerEvent_complete_shouldEmitCompleteEvent() {
         var event: AddServerCoordinatorEvent?
         coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(AddServerEvent.complete)
+        coordinator.receive(AddServerViewModelEvent.complete)
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return
