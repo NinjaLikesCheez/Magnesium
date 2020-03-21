@@ -33,7 +33,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
     init(viewModel: AnyTorrentListViewModel, session: Session) {
         self.viewModel = viewModel
         self.session = session
-        viewController = TorrentListViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
         super.init()
         viewController.provider = self
@@ -62,7 +62,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
 
     private func showActivities(_ activities: [Activity], torrents: [StandardTorrent], source: PopoverSource) {
         let activityController = UIActivityViewController(
-            activityItems: [ActivityMetadataItem(metadata: LPLinkMetadata(torrents: torrents))],
+            activityItems: [ActivityMetadataItem(metadata: .init(torrents: torrents))],
             applicationActivities: activities.map { $0.createUIActivity() }
         )
         activityController.configure(popoverSource: source)
@@ -95,11 +95,11 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             textField.textContentType = .URL
             textField.placeholder = "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a"
         }
-        alertController.addAction(UIAlertAction(title: L10n.add, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.add, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(UIAlertAction(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 
@@ -141,11 +141,11 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
             textField.placeholder = "/downloads"
             textField.text = currentPath
         }
-        alertController.addAction(UIAlertAction(title: L10n.save, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.save, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(UIAlertAction(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 }

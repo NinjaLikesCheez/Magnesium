@@ -10,7 +10,7 @@ struct TorrentDetailHeaderItem: Identifiable {
     var status: AnyPublisher<String, Never>
     var label: AnyPublisher<String, Never>
 
-    init<T: StandardTorrent>(torrent: CurrentValueSubject<T, Never>) {
+    init<Torrent: StandardTorrent>(torrent: CurrentValueSubject<Torrent, Never>) {
         id = torrent.value.hash
         name = torrent.map(\.name).ui().eraseToAnyPublisher()
         isActive = torrent.map(\.isActive).ui().eraseToAnyPublisher()

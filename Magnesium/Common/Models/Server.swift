@@ -1,13 +1,6 @@
 import Foundation
 
-struct Server: Codable, Equatable {
-    enum CodingKeys: CodingKey {
-        case id
-        case name
-        case type
-        case data
-    }
-
+struct Server: Identifiable {
     // swiftlint:disable:next type_name
     typealias ID = String
     private(set) var id: ID = UUID().uuidString
@@ -23,3 +16,14 @@ struct Server: Codable, Equatable {
         self.keychainData = keychainData
     }
 }
+
+extension Server: Codable {
+    enum CodingKeys: CodingKey {
+        case id
+        case name
+        case type
+        case data
+    }
+}
+
+extension Server: Equatable {}

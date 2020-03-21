@@ -25,7 +25,7 @@ final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter
     }
 
     init(viewModel: VM) {
-        viewController = TorrentDetailViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
     }
 
@@ -44,7 +44,7 @@ final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter
 
     private func showActivities(_ activities: [Activity], torrent: StandardTorrent, source: PopoverSource) {
         let activityController = UIActivityViewController(
-            activityItems: [ActivityMetadataItem(metadata: LPLinkMetadata(torrents: [torrent]))],
+            activityItems: [ActivityMetadataItem(metadata: .init(torrents: [torrent]))],
             applicationActivities: activities.map { $0.createUIActivity() }
         )
         activityController.configure(popoverSource: source)
@@ -62,11 +62,11 @@ final class TorrentDetailCoordinator<VM: ViewModel>: Coordinator, AlertPresenter
             textField.placeholder = "/downloads"
             textField.text = currentPath
         }
-        alertController.addAction(UIAlertAction(title: L10n.save, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.save, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(UIAlertAction(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 }

@@ -24,7 +24,7 @@ final class FilterCoordinator: Coordinator, AlertPresenter {
     init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         let viewModel = FilterViewModel(labels: labels)
         let viewController = FilterViewController(viewModel: viewModel)
-        navigationController = PresentableNavigationController(rootViewController: viewController)
+        navigationController = .init(rootViewController: viewController)
         viewModelEvents = viewModel.events
     }
 

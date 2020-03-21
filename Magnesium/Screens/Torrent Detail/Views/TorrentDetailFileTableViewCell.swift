@@ -7,7 +7,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()
@@ -15,7 +15,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     private lazy var sizeLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .secondaryLabel
         return label
     }()
@@ -23,7 +23,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     private lazy var progressLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .secondaryLabel
         return label
     }()

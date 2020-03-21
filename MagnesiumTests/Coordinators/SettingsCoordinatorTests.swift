@@ -46,7 +46,7 @@ class SettingsCoordinatorTests: XCTestCase {
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.receive(.alert(Alert(title: "", message: nil, style: .alert)))
+        coordinator.receive(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
         guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
             XCTFail("Unexpected view controller: \(String(describing: viewController))")

@@ -1,9 +1,7 @@
-struct FilterSection: Equatable {
-    enum SectionType: Equatable {
-        case sort
-        case filters
-    }
-
-    let type: SectionType
+struct FilterSection {
+    let type: FilterSectionType
     var items: [FilterItem]
 }
+
+extension FilterSection: Equatable {}
+extension FilterSection: Hashable {}

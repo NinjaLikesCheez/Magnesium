@@ -18,12 +18,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         case main
     }
 
-    private class DataSource: UITableViewDiffableDataSource<Section, TorrentListItem> {
-        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-            true
-        }
-    }
-
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
@@ -32,7 +26,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private lazy var statusView = StatusView()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "gear"),
             style: .plain,
             target: self,
@@ -41,7 +35,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var selectBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             title: "Select",
             style: .plain,
             target: self,
@@ -50,11 +44,11 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var doneBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped(_:)))
+        .init(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped(_:)))
     }()
 
     private lazy var addBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "plus"),
             style: .plain,
             target: self,
@@ -63,7 +57,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var filterBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: nil,
             style: .plain,
             target: self,
@@ -72,7 +66,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var resumeBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "play.circle"),
             style: .plain,
             target: self,
@@ -81,7 +75,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var pauseBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "pause.circle"),
             style: .plain,
             target: self,
@@ -90,7 +84,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var removeBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "trash.circle"),
             style: .plain,
             target: self,
@@ -99,7 +93,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }()
 
     private lazy var moreBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "ellipsis.circle"),
             style: .plain,
             target: self,
@@ -126,7 +120,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         label.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = UIFont(descriptor: descriptor, size: 0)
+        label.font = .init(descriptor: descriptor, size: 0)
         label.text = "No Torrents"
         label.textColor = .placeholderText
         return label
@@ -160,7 +154,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         emptyStateView.isHidden = true
         tableView.addSubview(emptyStateView)
 
-        refreshControl = UIRefreshControl()
+        refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
         statusView.configure(download: viewModel.view.totalDownloadSpeed, upload: viewModel.view.totalUploadSpeed)
@@ -224,7 +218,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         tableView.separatorStyle = .none
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
 
-        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: "torrent",
                 for: indexPath
@@ -290,9 +284,9 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             toolbarItems.append(filterBarButtonItem)
         }
 
-        toolbarItems.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
-        toolbarItems.append(UIBarButtonItem(customView: statusView))
-        toolbarItems.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
+        toolbarItems.append(.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
+        toolbarItems.append(.init(customView: statusView))
+        toolbarItems.append(.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
 
         if viewModel.view.showAddButton {
             toolbarItems.append(addBarButtonItem)
@@ -304,11 +298,11 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private func configureEditingToolbarItems() {
         toolbarItems = [
             resumeBarButtonItem,
-            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             pauseBarButtonItem,
-            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             removeBarButtonItem,
-            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             moreBarButtonItem,
         ]
     }
@@ -410,7 +404,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        UIContextMenuConfiguration(
+        .init(
             identifier: indexPath as NSCopying,
             previewProvider: { [weak self] in
                 self?.provider?.previewForItem(at: indexPath.row)
@@ -468,5 +462,13 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     func updateSearchResults(for searchController: UISearchController) {
         viewModel.receive(.search(query: searchController.searchBar.text))
+    }
+}
+
+private extension TorrentListViewController {
+    private class DataSource: UITableViewDiffableDataSource<Section, TorrentListItem> {
+        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+            true
+        }
     }
 }

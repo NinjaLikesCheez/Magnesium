@@ -20,20 +20,20 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .secondaryLabel
         return label
     }()
 
     private lazy var valueLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         return label
     }()
 
     private lazy var expandedValueLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()

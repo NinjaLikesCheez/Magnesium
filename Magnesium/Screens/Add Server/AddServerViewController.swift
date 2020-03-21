@@ -26,7 +26,7 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
         super.viewWillAppear(animated)
 
         if navigationController?.viewControllers.count == 1 {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(
+            navigationItem.leftBarButtonItem = .init(
                 barButtonSystemItem: .cancel,
                 target: self,
                 action: #selector(cancelButtonTapped(_:))

@@ -30,9 +30,9 @@ final class DelugeSettingsViewModel: ViewModel {
             try? JSONDecoder().decode(DelugeKeychainData.self, from: data)
         }
 
-        nameSubject = CurrentValueSubject(server?.name)
-        serverSubject = CurrentValueSubject(settings?.url.absoluteString)
-        passwordSubject = CurrentValueSubject(keychain?.password)
+        nameSubject = .init(server?.name)
+        serverSubject = .init(settings?.url.absoluteString)
+        passwordSubject = .init(keychain?.password)
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
         let nameInput = TextInputItem(
@@ -61,7 +61,7 @@ final class DelugeSettingsViewModel: ViewModel {
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
-        view = ServerSettingsViewRepresentation(
+        view = .init(
             title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
             saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,
@@ -147,7 +147,7 @@ final class DelugeSettingsViewModel: ViewModel {
             server.keychainData = keychainData
             Current.preferences.addOrUpdate(server: server)
         } else {
-            Current.preferences.addOrUpdate(server: Server(
+            Current.preferences.addOrUpdate(server: .init(
                 name: name,
                 type: .deluge,
                 data: data,
@@ -183,7 +183,6 @@ final class DelugeSettingsViewModel: ViewModel {
     }
 
     private func showError(title: String, message: String?) {
-        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(title: title, message: message, style: .alert, action: .ok)))
     }
 }

@@ -2,17 +2,17 @@ import Combine
 import UIKit
 import ViewModel
 
-final class FilterViewController<VM: ViewModel>: UITableViewController
-    where VM.ViewEvent == FilterViewEvent, VM.ViewRepresentation == FilterViewRepresentation {
+// swiftlint:disable:next line_length
+final class FilterViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == FilterViewEvent, VM.ViewRepresentation == FilterViewRepresentation {
     private let viewModel: VM
-    private var dataSource: UITableViewDiffableDataSource<FilterSection.SectionType, FilterItem>!
+    private var dataSource: UITableViewDiffableDataSource<FilterSectionType, FilterItem>!
     private var cancellables = Set<AnyCancellable>()
 
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         navigationItem.title = L10n.filterScreenTitle
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
+        navigationItem.leftBarButtonItem = .init(
             barButtonSystemItem: .done,
             target: self,
             action: #selector(doneButtonTapped(_:))
@@ -29,7 +29,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
 
         tableView.register(FilterItemTableViewCell.self, forCellReuseIdentifier: "cell")
 
-        dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
             switch item {
             case let .sort(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
@@ -59,7 +59,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController
     }
 
     private func update(sections: [FilterSection]) {
-        var snapshot = NSDiffableDataSourceSnapshot<FilterSection.SectionType, FilterItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<FilterSectionType, FilterItem>()
         for section in sections {
             snapshot.appendSections([section.type])
             snapshot.appendItems(section.items, toSection: section.type)

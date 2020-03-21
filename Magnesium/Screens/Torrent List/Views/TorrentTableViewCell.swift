@@ -7,7 +7,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.font = .preferredFont(forTextStyle: .callout)
         label.numberOfLines = 2
         return label
     }()
@@ -21,7 +21,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var stateLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .systemGray
         return label
     }()
@@ -29,7 +29,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var speedLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .systemGray
         return label
     }()
@@ -37,7 +37,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var progressLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .systemGray
         return label
     }()
@@ -45,7 +45,7 @@ final class TorrentTableViewCell: UITableViewCell {
     private lazy var ratioOrETALabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.textColor = .systemGray
         return label
     }()

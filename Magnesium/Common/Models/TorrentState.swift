@@ -1,6 +1,6 @@
 import UIKit
 
-enum TorrentState: String, Codable, Equatable, CaseIterable {
+enum TorrentState: String {
     case downloading
     case seeding
     case paused
@@ -8,6 +8,11 @@ enum TorrentState: String, Codable, Equatable, CaseIterable {
     case queued
     case error
 }
+
+extension TorrentState: CaseIterable {}
+extension TorrentState: Codable {}
+extension TorrentState: Equatable {}
+extension TorrentState: Hashable {}
 
 extension TorrentState {
     var localizedString: String {

@@ -35,7 +35,7 @@ final class SettingsViewModel: ViewModel {
 
     init(session: Session) {
         self.session = session
-        view = SettingsViewRepresentation(sections: sectionsSubject.eraseToAnyPublisher())
+        view = .init(sections: sectionsSubject.eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())
@@ -71,8 +71,7 @@ final class SettingsViewModel: ViewModel {
                 self.session.setServer(server)
             }
         }
-        let alert = Alert(title: nil, message: nil, style: .actionSheet(source), actions: serverActions + [.cancel])
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(style: .actionSheet(source), actions: serverActions + [.cancel])))
     }
 
     private func updateSections() {
@@ -80,11 +79,11 @@ final class SettingsViewModel: ViewModel {
         var sections = [SettingsSection]()
 
         if servers.count > 1, let server = session.server {
-            sections.append(SettingsSection(type: .changeServer, items: [.changeServer(server.name)]))
+            sections.append(.init(type: .changeServer, items: [.changeServer(server.name)]))
         }
 
         let serverItems = servers.map { SettingsItem.server(id: $0.id, name: $0.name) }
-        sections.append(SettingsSection(type: .servers, items: serverItems + [.addServer]))
+        sections.append(.init(type: .servers, items: serverItems + [.addServer]))
 
         let refreshInterval = Current.preferences[.autoRefreshInterval]
         let localizedRefresh: String
@@ -93,7 +92,7 @@ final class SettingsViewModel: ViewModel {
         } else {
             localizedRefresh = L10n.refreshIntervalSeconds(Int(refreshInterval))
         }
-        sections.append(SettingsSection(type: .general, items: [.refreshInterval(current: localizedRefresh)]))
+        sections.append(.init(type: .general, items: [.refreshInterval(current: localizedRefresh)]))
 
         sectionsSubject.send(sections)
     }

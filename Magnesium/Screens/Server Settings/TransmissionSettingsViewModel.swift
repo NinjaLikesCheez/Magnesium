@@ -31,10 +31,10 @@ final class TransmissionSettingsViewModel: ViewModel {
             try? JSONDecoder().decode(TransmissionKeychainData.self, from: data)
         }
 
-        nameSubject = CurrentValueSubject(server?.name)
-        serverSubject = CurrentValueSubject(settings?.url.absoluteString)
-        usernameSubject = CurrentValueSubject(settings?.username)
-        passwordSubject = CurrentValueSubject(keychain?.password)
+        nameSubject = .init(server?.name)
+        serverSubject = .init(settings?.url.absoluteString)
+        usernameSubject = .init(settings?.username)
+        passwordSubject = .init(keychain?.password)
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
         let nameInput = TextInputItem(
@@ -164,7 +164,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             server.keychainData = keychainData
             Current.preferences.addOrUpdate(server: server)
         } else {
-            Current.preferences.addOrUpdate(server: Server(
+            Current.preferences.addOrUpdate(server: .init(
                 name: name,
                 type: .transmission,
                 data: data,
@@ -200,7 +200,6 @@ final class TransmissionSettingsViewModel: ViewModel {
     }
 
     private func showError(title: String, message: String?) {
-        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(title: title, message: message, style: .alert, action: .ok)))
     }
 }

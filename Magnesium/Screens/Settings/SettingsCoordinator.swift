@@ -25,7 +25,7 @@ final class SettingsCoordinator: Coordinator, AlertPresenter {
     init(session: Session) {
         let viewModel = SettingsViewModel(session: session)
         let viewController = SettingsViewController(viewModel: viewModel)
-        navigationController = PresentableNavigationController(rootViewController: viewController)
+        navigationController = .init(rootViewController: viewController)
         viewModelEvents = viewModel.events
     }
 

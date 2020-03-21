@@ -26,6 +26,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private let implementation: Implementation
     private let torrent: CurrentValueSubject<Torrent, Never>
     private let labels: CurrentValueSubject<[Label], Never>
+    private let files: ValueMapper<Int, File>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
@@ -33,8 +34,20 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private var timerIntervalObserver: AnyCancellable?
     let view: TorrentDetailViewRepresentation
 
-    let files: ValueMapper<Int, File> = {
-        ValueMapper(filter: Just {
+    var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
+        eventSubject.eraseToAnyPublisher()
+    }
+
+    init(
+        implementation: Implementation,
+        torrent: CurrentValueSubject<Torrent, Never>,
+        labels: CurrentValueSubject<[Label], Never>
+    ) {
+        self.implementation = implementation
+        self.torrent = torrent
+        self.labels = labels
+
+        files = ValueMapper(filter: Just {
             $0.sorted {
                 let result = $0.value.name.compare(
                     $1.value.name,
@@ -50,20 +63,6 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 }
             }
         }.eraseToAnyPublisher())
-    }()
-
-    var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
-        eventSubject.eraseToAnyPublisher()
-    }
-
-    init(
-        implementation: Implementation,
-        torrent: CurrentValueSubject<Torrent, Never>,
-        labels: CurrentValueSubject<[Label], Never>
-    ) {
-        self.implementation = implementation
-        self.torrent = torrent
-        self.labels = labels
 
         let sections = torrent
             .combineLatest(files.values)
@@ -77,7 +76,8 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
-        view = TorrentDetailViewRepresentation(
+
+        view = .init(
             hash: torrent.value.hash,
             sections: sections,
             isRefreshing: isRefreshingSubject.eraseToAnyPublisher()
@@ -94,58 +94,58 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         files: [CurrentValueSubject<File, Never>]
     ) -> [TorrentDetailSection] {
         var sections = [TorrentDetailSection]()
-        sections.append(TorrentDetailSection(type: .header, items: [
-            .header(TorrentDetailHeaderItem(torrent: subject)),
+        sections.append(.init(type: .header, items: [
+            .header(.init(torrent: subject)),
         ]))
-        sections.append(TorrentDetailSection(type: .info, items: [
-            .info(TorrentDetailInfoItem(
+        sections.append(.init(type: .info, items: [
+            .info(.init(
                 name: L10n.torrentInfoSize,
                 value: subject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoDownloadSpeed,
                 value: subject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoUploadSpeed,
                 value: subject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoDownloaded,
                 value: subject.map { Formatters.bytes.string(fromByteCount: $0.downloaded) }.ui().eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoUploaded,
                 value: subject.map { Formatters.bytes.string(fromByteCount: $0.uploaded) }.ui().eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoETA,
                 value: subject.map(\.formattedETA).ui().eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoRatio,
                 value: subject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoPeers,
                 value: subject
                     .map { L10n.torrentPeers(peers: $0.peers, totalPeers: $0.totalPeers) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoSeed,
                 value: subject.map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
-            .info(TorrentDetailInfoItem(
+            .info(.init(
                 name: L10n.torrentInfoDownloadFolder,
                 value: subject.map { ($0.downloadPath as NSString).lastPathComponent }
                     .ui()
@@ -155,12 +155,12 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
         ]))
 
         if !torrent.trackerStrings.isEmpty {
-            sections.append(TorrentDetailSection(type: .trackers, items: torrent.trackerStrings.map { .tracker($0) }))
+            sections.append(.init(type: .trackers, items: torrent.trackerStrings.map { .tracker($0) }))
         }
 
         if !files.isEmpty {
-            sections.append(TorrentDetailSection(type: .files, items: files.map {
-                .file(TorrentDetailFileItem(file: $0))
+            sections.append(.init(type: .files, items: files.map {
+                .file(.init(file: $0))
             }))
         }
 
@@ -372,7 +372,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
-        let alert = Alert(title: nil, message: nil, style: .actionSheet(source)) { () -> [AlertAction] in
+        let alert = Alert(style: .actionSheet(source)) { () -> [AlertAction] in
             AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
                 self.remove(removeData: false)
             }
@@ -392,13 +392,11 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
                 self.setLabel(label)
             }
         }
-        let alert = Alert(title: nil, message: nil, style: .actionSheet(source), actions: labelActions + [.cancel])
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(style: .actionSheet(source), actions: labelActions + [.cancel])))
     }
 
     private func showError(title: String, message: String?) {
-        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(title: title, message: message, style: .alert, action: .ok)))
     }
 
     // MARK: Auto Refresh

@@ -7,7 +7,7 @@ final class StatusView: UIView {
     private lazy var speedLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .footnote)
+        label.font = .preferredFont(forTextStyle: .footnote)
         label.textColor = .secondaryLabel
         return label
     }()

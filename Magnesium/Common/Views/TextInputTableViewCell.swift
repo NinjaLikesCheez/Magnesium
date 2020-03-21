@@ -8,14 +8,14 @@ final class TextInputTableViewCell: UITableViewCell {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .caption1)
+        label.font = .preferredFont(forTextStyle: .caption1)
         return label
     }()
 
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.adjustsFontForContentSizeCategory = true
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.font = .preferredFont(forTextStyle: .body)
         textField.addTarget(self, action: #selector(textFieldTextChanged(_:)), for: .editingChanged)
         textField.delegate = self
         return textField

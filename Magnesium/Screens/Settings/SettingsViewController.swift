@@ -2,21 +2,8 @@ import Combine
 import UIKit
 import ViewModel
 
-final class SettingsViewController<VM: ViewModel>: UITableViewController
-    where VM.ViewEvent == SettingsViewEvent, VM.ViewRepresentation == SettingsViewRepresentation {
-    private class DataSource: UITableViewDiffableDataSource<SettingsSection.SectionType, SettingsItem> {
-        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-            switch snapshot().sectionIdentifiers[section] {
-            case .changeServer:
-                return nil
-            case .servers:
-                return L10n.settingsSectionServers
-            case .general:
-                return L10n.settingsSectionGeneral
-            }
-        }
-    }
-
+// swiftlint:disable:next line_length
+final class SettingsViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == SettingsViewEvent, VM.ViewRepresentation == SettingsViewRepresentation {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
@@ -26,7 +13,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
         super.init(style: .insetGrouped)
         title = L10n.settingsScreenTitle
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
+        navigationItem.leftBarButtonItem = .init(
             barButtonSystemItem: .done,
             target: self,
             action: #selector(doneButtonTapped(_:))
@@ -38,12 +25,12 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
 
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "text")
 
-        dataSource = DataSource(tableView: tableView) { tableView, indexPath, item in
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
             switch item {
             case let .changeServer(name):
                 var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "detail")
                 if cell == nil {
-                    cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
+                    cell = .init(style: .value1, reuseIdentifier: "detail")
                 }
                 cell.textLabel?.text = L10n.settingsOptionCurrentServer
                 cell.detailTextLabel?.text = name
@@ -62,7 +49,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             case let .refreshInterval(current: current):
                 var cell: UITableViewCell! = tableView.dequeueReusableCell(withIdentifier: "detail")
                 if cell == nil {
-                    cell = UITableViewCell(style: .value1, reuseIdentifier: "detail")
+                    cell = .init(style: .value1, reuseIdentifier: "detail")
                 }
                 cell.textLabel?.text = L10n.settingsOptionRefreshInterval
                 cell.detailTextLabel?.text = current
@@ -86,7 +73,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
     }
 
     private func update(sections: [SettingsSection]) {
-        var snapshot = NSDiffableDataSourceSnapshot<SettingsSection.SectionType, SettingsItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<SettingsSectionType, SettingsItem>()
         for section in sections {
             snapshot.appendSections([section.type])
             snapshot.appendItems(section.items, toSection: section.type)
@@ -115,6 +102,21 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController
             viewModel.receive(.refreshIntervalSelected)
         case .none:
             break
+        }
+    }
+}
+
+private extension SettingsViewController {
+    class DataSource: UITableViewDiffableDataSource<SettingsSectionType, SettingsItem> {
+        override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+            switch snapshot().sectionIdentifiers[section] {
+            case .changeServer:
+                return nil
+            case .servers:
+                return L10n.settingsSectionServers
+            case .general:
+                return L10n.settingsSectionGeneral
+            }
         }
     }
 }

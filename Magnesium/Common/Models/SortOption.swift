@@ -1,4 +1,4 @@
-struct SortOption: Codable, Equatable {
+struct SortOption {
     var property: Property
     var direction: Direction
 
@@ -11,7 +11,9 @@ struct SortOption: Codable, Equatable {
         self.property = property
         self.direction = direction
     }
+}
 
+extension SortOption {
     func withOppositeDirection() -> SortOption {
         var sortOption = self
         sortOption.direction = sortOption.direction.opposite
@@ -19,39 +21,54 @@ struct SortOption: Codable, Equatable {
     }
 }
 
+extension SortOption: Codable {}
+extension SortOption: Equatable {}
+
 extension SortOption {
-    enum Property: String, Codable, Equatable, CaseIterable {
+    enum Property: String {
         case dateAdded
         case name
         case downloadSpeed
         case uploadSpeed
+    }
+}
 
-        var preferredDirection: Direction {
-            switch self {
-            case .name:
-                return .ascending
-            case .dateAdded, .downloadSpeed, .uploadSpeed:
-                return .descending
-            }
+extension SortOption.Property {
+    var preferredDirection: SortOption.Direction {
+        switch self {
+        case .name:
+            return .ascending
+        case .dateAdded, .downloadSpeed, .uploadSpeed:
+            return .descending
         }
     }
 }
+
+extension SortOption.Property: CaseIterable {}
+extension SortOption.Property: Codable {}
+extension SortOption.Property: Equatable {}
 
 extension SortOption {
-    enum Direction: String, Codable, Equatable {
+    enum Direction: String {
         case ascending
         case descending
+    }
+}
 
-        var opposite: Direction {
-            switch self {
-            case .ascending:
-                return .descending
-            case .descending:
-                return .ascending
-            }
+extension SortOption.Direction {
+    var opposite: SortOption.Direction {
+        switch self {
+        case .ascending:
+            return .descending
+        case .descending:
+            return .ascending
         }
     }
 }
+
+extension SortOption.Direction: CaseIterable {}
+extension SortOption.Direction: Codable {}
+extension SortOption.Direction: Equatable {}
 
 extension SortOption {
     var localizedString: String {

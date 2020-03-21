@@ -1,9 +1,11 @@
-enum TorrentDetailItem: Equatable, Hashable {
+enum TorrentDetailItem {
     case header(TorrentDetailHeaderItem)
     case info(TorrentDetailInfoItem)
     case tracker(String)
     case file(TorrentDetailFileItem)
+}
 
+extension TorrentDetailItem: Equatable {
     static func == (lhs: Self, rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case let (.header(value1), .header(value2)):
@@ -18,7 +20,9 @@ enum TorrentDetailItem: Equatable, Hashable {
             return false
         }
     }
+}
 
+extension TorrentDetailItem: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .header(value):

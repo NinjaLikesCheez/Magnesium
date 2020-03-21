@@ -25,12 +25,12 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
         let viewModel: AnyServerSettingsViewModel
         switch server.type {
         case .deluge:
-            viewModel = AnyViewModel(DelugeSettingsViewModel(server: server))
+            viewModel = .init(DelugeSettingsViewModel(server: server))
         case .transmission:
-            viewModel = AnyViewModel(TransmissionSettingsViewModel(server: server))
+            viewModel = .init(TransmissionSettingsViewModel(server: server))
         }
 
-        viewController = ServerSettingsViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
     }
 
@@ -38,13 +38,13 @@ final class ServerSettingsCoordinator: Coordinator, AlertPresenter {
         let viewModel: AnyServerSettingsViewModel
         switch type {
         case .deluge:
-            viewModel = AnyViewModel(DelugeSettingsViewModel())
+            viewModel = .init(DelugeSettingsViewModel())
         case .transmission:
-            viewModel = AnyViewModel(TransmissionSettingsViewModel())
+            viewModel = .init(TransmissionSettingsViewModel())
         }
 
         viewModelEvents = viewModel.events
-        viewController = ServerSettingsViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
     }
 
     func receive(_ event: ServerSettingsViewModelEvent) {

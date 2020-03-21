@@ -1,5 +1,8 @@
 import Foundation
 
-struct DelugeServerSettings: Codable {
+struct DelugeServerSettings {
     var url: URL
 }
+
+extension DelugeServerSettings: Codable {}
+extension DelugeServerSettings: Equatable {}

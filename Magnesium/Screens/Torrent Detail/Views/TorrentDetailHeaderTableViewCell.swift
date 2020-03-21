@@ -11,6 +11,7 @@ protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
 final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
     private var buttonHeightConstraint: NSLayoutConstraint?
+    weak var delegate: TorrentDetailHeaderTableViewCellDelegate?
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -49,7 +50,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .callout)
+        label.font = .preferredFont(forTextStyle: .callout)
         label.textColor = .systemGray
         return label
     }()
@@ -89,8 +90,6 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             ), for: .normal)
         }
     }
-
-    weak var delegate: TorrentDetailHeaderTableViewCellDelegate?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

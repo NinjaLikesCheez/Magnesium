@@ -31,7 +31,7 @@ final class FilterViewModel: ViewModel {
 
     init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.labels = labels
-        view = FilterViewRepresentation(sections: sectionsSubject.eraseToAnyPublisher())
+        view = .init(sections: sectionsSubject.eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .asVoid()
@@ -66,17 +66,17 @@ final class FilterViewModel: ViewModel {
                     let sortOption = currentSort.withOppositeDirection()
                     Current.preferences[.sortOption] = sortOption
                 } else {
-                    Current.preferences[.sortOption] = SortOption(property: property)
+                    Current.preferences[.sortOption] = .init(property: property)
                 }
             }
         }
-        let alert = Alert(
+
+        eventSubject.send(.alert(.init(
             title: L10n.sortByAlertTitle,
             message: L10n.sortByAlertMessage,
             style: .actionSheet(source),
             actions: sortActions + [.cancel]
-        )
-        eventSubject.send(.alert(alert))
+        )))
     }
 
     private func handleLabelSelected(from source: PopoverSource) {
@@ -93,35 +93,30 @@ final class FilterViewModel: ViewModel {
             )
         }
 
-        let alert = Alert(
+        eventSubject.send(.alert(.init(
             title: L10n.filterLabelAlertTitle,
             message: L10n.filterLabelAlertMessage,
             style: .actionSheet(source),
             actions: labelActions + [.cancel]
-        )
-        eventSubject.send(.alert(alert))
+        )))
     }
 
     private func handleStateSelected(from source: PopoverSource) {
         var filterOptions = Current.preferences[.filterOptions]
         let states: [TorrentState?] = [nil] + TorrentState.allCases
         let filterActions = states.map { state in
-            AlertAction(
-                title: state?.localizedString ?? L10n.allFilter,
-                style: .default,
-                handler: {
-                    filterOptions.state = state
-                    Current.preferences[.filterOptions] = filterOptions
-                }
-            )
+            AlertAction(title: state?.localizedString ?? L10n.allFilter, style: .default) {
+                filterOptions.state = state
+                Current.preferences[.filterOptions] = filterOptions
+            }
         }
-        let alert = Alert(
+
+        eventSubject.send(.alert(.init(
             title: L10n.filterStateAlertTitle,
             message: L10n.filterStateAlertMessage,
             style: .actionSheet(source),
             actions: filterActions + [.cancel]
-        )
-        eventSubject.send(.alert(alert))
+        )))
     }
 
     private func updateSections() {
@@ -129,7 +124,7 @@ final class FilterViewModel: ViewModel {
         let filterOptions = Current.preferences[.filterOptions]
         var sections = [FilterSection]()
 
-        sections.append(FilterSection(type: .sort, items: [
+        sections.append(.init(type: .sort, items: [
             .sort(sortOption.localizedString),
         ]))
 

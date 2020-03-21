@@ -11,7 +11,7 @@ protocol TorrentDetailViewControllerIdentifiable {
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewRepresentation == TorrentDetailViewRepresentation {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
-    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSection.SectionType, TorrentDetailItem>!
+    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
     private var isFirstSnapshot = true
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
 
@@ -25,7 +25,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         title = L10n.torrentInfoScreenTitle
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(
+            .init(
                 image: UIImage(systemName: "ellipsis.circle"),
                 style: .plain,
                 target: self,
@@ -43,7 +43,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         super.viewDidLoad()
         configureTableView()
 
-        refreshControl = UIRefreshControl()
+        refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
         viewModel.view.isRefreshing
@@ -82,11 +82,11 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         tableView.tableHeaderView = {
             var frame = CGRect.zero
             frame.size.height = .leastNormalMagnitude
-            return UIView(frame: frame)
+            return .init(frame: frame)
         }()
-        tableView.tableFooterView = UIView()
+        tableView.tableFooterView = .init()
 
-        dataSource = UITableViewDiffableDataSource(tableView: tableView) { [weak self] tableView, indexPath, item in
+        dataSource = .init(tableView: tableView) { [weak self] tableView, indexPath, item in
             switch item {
             case let .header(item):
                 guard let cell = tableView.dequeueReusableCell(
@@ -149,7 +149,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         let animated = !isFirstSnapshot
         isFirstSnapshot = false
 
-        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSection.SectionType, TorrentDetailItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<TorrentDetailSectionType, TorrentDetailItem>()
 
         for section in sections {
             snapshot.appendSections([section.type])
@@ -173,7 +173,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     // MARK: UITableViewDelegate
 
-    private func titleForSection(_ type: TorrentDetailSection.SectionType) -> String? {
+    private func titleForSection(_ type: TorrentDetailSectionType) -> String? {
         switch type {
         case .header:
             return nil
@@ -205,7 +205,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     }
 
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        UIView()
+        .init()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

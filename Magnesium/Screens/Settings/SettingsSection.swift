@@ -1,10 +1,7 @@
-struct SettingsSection: Equatable {
-    enum SectionType: Hashable {
-        case changeServer
-        case servers
-        case general
-    }
-
-    let type: SectionType
+struct SettingsSection {
+    let type: SettingsSectionType
     let items: [SettingsItem]
 }
+
+extension SettingsSection: Equatable {}
+extension SettingsSection: Hashable {}

@@ -26,7 +26,7 @@ final class ServerErrorCoordinator: Coordinator {
     init(server: Server) {
         self.server = server
         let viewModel = ServerErrorViewModel()
-        viewController = ServerErrorViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
     }
 

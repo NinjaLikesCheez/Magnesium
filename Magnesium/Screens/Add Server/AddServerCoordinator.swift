@@ -24,7 +24,7 @@ final class AddServerCoordinator: Coordinator, AlertPresenter {
 
     init() {
         let viewModel = AddServerViewModel()
-        viewController = AddServerViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
     }
 

@@ -4,7 +4,7 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
     private lazy var trackerLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        label.font = .preferredFont(forTextStyle: .subheadline)
         label.numberOfLines = 0
         return label
     }()

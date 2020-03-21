@@ -25,7 +25,7 @@ final class NoServersCoordinator: Coordinator {
 
     init() {
         let viewModel = NoServersViewModel()
-        viewController = NoServersViewController(viewModel: viewModel)
+        viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
     }
 

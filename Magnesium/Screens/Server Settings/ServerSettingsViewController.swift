@@ -3,8 +3,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
-    where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewRepresentation == ServerSettingsViewRepresentation {
+// swiftlint:disable:next line_length
+final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewRepresentation == ServerSettingsViewRepresentation {
     private enum Section: Int {
         case settings
         case delete
@@ -14,7 +14,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             title: viewModel.view.saveButtonTitle,
             style: .done,
             target: self,
@@ -61,7 +61,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         super.viewWillAppear(animated)
 
         if navigationController?.viewControllers.count == 1 {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(
+            navigationItem.leftBarButtonItem = .init(
                 barButtonSystemItem: .cancel,
                 target: self,
                 action: #selector(cancelButtonTapped(_:))
@@ -107,7 +107,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "textInput", for: indexPath)
                 as? TextInputTableViewCell
             else {
-                return UITableViewCell()
+                return .init()
             }
 
             cell.configure(with: viewModel.view.inputs[indexPath.row])
@@ -125,7 +125,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "button", for: indexPath)
                 as? ButtonTableViewCell
             else {
-                return UITableViewCell()
+                return .init()
             }
 
             let configuration = ButtonTableViewCell.Configuration(
@@ -136,7 +136,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
             cell.configure(text: L10n.delete, configuration: configuration)
             return cell
         case .none:
-            return UITableViewCell()
+            return .init()
         }
     }
 

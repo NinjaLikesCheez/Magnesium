@@ -27,7 +27,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     private lazy var bodyLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = .preferredFont(forTextStyle: .body)
         label.textColor = UIColor.secondaryLabel
         label.text = L10n.noServersBody
         label.numberOfLines = 0
@@ -43,7 +43,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     }()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(
+        .init(
             image: UIImage(systemName: "gear"),
             style: .plain,
             target: self,

@@ -20,12 +20,12 @@ final class AddServerViewModel: ViewModel {
     private let serverTypes: [ServerType] = [.deluge, .transmission]
     let view: AddServerViewRepresentation
 
-    init() {
-        view = AddServerViewRepresentation(types: serverTypes.map(\.localizedString))
-    }
-
     var events: AnyPublisher<AddServerViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
+    }
+
+    init() {
+        view = .init(types: serverTypes.map(\.localizedString))
     }
 
     func receive(_ event: AddServerViewEvent) {

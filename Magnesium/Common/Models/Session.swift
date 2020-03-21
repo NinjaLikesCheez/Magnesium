@@ -7,9 +7,7 @@ final class Session {
     private(set) var server: Server?
 
     var serverPublisher: AnyPublisher<Server?, Never> {
-        serverSubject
-            .removeDuplicates()
-            .eraseToAnyPublisher()
+        serverSubject.removeDuplicates().eraseToAnyPublisher()
     }
 
     init() {
