@@ -1,6 +1,4 @@
 import Combine
-import Deluge
-import Transmission
 import UIKit
 
 final class AddTorrentFlow {
@@ -60,13 +58,19 @@ final class AddTorrentFlow {
             }
 
             let client = Current.deluge(settings.url, keychain.password)
-            let request: AnyPublisher<Void, DelugeError>
+            let request: AnyPublisher<Void, Error>
 
             switch type {
             case let .file(url):
-                request = client.request(.add(fileURL: url)).map { _ in () }.eraseToAnyPublisher()
+                request = client.request(.add(fileURL: url))
+                    .map { _ in () }
+                    .mapError { $0 as Error }
+                    .eraseToAnyPublisher()
             case let .magnet(url):
-                request = client.request(.add(magnetURL: url)).map { _ in () }.eraseToAnyPublisher()
+                request = client.request(.add(magnetURL: url))
+                    .map { _ in () }
+                    .mapError { $0 as Error }
+                    .eraseToAnyPublisher()
             }
 
             request
@@ -88,13 +92,13 @@ final class AddTorrentFlow {
             }
 
             let client = Current.transmission(settings.url, settings.username, keychain.password)
-            let request: AnyPublisher<Void, TransmissionError>
+            let request: AnyPublisher<Void, Error>
 
             switch type {
             case let .file(url):
-                request = client.request(.add(fileURL: url))
+                request = client.request(.add(fileURL: url)).mapError { $0 as Error }.eraseToAnyPublisher()
             case let .magnet(url):
-                request = client.request(.add(url: url))
+                request = client.request(.add(url: url)).mapError { $0 as Error }.eraseToAnyPublisher()
             }
 
             request

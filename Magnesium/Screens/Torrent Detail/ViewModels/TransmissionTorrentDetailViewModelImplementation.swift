@@ -1,5 +1,4 @@
 import Combine
-import Transmission
 
 final class TransmissionTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = TransmissionTorrent

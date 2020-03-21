@@ -1,5 +1,4 @@
 import Combine
-import Deluge
 
 final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailViewModelImplementation {
     typealias Torrent = DelugeTorrent
@@ -14,7 +13,7 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
         self.refresher = refresher
     }
 
-    private func torrentFiles(in items: [TorrentItem]) -> [DelugeTorrentFile] {
+    private func torrentFiles(in items: [DelugeTorrentItem]) -> [DelugeTorrentFile] {
         items.reduce(into: [DelugeTorrentFile]()) { result, item in
             switch item {
             case let .file(file):

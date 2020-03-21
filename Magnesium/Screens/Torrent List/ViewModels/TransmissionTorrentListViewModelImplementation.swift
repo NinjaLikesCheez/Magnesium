@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 import Preferences
-import Transmission
 import ViewModel
 
 // swiftlint:disable:next line_length
