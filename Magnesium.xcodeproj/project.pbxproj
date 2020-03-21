@@ -426,12 +426,12 @@
 		E9168309241414A80056D2A6 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				E9E022132425A451005CF2BD /* Environment */,
 				E90366E023AAC44700C6AB46 /* Extensions */,
 				E96B0080237A478E0091FA71 /* Models */,
 				E9637857241335950068E051 /* Protocols */,
 				E976FA42237E3634006B9DA9 /* Utilities */,
 				E97B543423B581AC006FFCC9 /* Views */,
+				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
 				E9918120242445E000AA4743 /* Prelude.swift */,
 			);
 			path = Common;
@@ -847,14 +847,6 @@
 				E9CF491E23E3B18200026723 /* FilterViewModel.swift */,
 			);
 			path = Filter;
-			sourceTree = "<group>";
-		};
-		E9E022132425A451005CF2BD /* Environment */ = {
-			isa = PBXGroup;
-			children = (
-				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
-			);
-			path = Environment;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
