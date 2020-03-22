@@ -36,10 +36,10 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
     // MARK: - Handle TorrentDetailEvent
 
-    func test_complete_shouldEmitCompleteEvent() {
-        var event: TorrentDetailCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.eventSubject.send(.complete)
+    func test_complete_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.wait().first {
+            self.viewModel.eventSubject.send(.complete)
+        }.unwrap()
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

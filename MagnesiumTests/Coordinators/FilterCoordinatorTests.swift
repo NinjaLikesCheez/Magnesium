@@ -6,14 +6,12 @@ import XCTest
 class FilterCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var coordinator: FilterCoordinator!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
         Current = .mock
         window = UIWindow()
         coordinator = FilterCoordinator(labels: CurrentValueSubject([]))
-        cancellables = Set()
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
@@ -31,14 +29,11 @@ class FilterCoordinatorTests: XCTestCase {
 
     // MARK: handle - FilterEvent
 
-    func test_filterEvent_complete_shouldEmitCompleteEvent() {
-        var event: FilterCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(.complete)
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_filterEvent_complete_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.wait().first {
+            self.coordinator.receive(.complete)
+        }.unwrap()
+        XCTAssertEqual(event, .complete)
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {

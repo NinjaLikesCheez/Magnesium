@@ -1,5 +1,6 @@
 import Combine
 import CommonModels
+import EnumTesting
 import LinkPresentation
 @testable import Magnesium
 import Preferences
@@ -54,10 +55,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_showAddFile_shouldPresentDocumentPickerViewController() {
         coordinator.showAddFile()
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
-        guard type(of: presentedViewController!) === UIDocumentPickerViewController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
-            return
-        }
+        XCTAssertType(presentedViewController, UIDocumentPickerViewController.self)
     }
 
     // MARK: - Handle TorrentListEvent
@@ -65,10 +63,7 @@ class TorrentListCoordinatorTests: XCTestCase {
     func test_alert_shouldPresentAlertController() {
         viewModel.eventSubject.send(.alert(.init(title: "", style: .alert)))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
-        guard type(of: presentedViewController!) === UIAlertController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
-            return
-        }
+        XCTAssertType(presentedViewController, UIAlertController.self)
     }
 
     func test_activities_shouldPresentActivityViewController() {
@@ -78,10 +73,7 @@ class TorrentListCoordinatorTests: XCTestCase {
             source: .view(UIView(), rect: .zero)
         ))
         let presentedViewController = coordinator.presentable.viewController.presentedViewController
-        guard type(of: presentedViewController!) === UIActivityViewController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: presentedViewController))")
-            return
-        }
+        XCTAssertType(presentedViewController, UIActivityViewController.self)
     }
 
     func test_add_shouldPresentAlertController() {
@@ -102,33 +94,23 @@ class TorrentListCoordinatorTests: XCTestCase {
         let viewController = coordinator.presentable.viewController
         let navigationController = viewController.presentedViewController as! UINavigationController
         XCTAssertEqual(navigationController.modalPresentationStyle, .popover)
-        let rootViewController = navigationController.viewControllers[0]
-        guard type(of: rootViewController) === FilterViewController<FilterViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, FilterViewController<FilterViewModel>.self)
     }
 
-    func test_detail_shouldEmitShowDetailEvent() {
-        var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
+    func test_detail_shouldEmitShowDetailEvent() throws {
         let detailViewModel = AnyViewModel(MockDetailViewModel())
-        viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
-        guard case let .showDetail(viewModel) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+        let event = try coordinator.events.wait().first {
+            self.viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
+        }.unwrap()
+        let viewModel = try extract(case: TorrentListCoordinatorEvent.showDetail, from: event)
         XCTAssertTrue(detailViewModel === viewModel)
     }
 
-    func test_settings_shouldEmitShowSettingsEvent() {
-        var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.eventSubject.send(.settings)
-        guard case .showSettings = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_settings_shouldEmitShowSettingsEvent() throws {
+        let event = try coordinator.events.wait().first {
+            self.viewModel.eventSubject.send(.settings)
+        }.unwrap()
+        XCTAssertCase(TorrentListCoordinatorEvent.showSettings, event)
     }
 
     func test_moveDownloadFolder_shouldPresentAlertController() {
@@ -144,14 +126,11 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(textField.text, "/path")
     }
 
-    func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() {
-        var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
-        guard case .torrentsUpdated = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() throws {
+        let event = try coordinator.events.wait().first {
+            self.viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
+        }.unwrap()
+        XCTAssertCase(TorrentListCoordinatorEvent.torrentsUpdated, event)
     }
 
     // MARK: - Handle FilterCoordinatorEvent
@@ -181,13 +160,15 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertEqual(menu?.identifier.rawValue, "mock")
     }
 
-    func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() {
-        var event: TorrentListCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        XCTAssertNotNil(coordinator.previewForItem(at: 0))
-        let childCoordinator = coordinator.childCoordinators.values.first?.base
-            as! TorrentDetailCoordinator<AnyTorrentDetailViewModel>
-        coordinator.commitPreviewForItem(at: 0)
+    func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
+        XCTAssertNotNil(self.coordinator.previewForItem(at: 0))
+        let childCoordinator = self.coordinator.childCoordinators.values.first?.base
+            as? TorrentDetailCoordinator<AnyTorrentDetailViewModel>
+
+        let event = try coordinator.events.wait().first {
+            self.coordinator.commitPreviewForItem(at: 0)
+        }.unwrap()
+
         guard case let .commitDetail(committedCoordinator) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

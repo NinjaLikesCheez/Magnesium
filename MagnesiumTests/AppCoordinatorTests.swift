@@ -26,21 +26,13 @@ class AppCoordinatorTests: XCTestCase {
 
     func test_masterViewController_whenNoServers_shouldBeExpectedViewController() {
         let navigationController = splitViewController.viewControllers[0] as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === NoServersViewController<NoServersViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, NoServersViewController<NoServersViewModel>.self)
     }
 
     func test_masterViewController_whenServerSettingsInvalid_shouldBeExpectedViewController() {
         let navigationController = splitViewController.viewControllers[0] as! UINavigationController
         session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === ServerErrorViewController<ServerErrorViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, ServerErrorViewController<ServerErrorViewModel>.self)
     }
 
     func test_masterViewController_whenServerChanged_shouldBeChanged() {
@@ -75,21 +67,16 @@ class AppCoordinatorTests: XCTestCase {
     func test_serverErrorCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(ServerErrorCoordinatorEvent.showSettings)
         let navigationController = splitViewController.presentedViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, SettingsViewController<SettingsViewModel>.self)
     }
 
     func test_serverErrorCoordinatorEvent_editServer_shouldShowServerSettings() throws {
         coordinator.handle(ServerErrorCoordinatorEvent.editServer(.mock(.transmission)))
         let navigationController = splitViewController.presentedViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(
+            navigationController.viewControllers.first,
+            ServerSettingsViewController<AnyServerSettingsViewModel>.self
+        )
     }
 
     // MARK: - NoServersCoordinatorEvent
@@ -97,21 +84,13 @@ class AppCoordinatorTests: XCTestCase {
     func test_noServersCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(NoServersCoordinatorEvent.showSettings)
         let navigationController = splitViewController.presentedViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, SettingsViewController<SettingsViewModel>.self)
     }
 
     func test_noServersCoordinatorEvent_addServer_shouldShowAddServer() throws {
         coordinator.handle(NoServersCoordinatorEvent.addServer)
         let navigationController = splitViewController.presentedViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === AddServerViewController<AddServerViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, AddServerViewController<AddServerViewModel>.self)
     }
 
     // MARK: - TorrentListCoordinatorEvent
@@ -119,21 +98,16 @@ class AppCoordinatorTests: XCTestCase {
     func test_listCoordinatorEvent_showSettings_shouldShowSettings() throws {
         coordinator.handle(TorrentListCoordinatorEvent.showSettings)
         let navigationController = splitViewController.presentedViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, SettingsViewController<SettingsViewModel>.self)
     }
 
     func test_listCoordinatorEvent_showDetail_shouldShowDetail() throws {
         coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel())))
         let navigationController = splitViewController.detailViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(
+            navigationController.viewControllers.first,
+            TorrentDetailViewController<AnyTorrentDetailViewModel>.self
+        )
     }
 
     func test_listCoordinatorEvent_commitDetail_shouldCommitDetail() throws {
@@ -141,11 +115,10 @@ class AppCoordinatorTests: XCTestCase {
         let detailCoordinator = TorrentDetailCoordinator(viewModel: viewModel)
         coordinator.handle(TorrentListCoordinatorEvent.commitDetail(coordinator: detailCoordinator))
         let navigationController = splitViewController.detailViewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(
+            navigationController.viewControllers.first,
+            TorrentDetailViewController<AnyTorrentDetailViewModel>.self
+        )
     }
 
     func test_listCoordinatorEvent_torrentsUpdated_whenHashNotRemoved_shouldDismissDetail() throws {

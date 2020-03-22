@@ -7,7 +7,6 @@ import XCTest
 class ServerPreferencesTests: XCTestCase {
     private var server: Server!
     private var keychainStore: InMemoryKeychain.Store!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -15,7 +14,6 @@ class ServerPreferencesTests: XCTestCase {
         keychainStore = .init()
         Current = .mock(keychain: InMemoryKeychain(store: keychainStore))
         server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
-        cancellables = Set()
     }
 
     func test_addOrUpdate_withNewServer() {
@@ -45,53 +43,38 @@ class ServerPreferencesTests: XCTestCase {
         XCTAssertEqual(preferences.getServers().count, 1)
     }
 
-    func test_serverUpdatePublisher_withNewServer_shouldEmit() {
-        let expectation = self.expectation(description: "Value received")
-        preferences.serverUpdatedPublisher(for: server).first().sink { updated in
-            XCTAssertEqual(updated, self.server)
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 0)
+    func test_serverUpdatePublisher_withNewServer_shouldEmit() throws {
+        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+            self.preferences.addOrUpdate(server: self.server)
+        }.unwrap()
+        XCTAssertEqual(server, updated)
     }
 
-    func test_serverUpdatedPublisher_withExistingServer_shouldEmitUpdatedServer() {
+    func test_serverUpdatedPublisher_withExistingServer_shouldEmitUpdatedServer() throws {
         preferences.addOrUpdate(server: server)
-        let expectation = self.expectation(description: "Value received")
-        preferences.serverUpdatedPublisher(for: server)
-            .first()
-            .sink { updated in
-                XCTAssertEqual(updated?.id, self.server.id)
-                XCTAssertEqual(updated?.name, "New Name")
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
         var server = self.server!
         server.name = "New Name"
-        preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 0)
+        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+            self.preferences.addOrUpdate(server: server)
+        }.unwrap()
+        XCTAssertEqual(updated?.id, self.server.id)
+        XCTAssertEqual(updated?.name, "New Name")
     }
 
     func test_serverUpdatedPublisher_withSameServer_shouldNotEmit() {
         preferences.addOrUpdate(server: server)
-        let expectation = self.expectation(description: "Value received")
-        expectation.isInverted = true
-        preferences.serverUpdatedPublisher(for: server).first().sink { _ in
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        preferences.addOrUpdate(server: server)
-        waitForExpectations(timeout: 0)
+        let optional = preferences.serverUpdatedPublisher(for: server).wait().first {
+            self.preferences.addOrUpdate(server: self.server)
+        }
+        XCTAssertEqual(optional, .none)
     }
 
-    func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() {
+    func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() throws {
         preferences.addOrUpdate(server: server)
-        let expectation = self.expectation(description: "Value received")
-        preferences.serverUpdatedPublisher(for: server).first().sink { updated in
-            XCTAssertNil(updated)
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        preferences.remove(server: server)
-        waitForExpectations(timeout: 0)
+        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+            self.preferences.remove(server: self.server)
+        }.unwrap()
+        XCTAssertNil(updated)
     }
 
     func test_addOrUpdate_withKeychainData_shouldPersistToKeychain() {

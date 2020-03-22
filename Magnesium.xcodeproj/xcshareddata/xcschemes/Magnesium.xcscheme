@@ -20,6 +20,34 @@
                ReferencedContainer = "container:Magnesium.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CombineWaiting"
+               BuildableName = "CombineWaiting"
+               BlueprintName = "CombineWaiting"
+               ReferencedContainer = "container:Libraries/Components">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EnumTesting"
+               BuildableName = "EnumTesting"
+               BlueprintName = "EnumTesting"
+               ReferencedContainer = "container:Libraries/Components">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

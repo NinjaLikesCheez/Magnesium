@@ -31,10 +31,10 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertNotNil(value)
     }
 
-    func test_doneSelected_shouldEmitCompleteEvent() {
-        let event = viewModel.events.wait().first {
+    func test_doneSelected_shouldEmitCompleteEvent() throws {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.doneSelected)
-        }
+        }.unwrap()
 
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -42,15 +42,15 @@ class SettingsViewModelTests: XCTestCase {
         }
     }
 
-    func test_changeServerSelected_shouldEmitAlert() {
+    func test_changeServerSelected_shouldEmitAlert() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = viewModel.events.wait().first {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }
+        }.unwrap()
 
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -61,16 +61,16 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(alert.actions.map { $0.title ?? "" }, expected)
     }
 
-    func test_changeServerSelected_whenServerSelected_shouldUpdateSession() {
+    func test_changeServerSelected_whenServerSelected_shouldUpdateSession() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
-        let event = viewModel.events.wait().first {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }
+        }.unwrap()
 
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -82,15 +82,15 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertNotEqual(session.server!.id, previousID)
     }
 
-    func test_serverSelected_shouldEmitEditServerEvent() {
+    func test_serverSelected_shouldEmitEditServerEvent() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = viewModel.events.wait().first {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.serverSelected(index: 1))
-        }
+        }.unwrap()
 
         guard case let .editServer(server) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -100,10 +100,10 @@ class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(server.id, server2.id)
     }
 
-    func test_addServerSelected_shouldEmitAddServerEvent() {
-        let event = viewModel.events.wait().first {
+    func test_addServerSelected_shouldEmitAddServerEvent() throws {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.addServerSelected)
-        }
+        }.unwrap()
 
         guard case .addServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -111,10 +111,10 @@ class SettingsViewModelTests: XCTestCase {
         }
     }
 
-    func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() {
-        let event = viewModel.events.wait().first {
+    func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() throws {
+        let event = try viewModel.events.wait().first {
             self.viewModel.receive(.refreshIntervalSelected)
-        }
+        }.unwrap()
 
         guard case .showRefreshIntervalSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

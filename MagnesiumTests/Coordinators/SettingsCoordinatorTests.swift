@@ -9,7 +9,6 @@ class SettingsCoordinatorTests: XCTestCase {
     private var window: UIWindow!
     private var session: Session!
     private var coordinator: SettingsCoordinator!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -18,7 +17,6 @@ class SettingsCoordinatorTests: XCTestCase {
         window = UIWindow()
         session = Session()
         coordinator = SettingsCoordinator(session: session)
-        cancellables = Set()
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
@@ -36,10 +34,10 @@ class SettingsCoordinatorTests: XCTestCase {
 
     // MARK: - SettingsEvent
 
-    func test_settingsEvent_complete_shouldEmitCompleteEvent() {
-        let event = coordinator.events.wait().first {
+    func test_settingsEvent_complete_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.wait().first {
             self.coordinator.receive(.complete)
-        }
+        }.unwrap()
         XCTAssertEqual(event, .complete)
     }
 
