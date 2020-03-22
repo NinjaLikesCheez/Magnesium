@@ -365,6 +365,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_sections_shouldHaveInfoRows() throws {
+        // swiftformat:disable all
         // swiftlint:disable comma
         let expected: [(String, String, String?)] = [
             ("Size",            "0 KB",         nil),
@@ -379,6 +380,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             ("Download Folder", "downloads",    "/downloads"),
         ]
         // swiftlint:enable comma
+        // swiftformat:enable all
         let section = try viewModel.view.sections.wait().first().unwrap()[1]
         let rows = try getInfoRows(in: section)
         XCTAssertEqual(rows.count, expected.count, String(describing: rows))

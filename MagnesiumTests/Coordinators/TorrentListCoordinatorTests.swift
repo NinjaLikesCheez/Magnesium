@@ -161,8 +161,8 @@ class TorrentListCoordinatorTests: XCTestCase {
     }
 
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
-        XCTAssertNotNil(self.coordinator.previewForItem(at: 0))
-        let childCoordinator = self.coordinator.childCoordinators.values.first?.base
+        XCTAssertNotNil(coordinator.previewForItem(at: 0))
+        let childCoordinator = coordinator.childCoordinators.values.first?.base
             as? TorrentDetailCoordinator<AnyTorrentDetailViewModel>
 
         let event = try coordinator.events.wait().first {
