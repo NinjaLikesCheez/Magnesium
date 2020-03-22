@@ -37,13 +37,10 @@ class SettingsCoordinatorTests: XCTestCase {
     // MARK: - SettingsEvent
 
     func test_settingsEvent_complete_shouldEmitCompleteEvent() {
-        var event: SettingsCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(.complete)
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+        let event = coordinator.events.wait().first {
+            self.coordinator.receive(.complete)
         }
+        XCTAssertEqual(event, .complete)
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
