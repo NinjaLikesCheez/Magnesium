@@ -29,7 +29,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
         let event = try viewModel.events.wait().first(executing: actions).unwrap()
-        return try extract(case: TorrentDetailViewModelEvent.alert, from: event)
+        return try unpack(case: TorrentDetailViewModelEvent.alert, from: event)
     }
 
     // MARK: Auto Refresh
@@ -107,7 +107,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
         let event = try viewModel.events.wait().first(executing: actions).unwrap()
-        return try extract(case: TorrentDetailViewModelEvent.activities, from: event).0
+        return try unpack(case: TorrentDetailViewModelEvent.activities, from: event).0
     }
 
     func test_moreOptions_shouldEmitExpectedActivities() throws {
@@ -197,7 +197,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let event = try viewModel.events.wait().first {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.unwrap()
-        let (path, _) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
+        let (path, _) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
 
@@ -209,7 +209,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let event = try viewModel.events.wait().first {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.unwrap()
-        let (_, subject) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
+        let (_, subject) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
         XCTAssertEqual(implementation.moveDownloadFolderParamPath, ["/new"])
@@ -224,7 +224,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let event = try viewModel.events.wait().first {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.unwrap()
-        let (_, subject) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
+        let (_, subject) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
         }
@@ -397,15 +397,15 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
         let section = try viewModel.view.sections.wait().first().unwrap()[2]
         XCTAssertEqual(section.type, .trackers)
-        let extracted = try section.items.map { try extract(case: TorrentDetailItem.tracker, from: $0) }
-        XCTAssertEqual(extracted, trackers)
+        let unpacked = try section.items.map { try unpack(case: TorrentDetailItem.tracker, from: $0) }
+        XCTAssertEqual(unpacked, trackers)
     }
 
     func test_sections_files_shouldBeSorted() throws {
         let section = try viewModel.view.sections.wait().first().unwrap()[2]
         XCTAssertEqual(section.type, .files)
         let files = try section.items.map {
-            try extract(case: TorrentDetailItem.file, from: $0).name.wait().first().unwrap()
+            try unpack(case: TorrentDetailItem.file, from: $0).name.wait().first().unwrap()
         }
         XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
     }

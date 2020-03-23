@@ -102,7 +102,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let event = try coordinator.events.wait().first {
             self.viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
         }.unwrap()
-        let viewModel = try extract(case: TorrentListCoordinatorEvent.showDetail, from: event)
+        let viewModel = try unpack(case: TorrentListCoordinatorEvent.showDetail, from: event)
         XCTAssertTrue(detailViewModel === viewModel)
     }
 
