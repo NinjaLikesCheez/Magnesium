@@ -1,1 +1,2 @@
-import CombineWaiting
+@_exported import CombineWaiting
+@_exported import TestExtensions

@@ -56,10 +56,10 @@ class SessionTests: XCTestCase {
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
         XCTAssertEqual(session.server, firstServer)
-        let optional = session.serverPublisher.dropFirst().wait().first {
+        let result = session.serverPublisher.dropFirst().wait().first {
             self.preferences[.selectedServerID] = secondServer.id
         }
-        XCTAssertEqual(optional, .none)
+        XCTAssertEqual(result, type(of: result).none)
         XCTAssertEqual(session.server, firstServer)
     }
 

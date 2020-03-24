@@ -48,8 +48,6 @@
 		E92D5CE323FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE223FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE523FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE423FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift */; };
 		E92D5CE723FB234800A4CB51 /* TransmissionTorrentFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D5CE623FB234800A4CB51 /* TransmissionTorrentFileTests.swift */; };
-		E93729BC24280D2F00D2191D /* EnumTesting in Frameworks */ = {isa = PBXBuildFile; productRef = E93729BB24280D2F00D2191D /* EnumTesting */; };
-		E93729BE24280F8000D2191D /* XCTestCase+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93729BD24280F8000D2191D /* XCTestCase+Extensions.swift */; };
 		E93F5D6523BA93F200B0FFA4 /* TorrentDetailFileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F5D6423BA93F200B0FFA4 /* TorrentDetailFileItem.swift */; };
 		E93F5D6D23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93F5D6C23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift */; };
 		E9460D1D237BB3B100A08E68 /* TorrentListViewRepresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9460D1C237BB3B100A08E68 /* TorrentListViewRepresentation.swift */; };
@@ -63,6 +61,7 @@
 		E951CA0623E4FC3F008A7D1F /* FilterViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */; };
 		E951CA0C23E50BC4008A7D1F /* ValueMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E951CA0B23E50BC4008A7D1F /* ValueMapper.swift */; };
 		E952A13524268A690050F108 /* FileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E952A13424268A690050F108 /* FileSystem.swift */; };
+		E95852532429ACAA00CF4AD6 /* TestExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = E95852522429ACAA00CF4AD6 /* TestExtensions */; };
 		E959FA9E23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E959FA9D23AC3D3C002CB8F8 /* TorrentDetailHeaderTableViewCell.swift */; };
 		E95A43DF240C7337006C4B45 /* DelugeTorrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95A43DE240C7337006C4B45 /* DelugeTorrent.swift */; };
 		E95AB87423EA56BC00827A94 /* TorrentListCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95AB87323EA56BC00827A94 /* TorrentListCoordinatorTests.swift */; };
@@ -233,7 +232,6 @@
 		E92D5CE223FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeTorrentDetailViewModelImplementationTests.swift; sourceTree = "<group>"; };
 		E92D5CE423FB207900A4CB51 /* TransmissionTorrentDetailViewModelImplementationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentDetailViewModelImplementationTests.swift; sourceTree = "<group>"; };
 		E92D5CE623FB234800A4CB51 /* TransmissionTorrentFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionTorrentFileTests.swift; sourceTree = "<group>"; };
-		E93729BD24280F8000D2191D /* XCTestCase+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Extensions.swift"; sourceTree = "<group>"; };
 		E93F5D6423BA93F200B0FFA4 /* TorrentDetailFileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailFileItem.swift; sourceTree = "<group>"; };
 		E93F5D6C23BA9BD200B0FFA4 /* TorrentDetailFileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailFileTableViewCell.swift; sourceTree = "<group>"; };
 		E9460D1C237BB3B100A08E68 /* TorrentListViewRepresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListViewRepresentation.swift; sourceTree = "<group>"; };
@@ -381,7 +379,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E93729BC24280D2F00D2191D /* EnumTesting in Frameworks */,
+				E95852532429ACAA00CF4AD6 /* TestExtensions in Frameworks */,
 				E9B9809E2426F65F0090AF37 /* CombineWaiting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -861,7 +859,6 @@
 				E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */,
 				E968232224131C9F0059D026 /* AddTorrentFlowTests.swift */,
 				E9B9809B2426F1C10090AF37 /* Imports.swift */,
-				E93729BD24280F8000D2191D /* XCTestCase+Extensions.swift */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
@@ -930,7 +927,7 @@
 			name = MagnesiumTests;
 			packageProductDependencies = (
 				E9B9809D2426F65F0090AF37 /* CombineWaiting */,
-				E93729BB24280D2F00D2191D /* EnumTesting */,
+				E95852522429ACAA00CF4AD6 /* TestExtensions */,
 			);
 			productName = MagnesiumTests;
 			productReference = E9CC160923AD5CD400EA1B4C /* MagnesiumTests.xctest */;
@@ -1202,7 +1199,6 @@
 				E9E7037623F85CBF0095A0B3 /* MockLabel.swift in Sources */,
 				E92D5CE323FB0E8A00A4CB51 /* DelugeTorrentDetailViewModelImplementationTests.swift in Sources */,
 				E9091D3623E268310034C353 /* AddServerViewModelTests.swift in Sources */,
-				E93729BE24280F8000D2191D /* XCTestCase+Extensions.swift in Sources */,
 				E988EDE223E7CA080011A733 /* TorrentDetailHeaderItemTests.swift in Sources */,
 				E9AC4FBE23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift in Sources */,
 				E91FD7C523FCB9F10059A21F /* NoServersViewModelTests.swift in Sources */,
@@ -1485,9 +1481,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E93729BB24280D2F00D2191D /* EnumTesting */ = {
+		E95852522429ACAA00CF4AD6 /* TestExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = EnumTesting;
+			productName = TestExtensions;
 		};
 		E96A4EF22426A93200D00131 /* CommonModels */ = {
 			isa = XCSwiftPackageProductDependency;

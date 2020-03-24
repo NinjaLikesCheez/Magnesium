@@ -5,53 +5,41 @@ import XCTest
 class TorrentDetailHeaderItemTests: XCTestCase {
     private var torrent: CurrentValueSubject<MockTorrent, Never>!
     private var item: TorrentDetailHeaderItem!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
         Current = .mock
         torrent = CurrentValueSubject(MockTorrent())
         item = TorrentDetailHeaderItem(torrent: torrent)
-        cancellables = Set()
     }
 
     func test_name() {
         torrent.send(MockTorrent(name: "name"))
-        var name: String?
-        item.name.sink { name = $0 }.store(in: &cancellables)
-        XCTAssertEqual(name, "name")
+        XCTAssertEqual(item.name.wait().first(), "name")
     }
 
     func test_label() {
         torrent.send(MockTorrent(label: "label"))
-        var label: String?
-        item.label.sink { label = $0 }.store(in: &cancellables)
-        XCTAssertEqual(label, "label")
+        XCTAssertEqual(item.label.wait().first(), "label")
     }
 
-    func test_isActive_withActiveStates_shouldBeTrue() {
+    func test_isActive_withActiveStates_shouldBeTrue() throws {
         for state in [TorrentState.downloading, .seeding] {
             torrent.send(MockTorrent(standardState: state))
-            var isActive: Bool?
-            item.isActive.sink { isActive = $0 }.store(in: &cancellables)
-            XCTAssertEqual(isActive, true) // swiftlint:disable:this xct_specific_matcher
+            XCTAssertTrue(item.isActive.wait().first())
         }
     }
 
     func test_isActive_withInactiveState_shouldBeFalse() {
         for state in [TorrentState.paused, .checking, .queued, .error] {
             torrent.send(MockTorrent(standardState: state))
-            var isActive: Bool?
-            item.isActive.sink { isActive = $0 }.store(in: &cancellables)
-            XCTAssertEqual(isActive, false) // swiftlint:disable:this xct_specific_matcher
+            XCTAssertFalse(item.isActive.wait().first())
         }
     }
 
     func test_progress() {
         torrent.send(MockTorrent(progress: 0.189_838))
-        var progress: Float?
-        item.progress.sink { progress = $0 }.store(in: &cancellables)
-        XCTAssertEqual(progress, 0.189_838)
+        XCTAssertEqual(item.progress.wait().first(), 0.189_838)
     }
 
     func test_progressColor() {
@@ -66,9 +54,7 @@ class TorrentDetailHeaderItemTests: XCTestCase {
 
         for (state, result) in pairs {
             torrent.send(MockTorrent(standardState: state))
-            var color: UIColor?
-            item.progressColor.sink { color = $0 }.store(in: &cancellables)
-            XCTAssertEqual(color, result, "\(state)")
+            XCTAssertEqual(item.progressColor.wait().first(), result, String(describing: state))
         }
     }
 
@@ -84,9 +70,7 @@ class TorrentDetailHeaderItemTests: XCTestCase {
 
         for (state, result) in pairs {
             torrent.send(MockTorrent(standardState: state))
-            var status: String?
-            item.status.sink { status = $0 }.store(in: &cancellables)
-            XCTAssertEqual(status, "\(result) (0.00%)")
+            XCTAssertEqual(item.status.wait().first(), "\(result) (0.00%)")
         }
     }
 }

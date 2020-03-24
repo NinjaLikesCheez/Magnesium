@@ -1,6 +1,5 @@
 import Combine
 import CommonModels
-import EnumTesting
 import LinkPresentation
 @testable import Magnesium
 import Preferences
@@ -130,7 +129,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let event = try coordinator.events.wait().first {
             self.viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
         }.unwrap()
-        XCTAssertCase(TorrentListCoordinatorEvent.torrentsUpdated, event)
+        XCTAssertCase(event, type(of: event).torrentsUpdated)
     }
 
     // MARK: - Handle FilterCoordinatorEvent

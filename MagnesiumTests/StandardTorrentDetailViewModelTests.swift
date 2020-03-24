@@ -1,7 +1,6 @@
 import Combine
 import CommonModels
 import Deluge
-import EnumTesting
 @testable import Magnesium
 import Preferences
 import ViewModel
@@ -29,7 +28,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
         let event = try viewModel.events.wait().first(executing: actions).unwrap()
-        return try unpack(case: TorrentDetailViewModelEvent.alert, from: event)
+        return try unpack(case: type(of: event).alert, from: event)
     }
 
     // MARK: Auto Refresh
@@ -107,7 +106,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
         let event = try viewModel.events.wait().first(executing: actions).unwrap()
-        return try unpack(case: TorrentDetailViewModelEvent.activities, from: event).0
+        return try unpack(case: type(of: event).activities, from: event).0
     }
 
     func test_moreOptions_shouldEmitExpectedActivities() throws {

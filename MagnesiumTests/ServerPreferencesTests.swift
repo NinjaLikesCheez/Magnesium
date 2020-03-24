@@ -63,10 +63,10 @@ class ServerPreferencesTests: XCTestCase {
 
     func test_serverUpdatedPublisher_withSameServer_shouldNotEmit() {
         preferences.addOrUpdate(server: server)
-        let optional = preferences.serverUpdatedPublisher(for: server).wait().first {
+        let result = preferences.serverUpdatedPublisher(for: server).wait().first {
             self.preferences.addOrUpdate(server: self.server)
         }
-        XCTAssertEqual(optional, .none)
+        XCTAssertEqual(result, type(of: result).none)
     }
 
     func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() throws {

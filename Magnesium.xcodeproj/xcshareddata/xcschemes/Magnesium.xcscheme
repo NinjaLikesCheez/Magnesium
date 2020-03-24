@@ -42,9 +42,9 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EnumTesting"
-               BuildableName = "EnumTesting"
-               BlueprintName = "EnumTesting"
+               BlueprintIdentifier = "TestExtensions"
+               BuildableName = "TestExtensions"
+               BlueprintName = "TestExtensions"
                ReferencedContainer = "container:Libraries/Components">
             </BuildableReference>
          </BuildActionEntry>
