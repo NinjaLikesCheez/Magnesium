@@ -98,17 +98,17 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_detail_shouldEmitShowDetailEvent() throws {
         let detailViewModel = AnyViewModel(MockDetailViewModel())
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
-        }.unwrap()
+        }.value()
         let viewModel = try unpack(case: TorrentListCoordinatorEvent.showDetail, from: event)
         XCTAssertTrue(detailViewModel === viewModel)
     }
 
     func test_settings_shouldEmitShowSettingsEvent() throws {
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.settings)
-        }.unwrap()
+        }.value()
         XCTAssertCase(TorrentListCoordinatorEvent.showSettings, event)
     }
 
@@ -126,9 +126,9 @@ class TorrentListCoordinatorTests: XCTestCase {
     }
 
     func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() throws {
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
-        }.unwrap()
+        }.value()
         XCTAssertCase(event, type(of: event).torrentsUpdated)
     }
 
@@ -164,9 +164,9 @@ class TorrentListCoordinatorTests: XCTestCase {
         let childCoordinator = coordinator.childCoordinators.values.first?.base
             as? TorrentDetailCoordinator<AnyTorrentDetailViewModel>
 
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.coordinator.commitPreviewForItem(at: 0)
-        }.unwrap()
+        }.value()
 
         guard case let .commitDetail(committedCoordinator) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

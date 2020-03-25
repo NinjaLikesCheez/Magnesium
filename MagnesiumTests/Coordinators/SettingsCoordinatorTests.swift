@@ -35,9 +35,9 @@ class SettingsCoordinatorTests: XCTestCase {
     // MARK: - SettingsEvent
 
     func test_settingsEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.coordinator.receive(.complete)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(event, .complete)
     }
 

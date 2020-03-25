@@ -15,31 +15,31 @@ class TorrentDetailHeaderItemTests: XCTestCase {
 
     func test_name() {
         torrent.send(MockTorrent(name: "name"))
-        XCTAssertEqual(item.name.wait().first(), "name")
+        XCTAssertEqual(item.name.first().wait(), "name")
     }
 
     func test_label() {
         torrent.send(MockTorrent(label: "label"))
-        XCTAssertEqual(item.label.wait().first(), "label")
+        XCTAssertEqual(item.label.first().wait(), "label")
     }
 
     func test_isActive_withActiveStates_shouldBeTrue() throws {
         for state in [TorrentState.downloading, .seeding] {
             torrent.send(MockTorrent(standardState: state))
-            XCTAssertTrue(item.isActive.wait().first())
+            XCTAssertTrue(item.isActive.first().wait())
         }
     }
 
     func test_isActive_withInactiveState_shouldBeFalse() {
         for state in [TorrentState.paused, .checking, .queued, .error] {
             torrent.send(MockTorrent(standardState: state))
-            XCTAssertFalse(item.isActive.wait().first())
+            XCTAssertFalse(item.isActive.first().wait())
         }
     }
 
     func test_progress() {
         torrent.send(MockTorrent(progress: 0.189_838))
-        XCTAssertEqual(item.progress.wait().first(), 0.189_838)
+        XCTAssertEqual(item.progress.first().wait(), 0.189_838)
     }
 
     func test_progressColor() {
@@ -54,7 +54,7 @@ class TorrentDetailHeaderItemTests: XCTestCase {
 
         for (state, result) in pairs {
             torrent.send(MockTorrent(standardState: state))
-            XCTAssertEqual(item.progressColor.wait().first(), result, String(describing: state))
+            XCTAssertEqual(item.progressColor.first().wait(), result, String(describing: state))
         }
     }
 
@@ -70,7 +70,7 @@ class TorrentDetailHeaderItemTests: XCTestCase {
 
         for (state, result) in pairs {
             torrent.send(MockTorrent(standardState: state))
-            XCTAssertEqual(item.status.wait().first(), "\(result) (0.00%)")
+            XCTAssertEqual(item.status.first().wait(), "\(result) (0.00%)")
         }
     }
 }

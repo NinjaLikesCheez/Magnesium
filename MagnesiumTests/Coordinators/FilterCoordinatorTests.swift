@@ -30,9 +30,9 @@ class FilterCoordinatorTests: XCTestCase {
     // MARK: handle - FilterEvent
 
     func test_filterEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.coordinator.receive(.complete)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(event, .complete)
     }
 

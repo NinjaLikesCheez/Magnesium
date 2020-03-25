@@ -14,14 +14,14 @@ class SessionTests: XCTestCase {
     }
 
     func test_serverPublisher_shouldHaveInitialValue() {
-        XCTAssertEqual(session.serverPublisher.wait().first(), .some(nil))
+        XCTAssertEqual(session.serverPublisher.first().wait(), .none)
     }
 
     func test_serverPublisher_whenFirstServerAdded_shouldEmit() throws {
         let server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
-        let updated = try session.serverPublisher.dropFirst().wait().first {
+        let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: server)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(updated, server)
         XCTAssertEqual(session.server, server)
     }
@@ -30,9 +30,9 @@ class SessionTests: XCTestCase {
         var server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         preferences.addOrUpdate(server: server)
         server.name = "New Name"
-        let updated = try session.serverPublisher.dropFirst().wait().first {
+        let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: server)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(updated, server)
         XCTAssertEqual(session.server, server)
     }
@@ -43,9 +43,9 @@ class SessionTests: XCTestCase {
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
         XCTAssertEqual(session.server, firstServer)
-        let updated = try session.serverPublisher.dropFirst().wait().first {
+        let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.remove(server: firstServer)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(updated, secondServer)
         XCTAssertEqual(session.server, secondServer)
     }
@@ -56,10 +56,10 @@ class SessionTests: XCTestCase {
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
         XCTAssertEqual(session.server, firstServer)
-        let result = session.serverPublisher.dropFirst().wait().first {
+        let result = session.serverPublisher.dropFirst().first().wait {
             self.preferences[.selectedServerID] = secondServer.id
         }
-        XCTAssertEqual(result, type(of: result).none)
+        XCTAssertTrue(result.isEmpty())
         XCTAssertEqual(session.server, firstServer)
     }
 
@@ -69,9 +69,9 @@ class SessionTests: XCTestCase {
         preferences.addOrUpdate(server: firstServer)
         preferences.addOrUpdate(server: secondServer)
         XCTAssertEqual(session.server, firstServer)
-        let updated = try session.serverPublisher.dropFirst().wait().first {
+        let updated = try session.serverPublisher.dropFirst().first().wait {
             self.session.setServer(secondServer)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(updated, secondServer)
         XCTAssertEqual(session.server, secondServer)
     }

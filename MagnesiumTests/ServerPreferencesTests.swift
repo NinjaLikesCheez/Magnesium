@@ -44,9 +44,9 @@ class ServerPreferencesTests: XCTestCase {
     }
 
     func test_serverUpdatePublisher_withNewServer_shouldEmit() throws {
-        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+        let updated = try preferences.serverUpdatedPublisher(for: server).first().wait {
             self.preferences.addOrUpdate(server: self.server)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(server, updated)
     }
 
@@ -54,26 +54,26 @@ class ServerPreferencesTests: XCTestCase {
         preferences.addOrUpdate(server: server)
         var server = self.server!
         server.name = "New Name"
-        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+        let updated = try preferences.serverUpdatedPublisher(for: server).first().wait {
             self.preferences.addOrUpdate(server: server)
-        }.unwrap()
+        }.value()
         XCTAssertEqual(updated?.id, self.server.id)
         XCTAssertEqual(updated?.name, "New Name")
     }
 
     func test_serverUpdatedPublisher_withSameServer_shouldNotEmit() {
         preferences.addOrUpdate(server: server)
-        let result = preferences.serverUpdatedPublisher(for: server).wait().first {
+        let result = preferences.serverUpdatedPublisher(for: server).first().wait {
             self.preferences.addOrUpdate(server: self.server)
         }
-        XCTAssertEqual(result, type(of: result).none)
+        XCTAssertTrue(result.isEmpty())
     }
 
     func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() throws {
         preferences.addOrUpdate(server: server)
-        let updated = try preferences.serverUpdatedPublisher(for: server).wait().first {
+        let updated = try preferences.serverUpdatedPublisher(for: server).first().wait {
             self.preferences.remove(server: self.server)
-        }.unwrap()
+        }.value()
         XCTAssertNil(updated)
     }
 

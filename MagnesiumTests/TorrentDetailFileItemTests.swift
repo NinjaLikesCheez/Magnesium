@@ -25,10 +25,10 @@ class TorrentDetailFileItemTests: XCTestCase {
     }
 
     func test_name() throws {
-        XCTAssertEqual(try item.name.wait().first().unwrap(), "file.rar")
+        XCTAssertEqual(try item.name.first().wait().value(), "file.rar")
     }
 
     func test_progress() {
-        XCTAssertEqual(try item.progress.wait().first().unwrap(), "19%")
+        XCTAssertEqual(try item.progress.first().wait().value(), "19%")
     }
 }

@@ -18,23 +18,23 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_sections_whenServersChanged_shouldEmit() {
-        let value = viewModel.view.sections.dropFirst().wait().first {
+        let value = viewModel.view.sections.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         }
         XCTAssertNotNil(value)
     }
 
     func test_sections_whenCurrentServerChanged_shouldEmit() {
-        let value = viewModel.view.sections.dropFirst().wait().first {
+        let value = viewModel.view.sections.dropFirst().first().wait {
             self.session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         }
         XCTAssertNotNil(value)
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() throws {
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.doneSelected)
-        }.unwrap()
+        }.value()
 
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -48,9 +48,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }.unwrap()
+        }.value()
 
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -68,9 +68,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }.unwrap()
+        }.value()
 
         guard case let .alert(alert) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -88,9 +88,9 @@ class SettingsViewModelTests: XCTestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.serverSelected(index: 1))
-        }.unwrap()
+        }.value()
 
         guard case let .editServer(server) = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -101,9 +101,9 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_addServerSelected_shouldEmitAddServerEvent() throws {
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.addServerSelected)
-        }.unwrap()
+        }.value()
 
         guard case .addServer = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
@@ -112,9 +112,9 @@ class SettingsViewModelTests: XCTestCase {
     }
 
     func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() throws {
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             self.viewModel.receive(.refreshIntervalSelected)
-        }.unwrap()
+        }.value()
 
         guard case .showRefreshIntervalSettings = event else {
             XCTFail("Unexpected event: \(String(describing: event))")

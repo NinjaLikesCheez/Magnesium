@@ -37,9 +37,9 @@ class TorrentDetailCoordinatorTests: XCTestCase {
     // MARK: - Handle TorrentDetailEvent
 
     func test_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.wait().first {
+        let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.complete)
-        }.unwrap()
+        }.value()
         guard case .complete = event else {
             XCTFail("Unexpected event: \(String(describing: event))")
             return

@@ -27,7 +27,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
-        let event = try viewModel.events.wait().first(executing: actions).unwrap()
+        let event = try viewModel.events.first().wait(executing: actions).value()
         return try unpack(case: type(of: event).alert, from: event)
     }
 
@@ -96,7 +96,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     }
 
     func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {
-        let values = viewModel.view.isRefreshing.dropFirst().wait().array {
+        let values = viewModel.view.isRefreshing.dropFirst().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertEqual(values, [true, false])
@@ -105,7 +105,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     // MARK: moreOptions
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
-        let event = try viewModel.events.wait().first(executing: actions).unwrap()
+        let event = try viewModel.events.first().wait(executing: actions).value()
         return try unpack(case: type(of: event).activities, from: event).0
     }
 
@@ -193,9 +193,9 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let activities = try getActivities {
             self.viewModel.receive(.moreOptions(source: .view(UIView(), rect: .zero)))
         }
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.unwrap()
+        }.value()
         let (path, _) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
@@ -205,9 +205,9 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let activities = try getActivities {
             self.viewModel.receive(.moreOptions(source: .view(UIView(), rect: .zero)))
         }
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.unwrap()
+        }.value()
         let (_, subject) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
@@ -220,9 +220,9 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let activities = try getActivities {
             self.viewModel.receive(.moreOptions(source: .view(UIView(), rect: .zero)))
         }
-        let event = try viewModel.events.wait().first {
+        let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.unwrap()
+        }.value()
         let (_, subject) = try unpack(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
@@ -340,7 +340,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     // MARK: sections
 
     func test_sections_shouldHaveHeader() throws {
-        let sections = try viewModel.view.sections.wait().first().unwrap()
+        let sections = try viewModel.view.sections.first().wait().value()
         XCTAssertEqual(sections.first?.type, .header)
         XCTAssertEqual(sections.first?.items.count, 1)
     }
@@ -353,8 +353,8 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             case let .info(item):
                 return (
                     item.name,
-                    try item.value.wait().first().unwrap(),
-                    try item.expandedValue?.wait().first().unwrap()
+                    try item.value.first().wait().value(),
+                    try item.expandedValue?.first().wait().value()
                 )
             default:
                 XCTFail("Unexpected item")
@@ -380,7 +380,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         ]
         // swiftlint:enable comma
         // swiftformat:enable all
-        let section = try viewModel.view.sections.wait().first().unwrap()[1]
+        let section = try viewModel.view.sections.first().wait().value()[1]
         let rows = try getInfoRows(in: section)
         XCTAssertEqual(rows.count, expected.count, String(describing: rows))
         for (row, expected) in zip(rows, expected) {
@@ -394,17 +394,17 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
         torrent.send(MockTorrent(trackerStrings: trackers))
 
-        let section = try viewModel.view.sections.wait().first().unwrap()[2]
+        let section = try viewModel.view.sections.first().wait().value()[2]
         XCTAssertEqual(section.type, .trackers)
         let unpacked = try section.items.map { try unpack(case: TorrentDetailItem.tracker, from: $0) }
         XCTAssertEqual(unpacked, trackers)
     }
 
     func test_sections_files_shouldBeSorted() throws {
-        let section = try viewModel.view.sections.wait().first().unwrap()[2]
+        let section = try viewModel.view.sections.first().wait().value()[2]
         XCTAssertEqual(section.type, .files)
         let files = try section.items.map {
-            try unpack(case: TorrentDetailItem.file, from: $0).name.wait().first().unwrap()
+            try unpack(case: TorrentDetailItem.file, from: $0).name.first().wait().value()
         }
         XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
     }
@@ -412,7 +412,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     // MARK: eta
 
     func test_eta_whenZero_shouldFormatProperly() throws {
-        let sections = try viewModel.view.sections.wait().first().unwrap()
+        let sections = try viewModel.view.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "ETA" }?.1
         XCTAssertEqual(eta, "∞")
     }
@@ -422,14 +422,14 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
     func test_ratio_whenInfinite_shouldFormatProperly() throws {
         torrent.send(MockTorrent(uploaded: 1))
         XCTAssertTrue(torrent.value.ratio.isInfinite)
-        let sections = try viewModel.view.sections.wait().first().unwrap()
+        let sections = try viewModel.view.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
 
     func test_ratio_whenNaN_shouldFormatProperly() throws {
         XCTAssertTrue(torrent.value.ratio.isNaN)
-        let sections = try viewModel.view.sections.wait().first().unwrap()
+        let sections = try viewModel.view.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
