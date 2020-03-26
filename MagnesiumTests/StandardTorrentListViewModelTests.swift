@@ -9,7 +9,6 @@ import XCTest
 final class StandardTorrentListViewModelTests: XCTestCase {
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentListViewModel<MockImplementation>!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -17,7 +16,6 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         Current = .mock
         implementation = MockImplementation()
         viewModel = StandardTorrentListViewModel(implementation: implementation, server: .mock(.deluge))
-        cancellables = Set()
     }
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
@@ -134,14 +132,11 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     // MARK: addSelected
 
-    func test_addSelected_shouldEmitAddEvent() {
-        var event: TorrentListViewModelEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        viewModel.receive(.addSelected(source: .view(UIView(), rect: .zero)))
-        guard case .add = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_addSelected_shouldEmitAddEvent() throws {
+        let event = try viewModel.events.first().wait {
+            self.viewModel.receive(.addSelected(source: .view(UIView(), rect: .zero)))
+        }.value()
+        XCTAssertCase(event, type(of: event).add)
     }
 
     func test_addLink_shouldCallImplementationAddLink() {
@@ -354,32 +349,26 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     // MARK: moreOptionsSelected
 
-    private func getActivities(actions: () -> Void) -> [Activity]? {
-        var event: TorrentListViewModelEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        actions()
-        guard case let .activities(activities, _, _) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return nil
-        }
-        return activities
+    private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
+        let event = try viewModel.events.first().wait(executing: actions).value()
+        return try unpack(case: type(of: event).activities, from: event).0
     }
 
-    func test_moreOptionsSelected_shouldEmitExpectedActivities() {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
-        }!
+    func test_moreOptionsSelected_shouldEmitExpectedActivities() throws {
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
+        }
         let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
         XCTAssertEqual(activities.map { $0.title }, expected)
     }
 
-    func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() {
+    func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() throws {
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
 
         viewModel.receive(.refresh)
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
+        }
         let expected = ["Verify Files", "Move Download Folder", "Update Trackers"]
         XCTAssertEqual(activities.map { $0.title }, expected)
     }
@@ -387,9 +376,9 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     // MARK: moreOptionsSelected - Set Label
 
     func test_setLabelActivity_withSingleTorrent_shouldEmitSelectionAlert() throws {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
+        }
         let alert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
@@ -399,9 +388,9 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_setLabelActivity_withMultipleTorrents_shouldEmitSelectionAlert() throws {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let alert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
@@ -411,9 +400,9 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_setLabelActivity_whenOptionSelected_shouldCallImplementationSetLabelAndRefresh() throws {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let alert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
@@ -427,9 +416,9 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_setLabelActivity_whenOptionSelected_andFails_shouldEmitAlert() throws {
         implementation.setLabelResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let optionsAlert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
@@ -442,25 +431,25 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_setLabelActivity_whenOptionSelected_andRefreshFails_shouldNotEmitAlert() throws {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let optionsAlert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
 
-        var event: TorrentListViewModelEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        optionsAlert.actions.first { $0.title == "label1" }?.handler?()
-        XCTAssertNil(event)
+        let event = viewModel.events.first().wait {
+            optionsAlert.actions.first { $0.title == "label1" }?.handler?()
+        }
+        XCTAssertTrue(event.isEmpty())
     }
 
     // MARK: moreOptionsSelected - Verify Files
 
-    func test_verifyFilesActivity_shouldCallImplementationVerifyFilesAndRefresh() {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+    func test_verifyFilesActivity_shouldCallImplementationVerifyFilesAndRefresh() throws {
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         activities.first { $0.title == "Verify Files" }?.handler()
         XCTAssertEqual(implementation.verifyCallCount, 1)
         XCTAssertEqual(implementation.verifyParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
@@ -470,95 +459,83 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_verifyFilesActivity_whenFails_shouldEmitAlert() throws {
         implementation.verifyResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let alert = try getAlert {
             activities.first { $0.title == "Verify Files" }?.handler()
         }
         XCTAssertEqual(alert.title, "Failed to Verify Files")
     }
 
-    func test_verifyFilesActivity_whenRefreshFails_shouldNotEmitAlert() {
+    func test_verifyFilesActivity_whenRefreshFails_shouldNotEmitAlert() throws {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
 
-        var event: TorrentListViewModelEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Verify Files" }?.handler()
-        XCTAssertNil(event)
+        let event = viewModel.events.first().wait {
+            activities.first { $0.title == "Verify Files" }?.handler()
+        }
+        XCTAssertTrue(event.isEmpty())
     }
 
     // MARK: moreOptionsSelected - Move Download Folder
 
-    func test_moveDownloadFolderActivity_shouldEmitMoveDownloadFolderEvent() {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case .moveDownloadFolder = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+    func test_moveDownloadFolderActivity_shouldEmitMoveDownloadFolderEvent() throws {
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let event = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        XCTAssertCase(event, type(of: event).moveDownloadFolder)
     }
 
-    func test_moveDownloadFolderActivity_withSameDownloadPath_shouldHaveCurrentPath() {
+    func test_moveDownloadFolderActivity_withSameDownloadPath_shouldHaveCurrentPath() throws {
         implementation.refreshResult = Just(([
             MockTorrent(downloadPath: "/downloads"),
             MockTorrent(downloadPath: "/downloads"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
 
         viewModel.receive(.refresh)
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case let .moveDownloadFolder(path, _) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let event = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        let (path, _) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
 
-    func test_moveDownloadFolderActivity_withDifferentDownloadPaths_shouldHaveNilCurrentPath() {
+    func test_moveDownloadFolderActivity_withDifferentDownloadPaths_shouldHaveNilCurrentPath() throws {
         implementation.refreshResult = Just(([
             MockTorrent(downloadPath: "/downloads"),
             MockTorrent(downloadPath: "/downloads2"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
 
         viewModel.receive(.refresh)
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case let .moveDownloadFolder(path, _) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let event = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        let (path, _) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertNil(path)
     }
 
     // swiftlint:disable:next line_length
-    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_shouldCallImplementationMoveDownloadFolderAndRefresh() {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case let .moveDownloadFolder(_, subject) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_shouldCallImplementationMoveDownloadFolderAndRefresh() throws {
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let event = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        let (_, subject) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
         XCTAssertEqual(implementation.moveDownloadFolderParamPath, ["/new"])
@@ -567,48 +544,42 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andFails_shouldEmitAlert() throws {
         implementation.moveDownloadFolderResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case let .moveDownloadFolder(_, subject) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let event = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        let (_, subject) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
         }
         XCTAssertEqual(alert.title, "Failed to Move Download Folder")
     }
 
-    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andRefreshFails_shouldNotEmitAlert() {
+    func test_moveDownloadFolderActivity_whenSubjectReceivesValue_andRefreshFails_shouldNotEmitAlert() throws {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
-        var event: TorrentListViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Move Download Folder" }?.handler()
-        guard case let .moveDownloadFolder(_, subject) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
         }
+        let moveEvent = try viewModel.events.first().wait {
+            activities.first { $0.title == "Move Download Folder" }?.handler()
+        }.value()
+        let (_, subject) = try unpack(case: type(of: moveEvent).moveDownloadFolder, from: moveEvent)
 
-        event = nil
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        subject.send("/new")
-        XCTAssertNil(event)
+        let event = viewModel.events.first().wait {
+            subject.send("/new")
+        }
+        XCTAssertTrue(event.isEmpty())
     }
 
     // MARK: moreOptionsSelected - Update Trackers
 
-    func test_updateTrackersActivity_shouldCallImplementationUpdateTrackersAndRefresh() {
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+    func test_updateTrackersActivity_shouldCallImplementationUpdateTrackersAndRefresh() throws {
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         activities.first { $0.title == "Update Trackers" }?.handler()
         XCTAssertEqual(implementation.updateTrackersCallCount, 1)
         XCTAssertEqual(implementation.updateTrackersParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
@@ -617,26 +588,26 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_updateTrackersActivity_whenFails_shouldEmitAlert() throws {
         implementation.updateTrackersResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
         let alert = try getAlert {
             activities.first { $0.title == "Update Trackers" }?.handler()
         }
         XCTAssertEqual(alert.title, "Failed to Update Trackers")
     }
 
-    func test_updateTrackersActivity_whenRefreshFails_shouldNotEmitAlert() {
+    func test_updateTrackersActivity_whenRefreshFails_shouldNotEmitAlert() throws {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let activities = getActivities {
-            viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
-        }!
+        let activities = try getActivities {
+            self.viewModel.receive(.moreOptionsSelected(indices: [0, 1], source: .view(UIView(), rect: .zero)))
+        }
 
-        var event: TorrentListViewModelEvent?
-        viewModel.events.first().sink { event = $0 }.store(in: &cancellables)
-        activities.first { $0.title == "Update Trackers" }?.handler()
-        XCTAssertNil(event)
+        let event = viewModel.events.first().wait {
+            activities.first { $0.title == "Update Trackers" }?.handler()
+        }
+        XCTAssertTrue(event.isEmpty())
     }
 
     // MARK: - State
@@ -644,46 +615,39 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     // MARK: items
 
     func test_items_shouldEmitInitialValue() {
-        let expectation = self.expectation(description: "Value received")
-        viewModel.view.items.first().sink { _ in
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        waitForExpectations(timeout: 0)
+        XCTAssertFalse(viewModel.view.items.first().wait().isEmpty())
     }
 
     func test_items_shouldRemoveDuplicates() {
-        var count = 0
-        viewModel.view.items.dropFirst().sink { _ in count += 1 }.store(in: &cancellables)
-        viewModel.receive(.refresh)
-        XCTAssertEqual(count, 0)
+        let items = viewModel.view.items.dropFirst().first().wait {
+            self.viewModel.receive(.refresh)
+        }
+        XCTAssertTrue(items.isEmpty())
     }
 
     func test_items_shouldEmitNewValues() {
-        var count = 0
-        viewModel.view.items.dropFirst().sink { _ in count += 1 }.store(in: &cancellables)
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
-        viewModel.receive(.refresh)
-        XCTAssertEqual(count, 1)
+
+        let items = viewModel.view.items.dropFirst().first().wait {
+            self.viewModel.receive(.refresh)
+        }
+        XCTAssertFalse(items.isEmpty())
     }
 
     // MARK: hasActiveFilters
 
-    func test_hasActiveFilters_withNoFilters_shouldBeFalse() {
-        var value: Bool?
-        viewModel.view.hasActiveFilters.sink { value = $0 }.store(in: &cancellables)
-        XCTAssertFalse(value!)
+    func test_hasActiveFilters_withNoFilters_shouldBeFalse() throws {
+        XCTAssertFalse(try viewModel.view.hasActiveFilters.first().wait().value())
     }
 
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
-        var value: Bool?
-        viewModel.view.hasActiveFilters.dropFirst().sink { value = $0 }.store(in: &cancellables)
         preferences[.filterOptions] = FilterOptions(state: .downloading)
-        XCTAssertTrue(value!)
+        XCTAssertTrue(try viewModel.view.hasActiveFilters.first().wait(timeout: 1).value())
     }
 
     // MARK: totalDownloadSpeed
 
-    func test_totalDownloadSpeed_shouldBeSumOfAllDownloadSpeeds() {
+    func test_totalDownloadSpeed_shouldBeSumOfAllDownloadSpeeds() throws {
         implementation.refreshResult = Just(([
             MockTorrent(downloadRate: 100_000, label: "label1"),
             MockTorrent(downloadRate: 200_000, label: "label2"),
@@ -692,14 +656,13 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         viewModel.receive(.refresh)
         preferences[.filterOptions] = FilterOptions(label: "label2")
 
-        var value: String?
-        viewModel.view.totalDownloadSpeed.first().sink { value = $0 }.store(in: &cancellables)
+        let value = try viewModel.view.totalDownloadSpeed.first().wait().value()
         XCTAssertEqual(value, "↓ 684 KB/s")
     }
 
     // MARK: totalUploadSpeed
 
-    func test_totalUploadSpeed_shouldBeSumOfAllDownloadSpeeds() {
+    func test_totalUploadSpeed_shouldBeSumOfAllDownloadSpeeds() throws {
         implementation.refreshResult = Just(([
             MockTorrent(uploadRate: 100_000, label: "label1"),
             MockTorrent(uploadRate: 200_000, label: "label2"),
@@ -708,8 +671,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         viewModel.receive(.refresh)
         preferences[.filterOptions] = FilterOptions(label: "label2")
 
-        var value: String?
-        viewModel.view.totalUploadSpeed.first().sink { value = $0 }.store(in: &cancellables)
+        let value = try viewModel.view.totalUploadSpeed.first().wait().value()
         XCTAssertEqual(value, "↑ 684 KB/s")
     }
 
@@ -894,18 +856,18 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_trailingSwipeActionsConfiguration_shouldReturnExpectedConfiguration() {
         let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
         let expected = [UIImage(systemName: "trash.fill"), UIImage(systemName: "ellipsis.circle.fill")]
-        XCTAssertEqual(config?.actions.map { $0.image }, expected)
-        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [nil, .systemGray])
-        XCTAssertEqual(config?.actions.map { $0.style }, [.destructive, .normal])
+        XCTAssertEqual(config?.actions.map(\.image), expected)
+        XCTAssertEqual(config?.actions.map(\.backgroundColor), [nil, .systemGray])
+        XCTAssertEqual(config?.actions.map(\.style), [.destructive, .normal])
     }
 
-    func test_moreSwipeAction_shouldEmitActivities() {
+    func test_moreSwipeAction_shouldEmitActivities() throws {
         let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
-        let activities = getActivities {
+        let activities = try getActivities {
             config?.actions[1].handler()
         }
         let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
-        XCTAssertEqual(activities?.map { $0.title }, expected)
+        XCTAssertEqual(activities.map(\.title), expected)
     }
 
     func test_removeSwipeAction_shouldCallImplementationRemoveAndRefresh() throws {
@@ -915,7 +877,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "Remove")
         XCTAssertEqual(alert.message, "Mock")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["Keep Data", "Remove Data", "Cancel"])
     }
 }
 

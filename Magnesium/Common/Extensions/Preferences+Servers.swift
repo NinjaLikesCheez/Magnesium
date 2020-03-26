@@ -26,7 +26,7 @@ extension Preferences {
                     return nil
                 }
             }
-            .prepend(getServers().first { $0.id == server.id })
+            .prepend(Deferred { Just(self.getServers().first { $0.id == server.id }) })
             .removeDuplicates()
             .dropFirst()
             .eraseToAnyPublisher()
