@@ -5,14 +5,12 @@ import XCTest
 class TorrentListItemTests: XCTestCase {
     private var subject: CurrentValueSubject<MockTorrent, Never>!
     private var item: TorrentListItem!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
         Current = .mock
         subject = CurrentValueSubject(MockTorrent())
         item = TorrentListItem(torrent: subject)
-        cancellables = Set()
     }
 
     func test_identity_shouldBeEqualToHash() {
@@ -62,16 +60,12 @@ class TorrentListItemTests: XCTestCase {
 
     func test_name() {
         subject.send(MockTorrent(name: "name"))
-        var name: String?
-        item.name.sink { name = $0 }.store(in: &cancellables)
-        XCTAssertEqual(name, "name")
+        XCTAssertEqual(item.name.first().wait(), "name")
     }
 
     func test_progress() {
         subject.send(MockTorrent(progress: 0.189_838))
-        var progress: Float?
-        item.progress.sink { progress = $0 }.store(in: &cancellables)
-        XCTAssertEqual(progress, 0.189_838)
+        XCTAssertEqual(item.progress.first().wait(), 0.189_838)
     }
 
     func test_progressColor() {
@@ -86,9 +80,7 @@ class TorrentListItemTests: XCTestCase {
 
         for (state, result) in pairs {
             subject.send(MockTorrent(standardState: state))
-            var color: UIColor?
-            item.progressColor.sink { color = $0 }.store(in: &cancellables)
-            XCTAssertEqual(color, result, "\(state)")
+            XCTAssertEqual(item.progressColor.first().wait(), result, String(describing: state))
         }
     }
 
@@ -104,41 +96,31 @@ class TorrentListItemTests: XCTestCase {
 
         for (state, result) in pairs {
             subject.send(MockTorrent(standardState: state))
-            var string: String?
-            item.state.sink { string = $0 }.store(in: &cancellables)
-            XCTAssertEqual(string, result, "\(state)")
+            XCTAssertEqual(item.state.first().wait(), result, String(describing: state))
         }
     }
 
     func test_speed_whenDownloading_shouldContainDownloadAndUploadRate() {
         subject.send(MockTorrent(downloadRate: 1_540_527, uploadRate: 465_158))
-        var speed: String?
-        item.speed.sink { speed = $0 }.store(in: &cancellables)
-        XCTAssertEqual(speed, "↓ 1.5 MB/s ↑ 454 KB/s")
+        XCTAssertEqual(item.speed.first().wait(), "↓ 1.5 MB/s ↑ 454 KB/s")
     }
 
     func test_speed_whenSeeding_shouldContainOnlyUploadRate() {
         subject.send(MockTorrent(standardState: .seeding, downloadRate: 1_540_527, uploadRate: 465_158))
-        var speed: String?
-        item.speed.sink { speed = $0 }.store(in: &cancellables)
-        XCTAssertEqual(speed, "↑ 454 KB/s")
+        XCTAssertEqual(item.speed.first().wait(), "↑ 454 KB/s")
     }
 
-    func test_speed_whenInactive_shouldBeEmpty() {
+    func test_speed_whenInactive_shouldBeEmpty() throws {
         let states: [TorrentState] = [.paused, .checking, .queued, .error]
         for state in states {
             subject.send(MockTorrent(standardState: state))
-            var speed: String?
-            item.speed.sink { speed = $0 }.store(in: &cancellables)
-            XCTAssertTrue(speed?.isEmpty ?? false, "\(state)")
+            XCTAssertTrue(try item.speed.first().wait().value().isEmpty)
         }
     }
 
     func test_progressString() {
         subject.send(MockTorrent(progress: 0.189_838, downloaded: 130_583_716, size: 687_865_856))
-        var progress: String?
-        item.progressString.sink { progress = $0 }.store(in: &cancellables)
-        XCTAssertEqual(progress, "124.5 MB / 656.0 MB (19%)")
+        XCTAssertEqual(item.progressString.first().wait(), "124.5 MB / 656.0 MB (19%)")
     }
 
     let ratioStates: [TorrentState] = [.seeding, .paused, .checking, .queued, .error]
@@ -146,9 +128,7 @@ class TorrentListItemTests: XCTestCase {
     func test_ratio() {
         for state in ratioStates {
             subject.send(MockTorrent(standardState: state, downloaded: 10_000, uploaded: 4254))
-            var ratio: String?
-            item.ratioOrETA.first().sink { ratio = $0 }.store(in: &cancellables)
-            XCTAssertEqual(ratio, "Ratio: 0.4")
+            XCTAssertEqual(item.ratioOrETA.first().wait(), "Ratio: 0.4")
         }
     }
 
@@ -156,9 +136,7 @@ class TorrentListItemTests: XCTestCase {
         for state in ratioStates {
             subject.send(MockTorrent(standardState: state, uploaded: 1))
             XCTAssertTrue(subject.value.ratio.isInfinite)
-            var ratio: String?
-            item.ratioOrETA.first().sink { ratio = $0 }.store(in: &cancellables)
-            XCTAssertEqual(ratio, "Ratio: ∞")
+            XCTAssertEqual(item.ratioOrETA.first().wait(), "Ratio: ∞")
         }
     }
 
@@ -166,22 +144,16 @@ class TorrentListItemTests: XCTestCase {
         for state in ratioStates {
             subject.send(MockTorrent(standardState: state))
             XCTAssertTrue(subject.value.ratio.isNaN)
-            var ratio: String?
-            item.ratioOrETA.sink { ratio = $0 }.store(in: &cancellables)
-            XCTAssertEqual(ratio, "Ratio: ∞")
+            XCTAssertEqual(item.ratioOrETA.first().wait(), "Ratio: ∞")
         }
     }
 
     func test_eta() {
         subject.send(MockTorrent(eta: 361))
-        var eta: String?
-        item.ratioOrETA.sink { eta = $0 }.store(in: &cancellables)
-        XCTAssertEqual(eta, "6m 1s")
+        XCTAssertEqual(item.ratioOrETA.first().wait(), "6m 1s")
     }
 
     func test_eta_whenZero_shouldFormatProperly() {
-        var eta: String?
-        item.ratioOrETA.sink { eta = $0 }.store(in: &cancellables)
-        XCTAssertEqual(eta, "∞")
+        XCTAssertEqual(item.ratioOrETA.first().wait(), "∞")
     }
 }
