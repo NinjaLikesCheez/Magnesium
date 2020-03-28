@@ -36,7 +36,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Unable to Add Torrent")
         XCTAssertEqual(alertController.message, "There are no servers.")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -49,7 +49,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Unable to Add Torrent")
         XCTAssertEqual(alertController.message, "The server settings could not be read.")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -76,7 +76,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Failed to Add Torrent")
         XCTAssertEqual(alertController.message, DelugeError.unauthenticated.localizedDescription)
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -101,7 +101,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Failed to Add Torrent")
         XCTAssertEqual(alertController.message, DelugeError.unauthenticated.localizedDescription)
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -114,7 +114,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Unable to Add Torrent")
         XCTAssertEqual(alertController.message, "The server settings could not be read.")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -138,7 +138,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Failed to Add Torrent")
         XCTAssertEqual(alertController.message, TransmissionError.unauthenticated.localizedDescription)
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 
@@ -162,7 +162,7 @@ class AddTorrentFlowTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Failed to Add Torrent")
         XCTAssertEqual(alertController.message, TransmissionError.unauthenticated.localizedDescription)
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["OK"])
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
 }

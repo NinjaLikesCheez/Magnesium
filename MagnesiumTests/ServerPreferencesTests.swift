@@ -66,7 +66,7 @@ class ServerPreferencesTests: XCTestCase {
         let result = preferences.serverUpdatedPublisher(for: server).first().wait {
             self.preferences.addOrUpdate(server: self.server)
         }
-        XCTAssertTrue(result.isEmpty())
+        XCTAssertFalse(result.hasValue())
     }
 
     func test_serverUpdatedPublisher_withDeletedServer_shouldEmitNil() throws {

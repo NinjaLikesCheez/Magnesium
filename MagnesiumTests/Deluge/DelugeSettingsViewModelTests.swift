@@ -24,7 +24,7 @@ class DelugeSettingsViewModelTests: XCTestCase {
     }
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.view.inputs.map { $0.name }, ["name", "server", "password"])
+        XCTAssertEqual(addViewModel.view.inputs.map(\.name), ["name", "server", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {

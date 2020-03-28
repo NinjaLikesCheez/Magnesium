@@ -6,7 +6,6 @@ import XCTest
 class SettingsViewModelTests: XCTestCase {
     private var session: Session!
     private var viewModel: SettingsViewModel!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -14,7 +13,6 @@ class SettingsViewModelTests: XCTestCase {
         Current = .mock
         session = Session()
         viewModel = SettingsViewModel(session: session)
-        cancellables = Set()
     }
 
     func test_sections_whenServersChanged_shouldEmit() {

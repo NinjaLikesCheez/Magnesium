@@ -59,7 +59,7 @@ class SessionTests: XCTestCase {
         let result = session.serverPublisher.dropFirst().first().wait {
             self.preferences[.selectedServerID] = secondServer.id
         }
-        XCTAssertTrue(result.isEmpty())
+        XCTAssertFalse(result.hasValue())
         XCTAssertEqual(session.server, firstServer)
     }
 

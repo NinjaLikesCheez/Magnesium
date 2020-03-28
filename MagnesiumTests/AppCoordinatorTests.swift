@@ -50,7 +50,7 @@ class AppCoordinatorTests: XCTestCase {
         let alertController = splitViewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Add to MockServer")
         XCTAssertEqual(alertController.message, "file.torrent")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Add Torrent", "Cancel"])
     }
 
     func test_addMagnetURL_shouldPresentAlertController() {
@@ -59,7 +59,7 @@ class AppCoordinatorTests: XCTestCase {
         let alertController = splitViewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Add to MockServer")
         XCTAssertEqual(alertController.message, "magnet:?")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Torrent", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Add Torrent", "Cancel"])
     }
 
     // MARK: - ServerErrorCoordinatorEvent

@@ -18,7 +18,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
 
     func test_options_names() {
         let expected = ["Never", "2 seconds", "5 seconds", "10 seconds", "30 seconds"]
-        XCTAssertEqual(viewModel.view.options.map { $0.name }, expected)
+        XCTAssertEqual(viewModel.view.options.map(\.name), expected)
     }
 
     func test_options_values() {

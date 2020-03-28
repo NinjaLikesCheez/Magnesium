@@ -77,7 +77,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let items = viewModel.view.items.dropFirst().first().wait {
             self.implementation.updatedSubject.send(([], []))
         }
-        XCTAssertFalse(items.isEmpty())
+        XCTAssertTrue(items.hasValue())
     }
 
     // MARK: - Handle TorrentListViewEvent
@@ -118,7 +118,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.dropFirst().first().wait {
             self.viewModel.receive(.refresh)
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     func test_refresh_withChanges_shouldEmitTorrentsUpdatedEvent() throws {
@@ -153,7 +153,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "ErrorTitle")
         XCTAssertEqual(alert.message, "ErrorMessage")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["OK"])
+        XCTAssertEqual(alert.actions.map(\.title), ["OK"])
     }
 
     // MARK: filterSelected
@@ -173,8 +173,8 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }.value()
         XCTAssertCase(event, type(of: event).detail)
         XCTAssertEqual(implementation.detailViewModelCallCount, 1)
-        XCTAssertEqual(implementation.detailViewModelParamTorrent.map { $0.value.name }, ["Mock"])
-        XCTAssertEqual(implementation.detailViewModelParamLabels[0].value.map { $0.name }, ["", "label1", "label2"])
+        XCTAssertEqual(implementation.detailViewModelParamTorrent.map(\.value.name), ["Mock"])
+        XCTAssertEqual(implementation.detailViewModelParamLabels[0].value.map(\.name), ["", "label1", "label2"])
     }
 
     // MARK: settingsSelected
@@ -208,7 +208,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_resumeSelected_shouldCallImplementationResumeAndRefresh() {
         viewModel.receive(.resumeSelected(indices: [0, 1]))
         XCTAssertEqual(implementation.resumeCallCount, 1)
-        XCTAssertEqual(implementation.resumeParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.resumeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -226,7 +226,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             self.viewModel.receive(.resumeSelected(indices: [0, 1]))
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: pauseSelected
@@ -234,7 +234,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     func test_pauseSelected_shouldCallImplementationPauseAndRefresh() {
         viewModel.receive(.pauseSelected(indices: [0, 1]))
         XCTAssertEqual(implementation.pauseCallCount, 1)
-        XCTAssertEqual(implementation.pauseParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.pauseParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -252,7 +252,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             self.viewModel.receive(.pauseSelected(indices: [0, 1]))
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: removeSelected
@@ -263,7 +263,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "Remove")
         XCTAssertEqual(alert.message, "Mock")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["Keep Data", "Remove Data", "Cancel"])
     }
 
     func test_removeSelected_withMultipleTorrents_shouldEmitAlert() throws {
@@ -272,7 +272,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "Remove")
         XCTAssertEqual(alert.message, "2 Torrents")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["Keep Data", "Remove Data", "Cancel"])
     }
 
     func test_removeSelected_whenKeepDataSelected_shouldCallImplementationRemoveAndRefresh() throws {
@@ -281,7 +281,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         alert.actions.first { $0.title == "Keep Data" }?.handler?()
         XCTAssertEqual(implementation.removeCallCount, 1)
-        XCTAssertEqual(implementation.removeParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.removeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.removeParamRemoveData, [false])
     }
 
@@ -308,7 +308,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             optionsAlert.actions.first { $0.title == "Keep Data" }?.handler?()
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     func test_removeSelected_whenRemoveDataSelected_shouldCallImplementationRemoveAndRefresh() throws {
@@ -317,7 +317,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         alert.actions.first { $0.title == "Remove Data" }?.handler?()
         XCTAssertEqual(implementation.removeCallCount, 1)
-        XCTAssertEqual(implementation.removeParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.removeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.removeParamRemoveData, [true])
     }
 
@@ -344,7 +344,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             optionsAlert.actions.first { $0.title == "Remove Data" }?.handler?()
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: moreOptionsSelected
@@ -359,7 +359,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             self.viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
         }
         let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
-        XCTAssertEqual(activities.map { $0.title }, expected)
+        XCTAssertEqual(activities.map(\.title), expected)
     }
 
     func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() throws {
@@ -370,7 +370,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
             self.viewModel.receive(.moreOptionsSelected(indices: [0], source: .view(UIView(), rect: .zero)))
         }
         let expected = ["Verify Files", "Move Download Folder", "Update Trackers"]
-        XCTAssertEqual(activities.map { $0.title }, expected)
+        XCTAssertEqual(activities.map(\.title), expected)
     }
 
     // MARK: moreOptionsSelected - Set Label
@@ -384,7 +384,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "Set Label")
         XCTAssertEqual(alert.message, "Mock")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["None", "label1", "label2", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["None", "label1", "label2", "Cancel"])
     }
 
     func test_setLabelActivity_withMultipleTorrents_shouldEmitSelectionAlert() throws {
@@ -396,7 +396,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         XCTAssertEqual(alert.title, "Set Label")
         XCTAssertEqual(alert.message, "2 Torrents")
-        XCTAssertEqual(alert.actions.map { $0.title }, ["None", "label1", "label2", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["None", "label1", "label2", "Cancel"])
     }
 
     func test_setLabelActivity_whenOptionSelected_shouldCallImplementationSetLabelAndRefresh() throws {
@@ -408,7 +408,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         alert.actions.first { $0.title == "label1" }?.handler?()
         XCTAssertEqual(implementation.setLabelCallCount, 1)
-        XCTAssertEqual(implementation.setLabelParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.setLabelParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.setLabelParamLabel[0].name, "label1")
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
@@ -441,7 +441,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             optionsAlert.actions.first { $0.title == "label1" }?.handler?()
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: moreOptionsSelected - Verify Files
@@ -452,7 +452,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         activities.first { $0.title == "Verify Files" }?.handler()
         XCTAssertEqual(implementation.verifyCallCount, 1)
-        XCTAssertEqual(implementation.verifyParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.verifyParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -478,7 +478,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             activities.first { $0.title == "Verify Files" }?.handler()
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: moreOptionsSelected - Move Download Folder
@@ -571,7 +571,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             subject.send("/new")
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: moreOptionsSelected - Update Trackers
@@ -582,7 +582,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         }
         activities.first { $0.title == "Update Trackers" }?.handler()
         XCTAssertEqual(implementation.updateTrackersCallCount, 1)
-        XCTAssertEqual(implementation.updateTrackersParamTorrents[0].map { $0.name }, ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.updateTrackersParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -607,7 +607,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = viewModel.events.first().wait {
             activities.first { $0.title == "Update Trackers" }?.handler()
         }
-        XCTAssertTrue(event.isEmpty())
+        XCTAssertFalse(event.hasValue())
     }
 
     // MARK: - State
@@ -615,14 +615,14 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     // MARK: items
 
     func test_items_shouldEmitInitialValue() {
-        XCTAssertFalse(viewModel.view.items.first().wait().isEmpty())
+        XCTAssertTrue(viewModel.view.items.first().wait().hasValue())
     }
 
     func test_items_shouldRemoveDuplicates() {
         let items = viewModel.view.items.dropFirst().first().wait {
             self.viewModel.receive(.refresh)
         }
-        XCTAssertTrue(items.isEmpty())
+        XCTAssertFalse(items.hasValue())
     }
 
     func test_items_shouldEmitNewValues() {
@@ -631,7 +631,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let items = viewModel.view.items.dropFirst().first().wait {
             self.viewModel.receive(.refresh)
         }
-        XCTAssertFalse(items.isEmpty())
+        XCTAssertTrue(items.hasValue())
     }
 
     // MARK: hasActiveFilters
@@ -792,9 +792,9 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsActive_shouldReturnedExpectedConfiguration() {
         let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
-        XCTAssertEqual(config?.actions.map { $0.image }, [UIImage(systemName: "pause.fill")])
-        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [.systemBlue])
-        XCTAssertEqual(config?.actions.map { $0.style }, [.normal])
+        XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "pause.fill")])
+        XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
+        XCTAssertEqual(config?.actions.map(\.style), [.normal])
     }
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsInactive_shouldReturnedExpectedConfiguration() {
@@ -804,16 +804,16 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         viewModel.receive(.refresh)
 
         let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
-        XCTAssertEqual(config?.actions.map { $0.image }, [UIImage(systemName: "play.fill")])
-        XCTAssertEqual(config?.actions.map { $0.backgroundColor }, [.systemBlue])
-        XCTAssertEqual(config?.actions.map { $0.style }, [.normal])
+        XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "play.fill")])
+        XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
+        XCTAssertEqual(config?.actions.map(\.style), [.normal])
     }
 
     func test_pauseSwipeAction_shouldCallImplementationPauseAndRefresh() {
         let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.pauseCallCount, 1)
-        XCTAssertEqual(implementation.pauseParamTorrents[0].map { $0.name }, ["Mock"])
+        XCTAssertEqual(implementation.pauseParamTorrents[0].map(\.name), ["Mock"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -835,7 +835,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.resumeCallCount, 1)
-        XCTAssertEqual(implementation.resumeParamTorrents[0].map { $0.name }, ["Mock"])
+        XCTAssertEqual(implementation.resumeParamTorrents[0].map(\.name), ["Mock"])
         XCTAssertEqual(implementation.refreshCallCount, 3)
     }
 

@@ -73,7 +73,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
         let viewController = coordinator.presentable.viewController
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Move Download Folder")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Save", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Save", "Cancel"])
         XCTAssertEqual(alertController.textFields?.count ?? 0, 1)
         let textField = alertController.textFields![0]
         XCTAssertEqual(textField.textContentType, .URL)

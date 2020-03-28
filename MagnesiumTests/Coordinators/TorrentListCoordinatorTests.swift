@@ -46,7 +46,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Enter a URL")
         XCTAssertEqual(alertController.message, "This can be either a link to a torrent or a magnet link.")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Add", "Cancel"])
         XCTAssertEqual(alertController.textFields?.count ?? 0, 1)
         XCTAssertEqual(alertController.preferredStyle, .alert)
     }
@@ -81,7 +81,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Add Torrent")
         XCTAssertEqual(alertController.message, "How would you like to add the torrent?")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Add Link", "Add File", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Add Link", "Add File", "Cancel"])
         XCTAssertEqual(alertController.preferredStyle, .actionSheet)
     }
 
@@ -117,7 +117,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let viewController = coordinator.presentable.viewController
         let alertController = viewController.presentedViewController as! UIAlertController
         XCTAssertEqual(alertController.title, "Move Download Folder")
-        XCTAssertEqual(alertController.actions.map { $0.title }, ["Save", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), ["Save", "Cancel"])
         XCTAssertEqual(alertController.textFields?.count ?? 0, 1)
         let textField = alertController.textFields![0]
         XCTAssertEqual(textField.textContentType, .URL)

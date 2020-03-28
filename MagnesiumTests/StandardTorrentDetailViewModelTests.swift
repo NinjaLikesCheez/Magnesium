@@ -114,7 +114,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             self.viewModel.receive(.moreOptions(source: .view(UIView(), rect: .zero)))
         }
         let expected = ["Set Label", "Verify Files", "Move Download Folder", "Update Trackers"]
-        XCTAssertEqual(activities.map { $0.title }, expected)
+        XCTAssertEqual(activities.map(\.title), expected)
     }
 
     func test_moreOptionsSelected_withNoLabels_shouldEmitExpectedActivities() throws {
@@ -123,7 +123,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
             self.viewModel.receive(.moreOptions(source: .view(UIView(), rect: .zero)))
         }
         let expected = ["Verify Files", "Move Download Folder", "Update Trackers"]
-        XCTAssertEqual(activities.map { $0.title }, expected)
+        XCTAssertEqual(activities.map(\.title), expected)
     }
 
     // MARK: moreOptions - Set Label
@@ -135,7 +135,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let alert = try getAlert {
             activities.first { $0.title == "Set Label" }?.handler()
         }
-        XCTAssertEqual(alert.actions.map { $0.title }, ["None", "label1", "label2", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["None", "label1", "label2", "Cancel"])
     }
 
     func test_setLabelActivity_whenOptionSelected_shouldCallImplementationSetLabelAndRefresh() throws {
@@ -290,7 +290,7 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
         let alert = try getAlert {
             self.viewModel.receive(.remove(source: .view(UIView(), rect: .zero)))
         }
-        XCTAssertEqual(alert.actions.map { $0.title }, ["Keep Data", "Remove Data", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["Keep Data", "Remove Data", "Cancel"])
     }
 
     func test_removeSelected_whenKeepDataSelected_shouldCallImplementationRemoveAndRefresh() throws {

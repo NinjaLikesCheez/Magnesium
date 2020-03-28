@@ -22,6 +22,15 @@ identifier_name:
 type_name:
   max_length: 60
 
+custom_rules:
+  keypath_map: # rule identifier
+    name: "KeyPath map syntax"
+    regex: "map \\{ \\$0\\.[\\w\\.]+ \\}"
+    match_kinds:
+      - identifier
+    message: "Use KeyPath map syntax instead."
+    severity: warning
+
 # -- MASTER -- #
 
 analyzer_rules:
