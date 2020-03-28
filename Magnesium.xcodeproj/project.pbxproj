@@ -737,34 +737,6 @@
 			path = Coordinator;
 			sourceTree = "<group>";
 		};
-		E9AC4FBA23EBAB7100E6BC65 /* Coordinators */ = {
-			isa = PBXGroup;
-			children = (
-				E95AB87323EA56BC00827A94 /* TorrentListCoordinatorTests.swift */,
-				E95AB87A23EA6A1100827A94 /* TorrentDetailCoordinatorTests.swift */,
-				E9AC4FB423EB945800E6BC65 /* SettingsCoordinatorTests.swift */,
-				E9AC4FB823EBA95600E6BC65 /* FilterCoordinatorTests.swift */,
-				E9AC4FBD23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift */,
-				E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */,
-				E91FD7C223FCB7AC0059A21F /* NoServersCoordinatorTests.swift */,
-				E91FD7CF23FCC5240059A21F /* ServerErrorCoordinatorTests.swift */,
-			);
-			path = Coordinators;
-			sourceTree = "<group>";
-		};
-		E9AC4FBB23EBAB8200E6BC65 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				E9091D3523E268310034C353 /* AddServerViewModelTests.swift */,
-				E9091D3323E25F580034C353 /* SettingsViewModelTests.swift */,
-				E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */,
-				E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */,
-				E91FD7C423FCB9F10059A21F /* NoServersViewModelTests.swift */,
-				E91FD7D123FCC5820059A21F /* ServerErrorViewModelTests.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
 		E9B40E9823B404E8009E30AE /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -841,24 +813,36 @@
 		E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */ = {
 			isa = PBXGroup;
 			children = (
-				E9AC4FBA23EBAB7100E6BC65 /* Coordinators */,
-				E917B4BE23E775870090D490 /* Deluge */,
-				E95AB87523EA60F500827A94 /* Mocks */,
-				E917B4BF23E7759D0090D490 /* Transmission */,
-				E9AC4FBB23EBAB8200E6BC65 /* ViewModels */,
-				E9CC160D23AD5CD400EA1B4C /* Info.plist */,
+				E9AC4FBD23EBABCC00E6BC65 /* AddServerCoordinatorTests.swift */,
+				E9091D3523E268310034C353 /* AddServerViewModelTests.swift */,
+				E968232224131C9F0059D026 /* AddTorrentFlowTests.swift */,
 				E969090223E9135900A95D31 /* AppCoordinatorTests.swift */,
+				E917B4BE23E775870090D490 /* Deluge */,
+				E9AC4FB823EBA95600E6BC65 /* FilterCoordinatorTests.swift */,
+				E951CA0523E4FC3F008A7D1F /* FilterViewModelTests.swift */,
+				E9B9809B2426F1C10090AF37 /* Imports.swift */,
+				E9CC160D23AD5CD400EA1B4C /* Info.plist */,
+				E95AB87523EA60F500827A94 /* Mocks */,
+				E91FD7C223FCB7AC0059A21F /* NoServersCoordinatorTests.swift */,
+				E91FD7C423FCB9F10059A21F /* NoServersViewModelTests.swift */,
+				E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */,
+				E91FD7CF23FCC5240059A21F /* ServerErrorCoordinatorTests.swift */,
+				E91FD7D123FCC5820059A21F /* ServerErrorViewModelTests.swift */,
 				E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */,
+				E9AC4FBF23EBAF7000E6BC65 /* ServerSettingsCoordinatorTests.swift */,
 				E9624D2C23D204AA0051EA99 /* SessionTests.swift */,
+				E9AC4FB423EB945800E6BC65 /* SettingsCoordinatorTests.swift */,
+				E9091D3323E25F580034C353 /* SettingsViewModelTests.swift */,
 				E9E411B423D932EE00A7EFED /* StandardTorrentDetailViewModelTests.swift */,
 				E9E411B623D933AD00A7EFED /* StandardTorrentListViewModelTests.swift */,
+				E95AB87A23EA6A1100827A94 /* TorrentDetailCoordinatorTests.swift */,
 				E988EDE723E7D0150011A733 /* TorrentDetailFileItemTests.swift */,
 				E988EDE123E7CA080011A733 /* TorrentDetailHeaderItemTests.swift */,
 				E9170B9923FA540100399672 /* TorrentDetailInfoItemTests.swift */,
+				E95AB87323EA56BC00827A94 /* TorrentListCoordinatorTests.swift */,
 				E9DF151323D4085500FB9F4D /* TorrentListItemTests.swift */,
 				E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */,
-				E968232224131C9F0059D026 /* AddTorrentFlowTests.swift */,
-				E9B9809B2426F1C10090AF37 /* Imports.swift */,
+				E917B4BF23E7759D0090D490 /* Transmission */,
 			);
 			path = MagnesiumTests;
 			sourceTree = "<group>";
