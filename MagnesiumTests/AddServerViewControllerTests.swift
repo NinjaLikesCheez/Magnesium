@@ -1,5 +1,6 @@
 @testable import Magnesium
 import SnapshotTesting
+import ViewModel
 import XCTest
 
 class AddServerViewControllerTests: TestCase {

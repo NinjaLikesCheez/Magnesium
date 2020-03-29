@@ -1,6 +1,7 @@
 import Combine
 @testable import Magnesium
 import SnapshotTesting
+import ViewModel
 import XCTest
 
 class RefreshIntervalViewControllerTests: TestCase {
