@@ -33,7 +33,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     private var cancellables = Set<AnyCancellable>()
     private var autoRefreshTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
-    let view: TorrentDetailViewRepresentation
+    let values: TorrentDetailViewValues
 
     var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -78,7 +78,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
             .ui()
             .eraseToAnyPublisher()
 
-        view = .init(
+        values = .init(
             hash: torrent.value.hash,
             sections: sections,
             isRefreshing: isRefreshingSubject.ui().eraseToAnyPublisher()

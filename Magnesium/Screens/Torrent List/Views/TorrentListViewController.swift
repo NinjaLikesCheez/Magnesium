@@ -14,7 +14,7 @@ protocol TorrentListViewProvider: AnyObject {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewRepresentation == TorrentListViewRepresentation {
+final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValues {
     private enum Section {
         case main
     }
@@ -131,7 +131,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .plain)
-        viewModel.view.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
+        viewModel.values.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
         navigationItem.searchController = searchController
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
@@ -157,10 +157,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        statusView.configure(status: viewModel.view.status)
+        statusView.configure(status: viewModel.values.status)
 
-        if viewModel.view.showFilterButton {
-            viewModel.view.hasActiveFilters
+        if viewModel.values.showFilterButton {
+            viewModel.values.hasActiveFilters
                 .sink { [weak self] in
                     self?.filterBarButtonItem.image = UIImage(systemName: $0
                         ? "line.horizontal.3.decrease.circle.fill"
@@ -169,7 +169,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 .store(in: &cancellables)
         }
 
-        viewModel.view.isLoading
+        viewModel.values.isLoading
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.activityView.stopAnimating()
@@ -178,7 +178,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             }
             .store(in: &cancellables)
 
-        viewModel.view.isEditing
+        viewModel.values.isEditing
             .sink { [weak self] isEditing in
                 if isEditing {
                     self?.configureEditingState()
@@ -188,13 +188,13 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             }
             .store(in: &cancellables)
 
-        viewModel.view.items
+        viewModel.values.items
             .map { !$0.isEmpty }
             .assign(to: \.isEnabled, on: selectBarButtonItem)
             .store(in: &cancellables)
 
-        let items = viewModel.view.items
-        let hasItems = viewModel.view.isLoading
+        let items = viewModel.values.items
+        let hasItems = viewModel.values.isLoading
             .first(where: { $0 == false })
             .flatMap { _ in items }
             .map { !$0.isEmpty }
@@ -208,14 +208,14 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             .assign(to: \.separatorStyle, on: tableView)
             .store(in: &cancellables)
 
-        viewModel.view.items
+        viewModel.values.items
             .sink { [weak self] items in
                 self?.update(with: items)
             }
             .store(in: &cancellables)
 
         for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
-            viewModel.view.editActionsEnabled
+            viewModel.values.editActionsEnabled
                 .assign(to: \.isEnabled, on: button)
                 .store(in: &cancellables)
         }
@@ -307,7 +307,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private func configureNormalToolbarItems() {
         var toolbarItems = [UIBarButtonItem]()
 
-        if viewModel.view.showFilterButton {
+        if viewModel.values.showFilterButton {
             toolbarItems.append(filterBarButtonItem)
         }
 
@@ -315,7 +315,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         toolbarItems.append(.init(customView: statusView))
         toolbarItems.append(.init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil))
 
-        if viewModel.view.showAddButton {
+        if viewModel.values.showAddButton {
             toolbarItems.append(addBarButtonItem)
         }
 

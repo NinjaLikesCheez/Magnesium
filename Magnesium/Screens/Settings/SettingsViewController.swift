@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class SettingsViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == SettingsViewEvent, VM.ViewRepresentation == SettingsViewRepresentation {
+final class SettingsViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
@@ -60,7 +60,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController where V
 
         tableView.dataSource = dataSource
 
-        viewModel.view.sections
+        viewModel.values.sections
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }

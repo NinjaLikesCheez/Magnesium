@@ -21,7 +21,7 @@ class FilterViewModelTests: TestCase {
 
     func test_sections_withoutLabels_shouldEmitExpectedValues() throws {
         labels.send([])
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         let expected = [
             FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
             FilterSection(type: .filters, items: [.state("All")]),
@@ -30,7 +30,7 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_sections_withLabels_shouldEmitExpectedValues() throws {
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         let expected = [
             FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
             FilterSection(type: .filters, items: [.state("All"), .label("All")]),
@@ -39,21 +39,21 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_sections_whenSortOptionChanged_shouldEmitNewSections() throws {
-        let sections = try viewModel.view.sections.dropFirst().first().wait {
+        let sections = try viewModel.values.sections.dropFirst().first().wait {
             self.preferences[.sortOption] = SortOption(property: .name)
         }.value()
         XCTAssertEqual(sections[0].items, [.sort("↑ Name")])
     }
 
     func test_sections_whenFilterOptionsChanged_shouldEmit() throws {
-        let sections = try viewModel.view.sections.dropFirst().first().wait {
+        let sections = try viewModel.values.sections.dropFirst().first().wait {
             self.preferences[.filterOptions] = FilterOptions(state: .downloading)
         }.value()
         XCTAssertEqual(sections[1].items[0], .state("Downloading"))
     }
 
     func test_sections_whenLabelsUpdated_shouldEmit() {
-        let sections = viewModel.view.sections.dropFirst().first().wait {
+        let sections = viewModel.values.sections.dropFirst().first().wait {
             self.labels.send(self.labels.value + [MockLabel(name: "new")])
         }
         XCTAssertTrue(sections.hasValue())
@@ -61,7 +61,7 @@ class FilterViewModelTests: TestCase {
 
     func test_sections_withSameLabelsPublished_shouldNotEmit() {
         labels.send(labels.value)
-        let sections = viewModel.view.sections.dropFirst().first().wait {
+        let sections = viewModel.values.sections.dropFirst().first().wait {
             self.labels.send(self.labels.value)
         }
         XCTAssertFalse(sections.hasValue())

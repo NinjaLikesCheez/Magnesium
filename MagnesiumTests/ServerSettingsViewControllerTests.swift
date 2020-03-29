@@ -6,7 +6,7 @@ import XCTest
 
 class ServerSettingsViewControllerTests: TestCase {
     func test_addServer() {
-        let viewRep = ServerSettingsViewRepresentation(
+        let values = ServerSettingsViewValues(
             title: "Add Server",
             saveButtonTitle: "Add",
             canDelete: false,
@@ -27,32 +27,32 @@ class ServerSettingsViewControllerTests: TestCase {
                 ),
             ]
         )
-        let viewModel = StaticViewModel(view: viewRep, type: ServerSettingsViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
     func test_editServer() {
-        let viewRep = ServerSettingsViewRepresentation.editServer
-        let viewModel = StaticViewModel(view: viewRep, type: ServerSettingsViewEvent.self)
+        let values = ServerSettingsViewValues.editServer
+        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
     func test_whenLoading() {
-        var viewRep = ServerSettingsViewRepresentation.editServer
-        viewRep.isLoading = Just(true).eraseToAnyPublisher()
-        let viewModel = StaticViewModel(view: viewRep, type: ServerSettingsViewEvent.self)
+        var values = ServerSettingsViewValues.editServer
+        values.isLoading = Just(true).eraseToAnyPublisher()
+        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 }
 
-private extension ServerSettingsViewRepresentation {
-    static var editServer: ServerSettingsViewRepresentation {
+private extension ServerSettingsViewValues {
+    static var editServer: ServerSettingsViewValues {
         .init(
             title: "Edit Server",
             saveButtonTitle: "Save",

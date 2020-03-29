@@ -15,7 +15,7 @@ class RefreshIntervalViewModelTests: TestCase {
 
     func test_options_names() {
         let expected = ["Never", "2 seconds", "5 seconds", "10 seconds", "30 seconds"]
-        XCTAssertEqual(viewModel.view.options.map(\.title), expected)
+        XCTAssertEqual(viewModel.values.options.map(\.title), expected)
     }
 
     func test_options_values() {
@@ -27,19 +27,19 @@ class RefreshIntervalViewModelTests: TestCase {
     }
 
     func test_option_whenIsCurrent_shouldBeSelected() throws {
-        let isSelected = try viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.wait().value()
+        let isSelected = try viewModel.values.options.first { $0.title == "2 seconds" }?.isSelected.wait().value()
         XCTAssertEqual(isSelected, .some(true))
     }
 
     func test_option_whenNoLongerCurrent_shouldDeselect() {
-        let isSelected = viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.wait {
+        let isSelected = viewModel.values.options.first { $0.title == "2 seconds" }?.isSelected.wait {
             self.viewModel.receive(.optionSelected(index: 0))
         }.values()
         XCTAssertEqual(isSelected, [true, false])
     }
 
     func test_option_whenSelected_shouldBecomeSelected() {
-        let isSelected = viewModel.view.options.first?.isSelected.wait {
+        let isSelected = viewModel.values.options.first?.isSelected.wait {
             self.viewModel.receive(.optionSelected(index: 0))
         }.values()
         XCTAssertEqual(isSelected, [false, true])

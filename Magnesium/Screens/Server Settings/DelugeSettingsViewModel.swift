@@ -14,7 +14,7 @@ final class DelugeSettingsViewModel: ViewModel {
     private let serverSubject: CurrentValueSubject<String?, Never>
     private let passwordSubject: CurrentValueSubject<String?, Never>
     private var cancellables = Set<AnyCancellable>()
-    let view: ServerSettingsViewRepresentation
+    let values: ServerSettingsViewValues
 
     var events: AnyPublisher<ServerSettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -62,7 +62,7 @@ final class DelugeSettingsViewModel: ViewModel {
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
-        view = .init(
+        values = .init(
             title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
             saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,

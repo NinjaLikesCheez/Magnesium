@@ -198,12 +198,12 @@ private final class MockSplitViewController: PresentableSplitViewController {
 }
 
 private final class MockTorrentDetailViewModel: ViewModel {
-    let view: TorrentDetailViewRepresentation
+    let values: TorrentDetailViewValues
     let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
     func receive(_ event: TorrentDetailViewEvent) {}
 
     init(hash: String = "") {
-        view = TorrentDetailViewRepresentation(
+        values = TorrentDetailViewValues(
             hash: hash,
             sections: Just([]).eraseToAnyPublisher(),
             isRefreshing: Just(false).eraseToAnyPublisher()

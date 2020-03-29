@@ -95,7 +95,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     }
 
     func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {
-        let values = viewModel.view.isRefreshing.dropFirst().wait {
+        let values = viewModel.values.isRefreshing.dropFirst().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertEqual(values, [true, false])
@@ -339,7 +339,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     // MARK: sections
 
     func test_sections_shouldHaveHeader() throws {
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         XCTAssertEqual(sections.first?.type, .header)
         XCTAssertEqual(sections.first?.items.count, 1)
     }
@@ -379,7 +379,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         ]
         // swiftlint:enable comma
         // swiftformat:enable all
-        let section = try viewModel.view.sections.first().wait().value()[1]
+        let section = try viewModel.values.sections.first().wait().value()[1]
         let rows = try getInfoRows(in: section)
         XCTAssertEqual(rows.count, expected.count, String(describing: rows))
         for (row, expected) in zip(rows, expected) {
@@ -393,14 +393,14 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
         torrent.send(MockTorrent(trackerStrings: trackers))
 
-        let section = try viewModel.view.sections.first().wait().value()[2]
+        let section = try viewModel.values.sections.first().wait().value()[2]
         XCTAssertEqual(section.type, .trackers)
         let extracted = try section.items.map { try extract(case: TorrentDetailItem.tracker, from: $0) }
         XCTAssertEqual(extracted, trackers)
     }
 
     func test_sections_files_shouldBeSorted() throws {
-        let section = try viewModel.view.sections.first().wait().value()[2]
+        let section = try viewModel.values.sections.first().wait().value()[2]
         XCTAssertEqual(section.type, .files)
         let files = try section.items.map {
             try extract(case: TorrentDetailItem.file, from: $0).name.first().wait().value()
@@ -411,7 +411,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     // MARK: eta
 
     func test_eta_whenZero_shouldFormatProperly() throws {
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "ETA" }?.1
         XCTAssertEqual(eta, "∞")
     }
@@ -421,14 +421,14 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     func test_ratio_whenInfinite_shouldFormatProperly() throws {
         torrent.send(MockTorrent(uploaded: 1))
         XCTAssertTrue(torrent.value.ratio.isInfinite)
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
 
     func test_ratio_whenNaN_shouldFormatProperly() throws {
         XCTAssertTrue(torrent.value.ratio.isNaN)
-        let sections = try viewModel.view.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().value()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }

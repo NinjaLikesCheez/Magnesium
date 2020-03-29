@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class FilterViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == FilterViewEvent, VM.ViewRepresentation == FilterViewRepresentation {
+final class FilterViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
     private let viewModel: VM
     private var dataSource: UITableViewDiffableDataSource<FilterSectionType, FilterItem>!
     private var cancellables = Set<AnyCancellable>()
@@ -51,7 +51,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController where VM.
 
         tableView.dataSource = dataSource
 
-        viewModel.view.sections
+        viewModel.values.sections
             .sink { [weak self] sections in
                 self?.update(sections: sections)
             }

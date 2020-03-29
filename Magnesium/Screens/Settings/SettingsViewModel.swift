@@ -19,7 +19,7 @@ enum SettingsViewEvent {
     case refreshIntervalSelected
 }
 
-struct SettingsViewRepresentation {
+struct SettingsViewValues {
     var sections: AnyPublisher<[SettingsSection], Never>
 }
 
@@ -28,7 +28,7 @@ final class SettingsViewModel: ViewModel {
     private var cancellables = Set<AnyCancellable>()
     private let eventSubject = PassthroughSubject<SettingsViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
-    let view: SettingsViewRepresentation
+    let values: SettingsViewValues
 
     var events: AnyPublisher<SettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -36,7 +36,7 @@ final class SettingsViewModel: ViewModel {
 
     init(session: Session) {
         self.session = session
-        view = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
+        values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())

@@ -1,6 +1,6 @@
 import Combine
 
-struct ServerSettingsViewRepresentation {
+struct ServerSettingsViewValues {
     var title: String
     var saveButtonTitle: String
     var canDelete: Bool

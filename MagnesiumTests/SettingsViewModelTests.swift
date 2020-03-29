@@ -15,14 +15,14 @@ class SettingsViewModelTests: TestCase {
     }
 
     func test_sections_whenServersChanged_shouldEmit() {
-        let value = viewModel.view.sections.dropFirst().first().wait {
+        let value = viewModel.values.sections.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         }
         XCTAssertNotNil(value)
     }
 
     func test_sections_whenCurrentServerChanged_shouldEmit() {
-        let value = viewModel.view.sections.dropFirst().first().wait {
+        let value = viewModel.values.sections.dropFirst().first().wait {
             self.session.setServer(Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         }
         XCTAssertNotNil(value)

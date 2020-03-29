@@ -25,24 +25,24 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: - Title
 
     func test_title_shouldBeExpectedTitle() {
-        XCTAssertEqual(viewModel.view.title.first().wait(), "MockServer")
+        XCTAssertEqual(viewModel.values.title.first().wait(), "MockServer")
     }
 
     func test_title_whenEditing_shouldBeSelectionCount() {
         viewModel.receive(.editSelected)
-        XCTAssertEqual(viewModel.view.title.first().wait(), "0 Selected")
+        XCTAssertEqual(viewModel.values.title.first().wait(), "0 Selected")
     }
 
     func test_title_whenEditingSelectionChanged_shouldUpdate() {
         viewModel.receive(.editSelected)
         viewModel.receive(.multiSelectUpdated(indices: [0, 1]))
-        XCTAssertEqual(viewModel.view.title.first().wait(), "2 Selected")
+        XCTAssertEqual(viewModel.values.title.first().wait(), "2 Selected")
     }
 
     func test_title_whenEditingEnded_shouldBeDefault() {
         viewModel.receive(.editSelected)
         viewModel.receive(.doneEditingSelected)
-        XCTAssertEqual(viewModel.view.title.first().wait(), "MockServer")
+        XCTAssertEqual(viewModel.values.title.first().wait(), "MockServer")
     }
 
     // MARK: - Auto Refresh
@@ -73,7 +73,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: - StandardTorrentListViewModelImplementation
 
     func test_implementation_updated_shouldUpdateItems() {
-        let items = viewModel.view.items.dropFirst().first().wait {
+        let items = viewModel.values.items.dropFirst().first().wait {
             self.implementation.updatedSubject.send(([], []))
         }
         XCTAssertTrue(items.hasValue())
@@ -98,7 +98,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_refresh_isLoading_shouldEmitTrueThenFalse() {
-        let values = viewModel.view.isLoading.dropFirst().wait {
+        let values = viewModel.values.isLoading.dropFirst().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertEqual(values, [true, false])
@@ -107,7 +107,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_refresh_isLoading_whenFails_shouldEmitTrueThenFalse() {
         implementation.refreshResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let values = viewModel.view.isLoading.dropFirst().wait {
+        let values = viewModel.values.isLoading.dropFirst().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertEqual(values, [true, false])
@@ -195,7 +195,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
 
         viewModel.receive(.refresh)
-        let items = try viewModel.view.items.dropFirst().first().wait {
+        let items = try viewModel.values.items.dropFirst().first().wait {
             self.viewModel.receive(.search(query: "test tor"))
         }.value()
         let names = try items.map { try $0.name.first().wait().value() }
@@ -614,11 +614,11 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: items
 
     func test_items_shouldEmitInitialValue() {
-        XCTAssertTrue(viewModel.view.items.first().wait().hasValue())
+        XCTAssertTrue(viewModel.values.items.first().wait().hasValue())
     }
 
     func test_items_shouldRemoveDuplicates() {
-        let items = viewModel.view.items.dropFirst().first().wait {
+        let items = viewModel.values.items.dropFirst().first().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertFalse(items.hasValue())
@@ -627,7 +627,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_items_shouldEmitNewValues() {
         implementation.refreshResult = Just(([MockTorrent()], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
 
-        let items = viewModel.view.items.dropFirst().first().wait {
+        let items = viewModel.values.items.dropFirst().first().wait {
             self.viewModel.receive(.refresh)
         }
         XCTAssertTrue(items.hasValue())
@@ -636,12 +636,12 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: hasActiveFilters
 
     func test_hasActiveFilters_withNoFilters_shouldBeFalse() throws {
-        XCTAssertFalse(try viewModel.view.hasActiveFilters.first().wait().value())
+        XCTAssertFalse(try viewModel.values.hasActiveFilters.first().wait().value())
     }
 
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
         preferences[.filterOptions] = FilterOptions(state: .downloading)
-        XCTAssertTrue(try viewModel.view.hasActiveFilters.first().wait(timeout: 1).value())
+        XCTAssertTrue(try viewModel.values.hasActiveFilters.first().wait(timeout: 1).value())
     }
 
     // MARK: status
@@ -654,7 +654,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.receive(.refresh)
         preferences[.filterOptions] = FilterOptions(label: "label2")
-        XCTAssertEqual(viewModel.view.status.first().wait(), "↓ 684 KB/s ↑ 1.3 MB/s")
+        XCTAssertEqual(viewModel.values.status.first().wait(), "↓ 684 KB/s ↑ 1.3 MB/s")
     }
 
     // MARK: - TorrentListProvider
@@ -979,7 +979,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
 }
 
 private final class MockDetailViewModel: ViewModel {
-    let view = TorrentDetailViewRepresentation(
+    let values = TorrentDetailViewValues(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()

@@ -211,7 +211,7 @@ class TorrentListCoordinatorTests: TestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel, TorrentListProvider {
-    let view = TorrentListViewRepresentation(
+    let values = TorrentListViewValues(
         title: Just("").eraseToAnyPublisher(),
         items: Just([]).eraseToAnyPublisher(),
         isLoading: Just(false).eraseToAnyPublisher(),
@@ -260,7 +260,7 @@ private final class MockViewModel: ViewModel, TorrentListProvider {
 }
 
 private final class MockDetailViewModel: ViewModel {
-    let view = TorrentDetailViewRepresentation(
+    let values = TorrentDetailViewValues(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()

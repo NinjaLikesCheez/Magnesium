@@ -5,7 +5,7 @@ import ViewModel
 
 final class AnyTorrentListViewModel: ViewModel, TorrentListProvider {
     private let _events: () -> AnyPublisher<Event, Never>
-    private let _view: () -> ViewRepresentation
+    private let _values: () -> ViewValues
     private let _receive: (ViewEvent) -> Void
     private let _viewModelForItem: (Int) -> AnyTorrentDetailViewModel?
     private let _contextMenuForItem: (Int) -> UIMenu?
@@ -13,7 +13,7 @@ final class AnyTorrentListViewModel: ViewModel, TorrentListProvider {
     private let _trailingSwipeActionsConfigurationForItem: (Int, PopoverSource) -> SwipeActionsConfiguration?
     let base: Any
 
-    var view: TorrentListViewRepresentation { _view() }
+    var values: TorrentListViewValues { _values() }
     var events: AnyPublisher<TorrentListViewModelEvent, Never> { _events() }
 
     init<Base>(_ base: Base) where
@@ -21,10 +21,10 @@ final class AnyTorrentListViewModel: ViewModel, TorrentListProvider {
         Base: TorrentListProvider,
         Base.Event == Event,
         Base.ViewEvent == ViewEvent,
-        Base.ViewRepresentation == ViewRepresentation {
+        Base.ViewValues == ViewValues {
         self.base = base
         _events = { base.events }
-        _view = { base.view }
+        _values = { base.values }
         _receive = { base.receive($0) }
         _viewModelForItem = { base.detailViewModelForItem(at: $0) }
         _contextMenuForItem = { base.contextMenuForItem(at: $0) }

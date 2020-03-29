@@ -30,52 +30,52 @@ class TransmissionSettingsViewModelTests: TestCase {
     }
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.view.inputs.map(\.name), ["name", "server", "username", "password"])
+        XCTAssertEqual(addViewModel.values.inputs.map(\.name), ["name", "server", "username", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[0].value.value, "Server")
+        XCTAssertEqual(editViewModel.values.inputs[0].value.value, "Server")
     }
 
     func test_serverURL_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[1].value.value, "http://example.com")
+        XCTAssertEqual(editViewModel.values.inputs[1].value.value, "http://example.com")
     }
 
     func test_username_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[2].value.value, "username")
+        XCTAssertEqual(editViewModel.values.inputs[2].value.value, "username")
     }
 
     func test_password_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[3].value.value, "password")
+        XCTAssertEqual(editViewModel.values.inputs[3].value.value, "password")
     }
 
     func test_title_withoutServer() {
-        XCTAssertEqual(addViewModel.view.title, "Add Server")
+        XCTAssertEqual(addViewModel.values.title, "Add Server")
     }
 
     func test_title_withServer() {
-        XCTAssertEqual(editViewModel.view.title, "Edit Server")
+        XCTAssertEqual(editViewModel.values.title, "Edit Server")
     }
 
     func test_saveButtonTitle_withoutServer() {
-        XCTAssertEqual(addViewModel.view.saveButtonTitle, "Add")
+        XCTAssertEqual(addViewModel.values.saveButtonTitle, "Add")
     }
 
     func test_saveButtonTitle_withServer() {
-        XCTAssertEqual(editViewModel.view.saveButtonTitle, "Save")
+        XCTAssertEqual(editViewModel.values.saveButtonTitle, "Save")
     }
 
     func test_canDelete_withoutServer() {
-        XCTAssertFalse(addViewModel.view.canDelete)
+        XCTAssertFalse(addViewModel.values.canDelete)
     }
 
     func test_canDelete_withServer() {
-        XCTAssertTrue(editViewModel.view.canDelete)
+        XCTAssertTrue(editViewModel.values.canDelete)
     }
 
     private func isSaveButtonEnabled(_ viewModel: TransmissionSettingsViewModel) -> Bool {
         var value: Bool!
-        _ = viewModel.view.isSaveButtonEnabled.sink {
+        _ = viewModel.values.isSaveButtonEnabled.sink {
             value = $0
         }
         return value
@@ -84,16 +84,16 @@ class TransmissionSettingsViewModelTests: TestCase {
     func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
         let viewModel = addViewModel!
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.view.inputs[0].value.value = "name"
+        viewModel.values.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[1].value.value = "http://example.com"
         XCTAssertTrue(isSaveButtonEnabled(viewModel))
     }
 
     func test_isSaveButtonEnabled_withInvalidServer_shouldBeFalse() throws {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "web://site"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "web://site"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)
@@ -109,10 +109,10 @@ class TransmissionSettingsViewModelTests: TestCase {
 
     func test_saveSelected_shouldChangeIsLoading() {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
 
-        let values = viewModel.view.isLoading.dropFirst().wait {
+        let values = viewModel.values.isLoading.dropFirst().wait {
             viewModel.receive(.saveSelected)
         }
         XCTAssertEqual(values, [true, false])
@@ -120,8 +120,8 @@ class TransmissionSettingsViewModelTests: TestCase {
 
     func test_saveSelected_shouldRequestRPCVersion() {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
         viewModel.receive(.saveSelected)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["session-get"])
         XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"fields":["rpc-version"]}"#])
@@ -134,8 +134,8 @@ class TransmissionSettingsViewModelTests: TestCase {
         ))
 
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)
@@ -147,7 +147,7 @@ class TransmissionSettingsViewModelTests: TestCase {
 
     func test_saveSelected_withoutData_shouldDoNothing() {
         let viewModel = addViewModel!
-        let event = viewModel.view.isLoading.dropFirst().first().wait {
+        let event = viewModel.values.isLoading.dropFirst().first().wait {
             viewModel.receive(.saveSelected)
         }
         XCTAssertFalse(event.hasValue())
@@ -165,10 +165,10 @@ class TransmissionSettingsViewModelTests: TestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = settings.url.absoluteString
-        viewModel.view.inputs[2].value.value = settings.username
-        viewModel.view.inputs[3].value.value = keychain.password
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = settings.url.absoluteString
+        viewModel.values.inputs[2].value.value = settings.username
+        viewModel.values.inputs[3].value.value = keychain.password
         viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
@@ -188,10 +188,10 @@ class TransmissionSettingsViewModelTests: TestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = editViewModel!
-        viewModel.view.inputs[0].value.value = "new name"
-        viewModel.view.inputs[1].value.value = settings.url.absoluteString
-        viewModel.view.inputs[2].value.value = settings.username
-        viewModel.view.inputs[3].value.value = keychain.password
+        viewModel.values.inputs[0].value.value = "new name"
+        viewModel.values.inputs[1].value.value = settings.url.absoluteString
+        viewModel.values.inputs[2].value.value = settings.username
+        viewModel.values.inputs[3].value.value = keychain.password
         viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
@@ -206,9 +206,9 @@ class TransmissionSettingsViewModelTests: TestCase {
         ))
 
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[2].value.value = "password"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)

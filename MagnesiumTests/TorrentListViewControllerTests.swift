@@ -6,7 +6,7 @@ import XCTest
 
 class TorrentListViewControllerTests: TestCase {
     func test_emptyState() {
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("Server").eraseToAnyPublisher(),
             items: Just([]).eraseToAnyPublisher(),
             isLoading: Just(false).eraseToAnyPublisher(),
@@ -15,14 +15,14 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
             status: Just("").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
     func test_loadingState() {
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("Server").eraseToAnyPublisher(),
             items: Just([]).eraseToAnyPublisher(),
             isLoading: Just(true).eraseToAnyPublisher(),
@@ -31,7 +31,7 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
             status: Just("").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -39,7 +39,7 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_items() {
         let torrents = [MockTorrent.visualMock]
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("Server").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
             isLoading: Just(false).eraseToAnyPublisher(),
@@ -48,7 +48,7 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
             status: Just("↓ 1.5 MB/s ↑ 454 KB/s").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()
@@ -56,7 +56,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_activeFilters() {
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("Server").eraseToAnyPublisher(),
             items: Just([]).eraseToAnyPublisher(),
             isLoading: Just(false).eraseToAnyPublisher(),
@@ -65,7 +65,7 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
             status: Just("").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -73,7 +73,7 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_editing() {
         let torrents = [MockTorrent.visualMock]
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("0 Selected").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
             isLoading: Just(false).eraseToAnyPublisher(),
@@ -82,7 +82,7 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
             status: Just("").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()
@@ -91,7 +91,7 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_editing_withSelection() {
         let torrents = [MockTorrent.visualMock]
-        let viewRep = TorrentListViewRepresentation(
+        let values = TorrentListViewValues(
             title: Just("1 Selected").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
             isLoading: Just(false).eraseToAnyPublisher(),
@@ -100,7 +100,7 @@ class TorrentListViewControllerTests: TestCase {
             editActionsEnabled: Just(true).eraseToAnyPublisher(),
             status: Just("").eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()

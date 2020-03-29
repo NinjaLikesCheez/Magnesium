@@ -7,7 +7,7 @@ import XCTest
 class TorrentDetailViewControllerTests: TestCase {
     func test_view() {
         let torrent = MockTorrent(name: "Name", label: "label")
-        let viewRep = TorrentDetailViewRepresentation(
+        let values = TorrentDetailViewValues(
             hash: "",
             sections: Just([
                 .init(type: .header, items: [.header(.init(torrent: .init(torrent)))]),
@@ -34,7 +34,7 @@ class TorrentDetailViewControllerTests: TestCase {
             ]).eraseToAnyPublisher(),
             isRefreshing: Just(false).eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(view: viewRep, type: TorrentDetailViewEvent.self)
+        let viewModel = StaticViewModel(values: values, type: TorrentDetailViewEvent.self)
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         viewController.loadViewIfNeeded()
         let navigationController = UINavigationController(rootViewController: viewController)

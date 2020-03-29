@@ -4,7 +4,7 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewRepresentation == ServerSettingsViewRepresentation {
+final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsViewValues {
     private enum Section: Int {
         case settings
         case delete
@@ -15,7 +15,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
     private lazy var saveBarButtonItem: UIBarButtonItem = {
         .init(
-            title: viewModel.view.saveButtonTitle,
+            title: viewModel.values.saveButtonTitle,
             style: .done,
             target: self,
             action: #selector(performSave)
@@ -32,7 +32,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
         isModalInPresentation = true
-        navigationItem.title = viewModel.view.title
+        navigationItem.title = viewModel.values.title
         navigationItem.largeTitleDisplayMode = .never
     }
 
@@ -46,13 +46,13 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
 
-        viewModel.view.isLoading
+        viewModel.values.isLoading
             .sink { [weak self] isLoading in
                 self?.isLoadingChanged(isLoading)
             }
             .store(in: &cancellables)
 
-        viewModel.view.isSaveButtonEnabled
+        viewModel.values.isSaveButtonEnabled
             .assign(to: \.isEnabled, on: saveBarButtonItem)
             .store(in: &cancellables)
     }
@@ -87,13 +87,13 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        viewModel.view.canDelete ? 2 : 1
+        viewModel.values.canDelete ? 2 : 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch Section(rawValue: section) {
         case .settings:
-            return viewModel.view.inputs.count
+            return viewModel.values.inputs.count
         case .delete:
             return 1
         case .none:
@@ -110,10 +110,10 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
                 return .init()
             }
 
-            cell.configure(with: viewModel.view.inputs[indexPath.row])
+            cell.configure(with: viewModel.values.inputs[indexPath.row])
             cell.proceedToNextInput = { [weak self] in
                 guard let strongSelf = self else { return }
-                if indexPath.row < strongSelf.viewModel.view.inputs.count - 1 {
+                if indexPath.row < strongSelf.viewModel.values.inputs.count - 1 {
                     let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
                     strongSelf.tableView.selectRow(at: nextIndexPath, animated: true, scrollPosition: .none)
                 } else {

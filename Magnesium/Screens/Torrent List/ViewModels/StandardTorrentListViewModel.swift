@@ -37,7 +37,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
-    let view: TorrentListViewRepresentation
+    let values: TorrentListViewValues
     var cancellables = Set<AnyCancellable>()
 
     var events: AnyPublisher<TorrentListViewModelEvent, Never> {
@@ -77,7 +77,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .map { "\($0) \($1)" }
             .ui()
             .eraseToAnyPublisher()
-        view = TorrentListViewRepresentation(
+        values = TorrentListViewValues(
             title: title,
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),

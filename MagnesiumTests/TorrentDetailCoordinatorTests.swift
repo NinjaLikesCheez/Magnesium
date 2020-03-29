@@ -72,7 +72,7 @@ class TorrentDetailCoordinatorTests: TestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel {
-    let view = TorrentDetailViewRepresentation(
+    let values = TorrentDetailViewValues(
         hash: "",
         sections: Just([]).eraseToAnyPublisher(),
         isRefreshing: Just(false).eraseToAnyPublisher()

@@ -11,21 +11,21 @@ enum AddServerViewEvent {
     case cancelSelected
 }
 
-struct AddServerViewRepresentation {
+struct AddServerViewValues {
     var types: [String]
 }
 
 final class AddServerViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<AddServerViewModelEvent, Never>()
     private let serverTypes: [ServerType] = [.deluge, .transmission]
-    let view: AddServerViewRepresentation
+    let values: AddServerViewValues
 
     var events: AnyPublisher<AddServerViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init() {
-        view = .init(types: serverTypes.map(\.localizedString))
+        values = .init(types: serverTypes.map(\.localizedString))
     }
 
     func receive(_ event: AddServerViewEvent) {

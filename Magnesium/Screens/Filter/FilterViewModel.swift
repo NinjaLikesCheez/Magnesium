@@ -15,7 +15,7 @@ enum FilterViewEvent {
     case labelSelected(source: PopoverSource)
 }
 
-struct FilterViewRepresentation {
+struct FilterViewValues {
     var sections: AnyPublisher<[FilterSection], Never>
 }
 
@@ -24,7 +24,7 @@ final class FilterViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<FilterViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
     private var cancellables = Set<AnyCancellable>()
-    let view: FilterViewRepresentation
+    let values: FilterViewValues
 
     var events: AnyPublisher<FilterViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -32,7 +32,7 @@ final class FilterViewModel: ViewModel {
 
     init(labels: CurrentValueSubject<[StandardLabel], Never>) {
         self.labels = labels
-        view = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
+        values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .asVoid()

@@ -22,48 +22,48 @@ class DelugeSettingsViewModelTests: TestCase {
     }
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.view.inputs.map(\.name), ["name", "server", "password"])
+        XCTAssertEqual(addViewModel.values.inputs.map(\.name), ["name", "server", "password"])
     }
 
     func test_name_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[0].value.value, "MockServer")
+        XCTAssertEqual(editViewModel.values.inputs[0].value.value, "MockServer")
     }
 
     func test_serverURL_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[1].value.value, "http://mock.mock")
+        XCTAssertEqual(editViewModel.values.inputs[1].value.value, "http://mock.mock")
     }
 
     func test_password_withServer_shouldUseExisting() {
-        XCTAssertEqual(editViewModel.view.inputs[2].value.value, "mockpassword")
+        XCTAssertEqual(editViewModel.values.inputs[2].value.value, "mockpassword")
     }
 
     func test_title_withoutServer() {
-        XCTAssertEqual(addViewModel.view.title, "Add Server")
+        XCTAssertEqual(addViewModel.values.title, "Add Server")
     }
 
     func test_title_withServer() {
-        XCTAssertEqual(editViewModel.view.title, "Edit Server")
+        XCTAssertEqual(editViewModel.values.title, "Edit Server")
     }
 
     func test_saveButtonTitle_withoutServer() {
-        XCTAssertEqual(addViewModel.view.saveButtonTitle, "Add")
+        XCTAssertEqual(addViewModel.values.saveButtonTitle, "Add")
     }
 
     func test_saveButtonTitle_withServer() {
-        XCTAssertEqual(editViewModel.view.saveButtonTitle, "Save")
+        XCTAssertEqual(editViewModel.values.saveButtonTitle, "Save")
     }
 
     func test_canDelete_withoutServer() {
-        XCTAssertFalse(addViewModel.view.canDelete)
+        XCTAssertFalse(addViewModel.values.canDelete)
     }
 
     func test_canDelete_withServer() {
-        XCTAssertTrue(editViewModel.view.canDelete)
+        XCTAssertTrue(editViewModel.values.canDelete)
     }
 
     private func isSaveButtonEnabled(_ viewModel: DelugeSettingsViewModel) -> Bool {
         var value: Bool!
-        _ = viewModel.view.isSaveButtonEnabled.sink {
+        _ = viewModel.values.isSaveButtonEnabled.sink {
             value = $0
         }
         return value
@@ -72,19 +72,19 @@ class DelugeSettingsViewModelTests: TestCase {
     func test_isSaveButtonEnabled_withValidData_shouldBeTrue() {
         let viewModel = addViewModel!
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.view.inputs[0].value.value = "name"
+        viewModel.values.inputs[0].value.value = "name"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.view.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[1].value.value = "http://example.com"
         XCTAssertFalse(isSaveButtonEnabled(viewModel))
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[2].value.value = "password"
         XCTAssertTrue(isSaveButtonEnabled(viewModel))
     }
 
     func test_saveSelected_withInvalidServer_shouldEmitAlert() throws {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "web://site"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "web://site"
+        viewModel.values.inputs[2].value.value = "password"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)
@@ -100,11 +100,11 @@ class DelugeSettingsViewModelTests: TestCase {
 
     func test_saveSelected_shouldChangeIsLoading() {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[2].value.value = "password"
 
-        let values = viewModel.view.isLoading.dropFirst().wait {
+        let values = viewModel.values.isLoading.dropFirst().wait {
             viewModel.receive(.saveSelected)
         }
         XCTAssertEqual(values, [true, false])
@@ -112,9 +112,9 @@ class DelugeSettingsViewModelTests: TestCase {
 
     func test_saveSelected_shouldAuthenticate() {
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[2].value.value = "password"
         viewModel.receive(.saveSelected)
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["auth.login"])
     }
@@ -125,9 +125,9 @@ class DelugeSettingsViewModelTests: TestCase {
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[2].value.value = "password"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)
@@ -139,7 +139,7 @@ class DelugeSettingsViewModelTests: TestCase {
 
     func test_saveSelected_withoutData_shouldDoNothing() {
         let viewModel = addViewModel!
-        let event = viewModel.view.isLoading.dropFirst().first().wait {
+        let event = viewModel.values.isLoading.dropFirst().first().wait {
             viewModel.receive(.saveSelected)
         }
         XCTAssertFalse(event.hasValue())
@@ -157,9 +157,9 @@ class DelugeSettingsViewModelTests: TestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = settings.url.absoluteString
-        viewModel.view.inputs[2].value.value = keychain.password
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = settings.url.absoluteString
+        viewModel.values.inputs[2].value.value = keychain.password
         viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
@@ -179,9 +179,9 @@ class DelugeSettingsViewModelTests: TestCase {
         let expectedKeychainData = try JSONEncoder().encode(keychain)
 
         let viewModel = editViewModel!
-        viewModel.view.inputs[0].value.value = "new name"
-        viewModel.view.inputs[1].value.value = settings.url.absoluteString
-        viewModel.view.inputs[2].value.value = keychain.password
+        viewModel.values.inputs[0].value.value = "new name"
+        viewModel.values.inputs[1].value.value = settings.url.absoluteString
+        viewModel.values.inputs[2].value.value = keychain.password
         viewModel.receive(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
@@ -196,9 +196,9 @@ class DelugeSettingsViewModelTests: TestCase {
         ))
 
         let viewModel = addViewModel!
-        viewModel.view.inputs[0].value.value = "name"
-        viewModel.view.inputs[1].value.value = "http://example.com"
-        viewModel.view.inputs[2].value.value = "password"
+        viewModel.values.inputs[0].value.value = "name"
+        viewModel.values.inputs[1].value.value = "http://example.com"
+        viewModel.values.inputs[2].value.value = "password"
 
         let event = try viewModel.events.first().wait {
             viewModel.receive(.saveSelected)

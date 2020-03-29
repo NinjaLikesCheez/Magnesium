@@ -8,7 +8,7 @@ protocol TorrentDetailViewControllerIdentifiable {
 }
 
 // swiftlint:disable:next line_length
-final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewRepresentation == TorrentDetailViewRepresentation {
+final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
@@ -16,7 +16,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
 
     var torrentHash: String {
-        viewModel.view.hash
+        viewModel.values.hash
     }
 
     init(viewModel: VM) {
@@ -46,7 +46,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        viewModel.view.isRefreshing
+        viewModel.values.isRefreshing
             .sink { [weak self] isLoading in
                 if !isLoading {
                     self?.refreshControl?.endRefreshing()
@@ -54,7 +54,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             }
             .store(in: &cancellables)
 
-        viewModel.view.sections
+        viewModel.values.sections
             .sink { [weak self] sections in
                 self?.update(with: sections)
             }

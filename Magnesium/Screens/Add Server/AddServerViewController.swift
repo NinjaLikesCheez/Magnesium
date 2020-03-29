@@ -3,7 +3,7 @@ import UIKit
 import ViewModel
 
 // swiftlint:disable:next line_length
-final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewRepresentation == AddServerViewRepresentation {
+final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues {
     private let viewModel: VM
 
     init(viewModel: VM) {
@@ -40,12 +40,12 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.view.types.count
+        viewModel.values.types.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-        cell.textLabel?.text = viewModel.view.types[indexPath.row]
+        cell.textLabel?.text = viewModel.values.types[indexPath.row]
         cell.accessoryType = .disclosureIndicator
         return cell
     }
