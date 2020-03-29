@@ -142,6 +142,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             }
         }
 
+        dataSource.defaultRowAnimation = .fade
         tableView.dataSource = dataSource
     }
 
