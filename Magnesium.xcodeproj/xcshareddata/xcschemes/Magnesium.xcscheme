@@ -78,6 +78,16 @@
                ReferencedContainer = "container:Magnesium.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E920A31B2404BB7F00319D71"
+               BuildableName = "MagnesiumSnapshotTests.xctest"
+               BlueprintName = "MagnesiumSnapshotTests"
+               ReferencedContainer = "container:Magnesium.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

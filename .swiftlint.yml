@@ -11,6 +11,7 @@ file_name:
     - Deluge+Mocks.swift
     - Transmission+Mocks.swift
     - PreferenceKeys.swift
+    - SnapshotExtensions.swift
 
 identifier_name:
   excluded:

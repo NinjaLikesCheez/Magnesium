@@ -30,19 +30,19 @@ final class StandardTorrentListViewModelTests: XCTestCase {
     }
 
     func test_title_whenEditing_shouldBeSelectionCount() {
-        viewModel.receive(.didBeginEditing)
+        viewModel.receive(.editSelected)
         XCTAssertEqual(viewModel.view.title.first().wait(), "0 Selected")
     }
 
     func test_title_whenEditingSelectionChanged_shouldUpdate() {
-        viewModel.receive(.didBeginEditing)
+        viewModel.receive(.editSelected)
         viewModel.receive(.multiSelectUpdated(indices: [0, 1]))
         XCTAssertEqual(viewModel.view.title.first().wait(), "2 Selected")
     }
 
     func test_title_whenEditingEnded_shouldBeDefault() {
-        viewModel.receive(.didBeginEditing)
-        viewModel.receive(.didEndEditing)
+        viewModel.receive(.editSelected)
+        viewModel.receive(.doneEditingSelected)
         XCTAssertEqual(viewModel.view.title.first().wait(), "MockServer")
     }
 
@@ -645,34 +645,17 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         XCTAssertTrue(try viewModel.view.hasActiveFilters.first().wait(timeout: 1).value())
     }
 
-    // MARK: totalDownloadSpeed
+    // MARK: status
 
-    func test_totalDownloadSpeed_shouldBeSumOfAllDownloadSpeeds() throws {
+    func test_status_shouldBeTotalSpeeds() {
         implementation.refreshResult = Just(([
-            MockTorrent(downloadRate: 100_000, label: "label1"),
-            MockTorrent(downloadRate: 200_000, label: "label2"),
-            MockTorrent(downloadRate: 400_000, label: "label1"),
+            MockTorrent(downloadRate: 100_000, uploadRate: 200_000, label: "label1"),
+            MockTorrent(downloadRate: 200_000, uploadRate: 400_000, label: "label2"),
+            MockTorrent(downloadRate: 400_000, uploadRate: 800_000, label: "label1"),
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.receive(.refresh)
         preferences[.filterOptions] = FilterOptions(label: "label2")
-
-        let value = try viewModel.view.totalDownloadSpeed.first().wait().value()
-        XCTAssertEqual(value, "↓ 684 KB/s")
-    }
-
-    // MARK: totalUploadSpeed
-
-    func test_totalUploadSpeed_shouldBeSumOfAllDownloadSpeeds() throws {
-        implementation.refreshResult = Just(([
-            MockTorrent(uploadRate: 100_000, label: "label1"),
-            MockTorrent(uploadRate: 200_000, label: "label2"),
-            MockTorrent(uploadRate: 400_000, label: "label1"),
-        ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
-        viewModel.receive(.refresh)
-        preferences[.filterOptions] = FilterOptions(label: "label2")
-
-        let value = try viewModel.view.totalUploadSpeed.first().wait().value()
-        XCTAssertEqual(value, "↑ 684 KB/s")
+        XCTAssertEqual(viewModel.view.status.first().wait(), "↓ 684 KB/s ↑ 1.3 MB/s")
     }
 
     // MARK: - TorrentListProvider

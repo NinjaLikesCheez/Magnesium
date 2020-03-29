@@ -73,14 +73,18 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
+        let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
+            .map { "\($0) \($1)" }
+            .ui()
+            .eraseToAnyPublisher()
         view = TorrentListViewRepresentation(
             title: title,
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
+            isEditing: isEditingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
             hasActiveFilters: hasActiveFilters,
             editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher(),
-            totalDownloadSpeed: totalDownloadSpeed,
-            totalUploadSpeed: totalUploadSpeed
+            status: status
         )
 
         refresh()
@@ -155,14 +159,14 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         case let .moreOptionsSelected(indices, source):
             presentActivities(for: indices.map { torrents.subject(at: $0).value }, source: source)
 
-        case .didBeginEditing:
-            isEditingSubject.send(true)
-
-        case .didEndEditing:
-            isEditingSubject.send(false)
-
         case let .multiSelectUpdated(indices):
             multiSelectCountSubject.send(indices.count)
+
+        case .editSelected:
+            isEditingSubject.send(true)
+
+        case .doneEditingSelected:
+            isEditingSubject.send(false)
         }
     }
 

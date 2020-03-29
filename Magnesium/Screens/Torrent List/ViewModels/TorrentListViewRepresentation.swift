@@ -6,8 +6,8 @@ struct TorrentListViewRepresentation {
     var title: AnyPublisher<String, Never>
     var items: AnyPublisher<[TorrentListItem], Never>
     var isLoading: AnyPublisher<Bool, Never>
+    var isEditing: AnyPublisher<Bool, Never>
     var hasActiveFilters: AnyPublisher<Bool, Never>
     var editActionsEnabled: AnyPublisher<Bool, Never>
-    var totalDownloadSpeed: AnyPublisher<String, Never>
-    var totalUploadSpeed: AnyPublisher<String, Never>
+    var status: AnyPublisher<String, Never>
 }

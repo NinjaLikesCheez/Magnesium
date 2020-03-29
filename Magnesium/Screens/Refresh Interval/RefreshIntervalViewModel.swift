@@ -7,11 +7,11 @@ enum RefreshIntervalViewEvent {
 }
 
 struct RefreshIntervalViewRepresentation {
-    var options: [RefreshIntervalOptionViewRepresentation]
+    var options: [RefreshIntervalOptionItem]
 }
 
-struct RefreshIntervalOptionViewRepresentation {
-    var name: String
+struct RefreshIntervalOptionItem {
+    var title: String
     var isSelected: AnyPublisher<Bool, Never>
 }
 
@@ -30,7 +30,7 @@ final class RefreshIntervalViewModel: ViewModel {
         let publisher = Current.preferences.valuePublisher(for: .autoRefreshInterval)
         view = .init(options: options.map { option in
             .init(
-                name: option.1,
+                title: option.1,
                 isSelected: publisher.map { Int($0) == option.0 }.ui().eraseToAnyPublisher()
             )
         })

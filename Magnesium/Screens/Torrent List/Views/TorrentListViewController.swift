@@ -22,7 +22,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
-    fileprivate var applySnapshotInBackground = true
     weak var provider: TorrentListViewProvider?
     private lazy var statusView = StatusView()
 
@@ -158,7 +157,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        statusView.configure(download: viewModel.view.totalDownloadSpeed, upload: viewModel.view.totalUploadSpeed)
+        statusView.configure(status: viewModel.view.status)
 
         if viewModel.view.showFilterButton {
             viewModel.view.hasActiveFilters
@@ -175,6 +174,16 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 if !isLoading {
                     self?.activityView.stopAnimating()
                     self?.refreshControl?.endRefreshing()
+                }
+            }
+            .store(in: &cancellables)
+
+        viewModel.view.isEditing
+            .sink { [weak self] isEditing in
+                if isEditing {
+                    self?.configureEditingState()
+                } else {
+                    self?.configureNormalState()
                 }
             }
             .store(in: &cancellables)
@@ -240,12 +249,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         snapshot.appendSections([.main])
         snapshot.appendItems(items, toSection: .main)
 
-        if applySnapshotInBackground {
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.dataSource.apply(snapshot, animatingDifferences: true)
-            }
-        } else {
-            dataSource.apply(snapshot, animatingDifferences: true)
+        DispatchQueue.global(qos: .userInteractive).async {
+            self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }
 
@@ -267,6 +272,27 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }
 
     // MARK: Editing
+
+    private func configureNormalState() {
+        setEditing(false, animated: true)
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
+        viewModel.receive(.multiSelectUpdated(indices: []))
+        configureNormalBarButtonItems()
+        configureNormalToolbarItems()
+    }
+
+    private func configureEditingState() {
+        setEditing(true, animated: true)
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
+        configureEditingBarButtonItems()
+        configureEditingToolbarItems()
+    }
 
     private func configureNormalBarButtonItems() {
         navigationItem.leftBarButtonItem = settingsBarButtonItem
@@ -332,27 +358,12 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     @objc
     private func selectButtonTapped(_ sender: UIBarButtonItem) {
-        setEditing(true, animated: true)
-        UIView.performWithoutAnimation {
-            tableView.beginUpdates()
-            tableView.endUpdates()
-        }
-        viewModel.receive(.didBeginEditing)
-        configureEditingBarButtonItems()
-        configureEditingToolbarItems()
+        viewModel.receive(.editSelected)
     }
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        setEditing(false, animated: true)
-        UIView.performWithoutAnimation {
-            tableView.beginUpdates()
-            tableView.endUpdates()
-        }
-        viewModel.receive(.didEndEditing)
-        viewModel.receive(.multiSelectUpdated(indices: []))
-        configureNormalBarButtonItems()
-        configureNormalToolbarItems()
+        viewModel.receive(.doneEditingSelected)
     }
 
     @objc

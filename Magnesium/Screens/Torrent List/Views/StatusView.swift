@@ -42,10 +42,9 @@ final class StatusView: UIView {
         ])
     }
 
-    func configure(download: AnyPublisher<String, Never>, upload: AnyPublisher<String, Never>) {
+    func configure(status: AnyPublisher<String, Never>) {
         cancellables.removeAll()
-        Publishers.CombineLatest(download, upload)
-            .map { "\($0) \($1)" }
+        status
             .asOptional()
             .assign(to: \.text, on: speedLabel)
             .store(in: &cancellables)

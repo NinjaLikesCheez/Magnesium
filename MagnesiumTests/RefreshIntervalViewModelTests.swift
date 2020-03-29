@@ -18,7 +18,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
 
     func test_options_names() {
         let expected = ["Never", "2 seconds", "5 seconds", "10 seconds", "30 seconds"]
-        XCTAssertEqual(viewModel.view.options.map(\.name), expected)
+        XCTAssertEqual(viewModel.view.options.map(\.title), expected)
     }
 
     func test_options_values() {
@@ -31,7 +31,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
 
     func test_option_whenIsCurrent_shouldBeSelected() {
         var values = [Bool]()
-        viewModel.view.options.first { $0.name == "2 seconds" }?.isSelected.sink {
+        viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.sink {
             values.append($0)
         }.store(in: &cancellables)
         XCTAssertEqual(values, [true])
@@ -39,7 +39,7 @@ class RefreshIntervalViewModelTests: XCTestCase {
 
     func test_option_whenNoLongerCurrent_shouldDeselect() {
         var values = [Bool]()
-        viewModel.view.options.first { $0.name == "2 seconds" }?.isSelected.sink {
+        viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.sink {
             values.append($0)
         }.store(in: &cancellables)
         XCTAssertEqual(values, [true])

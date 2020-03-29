@@ -11,7 +11,7 @@ enum TorrentListViewEvent {
     case pauseSelected(indices: [Int])
     case removeSelected(indices: [Int], source: PopoverSource)
     case moreOptionsSelected(indices: [Int], source: PopoverSource)
-    case didBeginEditing
-    case didEndEditing
     case multiSelectUpdated(indices: [Int])
+    case editSelected
+    case doneEditingSelected
 }

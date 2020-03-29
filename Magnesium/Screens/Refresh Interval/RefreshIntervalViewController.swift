@@ -8,10 +8,10 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
     private var cancellables = Set<AnyCancellable>()
 
     private lazy var cells: [UITableViewCell] = {
-        viewModel.view.options.map { state in
+        viewModel.view.options.map { item in
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.textLabel?.text = state.name
-            state.isSelected
+            cell.textLabel?.text = item.title
+            item.isSelected
                 .map { isSelected -> UITableViewCell.AccessoryType in
                     isSelected ? .checkmark : .none
                 }
