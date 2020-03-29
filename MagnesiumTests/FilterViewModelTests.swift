@@ -80,7 +80,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), expected)
     }
 
@@ -88,7 +88,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         let previousOption = preferences[.sortOption]
         alert.actions.first { $0.title == previousOption.property.localizedString }?.handler?()
         let newOption = preferences[.sortOption]
@@ -99,7 +99,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Name" }?.handler?()
         let newOption = preferences[.sortOption]
         XCTAssertEqual(newOption, SortOption(property: .name))
@@ -109,7 +109,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         let expected = ["All", "Downloading", "Seeding", "Paused", "Checking", "Queued", "Error", "Cancel"]
         XCTAssertEqual(alert.actions.map(\.title), expected)
     }
@@ -118,7 +118,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Downloading" }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions(state: .downloading))
@@ -128,7 +128,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), ["All", "None", "test", "Cancel"])
     }
 
@@ -136,7 +136,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "All" }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions())
@@ -146,7 +146,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "None" }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions(label: ""))
@@ -156,7 +156,7 @@ class FilterViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
-        let alert = try unpack(case: type(of: event).alert, from: event)
+        let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "test" }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions(label: "test"))

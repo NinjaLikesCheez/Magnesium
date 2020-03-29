@@ -19,7 +19,7 @@ class AddServerViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.typeSelected(index: 0))
         }.value()
-        let type = try unpack(case: Swift.type(of: event).addServer, from: event)
+        let type = try extract(case: Swift.type(of: event).addServer, from: event)
         XCTAssertEqual(type, ServerType.deluge)
     }
 
@@ -27,7 +27,7 @@ class AddServerViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.typeSelected(index: 1))
         }.value()
-        let type = try unpack(case: Swift.type(of: event).addServer, from: event)
+        let type = try extract(case: Swift.type(of: event).addServer, from: event)
         XCTAssertEqual(type, ServerType.transmission)
     }
 

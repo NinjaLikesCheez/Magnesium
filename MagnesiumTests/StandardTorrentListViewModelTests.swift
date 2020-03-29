@@ -20,7 +20,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
         let event = try viewModel.events.first().wait(executing: actions).value()
-        return try unpack(case: type(of: event).alert, from: event)
+        return try extract(case: type(of: event).alert, from: event)
     }
 
     // MARK: - Title
@@ -351,7 +351,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
         let event = try viewModel.events.first().wait(executing: actions).value()
-        return try unpack(case: type(of: event).activities, from: event).0
+        return try extract(case: type(of: event).activities, from: event).0
     }
 
     func test_moreOptionsSelected_shouldEmitExpectedActivities() throws {
@@ -506,7 +506,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.value()
-        let (path, _) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
+        let (path, _) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
 
@@ -523,7 +523,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.value()
-        let (path, _) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
+        let (path, _) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertNil(path)
     }
 
@@ -535,7 +535,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.value()
-        let (_, subject) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
+        let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
         XCTAssertEqual(implementation.moveDownloadFolderParamPath, ["/new"])
@@ -550,7 +550,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.value()
-        let (_, subject) = try unpack(case: type(of: event).moveDownloadFolder, from: event)
+        let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
         }
@@ -566,7 +566,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let moveEvent = try viewModel.events.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
         }.value()
-        let (_, subject) = try unpack(case: type(of: moveEvent).moveDownloadFolder, from: moveEvent)
+        let (_, subject) = try extract(case: type(of: moveEvent).moveDownloadFolder, from: moveEvent)
 
         let event = viewModel.events.first().wait {
             subject.send("/new")
