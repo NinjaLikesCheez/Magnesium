@@ -2,12 +2,11 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class AddServerViewModelTests: XCTestCase {
+class AddServerViewModelTests: TestCase {
     private var viewModel: AddServerViewModel!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         viewModel = AddServerViewModel()
     }
 
@@ -20,7 +19,7 @@ class AddServerViewModelTests: XCTestCase {
             self.viewModel.receive(.typeSelected(index: 0))
         }.value()
         let type = try extract(case: Swift.type(of: event).addServer, from: event)
-        XCTAssertEqual(type, ServerType.deluge)
+        XCTAssertEqual(type, .deluge)
     }
 
     func test_typeSelected_withTransmission_shouldEmitTransmissionAddServerType() throws {
@@ -28,13 +27,13 @@ class AddServerViewModelTests: XCTestCase {
             self.viewModel.receive(.typeSelected(index: 1))
         }.value()
         let type = try extract(case: Swift.type(of: event).addServer, from: event)
-        XCTAssertEqual(type, ServerType.transmission)
+        XCTAssertEqual(type, .transmission)
     }
 
     func test_cancelSelected_shouldEmitCompleteEvent() throws {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.cancelSelected)
         }.value()
-        XCTAssertCase(event, type(of: event).complete)
+        XCTAssertCase(event, .complete)
     }
 }

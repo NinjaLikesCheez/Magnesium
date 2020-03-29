@@ -3,13 +3,12 @@ import Combine
 import Preferences
 import XCTest
 
-class SessionTests: XCTestCase {
+class SessionTests: TestCase {
     private var session: Session!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         session = Session()
     }
 

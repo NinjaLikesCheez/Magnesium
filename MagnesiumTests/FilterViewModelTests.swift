@@ -4,7 +4,7 @@ import CommonModels
 import Preferences
 import XCTest
 
-class FilterViewModelTests: XCTestCase {
+class FilterViewModelTests: TestCase {
     private var labels: CurrentValueSubject<[MockLabel], Never>!
     private var viewModel: FilterViewModel!
     private var cancellables: Set<AnyCancellable>!
@@ -12,7 +12,6 @@ class FilterViewModelTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         labels = CurrentValueSubject([MockLabel(), MockLabel(name: "test")])
         cancellables = Set()
         let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)

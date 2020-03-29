@@ -6,7 +6,7 @@ import Preferences
 import ViewModel
 import XCTest
 
-class TorrentListCoordinatorTests: XCTestCase {
+class TorrentListCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
     private var session: Session!
@@ -16,7 +16,6 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         viewModel = MockViewModel()
         session = Session()
@@ -32,10 +31,7 @@ class TorrentListCoordinatorTests: XCTestCase {
 
     func test_presentable_shouldBeTorrentListViewController() {
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === TorrentListViewController<AnyTorrentListViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, TorrentListViewController<AnyTorrentListViewModel>.self)
     }
 
     // MARK: - Add Torrent
@@ -109,7 +105,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.settings)
         }.value()
-        XCTAssertCase(TorrentListCoordinatorEvent.showSettings, event)
+        XCTAssertCase(event, .showSettings)
     }
 
     func test_moveDownloadFolder_shouldPresentAlertController() {
@@ -148,10 +144,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         XCTAssertNotNil(viewController)
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
         let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
-        guard type(of: childCoordinator) === TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self else {
-            XCTFail("Unexpected coordinator: \(String(describing: coordinator))")
-            return
-        }
+        XCTAssertType(childCoordinator, TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self)
     }
 
     func test_contextMenuForItem_shouldReturnExpectedMenu() {
@@ -167,11 +160,7 @@ class TorrentListCoordinatorTests: XCTestCase {
         let event = try coordinator.events.first().wait {
             self.coordinator.commitPreviewForItem(at: 0)
         }.value()
-
-        guard case let .commitDetail(committedCoordinator) = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+        let committedCoordinator = try extract(case: type(of: event).commitDetail, from: event)
         XCTAssertTrue(childCoordinator === committedCoordinator)
     }
 

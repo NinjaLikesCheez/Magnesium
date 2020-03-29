@@ -2,13 +2,12 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class TorrentDetailFileItemTests: XCTestCase {
+class TorrentDetailFileItemTests: TestCase {
     private var file: CurrentValueSubject<MockTorrentFile, Never>!
     private var item: TorrentDetailFileItem!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         file = CurrentValueSubject(MockTorrentFile(
             index: 0,
             name: "file.rar",

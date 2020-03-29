@@ -3,7 +3,7 @@ import Combine
 import SnapshotTesting
 import XCTest
 
-class TorrentDetailInfoTableViewCellTests: XCTestCase {
+class TorrentDetailInfoTableViewCellTests: TestCase {
     func test_view() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name",

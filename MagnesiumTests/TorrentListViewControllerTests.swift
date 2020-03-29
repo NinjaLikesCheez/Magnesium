@@ -4,7 +4,7 @@ import SnapshotTesting
 import ViewModel
 import XCTest
 
-class TorrentListViewControllerTests: XCTestCase {
+class TorrentListViewControllerTests: TestCase {
     func test_emptyState() {
         let viewRep = TorrentListViewRepresentation(
             title: Just("Server").eraseToAnyPublisher(),
@@ -110,7 +110,7 @@ class TorrentListViewControllerTests: XCTestCase {
             viewController.tableView.selectRow(at: .init(row: 0, section: 0), animated: false, scrollPosition: .none)
             expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 0.1)
+        wait(for: [expectation], timeout: 1)
 
         assertSnapshot(matching: navigationController, as: .image)
     }

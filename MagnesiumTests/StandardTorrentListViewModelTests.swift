@@ -6,14 +6,13 @@ import Preferences
 import ViewModel
 import XCTest
 
-final class StandardTorrentListViewModelTests: XCTestCase {
+final class StandardTorrentListViewModelTests: TestCase {
     private var implementation: MockImplementation!
     private var viewModel: StandardTorrentListViewModel<MockImplementation>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         implementation = MockImplementation()
         viewModel = StandardTorrentListViewModel(implementation: implementation, server: .mock(.deluge))
     }
@@ -183,7 +182,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
         let event = try viewModel.events.first().wait {
             self.viewModel.receive(.settingsSelected)
         }.value()
-        XCTAssertCase(event, type(of: event).settings)
+        XCTAssertCase(event, .settings)
     }
 
     // MARK: search
@@ -662,10 +661,7 @@ final class StandardTorrentListViewModelTests: XCTestCase {
 
     func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
         let detailViewModel = viewModel.detailViewModelForItem(at: 0)!.base as AnyObject
-        guard type(of: detailViewModel) === MockDetailViewModel.self else {
-            XCTFail("Unexpected view model: \(String(describing: viewModel))")
-            return
-        }
+        XCTAssertType(detailViewModel, MockDetailViewModel.self)
     }
 
     func test_contextMenuForItem_whenNoLabels_shouldReturnExpectedMenu() {

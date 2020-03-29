@@ -2,7 +2,7 @@
 import SnapshotTesting
 import XCTest
 
-class TorrentDetailTrackerTableViewCellTests: XCTestCase {
+class TorrentDetailTrackerTableViewCellTests: TestCase {
     func test_view() {
         let cell = TorrentDetailTrackerTableViewCell.mock(
             tracker: "http://tracker.example.com:9000/announce",

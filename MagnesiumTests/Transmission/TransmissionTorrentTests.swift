@@ -2,10 +2,9 @@
 import Transmission
 import XCTest
 
-class TransmissionTorrentTests: XCTestCase {
+class TransmissionTorrentTests: TestCase {
     override func setUp() {
         super.setUp()
-        Current = .mock
     }
 
     func test_init_state_shouldMapToExpectedStandardState() {

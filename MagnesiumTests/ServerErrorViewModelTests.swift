@@ -2,36 +2,27 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class ServerErrorViewModelTests: XCTestCase {
+class ServerErrorViewModelTests: TestCase {
     private var viewModel: ServerErrorViewModel!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         viewModel = ServerErrorViewModel()
-        cancellables = Set()
     }
 
     // MARK: ServerErrorViewEvent
 
-    func test_serverErrorViewEvent_settingsSelected_shouldEmitShowSettings() {
-        var event: ServerErrorViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.receive(.settingsSelected)
-        guard case .showSettings = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverErrorViewEvent_settingsSelected_shouldEmitShowSettings() throws {
+        let event = try viewModel.events.first().wait {
+            self.viewModel.receive(.settingsSelected)
+        }.value()
+        XCTAssertCase(event, .showSettings)
     }
 
-    func test_serverErrorViewEvent_editServerSelected_showEmitEditServer() {
-        var event: ServerErrorViewModelEvent?
-        viewModel.events.sink { event = $0 }.store(in: &cancellables)
-        viewModel.receive(.editServerSelected)
-        guard case .editServer = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverErrorViewEvent_editServerSelected_showEmitEditServer() throws {
+        let event = try viewModel.events.first().wait {
+            self.viewModel.receive(.editServerSelected)
+        }.value()
+        XCTAssertCase(event, .editServer)
     }
 }

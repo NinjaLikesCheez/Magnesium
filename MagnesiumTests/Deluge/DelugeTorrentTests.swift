@@ -2,10 +2,9 @@ import Deluge
 @testable import Magnesium
 import XCTest
 
-class DelugeTorrentTests: XCTestCase {
+class DelugeTorrentTests: TestCase {
     override func setUp() {
         super.setUp()
-        Current = .mock
     }
 
     func test_init_state_shouldMapToExpectedStandardState() {

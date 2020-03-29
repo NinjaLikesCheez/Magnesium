@@ -4,7 +4,7 @@ import Keychain
 import Preferences
 import XCTest
 
-class ServerPreferencesTests: XCTestCase {
+class ServerPreferencesTests: TestCase {
     private var server: Server!
     private var keychainStore: InMemoryKeychain.Store!
     private var preferences: Preferences { Current.preferences }
@@ -12,7 +12,7 @@ class ServerPreferencesTests: XCTestCase {
     override func setUp() {
         super.setUp()
         keychainStore = .init()
-        Current = .mock(keychain: InMemoryKeychain(store: keychainStore))
+        Current.keychain = InMemoryKeychain(store: keychainStore)
         server = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
     }
 

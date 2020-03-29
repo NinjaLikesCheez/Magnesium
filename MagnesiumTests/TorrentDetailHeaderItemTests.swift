@@ -2,13 +2,12 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class TorrentDetailHeaderItemTests: XCTestCase {
+class TorrentDetailHeaderItemTests: TestCase {
     private var torrent: CurrentValueSubject<MockTorrent, Never>!
     private var item: TorrentDetailHeaderItem!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         torrent = CurrentValueSubject(MockTorrent())
         item = TorrentDetailHeaderItem(torrent: torrent)
     }

@@ -3,17 +3,14 @@ import Combine
 import Preferences
 import XCTest
 
-class RefreshIntervalViewModelTests: XCTestCase {
+class RefreshIntervalViewModelTests: TestCase {
     private var viewModel: RefreshIntervalViewModel!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         preferences[.autoRefreshInterval] = 2
         viewModel = RefreshIntervalViewModel()
-        cancellables = Set()
     }
 
     func test_options_names() {
@@ -29,31 +26,22 @@ class RefreshIntervalViewModelTests: XCTestCase {
         }
     }
 
-    func test_option_whenIsCurrent_shouldBeSelected() {
-        var values = [Bool]()
-        viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.sink {
-            values.append($0)
-        }.store(in: &cancellables)
-        XCTAssertEqual(values, [true])
+    func test_option_whenIsCurrent_shouldBeSelected() throws {
+        let isSelected = try viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.wait().value()
+        XCTAssertEqual(isSelected, .some(true))
     }
 
     func test_option_whenNoLongerCurrent_shouldDeselect() {
-        var values = [Bool]()
-        viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.sink {
-            values.append($0)
-        }.store(in: &cancellables)
-        XCTAssertEqual(values, [true])
-        viewModel.receive(.optionSelected(index: 0))
-        XCTAssertEqual(values, [true, false])
+        let isSelected = viewModel.view.options.first { $0.title == "2 seconds" }?.isSelected.wait {
+            self.viewModel.receive(.optionSelected(index: 0))
+        }.values()
+        XCTAssertEqual(isSelected, [true, false])
     }
 
     func test_option_whenSelected_shouldBecomeSelected() {
-        var values = [Bool]()
-        viewModel.view.options.first?.isSelected.sink {
-            values.append($0)
-        }.store(in: &cancellables)
-        XCTAssertEqual(values, [false])
-        viewModel.receive(.optionSelected(index: 0))
-        XCTAssertEqual(values, [false, true])
+        let isSelected = viewModel.view.options.first?.isSelected.wait {
+            self.viewModel.receive(.optionSelected(index: 0))
+        }.values()
+        XCTAssertEqual(isSelected, [false, true])
     }
 }

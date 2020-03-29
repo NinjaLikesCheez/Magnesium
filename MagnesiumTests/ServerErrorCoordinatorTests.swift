@@ -2,46 +2,34 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class ServerErrorCoordinatorTests: XCTestCase {
+class ServerErrorCoordinatorTests: TestCase {
     private var coordinator: ServerErrorCoordinator!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         coordinator = ServerErrorCoordinator(server: .mock(.transmission))
-        cancellables = Set()
     }
 
     // MARK: - Presentable
 
     func test_presentable_shouldBeExpectedViewController() {
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === ServerErrorViewController<ServerErrorViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerErrorViewController<ServerErrorViewModel>.self)
     }
 
     // MARK: - ServerErrorEvent
 
-    func test_serverErrorEvent_showSettings_shouldEmitShowSettings() {
-        var event: ServerErrorCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(.showSettings)
-        guard case .showSettings = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverErrorEvent_showSettings_shouldEmitShowSettings() throws {
+        let event = try coordinator.events.first().wait {
+            self.coordinator.receive(.showSettings)
+        }.value()
+        XCTAssertCase(event, .showSettings)
     }
 
-    func test_serverErrorEvent_editServer_shouldEmitEditServerEvent() {
-        var event: ServerErrorCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(.editServer)
-        guard case .editServer = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverErrorEvent_editServer_shouldEmitEditServerEvent() throws {
+        let event = try coordinator.events.first().wait {
+            self.coordinator.receive(.editServer)
+        }.value()
+        XCTAssertCase(event, type(of: event).editServer)
     }
 }

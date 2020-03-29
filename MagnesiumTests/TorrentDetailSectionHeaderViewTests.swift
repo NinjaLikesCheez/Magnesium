@@ -2,7 +2,7 @@
 import SnapshotTesting
 import XCTest
 
-class TorrentDetailSectionHeaderViewTests: XCTestCase {
+class TorrentDetailSectionHeaderViewTests: TestCase {
     func test_view() {
         let cell = TorrentDetailSectionHeaderView.mock(title: "Title")
         assertSnapshot(matching: SizingView(cell), as: .image)

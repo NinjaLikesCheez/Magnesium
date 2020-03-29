@@ -3,7 +3,7 @@ import Combine
 import SnapshotTesting
 import XCTest
 
-class RefreshIntervalViewControllerTests: XCTestCase {
+class RefreshIntervalViewControllerTests: TestCase {
     func test_view() {
         let viewRep = RefreshIntervalViewRepresentation(options: [
             .init(title: "2 seconds", isSelected: Just(true).eraseToAnyPublisher()),

@@ -5,7 +5,7 @@ import Preferences
 import ViewModel
 import XCTest
 
-class AppCoordinatorTests: XCTestCase {
+class AppCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var session: Session!
     private var splitViewController: MockSplitViewController!
@@ -13,7 +13,6 @@ class AppCoordinatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         session = Session()
         splitViewController = MockSplitViewController()

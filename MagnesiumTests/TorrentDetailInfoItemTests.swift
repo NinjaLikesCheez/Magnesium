@@ -2,10 +2,9 @@ import Combine
 @testable import Magnesium
 import XCTest
 
-class TorrentDetailInfoItemTests: XCTestCase {
+class TorrentDetailInfoItemTests: TestCase {
     override func setUp() {
         super.setUp()
-        Current = .mock
     }
 
     func test_id_shouldEqualName() {

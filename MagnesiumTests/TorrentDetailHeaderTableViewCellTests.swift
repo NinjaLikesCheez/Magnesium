@@ -2,7 +2,7 @@
 import SnapshotTesting
 import XCTest
 
-class TorrentDetailHeaderTableViewCellTests: XCTestCase {
+class TorrentDetailHeaderTableViewCellTests: TestCase {
     func test_view() {
         let torrent = MockTorrent(name: "Name")
         let cell = TorrentDetailHeaderTableViewCell.mock(torrent: torrent)

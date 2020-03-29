@@ -24,12 +24,19 @@ type_name:
   max_length: 60
 
 custom_rules:
-  keypath_map: # rule identifier
+  keypath_map:
     name: "KeyPath map syntax"
     regex: "map \\{ \\$0\\.[\\w\\.]+ \\}"
     match_kinds:
       - identifier
     message: "Use KeyPath map syntax instead."
+    severity: warning
+  testcase_inheritance:
+    name: "TestCase inheritance"
+    regex: ": XCTestCase"
+    match_kinds:
+      - typeidentifier
+    message: "Inherit from TestCase instead."
     severity: warning
 
 # -- MASTER -- #

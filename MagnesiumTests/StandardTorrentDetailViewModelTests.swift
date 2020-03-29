@@ -6,7 +6,7 @@ import Preferences
 import ViewModel
 import XCTest
 
-final class StandardTorrentDetailViewModelTests: XCTestCase {
+final class StandardTorrentDetailViewModelTests: TestCase {
     private var torrent: CurrentValueSubject<MockTorrent, Never>!
     private var labels: CurrentValueSubject<[MockLabel], Never>!
     private var implementation: MockImplementation!
@@ -15,7 +15,6 @@ final class StandardTorrentDetailViewModelTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         torrent = CurrentValueSubject(MockTorrent(name: "Mock", downloadPath: "/downloads"))
         labels = CurrentValueSubject([MockLabel(), MockLabel(name: "label1"), MockLabel(name: "label2")])
         implementation = MockImplementation()

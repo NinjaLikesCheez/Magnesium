@@ -3,7 +3,7 @@ import Combine
 import SnapshotTesting
 import XCTest
 
-class SettingsViewControllerTests: XCTestCase {
+class SettingsViewControllerTests: TestCase {
     func test_view() {
         let viewRep = SettingsViewRepresentation(
             sections: Just([

@@ -1,10 +1,9 @@
 @testable import Magnesium
 import XCTest
 
-class TransmissionTorrentFileTests: XCTestCase {
+class TransmissionTorrentFileTests: TestCase {
     override func setUp() {
         super.setUp()
-        Current = .mock
     }
 
     func test_progress_shouldEqualDownloadedOverSize() {

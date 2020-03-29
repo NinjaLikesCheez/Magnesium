@@ -5,14 +5,14 @@ import Preferences
 import Transmission
 
 struct Environment {
-    let deluge: (URL, String) -> DelugeClient
-    let transmission: (URL, String?, String?) -> TransmissionClient
-    let preferences: Preferences
-    let keychain: Keychain
-    let locale: Locale
-    let calendar: Calendar
-    let fileSystem: FileSystem
-    let defaults: Defaults
+    var deluge: (URL, String) -> DelugeClient
+    var transmission: (URL, String?, String?) -> TransmissionClient
+    var preferences: Preferences
+    var keychain: Keychain
+    var locale: Locale
+    var calendar: Calendar
+    var fileSystem: FileSystem
+    var defaults: Defaults
 }
 
 extension Environment {

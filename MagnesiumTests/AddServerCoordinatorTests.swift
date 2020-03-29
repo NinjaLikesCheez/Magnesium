@@ -3,18 +3,15 @@ import Combine
 import Preferences
 import XCTest
 
-class AddServerCoordinatorTests: XCTestCase {
+class AddServerCoordinatorTests: TestCase {
     private let window = UIWindow()
     private var navigationController: UINavigationController!
     private var coordinator: AddServerCoordinator!
-    private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         coordinator = AddServerCoordinator()
         navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
-        cancellables = Set()
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
@@ -22,10 +19,7 @@ class AddServerCoordinatorTests: XCTestCase {
 
     func test_presentable_shouldBeAddServerViewController() {
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) == AddServerViewController<AddServerViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, AddServerViewController<AddServerViewModel>.self)
     }
 
     // MARK: AddServerViewModelEvent
@@ -37,25 +31,19 @@ class AddServerCoordinatorTests: XCTestCase {
         XCTAssertEqual(navigationController.viewControllers.count, 2)
     }
 
-    func test_addServerEvent_complete_shouldEmitCompleteEvent() {
-        var event: AddServerCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(AddServerViewModelEvent.complete)
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_addServerEvent_complete_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.first().wait {
+            self.coordinator.receive(AddServerViewModelEvent.complete)
+        }.value()
+        XCTAssertCase(event, .complete)
     }
 
     // MARK: ServerSettingsCoordinatorEvent
 
-    func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() {
-        var event: AddServerCoordinatorEvent?
-        coordinator.events.sink { event = $0 }.store(in: &cancellables)
-        coordinator.handle(ServerSettingsCoordinatorEvent.complete)
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.first().wait {
+            self.coordinator.handle(ServerSettingsCoordinatorEvent.complete)
+        }.value()
+        XCTAssertCase(event, .complete)
     }
 }

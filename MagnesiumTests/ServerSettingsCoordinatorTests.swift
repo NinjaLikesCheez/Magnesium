@@ -4,18 +4,15 @@ import CommonModels
 import Preferences
 import XCTest
 
-class ServerSettingsCoordinatorTests: XCTestCase {
+class ServerSettingsCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var coordinator: ServerSettingsCoordinator!
-    private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         coordinator = ServerSettingsCoordinator(type: .transmission)
-        cancellables = Set()
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -26,57 +23,39 @@ class ServerSettingsCoordinatorTests: XCTestCase {
     func test_presentable_withDelugeServer_shouldBeServerSettingsViewController() {
         let coordinator = ServerSettingsCoordinator(server: .mock(.deluge))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     func test_presentable_withTransmissionServer_shouldBeServerSettingsViewController() {
         let coordinator = ServerSettingsCoordinator(server: .mock(.transmission))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     func test_presentable_withDelugeServerType_shouldBeServerSettingsViewController() {
         let coordinator = ServerSettingsCoordinator(type: .deluge)
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     func test_presentable_withTransmissionServerType_shouldBeServerSettingsViewController() {
         let coordinator = ServerSettingsCoordinator(type: .transmission)
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     // MARK: handle - ServerSettingsEvent
 
-    func test_serverSettings_completeEvent_shouldEmitCompleteEvent() {
-        var event: ServerSettingsCoordinatorEvent?
-        coordinator.events.first().sink { event = $0 }.store(in: &cancellables)
-        coordinator.receive(.complete)
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+    func test_serverSettings_completeEvent_shouldEmitCompleteEvent() throws {
+        let event = try coordinator.events.first().wait {
+            self.coordinator.receive(.complete)
+        }.value()
+        XCTAssertCase(event, .complete)
     }
 
     func test_serverSettings_alertEvent_shouldPresentAlertController() {
         coordinator.receive(.alert(Alert(title: "", style: .alert)))
-        let viewController = coordinator.presentable.viewController.presentedViewController!
-        guard type(of: viewController) == UIAlertController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        let viewController = coordinator.presentable.viewController.presentedViewController
+        XCTAssertType(viewController, UIAlertController.self)
     }
 }

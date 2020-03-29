@@ -3,13 +3,12 @@ import CommonModels
 @testable import Magnesium
 import XCTest
 
-class FilterCoordinatorTests: XCTestCase {
+class FilterCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var coordinator: FilterCoordinator!
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         coordinator = FilterCoordinator(labels: CurrentValueSubject([]))
 
@@ -20,11 +19,7 @@ class FilterCoordinatorTests: XCTestCase {
 
     func test_presentable_shouldBeNavigationController_withFilterViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === FilterViewController<FilterViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, FilterViewController<FilterViewModel>.self)
     }
 
     // MARK: handle - FilterEvent
@@ -39,9 +34,6 @@ class FilterCoordinatorTests: XCTestCase {
     func test_settingsEvent_alert_shouldPresentAlertController() {
         coordinator.receive(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 }

@@ -3,7 +3,7 @@ import Combine
 import SnapshotTesting
 import XCTest
 
-class ServerSettingsViewControllerTests: XCTestCase {
+class ServerSettingsViewControllerTests: TestCase {
     func test_addServer() {
         let viewRep = ServerSettingsViewRepresentation(
             title: "Add Server",

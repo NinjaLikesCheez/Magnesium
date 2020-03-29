@@ -5,7 +5,7 @@ import Preferences
 import Transmission
 import XCTest
 
-class AddTorrentFlowTests: XCTestCase {
+class AddTorrentFlowTests: TestCase {
     private var window: UIWindow!
     private var viewController: UIViewController!
     private var session: Session!
@@ -18,10 +18,8 @@ class AddTorrentFlowTests: XCTestCase {
         super.setUp()
         delugeClient = MockDelugeClient()
         transmissionClient = MockTransmissionClient()
-        Current = .mock(
-            deluge: { _, _ in self.delugeClient },
-            transmission: { _, _, _ in self.transmissionClient }
-        )
+        Current.deluge = { _, _ in self.delugeClient }
+        Current.transmission = { _, _, _ in self.transmissionClient }
         window = UIWindow()
         viewController = UIViewController()
         session = Session()

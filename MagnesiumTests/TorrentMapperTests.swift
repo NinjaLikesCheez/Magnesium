@@ -4,12 +4,11 @@ import CryptoKit
 import Preferences
 import XCTest
 
-class TorrentMapperTests: XCTestCase {
+class TorrentMapperTests: TestCase {
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        Current = .mock
     }
 
     private func getValues(from mapper: TorrentMapper<Int, MockTorrent>) -> [MockTorrent] {

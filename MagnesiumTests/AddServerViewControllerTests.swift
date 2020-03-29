@@ -2,7 +2,7 @@
 import SnapshotTesting
 import XCTest
 
-class AddServerViewControllerTests: XCTestCase {
+class AddServerViewControllerTests: TestCase {
     func test_view() {
         let viewRep = AddServerViewRepresentation(types: [
             "Deluge",

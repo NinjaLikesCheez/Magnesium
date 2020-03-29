@@ -2,7 +2,7 @@
 import SnapshotTesting
 import XCTest
 
-class FilterViewControllerTests: XCTestCase {
+class FilterViewControllerTests: TestCase {
     func test_view() {
         let viewModel = FilterViewModel(labels: .init([MockLabel(), MockLabel(name: "label")]))
         let viewController = FilterViewController(viewModel: viewModel)

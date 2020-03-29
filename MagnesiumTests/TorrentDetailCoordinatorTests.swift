@@ -5,7 +5,7 @@ import LinkPresentation
 import ViewModel
 import XCTest
 
-class TorrentDetailCoordinatorTests: XCTestCase {
+class TorrentDetailCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
     private var coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>!
@@ -13,7 +13,6 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         viewModel = MockViewModel()
         coordinator = TorrentDetailCoordinator(viewModel: AnyViewModel(viewModel))
@@ -28,10 +27,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
 
     func test_presentable_shouldBeTorrentDetailViewController() {
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController) === TorrentDetailViewController<AnyTorrentDetailViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: self))")
-            return
-        }
+        XCTAssertType(viewController, TorrentDetailViewController<AnyTorrentDetailViewModel>.self)
     }
 
     // MARK: - Handle TorrentDetailEvent
@@ -40,19 +36,13 @@ class TorrentDetailCoordinatorTests: XCTestCase {
         let event = try coordinator.events.first().wait {
             self.viewModel.eventSubject.send(.complete)
         }.value()
-        guard case .complete = event else {
-            XCTFail("Unexpected event: \(String(describing: event))")
-            return
-        }
+        XCTAssertCase(event, .complete)
     }
 
     func test_alert_shouldPresentAlertController() {
         viewModel.eventSubject.send(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")
-            return
-        }
+        XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 
     func test_activities_shouldPresentActivityViewController() {
@@ -62,10 +52,7 @@ class TorrentDetailCoordinatorTests: XCTestCase {
             source: .view(UIView(), rect: .zero)
         ))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController.presentedViewController!) === UIActivityViewController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController.presentedViewController))")
-            return
-        }
+        XCTAssertType(viewController.presentedViewController, UIActivityViewController.self)
     }
 
     func test_moveDownloadFolder_shouldPresentAlertController() {

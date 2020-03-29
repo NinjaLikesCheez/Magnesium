@@ -3,7 +3,7 @@ import Combine
 import SnapshotTesting
 import XCTest
 
-class TorrentDetailViewControllerTests: XCTestCase {
+class TorrentDetailViewControllerTests: TestCase {
     func test_view() {
         let torrent = MockTorrent(name: "Name", label: "label")
         let viewRep = TorrentDetailViewRepresentation(

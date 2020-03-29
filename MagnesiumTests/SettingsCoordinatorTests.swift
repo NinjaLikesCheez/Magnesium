@@ -5,7 +5,7 @@ import Coordinator
 import Preferences
 import XCTest
 
-class SettingsCoordinatorTests: XCTestCase {
+class SettingsCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var session: Session!
     private var coordinator: SettingsCoordinator!
@@ -13,7 +13,6 @@ class SettingsCoordinatorTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        Current = .mock
         window = UIWindow()
         session = Session()
         coordinator = SettingsCoordinator(session: session)
@@ -25,11 +24,7 @@ class SettingsCoordinatorTests: XCTestCase {
 
     func test_presentable_shouldBeNavigationController_withSettingsViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
-        let viewController = navigationController.viewControllers[0]
-        guard type(of: viewController) === SettingsViewController<SettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(navigationController.viewControllers.first, SettingsViewController<SettingsViewModel>.self)
     }
 
     // MARK: - SettingsEvent
@@ -44,10 +39,7 @@ class SettingsCoordinatorTests: XCTestCase {
     func test_settingsEvent_alert_shouldPresentAlertController() {
         coordinator.receive(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
-        guard type(of: viewController.presentedViewController!) === UIAlertController.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
@@ -55,10 +47,7 @@ class SettingsCoordinatorTests: XCTestCase {
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     func test_settingsEvent_editServer_withDelugeServer_shouldPushServerSettingsViewController() {
@@ -66,10 +55,7 @@ class SettingsCoordinatorTests: XCTestCase {
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
-        guard type(of: viewController) === ServerSettingsViewController<AnyServerSettingsViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, ServerSettingsViewController<AnyServerSettingsViewModel>.self)
     }
 
     func test_settingsEvent_addServer_shouldPushAddServerViewController() {
@@ -77,10 +63,7 @@ class SettingsCoordinatorTests: XCTestCase {
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
-        guard type(of: viewController) === AddServerViewController<AddServerViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, AddServerViewController<AddServerViewModel>.self)
     }
 
     func test_settingsEvent_showRefreshIntervalSettings_shouldPushRefreshIntervalViewController() {
@@ -88,10 +71,7 @@ class SettingsCoordinatorTests: XCTestCase {
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
-        guard type(of: viewController) === RefreshIntervalViewController<RefreshIntervalViewModel>.self else {
-            XCTFail("Unexpected view controller: \(String(describing: viewController))")
-            return
-        }
+        XCTAssertType(viewController, RefreshIntervalViewController<RefreshIntervalViewModel>.self)
     }
 
     // MARK: - ServerSettingsCoordinatorEvent
