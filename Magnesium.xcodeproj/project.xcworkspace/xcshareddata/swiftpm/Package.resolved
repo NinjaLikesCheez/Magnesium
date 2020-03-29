@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "CombineWaiting",
+        "repositoryURL": "https://github.com/jameshurst/CombineWaiting.git",
+        "state": {
+          "branch": null,
+          "revision": "11bea05c8699924b918c8cc3156c846a16396864",
+          "version": "1.0.0"
+        }
+      },
+      {
         "package": "Deluge",
         "repositoryURL": "https://github.com/jameshurst/Deluge-Swift.git",
         "state": {
