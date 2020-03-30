@@ -137,7 +137,7 @@ class TorrentListCoordinatorTests: TestCase {
         XCTAssertEqual(viewController.dismissParamAnimated, [true])
     }
 
-    // MARK: - TorrentListPreviewProvider
+    // MARK: - TorrentListViewDelegate
 
     func test_previewForItem_shouldAddDetailChildCoordinator() {
         let viewController = coordinator.previewForItem(at: 0)
@@ -145,11 +145,6 @@ class TorrentListCoordinatorTests: TestCase {
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
         let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
         XCTAssertType(childCoordinator, TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self)
-    }
-
-    func test_contextMenuForItem_shouldReturnExpectedMenu() {
-        let menu = coordinator.contextMenuForItem(at: 0)
-        XCTAssertEqual(menu?.identifier.rawValue, "mock")
     }
 
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
@@ -188,29 +183,11 @@ class TorrentListCoordinatorTests: TestCase {
         }
         waitForExpectations(timeout: 1)
     }
-
-    func test_leadingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {
-        let configuration = coordinator.leadingSwipeActionsConfigurationForItem(
-            at: 0,
-            source: .view(UIView(), rect: .zero)
-        )!
-        XCTAssertEqual(configuration.actions.count, 1)
-        XCTAssertEqual(configuration.actions[0].title, "leadingMock")
-    }
-
-    func test_trailingSwipeActionsConfigurationForItem_shouldReturnExpectedActions() {
-        let configuration = coordinator.trailingSwipeActionsConfigurationForItem(
-            at: 0,
-            source: .view(UIView(), rect: .zero)
-        )!
-        XCTAssertEqual(configuration.actions.count, 1)
-        XCTAssertEqual(configuration.actions[0].title, "trailingMock")
-    }
 }
 
 // MARK: - Mocks
 
-private final class MockViewModel: ViewModel, TorrentListProvider {
+private final class MockViewModel: ViewModel {
     let values = TorrentListViewValues(
         title: Just("").eraseToAnyPublisher(),
         items: Just([]).eraseToAnyPublisher(),
@@ -218,45 +195,15 @@ private final class MockViewModel: ViewModel, TorrentListProvider {
         isEditing: Just(false).eraseToAnyPublisher(),
         hasActiveFilters: Just(false).eraseToAnyPublisher(),
         editActionsEnabled: Just(false).eraseToAnyPublisher(),
-        status: Just("").eraseToAnyPublisher()
+        status: Just("").eraseToAnyPublisher(),
+        detailViewModel: { _ in .init(MockDetailViewModel()) },
+        contextMenu: { _ in nil },
+        leadingSwipeActionsConfiguration: { _, _ in nil },
+        trailingSwipeActionsConfiguration: { _, _ in nil }
     )
     let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     var events: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
     func receive(_ event: TorrentListViewEvent) {}
-
-    private(set) var previewViewModels = [AnyTorrentDetailViewModel]()
-    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        let torrent = CurrentValueSubject<DelugeTorrent, Never>(DelugeTorrent.mock())
-        let labels = CurrentValueSubject<[DelugeLabel], Never>([.mock()])
-        let client = MockDelugeClient()
-        let refresher = MockTorrentRefresher()
-        let viewModel = AnyTorrentDetailViewModel(StandardTorrentDetailViewModel(
-            implementation: DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher),
-            torrent: torrent,
-            labels: labels
-        ))
-        previewViewModels.append(viewModel)
-        return viewModel
-    }
-
-    func contextMenuForItem(at index: Int) -> UIMenu? {
-        UIMenu(title: "Menu", identifier: UIMenu.Identifier(rawValue: "mock"))
-    }
-
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
-        SwipeActionsConfiguration(actions: [
-            SwipeAction(title: "leadingMock", handler: {}),
-        ])
-    }
-
-    func trailingSwipeActionsConfigurationForItem(
-        at index: Int,
-        source: PopoverSource
-    ) -> SwipeActionsConfiguration? {
-        SwipeActionsConfiguration(actions: [
-            SwipeAction(title: "trailingMock", handler: {}),
-        ])
-    }
 }
 
 private final class MockDetailViewModel: ViewModel {

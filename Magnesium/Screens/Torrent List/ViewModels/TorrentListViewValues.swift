@@ -1,4 +1,6 @@
 import Combine
+import CommonModels
+import UIKit
 
 struct TorrentListViewValues {
     var showAddButton: Bool = true
@@ -10,4 +12,8 @@ struct TorrentListViewValues {
     var hasActiveFilters: AnyPublisher<Bool, Never>
     var editActionsEnabled: AnyPublisher<Bool, Never>
     var status: AnyPublisher<String, Never>
+    var detailViewModel: (Int) -> AnyTorrentDetailViewModel?
+    var contextMenu: (Int) -> UIMenu?
+    var leadingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
+    var trailingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
 }

@@ -334,7 +334,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         XCTAssertEqual(errorAlert.title, "Failed to Remove")
     }
 
-    // MARK: - State
+    // MARK: - Values
 
     // MARK: sections
 

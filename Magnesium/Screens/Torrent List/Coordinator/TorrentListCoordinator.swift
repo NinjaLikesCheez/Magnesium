@@ -31,13 +31,18 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(viewModel: AnyTorrentListViewModel, session: Session) {
+    convenience init?(server: Server, session: Session) {
+        guard let viewModel = Self.decode(server: server) else { return nil }
+        self.init(viewModel: viewModel, session: session)
+    }
+
+    init?(viewModel: AnyTorrentListViewModel, session: Session) {
         self.viewModel = viewModel
         self.session = session
         viewController = .init(viewModel: viewModel)
         viewModelEvents = viewModel.events
         super.init()
-        viewController.provider = self
+        viewController.delegate = self
     }
 
     func receive(_ event: TorrentListViewModelEvent) {
@@ -158,17 +163,13 @@ extension TorrentListCoordinator: UIDocumentPickerDelegate {
     }
 }
 
-extension TorrentListCoordinator: TorrentListViewProvider {
+extension TorrentListCoordinator: TorrentListViewDelegate {
     func previewForItem(at index: Int) -> UIViewController? {
-        guard let viewModel = viewModel.detailViewModelForItem(at: index) else { return nil }
+        guard let viewModel = viewModel.values.detailViewModel(index) else { return nil }
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { _, _ in }
         previewCoordinatorMap[index] = coordinator
         return coordinator.presentable.viewController
-    }
-
-    func contextMenuForItem(at index: Int) -> UIMenu? {
-        viewModel.contextMenuForItem(at: index)
     }
 
     func commitPreviewForItem(at index: Int) {
@@ -183,17 +184,35 @@ extension TorrentListCoordinator: TorrentListViewProvider {
             self?.previewCoordinatorMap.removeValue(forKey: index)
         }
     }
+}
 
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration? {
-        let configuration = viewModel.leadingSwipeActionsConfigurationForItem(at: index, source: source)
-        return configuration?.createUISwipeActionsConfiguration()
-    }
-
-    func trailingSwipeActionsConfigurationForItem(
-        at index: Int,
-        source: PopoverSource
-    ) -> UISwipeActionsConfiguration? {
-        let configuration = viewModel.trailingSwipeActionsConfigurationForItem(at: index, source: source)
-        return configuration?.createUISwipeActionsConfiguration()
+private extension TorrentListCoordinator {
+    static func decode(server: Server) -> AnyTorrentListViewModel? {
+        switch server.type {
+        case .deluge:
+            let decoder = JSONDecoder()
+            guard let settings = try? decoder.decode(DelugeServerSettings.self, from: server.data),
+                let keychainData = server.keychainData,
+                let keychain = try? decoder.decode(DelugeKeychainData.self, from: keychainData)
+            else {
+                return nil
+            }
+            let client = Current.deluge(settings.url, keychain.password)
+            let implementation = DelugeTorrentListViewModelImplementation(client: client)
+            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: server)
+            return .init(viewModel)
+        case .transmission:
+            let decoder = JSONDecoder()
+            guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
+                let keychainData = server.keychainData,
+                let keychain = try? decoder.decode(TransmissionKeychainData.self, from: keychainData)
+            else {
+                return nil
+            }
+            let client = Current.transmission(settings.url, settings.username, keychain.password)
+            let implementation = TransmissionTorrentListViewModelImplementation(client: client)
+            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: server)
+            return .init(viewModel)
+        }
     }
 }

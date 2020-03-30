@@ -4,13 +4,10 @@ import Coordinator
 import UIKit
 import ViewModel
 
-protocol TorrentListViewProvider: AnyObject {
+protocol TorrentListViewDelegate: AnyObject {
     func previewForItem(at index: Int) -> UIViewController?
-    func contextMenuForItem(at index: Int) -> UIMenu?
     func commitPreviewForItem(at index: Int)
     func didDismissPreviewForItem(at index: Int)
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
-    func trailingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> UISwipeActionsConfiguration?
 }
 
 // swiftlint:disable:next line_length
@@ -22,7 +19,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
-    weak var provider: TorrentListViewProvider?
+    weak var delegate: TorrentListViewDelegate?
     private lazy var statusView = StatusView()
 
     private lazy var settingsBarButtonItem: UIBarButtonItem = {
@@ -419,10 +416,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         .init(
             identifier: indexPath as NSCopying,
             previewProvider: { [weak self] in
-                self?.provider?.previewForItem(at: indexPath.row)
+                self?.delegate?.previewForItem(at: indexPath.row)
             },
             actionProvider: { [weak self] _ in
-                self?.provider?.contextMenuForItem(at: indexPath.row)
+                self?.viewModel.values.contextMenu(indexPath.row)
             }
         )
     }
@@ -434,7 +431,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     ) {
         guard let indexPath = configuration.identifier as? IndexPath else { return }
         animator.addAnimations {
-            self.provider?.commitPreviewForItem(at: indexPath.row)
+            self.delegate?.commitPreviewForItem(at: indexPath.row)
         }
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
     }
@@ -444,7 +441,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
         guard let indexPath = configuration.identifier as? IndexPath else { return nil }
-        provider?.didDismissPreviewForItem(at: indexPath.row)
+        delegate?.didDismissPreviewForItem(at: indexPath.row)
         return nil
     }
 
@@ -453,10 +450,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
         guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
-        return provider?.leadingSwipeActionsConfigurationForItem(
-            at: indexPath.row,
-            source: .view(cell, rect: cell.bounds)
-        )
+        return viewModel.values.leadingSwipeActionsConfiguration(
+            indexPath.row,
+            PopoverSource.view(cell, rect: cell.bounds)
+        )?.createUISwipeActionsConfiguration()
     }
 
     override func tableView(
@@ -464,10 +461,10 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
         guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
-        return provider?.trailingSwipeActionsConfigurationForItem(
-            at: indexPath.row,
-            source: .view(cell, rect: cell.bounds)
-        )
+        return viewModel.values.trailingSwipeActionsConfiguration(
+            indexPath.row,
+            PopoverSource.view(cell, rect: cell.bounds)
+        )?.createUISwipeActionsConfiguration()
     }
 
     // MARK: UISearchResultsUpdating

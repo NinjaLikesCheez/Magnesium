@@ -48,8 +48,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     private func show(server: Server?) {
         let viewController: UIViewController
-        if let server = server, let viewModel = server.listViewModel() {
-            let coordinator = TorrentListCoordinator(viewModel: viewModel, session: session)
+        if let server = server, let coordinator = TorrentListCoordinator(server: server, session: session) {
             addChildCoordinator(coordinator) { [weak self] _, event in
                 self?.handle(event)
             }

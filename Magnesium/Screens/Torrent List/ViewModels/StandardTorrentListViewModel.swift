@@ -23,8 +23,7 @@ protocol StandardTorrentListViewModelImplementation {
     func moveDownloadFolder(for torrents: [Torrent], to path: String) -> AnyPublisher<Void, Error>
 }
 
-// swiftlint:disable:next line_length
-final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel, TorrentListProvider {
+final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel {
     typealias Torrent = Implementation.Torrent
     typealias Label = Implementation.Label
 
@@ -37,8 +36,12 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     private let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     private let querySubject = CurrentValueSubject<String?, Never>(nil)
     private var autoRefreshTimer: Timer?
-    let values: TorrentListViewValues
+    private var _values: TorrentListViewValues!
     var cancellables = Set<AnyCancellable>()
+
+    var values: TorrentListViewValues {
+        _values
+    }
 
     var events: AnyPublisher<TorrentListViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -55,36 +58,46 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
             }
             .ui()
             .eraseToAnyPublisher()
+
         let items = torrents.values
             .map { $0.map { TorrentListItem(torrent: $0) } }
             .ui()
             .eraseToAnyPublisher()
+
         let hasActiveFilters = Current.preferences.valuePublisher(for: .filterOptions)
             .map { $0 != FilterOptions() }
             .ui()
             .eraseToAnyPublisher()
+
         let totalDownloadSpeed = torrents.allValues
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
             .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
+
         let totalUploadSpeed = torrents.allValues
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
+
         let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
             .map { "\($0) \($1)" }
             .ui()
             .eraseToAnyPublisher()
-        values = TorrentListViewValues(
+
+        _values = .init(
             title: title,
             items: items,
             isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
             isEditing: isEditingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
             hasActiveFilters: hasActiveFilters,
             editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher(),
-            status: status
+            status: status,
+            detailViewModel: detailViewModelForItem(at:),
+            contextMenu: contextMenuForItem(at:),
+            leadingSwipeActionsConfiguration: leadingSwipeActionsConfigurationForItem(at:source:),
+            trailingSwipeActionsConfiguration: trailingSwipeActionsConfigurationForItem(at:source:)
         )
 
         refresh()
@@ -115,6 +128,8 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     deinit {
         autoRefreshTimer?.invalidate()
     }
+
+    // MARK: View Events
 
     // swiftlint:disable:next cyclomatic_complexity
     func receive(_ event: TorrentListViewEvent) {
@@ -325,57 +340,14 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         eventSubject.send(.alert(alert))
     }
 
-    // MARK: Auto Refresh
+    // MARK: View Functions
 
-    private func configureAutoRefreshTimer(interval: Int?) {
-        autoRefreshTimer?.invalidate()
-        guard let interval = interval.map({ TimeInterval($0) }), interval > 0 else { return }
-        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
-            self?.refreshTimerFired($0)
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        autoRefreshTimer = timer
-    }
-
-    private func refreshTimerFired(_ timer: Timer) {
-        performRefresh()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &cancellables)
-    }
-
-    private func refresh() -> AnyPublisher<Void, Error> {
-        performRefresh()
-            .eraseError()
-            .ui()
-            .handleEvents(receiveCompletion: { [weak self] completion in
-                guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
-            })
-            .eraseToAnyPublisher()
-    }
-
-    private func performRefresh() -> AnyPublisher<Void, Error> {
-        isLoadingSubject.send(true)
-        return implementation.refresh()
-            .handleEvents(receiveOutput: { [weak self] update in
-                self?.labels.send(update.1)
-                self?.torrents.update(with: update.0.map { ($0.hash, $0) })
-                self?.isLoadingSubject.send(false)
-            }, receiveCompletion: { [weak self] _ in
-                self?.isLoadingSubject.send(false)
-            })
-            .asVoid()
-            .eraseToAnyPublisher()
-    }
-
-    // MARK: TorrentListPreviewProvider
-
-    func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
+    private func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
         let subject = torrents.subject(at: index)
         return implementation.detailViewModel(for: subject, labels: labels)
     }
 
-    func contextMenuForItem(at index: Int) -> UIMenu? {
+    private func contextMenuForItem(at index: Int) -> UIMenu? {
         let torrent = torrents.subject(at: index).value
         var actions = [UIMenuElement]()
 
@@ -453,7 +425,10 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         return UIMenu(title: "", children: actions)
     }
 
-    func leadingSwipeActionsConfigurationForItem(at index: Int, source: PopoverSource) -> SwipeActionsConfiguration? {
+    private func leadingSwipeActionsConfigurationForItem(
+        at index: Int,
+        source: PopoverSource
+    ) -> SwipeActionsConfiguration? {
         let torrent = torrents.subject(at: index).value
         if torrent.isActive {
             return SwipeActionsConfiguration(actions: [
@@ -480,7 +455,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         }
     }
 
-    func trailingSwipeActionsConfigurationForItem(
+    private func trailingSwipeActionsConfigurationForItem(
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
@@ -501,5 +476,48 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
                 }
             ),
         ])
+    }
+
+    // MARK: Auto Refresh
+
+    private func configureAutoRefreshTimer(interval: Int?) {
+        autoRefreshTimer?.invalidate()
+        guard let interval = interval.map({ TimeInterval($0) }), interval > 0 else { return }
+        let timer = Timer(fire: Date().advanced(by: interval), interval: interval, repeats: true) { [weak self] in
+            self?.refreshTimerFired($0)
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        autoRefreshTimer = timer
+    }
+
+    private func refreshTimerFired(_ timer: Timer) {
+        performRefresh()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellables)
+    }
+
+    private func refresh() -> AnyPublisher<Void, Error> {
+        performRefresh()
+            .eraseError()
+            .ui()
+            .handleEvents(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
+            })
+            .eraseToAnyPublisher()
+    }
+
+    private func performRefresh() -> AnyPublisher<Void, Error> {
+        isLoadingSubject.send(true)
+        return implementation.refresh()
+            .handleEvents(receiveOutput: { [weak self] update in
+                self?.labels.send(update.1)
+                self?.torrents.update(with: update.0.map { ($0.hash, $0) })
+                self?.isLoadingSubject.send(false)
+            }, receiveCompletion: { [weak self] _ in
+                self?.isLoadingSubject.send(false)
+            })
+            .asVoid()
+            .eraseToAnyPublisher()
     }
 }

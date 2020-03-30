@@ -609,7 +609,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertFalse(event.hasValue())
     }
 
-    // MARK: - State
+    // MARK: - Values
 
     // MARK: items
 
@@ -657,20 +657,22 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertEqual(viewModel.values.status.first().wait(), "↓ 684 KB/s ↑ 1.3 MB/s")
     }
 
-    // MARK: - TorrentListProvider
+    // MARK: detailViewModel
 
-    func test_detailViewModelForItem_shouldReturnExpectedViewModel() {
-        let detailViewModel = viewModel.detailViewModelForItem(at: 0)!.base as AnyObject
+    func test_detailViewModel_shouldReturnExpectedViewModel() {
+        let detailViewModel = viewModel.values.detailViewModel(0)!.base as AnyObject
         XCTAssertType(detailViewModel, MockDetailViewModel.self)
     }
 
-    func test_contextMenuForItem_whenNoLabels_shouldReturnExpectedMenu() {
+    // MARK: contextMenu
+
+    func test_contextMenu_whenNoLabels_shouldReturnExpectedMenu() {
         implementation.refreshResult = Just(([MockTorrent()], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let menu = viewModel.contextMenuForItem(at: 0)!
+        let menu = viewModel.values.contextMenu(0)!
         func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
             var output = String(repeating: " ", count: level * 2)
             output += "\(menu.title)\n"
@@ -697,8 +699,8 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertEqual(menuString(menu), expected)
     }
 
-    func test_contextMenuForItem_withActiveTorrent_shouldReturnExpectedMenu() {
-        let menu = viewModel.contextMenuForItem(at: 0)!
+    func test_contextMenu_withActiveTorrent_shouldReturnExpectedMenu() {
+        let menu = viewModel.values.contextMenu(0)!
         func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
             var output = String(repeating: " ", count: level * 2)
             output += "\(menu.title)\n"
@@ -729,7 +731,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertEqual(menuString(menu), expected)
     }
 
-    func test_contextMenuForItem_withInactiveTorrent_shouldReturnExpectedMenu() {
+    func test_contextMenu_withInactiveTorrent_shouldReturnExpectedMenu() {
         implementation.refreshResult = Just((
             [MockTorrent(standardState: .paused)],
             [MockLabel(name: ""), MockLabel(name: "label1"), MockLabel(name: "label2")]
@@ -738,7 +740,7 @@ final class StandardTorrentListViewModelTests: TestCase {
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let menu = viewModel.contextMenuForItem(at: 0)!
+        let menu = viewModel.values.contextMenu(0)!
         func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
             var output = String(repeating: " ", count: level * 2)
             output += "\(menu.title)\n"
@@ -769,8 +771,10 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertEqual(menuString(menu), expected)
     }
 
+    // MARK: leadingSwipeActionsConfiguration
+
     func test_leadingSwipeActionsConfiguration_whenTorrentIsActive_shouldReturnedExpectedConfiguration() {
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "pause.fill")])
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
         XCTAssertEqual(config?.actions.map(\.style), [.normal])
@@ -782,14 +786,14 @@ final class StandardTorrentListViewModelTests: TestCase {
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "play.fill")])
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
         XCTAssertEqual(config?.actions.map(\.style), [.normal])
     }
 
     func test_pauseSwipeAction_shouldCallImplementationPauseAndRefresh() {
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.pauseCallCount, 1)
         XCTAssertEqual(implementation.pauseParamTorrents[0].map(\.name), ["Mock"])
@@ -798,7 +802,7 @@ final class StandardTorrentListViewModelTests: TestCase {
 
     func test_pauseSwipeAction_whenFails_shouldEmitAlert() throws {
         implementation.pauseResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }
@@ -811,7 +815,7 @@ final class StandardTorrentListViewModelTests: TestCase {
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.resumeCallCount, 1)
         XCTAssertEqual(implementation.resumeParamTorrents[0].map(\.name), ["Mock"])
@@ -825,15 +829,17 @@ final class StandardTorrentListViewModelTests: TestCase {
         viewModel.receive(.refresh)
         implementation.resumeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let config = viewModel.leadingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }
         XCTAssertEqual(alert.title, "Failed to Resume")
     }
 
+    // MARK: trailingSwipeActionsConfiguration
+
     func test_trailingSwipeActionsConfiguration_shouldReturnExpectedConfiguration() {
-        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         let expected = [UIImage(systemName: "trash.fill"), UIImage(systemName: "ellipsis.circle.fill")]
         XCTAssertEqual(config?.actions.map(\.image), expected)
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [nil, .systemGray])
@@ -841,7 +847,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_moreSwipeAction_shouldEmitActivities() throws {
-        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         let activities = try getActivities {
             config?.actions[1].handler()
         }
@@ -850,7 +856,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_removeSwipeAction_shouldCallImplementationRemoveAndRefresh() throws {
-        let config = viewModel.trailingSwipeActionsConfigurationForItem(at: 0, source: .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }

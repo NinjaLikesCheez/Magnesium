@@ -13,7 +13,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(false).eraseToAnyPublisher(),
             hasActiveFilters: Just(false).eraseToAnyPublisher(),
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher()
+            status: Just("").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -29,7 +33,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(false).eraseToAnyPublisher(),
             hasActiveFilters: Just(false).eraseToAnyPublisher(),
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher()
+            status: Just("").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -46,7 +54,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(false).eraseToAnyPublisher(),
             hasActiveFilters: Just(false).eraseToAnyPublisher(),
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("↓ 1.5 MB/s ↑ 454 KB/s").eraseToAnyPublisher()
+            status: Just("↓ 1.5 MB/s ↑ 454 KB/s").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -63,7 +75,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(false).eraseToAnyPublisher(),
             hasActiveFilters: Just(true).eraseToAnyPublisher(),
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher()
+            status: Just("").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -80,7 +96,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(true).eraseToAnyPublisher(),
             hasActiveFilters: Just(false).eraseToAnyPublisher(),
             editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher()
+            status: Just("").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -98,7 +118,11 @@ class TorrentListViewControllerTests: TestCase {
             isEditing: Just(true).eraseToAnyPublisher(),
             hasActiveFilters: Just(false).eraseToAnyPublisher(),
             editActionsEnabled: Just(true).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher()
+            status: Just("").eraseToAnyPublisher(),
+            detailViewModel: { _ in nil },
+            contextMenu: { _ in nil },
+            leadingSwipeActionsConfiguration: { _, _ in nil },
+            trailingSwipeActionsConfiguration: { _, _ in nil }
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
