@@ -1,9 +1,10 @@
 import Combine
 @testable import Magnesium
 import SnapshotTesting
+import Transmission
 import XCTest
 
-class TransmissionTorrentDetailViewModelImplementationTests: TestCase {
+class TransmissionTorrentDetailImplementationTests: TestCase {
     private var client: MockTransmissionClient!
     private var implementation: StandardTorrentDetailImplementation<
         TransmissionTorrent,
@@ -17,9 +18,22 @@ class TransmissionTorrentDetailViewModelImplementationTests: TestCase {
         implementation = .transmission(session: .init(client: client))
     }
 
-    func test_refresh_shouldCallRefresher() {
+    func test_refresh_shouldGetTorrents() {
         _ = implementation.refresh().wait()
         assertSnapshot(matching: client.requests, as: .requests)
+    }
+
+    func test_refreshFiles_shouldGetTorrentFiles() throws {
+        let files: [TransmissionTorrentFile] = [
+            .mock(index: 0, name: "f0"),
+            .mock(index: 0, name: "f1"),
+        ]
+        client.results.append((
+            method: "torrent-get",
+            result: Just(files as Any).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
+        ))
+        let results = try implementation.refreshFiles(.mock()).wait().value()
+        XCTAssertEqual(results, files)
     }
 
     func test_pause_shouldStop() {

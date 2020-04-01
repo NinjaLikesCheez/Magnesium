@@ -4,7 +4,7 @@ import Deluge
 import SnapshotTesting
 import XCTest
 
-class DelugeTorrentDetailViewModelImplementationTests: TestCase {
+class DelugeTorrentDetailImplementationTests: TestCase {
     private var client: MockDelugeClient!
     private var implementation: StandardTorrentDetailImplementation<DelugeTorrent, DelugeLabel, DelugeTorrentFile>!
 
@@ -14,9 +14,22 @@ class DelugeTorrentDetailViewModelImplementationTests: TestCase {
         implementation = .deluge(session: .init(client: client))
     }
 
-    func test_refresh_shouldCallRefresher() {
+    func test_refresh_shouldUpdateUI() {
         _ = implementation.refresh().wait()
         assertSnapshot(matching: client.requests, as: .requests)
+    }
+
+    func test_refreshFiles_shouldRefreshFiles() throws {
+        let items: [DelugeTorrentItem] = [
+            .directory(name: "d0", items: [.file(.mock(index: 0, name: "f0"))]),
+            .file(.mock(index: 1, name: "f1")),
+        ]
+        client.results.append((
+            method: "web.get_torrent_files",
+            result: Just(items as Any).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
+        ))
+        let files = try implementation.refreshFiles(.mock()).wait().value()
+        XCTAssertEqual(files, [.mock(index: 0, name: "f0"), .mock(index: 1, name: "f1")])
     }
 
     func test_pause_shouldPause() {
