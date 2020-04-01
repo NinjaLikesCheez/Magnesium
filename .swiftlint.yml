@@ -10,8 +10,6 @@ file_name:
     - PreferenceKeys.swift
     - Publishers+AsOptional.swift
     - SnapshotExtensions.swift
-    - StandardTorrentListViewModel+Deluge.swift
-    - StandardTorrentListViewModel+Transmission.swift
     - Transmission+App.swift
     - Transmission+Mocks.swift
 

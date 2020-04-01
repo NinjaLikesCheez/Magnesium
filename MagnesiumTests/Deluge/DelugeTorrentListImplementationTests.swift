@@ -26,7 +26,7 @@ class DelugeTorrentListImplementationTests: TestCase {
             CurrentValueSubject(.mock()),
             CurrentValueSubject([])
         ).base as AnyObject
-        XCTAssertType(viewModel, StandardTorrentDetailViewModel<DelugeTorrentDetailViewModelImplementation>.self)
+        XCTAssertType(viewModel, StandardTorrentDetailViewModel<DelugeTorrent, DelugeLabel, DelugeTorrentFile>.self)
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {

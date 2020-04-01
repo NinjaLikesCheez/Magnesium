@@ -889,7 +889,7 @@ private extension StandardTorrentListImplementation {
     }
 }
 
-private class MockImplementation {
+private final class MockImplementation {
     typealias AddLinkError = StandardTorrentListImplementation<MockTorrent, MockLabel>.AddLinkError
 
     let updatedSubject = PassthroughSubject<([MockTorrent], [MockLabel]), Never>()

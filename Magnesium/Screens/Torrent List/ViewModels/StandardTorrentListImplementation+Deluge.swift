@@ -34,9 +34,8 @@ extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Labe
         torrent: CurrentValueSubject<DelugeTorrent, Never>,
         labels: CurrentValueSubject<[DelugeLabel], Never>
     ) -> AnyTorrentDetailViewModel {
-        let implementation = DelugeTorrentDetailViewModelImplementation(session: session)
         let viewModel = StandardTorrentDetailViewModel(
-            implementation: implementation,
+            implementation: .deluge(session: session),
             torrent: torrent,
             labels: labels
         )

@@ -10,7 +10,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     private var torrent: CurrentValueSubject<MockTorrent, Never>!
     private var labels: CurrentValueSubject<[MockLabel], Never>!
     private var implementation: MockImplementation!
-    private var viewModel: StandardTorrentDetailViewModel<MockImplementation>!
+    private var viewModel: StandardTorrentDetailViewModel<MockTorrent, MockLabel, MockTorrentFile>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -19,7 +19,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         labels = CurrentValueSubject([MockLabel(), MockLabel(name: "label1"), MockLabel(name: "label2")])
         implementation = MockImplementation()
         viewModel = StandardTorrentDetailViewModel(
-            implementation: implementation,
+            implementation: .mock(implementation),
             torrent: torrent,
             labels: labels
         )
@@ -36,7 +36,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         preferences[.autoRefreshInterval] = 1
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            XCTAssertEqual(self.implementation.updateFilesCallCount, 1)
+            XCTAssertEqual(self.implementation.refreshFilesCallCount, 1)
             expectation.fulfill()
         }
         waitForExpectations(timeout: 2)
@@ -47,7 +47,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         viewModel.receive(.appear)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            XCTAssertEqual(self.implementation.updateFilesCallCount, 2)
+            XCTAssertEqual(self.implementation.refreshFilesCallCount, 2)
             expectation.fulfill()
         }
         waitForExpectations(timeout: 2)
@@ -59,7 +59,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         viewModel.receive(.disappear)
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            XCTAssertEqual(self.implementation.updateFilesCallCount, 1)
+            XCTAssertEqual(self.implementation.refreshFilesCallCount, 1)
             expectation.fulfill()
         }
         waitForExpectations(timeout: 2)
@@ -71,7 +71,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         preferences[.autoRefreshInterval] = 0
         let expectation = self.expectation(description: "Check")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            XCTAssertEqual(self.implementation.updateFilesCallCount, 1)
+            XCTAssertEqual(self.implementation.refreshFilesCallCount, 1)
             expectation.fulfill()
         }
         waitForExpectations(timeout: 2)
@@ -434,11 +434,27 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     }
 }
 
-private final class MockImplementation: StandardTorrentDetailViewModelImplementation {
-    typealias Torrent = MockTorrent
-    typealias Label = MockLabel
-    typealias File = MockTorrentFile
+// MARK: - Mocks
 
+private extension StandardTorrentDetailImplementation {
+    static func mock(
+        _ impl: MockImplementation
+    ) -> StandardTorrentDetailImplementation<MockTorrent, MockLabel, MockTorrentFile> {
+        .init(
+            refresh: impl.refresh,
+            refreshFiles: impl.refreshFiles(torrent:),
+            pause: impl.pause(torrent:),
+            resume: impl.resume(torrent:),
+            remove: impl.remove(torrent:removeData:),
+            verify: impl.verify(torrent:),
+            setLabel: impl.setLabel(label:for:),
+            updateTrackers: impl.updateTrackers(torrent:),
+            moveDownloadFolder: impl.moveDownloadFolder(path:torrent:)
+        )
+    }
+}
+
+private final class MockImplementation {
     private(set) var refreshCallCount = 0
     var refreshResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     func refresh() -> AnyPublisher<Void, Error> {
@@ -446,23 +462,23 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
         return refreshResult
     }
 
-    private(set) var updateFilesCallCount = 0
-    private(set) var updateFilesParamTorrent = [MockTorrent]()
-    var updateFilesResult = Just([
+    private(set) var refreshFilesCallCount = 0
+    private(set) var refreshFilesParamTorrent = [MockTorrent]()
+    var refreshFilesResult = Just([
         MockTorrentFile(index: 0, name: "file.rar"),
         MockTorrentFile(index: 1, name: "file.r01"),
         MockTorrentFile(index: 2, name: "file.r00"),
     ]).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func updateFiles(_ torrent: MockTorrent) -> AnyPublisher<[MockTorrentFile], Error> {
-        updateFilesCallCount += 1
-        updateFilesParamTorrent.append(torrent)
-        return updateFilesResult
+    func refreshFiles(torrent: MockTorrent) -> AnyPublisher<[MockTorrentFile], Error> {
+        refreshFilesCallCount += 1
+        refreshFilesParamTorrent.append(torrent)
+        return refreshFilesResult
     }
 
     private(set) var pauseCallCount = 0
     private(set) var pauseParamTorrent = [MockTorrent]()
     var pauseResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func pause(_ torrent: MockTorrent) -> AnyPublisher<Void, Error> {
+    func pause(torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         pauseCallCount += 1
         pauseParamTorrent.append(torrent)
         return pauseResult
@@ -471,7 +487,7 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
     private(set) var resumeCallCount = 0
     private(set) var resumeParamTorrent = [MockTorrent]()
     var resumeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func resume(_ torrent: MockTorrent) -> AnyPublisher<Void, Error> {
+    func resume(torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         resumeCallCount += 1
         resumeParamTorrent.append(torrent)
         return resumeResult
@@ -481,7 +497,7 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
     private(set) var removeParamTorrent = [MockTorrent]()
     private(set) var removeParamRemoveData = [Bool]()
     var removeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func remove(_ torrent: MockTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
+    func remove(torrent: MockTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
         removeCallCount += 1
         removeParamTorrent.append(torrent)
         removeParamRemoveData.append(removeData)
@@ -491,7 +507,7 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
     private(set) var verifyCallCount = 0
     private(set) var verifyParamTorrent = [MockTorrent]()
     var verifyResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func verify(_ torrent: MockTorrent) -> AnyPublisher<Void, Error> {
+    func verify(torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         verifyCallCount += 1
         verifyParamTorrent.append(torrent)
         return verifyResult
@@ -501,7 +517,7 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
     private(set) var setLabelParamLabel = [MockLabel]()
     private(set) var setLabelParamTorrent = [MockTorrent]()
     var setLabelResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func setLabel(_ label: MockLabel, for torrent: MockTorrent) -> AnyPublisher<Void, Error> {
+    func setLabel(label: MockLabel, for torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         setLabelCallCount += 1
         setLabelParamLabel.append(label)
         setLabelParamTorrent.append(torrent)
@@ -511,20 +527,20 @@ private final class MockImplementation: StandardTorrentDetailViewModelImplementa
     private(set) var updateTrackersCallCount = 0
     private(set) var updateTrackersParamTorrent = [MockTorrent]()
     var updateTrackersResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func updateTrackers(for torrent: MockTorrent) -> AnyPublisher<Void, Error> {
+    func updateTrackers(torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         updateTrackersCallCount += 1
         updateTrackersParamTorrent.append(torrent)
         return updateTrackersResult
     }
 
     private(set) var moveDownloadFolderCallCount = 0
-    private(set) var moveDownloadFolderParamTorrent = [MockTorrent]()
     private(set) var moveDownloadFolderParamPath = [String]()
+    private(set) var moveDownloadFolderParamTorrent = [MockTorrent]()
     var moveDownloadFolderResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func moveDownloadFolder(for torrent: MockTorrent, to path: String) -> AnyPublisher<Void, Error> {
+    func moveDownloadFolder(path: String, torrent: MockTorrent) -> AnyPublisher<Void, Error> {
         moveDownloadFolderCallCount += 1
-        moveDownloadFolderParamTorrent.append(torrent)
         moveDownloadFolderParamPath.append(path)
+        moveDownloadFolderParamTorrent.append(torrent)
         return moveDownloadFolderResult
     }
 }

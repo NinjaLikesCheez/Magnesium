@@ -4,27 +4,12 @@ import Foundation
 import Preferences
 import ViewModel
 
-protocol StandardTorrentDetailViewModelImplementation {
-    associatedtype Torrent: StandardTorrent
-    associatedtype Label: StandardLabel
-    associatedtype File: StandardTorrentFile
-    func refresh() -> AnyPublisher<Void, Error>
-    func updateFiles(_ torrent: Torrent) -> AnyPublisher<[File], Error>
-    func pause(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func resume(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func remove(_ torrent: Torrent, removeData: Bool) -> AnyPublisher<Void, Error>
-    func verify(_ torrent: Torrent) -> AnyPublisher<Void, Error>
-    func setLabel(_ label: Label, for torrent: Torrent) -> AnyPublisher<Void, Error>
-    func updateTrackers(for torrent: Torrent) -> AnyPublisher<Void, Error>
-    func moveDownloadFolder(for torrent: Torrent, to path: String) -> AnyPublisher<Void, Error>
-}
-
-final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetailViewModelImplementation>: ViewModel {
-    typealias Torrent = Implementation.Torrent
-    typealias Label = Implementation.Label
-    typealias File = Implementation.File
-
-    private let implementation: Implementation
+final class StandardTorrentDetailViewModel<
+    Torrent: StandardTorrent,
+    Label: StandardLabel,
+    File: StandardTorrentFile
+>: ViewModel {
+    private let implementation: StandardTorrentDetailImplementation<Torrent, Label, File>
     private let torrent: CurrentValueSubject<Torrent, Never>
     private let labels: CurrentValueSubject<[Label], Never>
     private let files: ValueMapper<Int, File>
@@ -40,7 +25,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     init(
-        implementation: Implementation,
+        implementation: StandardTorrentDetailImplementation<Torrent, Label, File>,
         torrent: CurrentValueSubject<Torrent, Never>,
         labels: CurrentValueSubject<[Label], Never>
     ) {
@@ -276,7 +261,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func remove(removeData: Bool) {
-        implementation.remove(torrent.value, removeData: removeData)
+        implementation.remove(torrent.value, removeData)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -302,7 +287,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func setLabel(_ label: Label) {
-        implementation.setLabel(label, for: torrent.value)
+        implementation.setLabel(label, torrent.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -313,7 +298,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func updateTrackers() {
-        implementation.updateTrackers(for: torrent.value)
+        implementation.updateTrackers(torrent.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -324,7 +309,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func moveDownloadFolder(to path: String) {
-        implementation.moveDownloadFolder(for: torrent.value, to: path)
+        implementation.moveDownloadFolder(path, torrent.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -381,7 +366,7 @@ final class StandardTorrentDetailViewModel<Implementation: StandardTorrentDetail
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        implementation.updateFiles(torrent.value)
+        implementation.refreshFiles(torrent.value)
             .handleEvents(receiveOutput: { [weak self] new in
                 self?.files.update(with: new.map { ($0.index, $0) })
             })

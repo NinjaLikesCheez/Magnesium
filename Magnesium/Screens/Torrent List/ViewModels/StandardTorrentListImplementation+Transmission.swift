@@ -30,9 +30,8 @@ extension StandardTorrentListImplementation where Torrent == TransmissionTorrent
         torrent: CurrentValueSubject<TransmissionTorrent, Never>,
         labels: CurrentValueSubject<[Never], Never>
     ) -> AnyTorrentDetailViewModel {
-        let implementation = TransmissionTorrentDetailViewModelImplementation(session: session)
         let viewModel = StandardTorrentDetailViewModel(
-            implementation: implementation,
+            implementation: .transmission(session: session),
             torrent: torrent,
             labels: labels
         )

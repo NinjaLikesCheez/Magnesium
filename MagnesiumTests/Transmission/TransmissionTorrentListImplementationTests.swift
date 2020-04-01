@@ -26,7 +26,10 @@ class TransmissionTorrentListImplementationTests: TestCase {
             CurrentValueSubject(.mock()),
             CurrentValueSubject([])
         ).base as AnyObject
-        XCTAssertType(viewModel, StandardTorrentDetailViewModel<TransmissionTorrentDetailViewModelImplementation>.self)
+        XCTAssertType(
+            viewModel,
+            StandardTorrentDetailViewModel<TransmissionTorrent, Never, TransmissionTorrentFile>.self
+        )
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {
