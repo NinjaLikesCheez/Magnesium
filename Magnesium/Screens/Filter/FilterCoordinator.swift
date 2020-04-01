@@ -1,6 +1,5 @@
 import Combine
 import Coordinator
-import Preferences
 
 enum FilterCoordinatorEvent {
     case complete

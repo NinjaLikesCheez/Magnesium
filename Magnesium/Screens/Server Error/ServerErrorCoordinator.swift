@@ -1,6 +1,5 @@
 import Combine
 import Coordinator
-import Preferences
 
 enum ServerErrorCoordinatorEvent {
     case showSettings

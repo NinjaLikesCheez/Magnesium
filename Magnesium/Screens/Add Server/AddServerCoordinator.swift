@@ -1,6 +1,5 @@
 import Combine
 import Coordinator
-import Preferences
 import UIKit
 
 enum AddServerCoordinatorEvent {

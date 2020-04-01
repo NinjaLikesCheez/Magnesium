@@ -1,7 +1,5 @@
 import Combine
-import CommonModels
 import Coordinator
-import Preferences
 import UIKit
 
 enum SettingsCoordinatorEvent {

@@ -2,7 +2,6 @@ import Combine
 import CommonModels
 import Deluge
 import Foundation
-import Preferences
 import ViewModel
 
 final class DelugeSettingsViewModel: ViewModel {

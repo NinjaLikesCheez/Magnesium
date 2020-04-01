@@ -1,7 +1,6 @@
 import Combine
 import Deluge
 import Foundation
-import Preferences
 import ViewModel
 
 extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Label == DelugeLabel {

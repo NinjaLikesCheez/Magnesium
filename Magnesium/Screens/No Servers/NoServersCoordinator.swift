@@ -1,7 +1,6 @@
 import Combine
 import Coordinator
 import Preferences
-import UIKit
 
 enum NoServersCoordinatorEvent {
     case showSettings

@@ -1,6 +1,5 @@
 import Combine
 import Foundation
-import Preferences
 import ViewModel
 
 extension StandardTorrentListImplementation where Torrent == TransmissionTorrent, Label == Never {

@@ -1,5 +1,4 @@
 import Combine
-import Foundation
 import Preferences
 
 extension Preferences {

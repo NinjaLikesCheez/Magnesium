@@ -1,5 +1,5 @@
-import Foundation
 import Keychain
+import Security
 
 extension KeychainGroupKey {
     static var servers: KeychainGroupKey {

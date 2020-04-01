@@ -1,8 +1,6 @@
 import Combine
 import CommonModels
 import Coordinator
-import LinkPresentation
-import Preferences
 import UIKit
 
 enum TorrentListCoordinatorEvent {

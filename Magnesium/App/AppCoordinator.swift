@@ -1,7 +1,6 @@
 import Combine
 import CommonModels
 import Coordinator
-import Preferences
 import UIKit
 
 final class AppCoordinator: Coordinator, AlertPresenter {

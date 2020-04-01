@@ -1,5 +1,4 @@
 import Combine
-import CommonModels
 import UIKit
 
 protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {

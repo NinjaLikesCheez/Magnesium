@@ -1,7 +1,5 @@
 import Combine
 
-func absurd(_ never: Never) -> Never {}
-
 // swiftlint:disable:next line_length
 extension StandardTorrentDetailImplementation where Torrent == TransmissionTorrent, Label == Never, File == TransmissionTorrentFile {
     static func transmission(session: TransmissionSession) -> Self {

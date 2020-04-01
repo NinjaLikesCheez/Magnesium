@@ -1,5 +1,5 @@
-import Foundation
 import Keychain
+import Security
 
 extension KeychainKey {
     static func server(_ server: Server) -> KeychainKey {
