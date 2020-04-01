@@ -2,6 +2,7 @@ import Combine
 import CommonModels
 @testable import Magnesium
 import Preferences
+import SnapshotTesting
 import Transmission
 import XCTest
 
@@ -123,8 +124,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "http://example.com"
         viewModel.receive(.saveSelected)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["session-get"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"fields":["rpc-version"]}"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_saveSelected_whenAuthenticationFails_shouldEmitError() throws {

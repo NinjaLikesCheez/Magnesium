@@ -1,0 +1,12 @@
+[
+  {
+    "args" : [
+      [
+        "A",
+        "B"
+      ],
+      "/new"
+    ],
+    "method" : "core.move_storage"
+  }
+]

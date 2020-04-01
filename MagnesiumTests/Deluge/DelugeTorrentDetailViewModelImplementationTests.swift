@@ -1,6 +1,7 @@
 import Combine
 import Deluge
 @testable import Magnesium
+import SnapshotTesting
 import XCTest
 
 class DelugeTorrentDetailViewModelImplementationTests: TestCase {
@@ -15,49 +16,46 @@ class DelugeTorrentDetailViewModelImplementationTests: TestCase {
 
     func test_refresh_shouldCallRefresher() {
         _ = implementation.refresh().wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_pause_shouldPause() {
-        _ = implementation.pause(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.pause_torrents"])
+        _ = implementation.pause(.mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_resume_shouldResume() {
-        _ = implementation.resume(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.resume_torrents"])
+        _ = implementation.resume(.mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_remove_withKeepData_shouldRemove() {
         _ = implementation.remove(.mock(hash: "A"), removeData: false).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],false]"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_remove_withRemoveData_shouldRemove() {
         _ = implementation.remove(.mock(hash: "A"), removeData: true).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.remove_torrents"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],true]"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_verify_shouldRecheck() {
-        _ = implementation.verify(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_recheck"])
+        _ = implementation.verify(.mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_setLabel_shouldSetLabels() {
-        _ = implementation.setLabel(.mock(), for: .mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["label.set_torrent"])
+        _ = implementation.setLabel(.mock(name: "label"), for: .mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_updateTrackers_shouldReannounce() {
-        _ = implementation.updateTrackers(for: .mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.force_reannounce"])
+        _ = implementation.updateTrackers(for: .mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_moveDownloadFolder_shouldMoveStorage() {
         _ = implementation.moveDownloadFolder(for: .mock(hash: "A"), to: "/new")
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["core.move_storage"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"[["A"],"\/new"]"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 }

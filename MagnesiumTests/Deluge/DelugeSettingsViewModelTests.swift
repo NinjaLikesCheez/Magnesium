@@ -3,6 +3,7 @@ import CommonModels
 import Deluge
 @testable import Magnesium
 import Preferences
+import SnapshotTesting
 import XCTest
 
 class DelugeSettingsViewModelTests: TestCase {
@@ -116,7 +117,7 @@ class DelugeSettingsViewModelTests: TestCase {
         viewModel.values.inputs[1].value.value = "http://example.com"
         viewModel.values.inputs[2].value.value = "password"
         viewModel.receive(.saveSelected)
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["auth.login"])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_save_whenAuthenticationFails_shouldEmitError() throws {

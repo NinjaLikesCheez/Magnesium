@@ -1,0 +1,11 @@
+[
+  {
+    "args" : [
+      "magnet:?",
+      {
+
+      }
+    ],
+    "method" : "core.add_torrent_magnet"
+  }
+]

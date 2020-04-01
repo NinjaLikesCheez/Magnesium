@@ -1,5 +1,6 @@
 import Combine
 @testable import Magnesium
+import SnapshotTesting
 import XCTest
 
 class TransmissionTorrentDetailViewModelImplementationTests: TestCase {
@@ -14,44 +15,41 @@ class TransmissionTorrentDetailViewModelImplementationTests: TestCase {
 
     func test_refresh_shouldCallRefresher() {
         _ = implementation.refresh().wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-get"])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_pause_shouldStop() {
-        _ = implementation.pause(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-stop"])
+        _ = implementation.pause(.mock(hash: "B")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_resume_shouldStart() {
-        _ = implementation.resume(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-start"])
+        _ = implementation.resume(.mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_remove_withKeepData_shouldRemove() {
         _ = implementation.remove(.mock(hash: "A"), removeData: false).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":false,"ids":["A"]}"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_remove_withRemoveData_shouldRemove() {
         _ = implementation.remove(.mock(hash: "A"), removeData: true).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":true,"ids":["A"]}"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_verify_shouldVerify() {
-        _ = implementation.verify(.mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-verify"])
+        _ = implementation.verify(.mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_updateTrackers_shouldReannounce() {
-        _ = implementation.updateTrackers(for: .mock()).wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-reannounce"])
+        _ = implementation.updateTrackers(for: .mock(hash: "A")).wait()
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 
     func test_moveDownloadFolder_shouldSetLocation() {
         _ = implementation.moveDownloadFolder(for: .mock(hash: "A"), to: "/new").wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-set-location"])
-        XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"ids":["A"],"location":"\/new","move":true}"#])
+        assertSnapshot(matching: client.requests, as: .requests)
     }
 }

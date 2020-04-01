@@ -1,0 +1,10 @@
+[
+  {
+    "args" : {
+      "fields" : [
+        "rpc-version"
+      ]
+    },
+    "method" : "session-get"
+  }
+]

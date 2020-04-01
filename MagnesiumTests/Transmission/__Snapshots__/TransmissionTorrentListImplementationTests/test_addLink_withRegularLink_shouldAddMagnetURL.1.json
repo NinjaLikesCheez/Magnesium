@@ -1,0 +1,8 @@
+[
+  {
+    "args" : {
+      "filename" : "http://example.com"
+    },
+    "method" : "torrent-add"
+  }
+]

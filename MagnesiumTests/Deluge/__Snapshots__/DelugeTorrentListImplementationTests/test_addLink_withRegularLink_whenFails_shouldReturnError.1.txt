@@ -1,0 +1,3 @@
+▿ AddLinkError
+  - message: "Unable to authenticate. Verify that your credentials are correct."
+  - title: "Failed to Add Torrent"

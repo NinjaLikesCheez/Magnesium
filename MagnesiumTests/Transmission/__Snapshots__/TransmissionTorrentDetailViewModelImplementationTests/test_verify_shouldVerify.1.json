@@ -1,0 +1,10 @@
+[
+  {
+    "args" : {
+      "ids" : [
+        "A"
+      ]
+    },
+    "method" : "torrent-verify"
+  }
+]

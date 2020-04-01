@@ -1,0 +1,10 @@
+[
+  {
+    "args" : [
+      [
+        "A"
+      ]
+    ],
+    "method" : "core.resume_torrents"
+  }
+]

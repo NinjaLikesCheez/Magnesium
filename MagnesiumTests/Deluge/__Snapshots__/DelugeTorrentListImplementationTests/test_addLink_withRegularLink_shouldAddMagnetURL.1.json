@@ -1,0 +1,11 @@
+[
+  {
+    "args" : [
+      "http://example.com",
+      {
+
+      }
+    ],
+    "method" : "core.add_torrent_url"
+  }
+]

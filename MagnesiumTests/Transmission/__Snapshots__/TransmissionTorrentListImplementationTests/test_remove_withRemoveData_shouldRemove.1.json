@@ -1,0 +1,12 @@
+[
+  {
+    "args" : {
+      "delete-local-data" : true,
+      "ids" : [
+        "A",
+        "B"
+      ]
+    },
+    "method" : "torrent-remove"
+  }
+]

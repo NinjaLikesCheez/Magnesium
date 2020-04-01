@@ -1,0 +1,12 @@
+[
+  {
+    "args" : [
+      "file.torrent",
+      "",
+      {
+
+      }
+    ],
+    "method" : "core.add_torrent_file"
+  }
+]

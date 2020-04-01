@@ -1,0 +1,24 @@
+[
+  {
+    "args" : {
+      "fields" : [
+        "addedDate",
+        "downloadDir",
+        "rateDownload",
+        "eta",
+        "hashString",
+        "name",
+        "peersGettingFromUs",
+        "percentDone",
+        "peersSendingToUs",
+        "totalSize",
+        "status",
+        "peersConnected",
+        "trackerStats",
+        "uploadedEver",
+        "rateUpload"
+      ]
+    },
+    "method" : "torrent-get"
+  }
+]

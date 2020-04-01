@@ -1,0 +1,11 @@
+[
+  {
+    "args" : [
+      [
+        "A"
+      ],
+      false
+    ],
+    "method" : "core.remove_torrents"
+  }
+]

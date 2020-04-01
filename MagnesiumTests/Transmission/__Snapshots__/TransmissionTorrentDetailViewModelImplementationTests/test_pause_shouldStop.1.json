@@ -1,0 +1,10 @@
+[
+  {
+    "args" : {
+      "ids" : [
+        "B"
+      ]
+    },
+    "method" : "torrent-stop"
+  }
+]

@@ -2,6 +2,7 @@ import Combine
 import Deluge
 @testable import Magnesium
 import Preferences
+import SnapshotTesting
 import Transmission
 import XCTest
 
@@ -59,8 +60,7 @@ class AddTorrentFlowTests: TestCase {
         session.setServer(.mock(.deluge))
 
         flow.add(type: .file(URL(fileURLWithPath: "file.torrent")))
-        XCTAssertEqual(delugeClient.requestParamRequest.map(\.method), ["core.add_torrent_file"])
-        XCTAssertEqual(delugeClient.requestParamRequest.map(\.argsJSON), [#"["file.torrent","",{}]"#])
+        assertSnapshot(matching: delugeClient.requests, as: .requests)
     }
 
     func test_add_withDeluge_andFileURL_whenFails_shouldPresentAlertController() {
@@ -86,9 +86,7 @@ class AddTorrentFlowTests: TestCase {
         session.setServer(.mock(.deluge))
 
         flow.add(type: .magnet(URL(string: "magnet:?")!))
-        XCTAssertEqual(delugeClient.requestCallCount, 1)
-        XCTAssertEqual(delugeClient.requestParamRequest.first?.method, "core.add_torrent_magnet")
-        XCTAssertEqual(delugeClient.requestParamRequest.first?.argsJSON, #"["magnet:?",{}]"#)
+        assertSnapshot(matching: delugeClient.requests, as: .requests)
     }
 
     func test_add_withDeluge_andMagnetURL_whenFails_shouldPresentAlertController() {
@@ -121,8 +119,7 @@ class AddTorrentFlowTests: TestCase {
 
         let url = URL(fileURLWithPath: "file.torrent")
         flow.add(type: .file(url))
-        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.method), ["torrent-add"])
-        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.argsJSON), [#"{"metainfo":""}"#])
+        assertSnapshot(matching: transmissionClient.requests, as: .requests)
     }
 
     func test_add_withTransmission_andFileURL_whenFails_shouldPresentAlertController() {
@@ -145,8 +142,7 @@ class AddTorrentFlowTests: TestCase {
 
         let url = URL(string: "magnet:?")!
         flow.add(type: .magnet(url))
-        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.method), ["torrent-add"])
-        XCTAssertEqual(transmissionClient.requestParamRequest.map(\.argsJSON), [#"{"filename":"magnet:?"}"#])
+        assertSnapshot(matching: transmissionClient.requests, as: .requests)
     }
 
     func test_add_withTransmission_andMagnetURL_whenFails_shouldPresentAlertController() {

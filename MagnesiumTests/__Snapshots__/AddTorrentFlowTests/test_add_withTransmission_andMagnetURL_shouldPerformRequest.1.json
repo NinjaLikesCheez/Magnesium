@@ -1,0 +1,8 @@
+[
+  {
+    "args" : {
+      "filename" : "magnet:?"
+    },
+    "method" : "torrent-add"
+  }
+]
