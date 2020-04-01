@@ -5,19 +5,17 @@ import XCTest
 
 class DelugeTorrentDetailViewModelImplementationTests: TestCase {
     private var client: MockDelugeClient!
-    private var refresher: MockTorrentRefresher!
     private var implementation: DelugeTorrentDetailViewModelImplementation!
 
     override func setUp() {
         super.setUp()
         client = MockDelugeClient()
-        refresher = MockTorrentRefresher()
-        implementation = DelugeTorrentDetailViewModelImplementation(client: client, refresher: refresher)
+        implementation = DelugeTorrentDetailViewModelImplementation(session: .init(client: client))
     }
 
     func test_refresh_shouldCallRefresher() {
         _ = implementation.refresh().wait()
-        XCTAssertEqual(refresher.refreshTorrentsCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["web.update_ui"])
     }
 
     func test_pause_shouldPause() {

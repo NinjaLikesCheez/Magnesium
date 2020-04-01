@@ -4,15 +4,15 @@ import Preferences
 import Transmission
 import XCTest
 
-class TransmissionTorrentListViewModelImplementationTests: TestCase {
+class TransmissionTorrentListImplementationTests: TestCase {
     private var client: MockTransmissionClient!
-    private var implementation: TransmissionTorrentListViewModelImplementation!
+    private var implementation: StandardTorrentListImplementation<TransmissionTorrent, Never>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
         client = MockTransmissionClient()
-        implementation = TransmissionTorrentListViewModelImplementation(client: client)
+        implementation = .transmission(.init(client: client))
     }
 
     func test_refresh_shouldGetTorrents() {
@@ -22,16 +22,16 @@ class TransmissionTorrentListViewModelImplementationTests: TestCase {
 
     func test_detailViewModel_shouldReturnExpectedViewModelType() {
         let viewModel = implementation.detailViewModel(
-            for: CurrentValueSubject(.mock()),
-            labels: CurrentValueSubject([])
+            CurrentValueSubject(.mock()),
+            CurrentValueSubject([])
         ).base as AnyObject
         XCTAssertType(viewModel, StandardTorrentDetailViewModel<TransmissionTorrentDetailViewModelImplementation>.self)
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {
-        let error = try implementation.addLink("^").wait().value()
-        XCTAssertEqual(error.0, "Unable to Add Link")
-        XCTAssertEqual(error.1, "That link doesn't appear to be valid.")
+        let error = try implementation.addLink("^").wait().error()
+        XCTAssertEqual(error.title, "Unable to Add Link")
+        XCTAssertEqual(error.message, "That link doesn't appear to be valid.")
     }
 
     func test_addLink_withMagnetLink_shouldAddURL() {
@@ -52,8 +52,8 @@ class TransmissionTorrentListViewModelImplementationTests: TestCase {
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
 
-        let error = try implementation.addLink("http://example.com").wait().value()
-        XCTAssertEqual(error.0, "Failed to Add Torrent")
+        let error = try implementation.addLink("http://example.com").wait().error()
+        XCTAssertEqual(error.title, "Failed to Add Torrent")
     }
 
     func test_pause_shouldStop() {
@@ -67,13 +67,13 @@ class TransmissionTorrentListViewModelImplementationTests: TestCase {
     }
 
     func test_remove_withKeepData_shouldRemove() {
-        _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: false).wait()
+        _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], false).wait()
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
         XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":false,"ids":["A","B"]}"#])
     }
 
     func test_remove_withRemoveData_shouldRemove() {
-        _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], removeData: true).wait()
+        _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], true).wait()
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-remove"])
         XCTAssertEqual(client.requestParamRequest.map(\.argsJSON), [#"{"delete-local-data":true,"ids":["A","B"]}"#])
     }
@@ -84,36 +84,16 @@ class TransmissionTorrentListViewModelImplementationTests: TestCase {
     }
 
     func test_updateTrackers_shouldReannounce() {
-        _ = implementation.updateTrackers(for: [.mock(), .mock()]).wait()
+        _ = implementation.updateTrackers([.mock(), .mock()]).wait()
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-reannounce"])
     }
 
     func test_moveDownloadFolder_shouldSetLocation() {
-        _ = implementation.moveDownloadFolder(for: [.mock(hash: "A"), .mock(hash: "B")], to: "/new").wait()
+        _ = implementation.moveDownloadFolder("/new", [.mock(hash: "A"), .mock(hash: "B")]).wait()
         XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-set-location"])
         XCTAssertEqual(
             client.requestParamRequest.map(\.argsJSON),
             [#"{"ids":["A","B"],"location":"\/new","move":true}"#]
         )
-    }
-
-    func test_refreshTorrents_shouldGetTorrents() {
-        _ = implementation.refreshTorrents().wait()
-        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-get"])
-    }
-
-    func test_refreshTorrents_shouldEmitUpdate() {
-        client.results.append((
-            method: "torrent-get",
-            result: Just([]).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
-        ))
-        var cancellables = Set<AnyCancellable>()
-
-        let update = implementation.updated.wait {
-            self.implementation.refreshTorrents()
-                .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-                .store(in: &cancellables)
-        }
-        XCTAssertTrue(update.hasValue())
     }
 }

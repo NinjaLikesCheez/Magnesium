@@ -36,29 +36,3 @@ extension DelugeError: LocalizedError {
         }
     }
 }
-
-extension Request {
-    static var updateUIForApp: Request<([DelugeTorrent], [DelugeLabel])> {
-        let properties: [Torrent.PropertyKeys] = [
-            .dateAdded,
-            .downloaded,
-            .downloadPath,
-            .downloadRate,
-            .eta,
-            .label,
-            .name,
-            .peers,
-            .progress,
-            .seeds,
-            .size,
-            .state,
-            .totalPeers,
-            .totalSeeds,
-            .trackers,
-            .uploaded,
-            .uploadRate,
-        ]
-
-        return Self.updateUI(properties: properties).map { ($0.compactMap(DelugeTorrent.init), $1) }
-    }
-}

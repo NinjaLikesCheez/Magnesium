@@ -8,13 +8,13 @@ import XCTest
 
 final class StandardTorrentListViewModelTests: TestCase {
     private var implementation: MockImplementation!
-    private var viewModel: StandardTorrentListViewModel<MockImplementation>!
+    private var viewModel: StandardTorrentListViewModel<MockTorrent, MockLabel>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
         implementation = MockImplementation()
-        viewModel = StandardTorrentListViewModel(implementation: implementation, server: .mock(.deluge))
+        viewModel = StandardTorrentListViewModel(implementation: .mock(implementation), server: .mock(.deluge))
     }
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
@@ -145,7 +145,10 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_addLink_whenFails_shouldEmitAlert() throws {
-        implementation.addLinkResult = Just(("ErrorTitle", "ErrorMessage")).eraseToAnyPublisher()
+        implementation.addLinkResult = Fail(error: .init(
+            title: "ErrorTitle",
+            message: "ErrorMessage"
+        )).eraseToAnyPublisher()
 
         let alert = try getAlert {
             self.viewModel.addLink("http://example.com")
@@ -868,15 +871,28 @@ final class StandardTorrentListViewModelTests: TestCase {
 
 // MARK: - Mocks
 
-private final class MockImplementation: StandardTorrentListViewModelImplementation {
-    typealias Torrent = MockTorrent
-    typealias Label = MockLabel
+private extension StandardTorrentListImplementation {
+    static func mock(_ impl: MockImplementation) -> StandardTorrentListImplementation<MockTorrent, MockLabel> {
+        .init(
+            updated: impl.updatedSubject.eraseToAnyPublisher(),
+            refresh: impl.refresh,
+            detailViewModel: impl.detailViewModel(torrent:labels:),
+            addLink: impl.addLink(url:),
+            pause: impl.pause(torrents:),
+            resume: impl.resume(torrents:),
+            remove: impl.remove(torrents:removeData:),
+            verify: impl.verify(_:),
+            setLabel: impl.setLabel(label:torrents:),
+            updateTrackers: impl.updateTrackers(torrents:),
+            moveDownloadFolder: impl.moveDownloadFolder(path:torrents:)
+        )
+    }
+}
+
+private class MockImplementation {
+    typealias AddLinkError = StandardTorrentListImplementation<MockTorrent, MockLabel>.AddLinkError
 
     let updatedSubject = PassthroughSubject<([MockTorrent], [MockLabel]), Never>()
-
-    var updated: AnyPublisher<([MockTorrent], [MockLabel]), Never> {
-        updatedSubject.eraseToAnyPublisher()
-    }
 
     private(set) var refreshCallCount = 0
     var refreshResult = Just((
@@ -896,7 +912,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var detailViewModelParamLabels = [CurrentValueSubject<[MockLabel], Never>]()
     var detailViewModelResult = AnyViewModel(MockDetailViewModel())
     func detailViewModel(
-        for torrent: CurrentValueSubject<MockTorrent, Never>,
+        torrent: CurrentValueSubject<MockTorrent, Never>,
         labels: CurrentValueSubject<[MockLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         detailViewModelCallCount += 1
@@ -907,8 +923,8 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
 
     private(set) var addLinkCallCount = 0
     private(set) var addLinkParamURL = [String]()
-    var addLinkResult = Empty<(String, String), Never>(completeImmediately: true).eraseToAnyPublisher()
-    func addLink(_ url: String) -> AnyPublisher<(String, String), Never> {
+    var addLinkResult = Empty<Void, AddLinkError>(completeImmediately: true).eraseToAnyPublisher()
+    func addLink(url: String) -> AnyPublisher<Void, AddLinkError> {
         addLinkCallCount += 1
         addLinkParamURL.append(url)
         return addLinkResult
@@ -917,7 +933,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var pauseCallCount = 0
     private(set) var pauseParamTorrents = [[MockTorrent]]()
     var pauseResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func pause(_ torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
+    func pause(torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
         pauseCallCount += 1
         pauseParamTorrents.append(torrents)
         return pauseResult
@@ -926,7 +942,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var resumeCallCount = 0
     private(set) var resumeParamTorrents = [[MockTorrent]]()
     var resumeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func resume(_ torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
+    func resume(torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
         resumeCallCount += 1
         resumeParamTorrents.append(torrents)
         return resumeResult
@@ -936,7 +952,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var removeParamTorrents = [[MockTorrent]]()
     private(set) var removeParamRemoveData = [Bool]()
     var removeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func remove(_ torrents: [MockTorrent], removeData: Bool) -> AnyPublisher<Void, Error> {
+    func remove(torrents: [MockTorrent], removeData: Bool) -> AnyPublisher<Void, Error> {
         removeCallCount += 1
         removeParamTorrents.append(torrents)
         removeParamRemoveData.append(removeData)
@@ -956,7 +972,7 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var setLabelParamLabel = [MockLabel]()
     private(set) var setLabelParamTorrents = [[MockTorrent]]()
     var setLabelResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func setLabel(_ label: MockLabel, for torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
+    func setLabel(label: MockLabel, torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
         setLabelCallCount += 1
         setLabelParamLabel.append(label)
         setLabelParamTorrents.append(torrents)
@@ -966,17 +982,17 @@ private final class MockImplementation: StandardTorrentListViewModelImplementati
     private(set) var updateTrackersCallCount = 0
     private(set) var updateTrackersParamTorrents = [[MockTorrent]]()
     var updateTrackersResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func updateTrackers(for torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
+    func updateTrackers(torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
         updateTrackersCallCount += 1
         updateTrackersParamTorrents.append(torrents)
         return updateTrackersResult
     }
 
     private(set) var moveDownloadFolderCallCount = 0
-    private(set) var moveDownloadFolderParamTorrents = [[MockTorrent]]()
     private(set) var moveDownloadFolderParamPath = [String]()
+    private(set) var moveDownloadFolderParamTorrents = [[MockTorrent]]()
     var moveDownloadFolderResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func moveDownloadFolder(for torrents: [MockTorrent], to path: String) -> AnyPublisher<Void, Error> {
+    func moveDownloadFolder(path: String, torrents: [MockTorrent]) -> AnyPublisher<Void, Error> {
         moveDownloadFolderCallCount += 1
         moveDownloadFolderParamTorrents.append(torrents)
         moveDownloadFolderParamPath.append(path)

@@ -4,30 +4,8 @@ import Preferences
 import UIKit
 import ViewModel
 
-protocol StandardTorrentListViewModelImplementation {
-    associatedtype Torrent: StandardTorrent
-    associatedtype Label: StandardLabel
-    var updated: AnyPublisher<([Torrent], [Label]), Never> { get }
-    func refresh() -> AnyPublisher<([Torrent], [Label]), Error>
-    func detailViewModel(
-        for torrent: CurrentValueSubject<Torrent, Never>,
-        labels: CurrentValueSubject<[Label], Never>
-    ) -> AnyTorrentDetailViewModel
-    func addLink(_ url: String) -> AnyPublisher<(String, String), Never>
-    func pause(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
-    func resume(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
-    func remove(_ torrents: [Torrent], removeData: Bool) -> AnyPublisher<Void, Error>
-    func verify(_ torrents: [Torrent]) -> AnyPublisher<Void, Error>
-    func setLabel(_ label: Label, for torrents: [Torrent]) -> AnyPublisher<Void, Error>
-    func updateTrackers(for torrents: [Torrent]) -> AnyPublisher<Void, Error>
-    func moveDownloadFolder(for torrents: [Torrent], to path: String) -> AnyPublisher<Void, Error>
-}
-
-final class StandardTorrentListViewModel<Implementation: StandardTorrentListViewModelImplementation>: ViewModel {
-    typealias Torrent = Implementation.Torrent
-    typealias Label = Implementation.Label
-
-    private let implementation: Implementation
+final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: StandardLabel>: ViewModel {
+    private let implementation: StandardTorrentListImplementation<Torrent, Label>
     private let torrents: TorrentMapper<String, Torrent>
     private let labels = CurrentValueSubject<[Label], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
@@ -47,7 +25,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(implementation: Implementation, server: Server) {
+    init(implementation: StandardTorrentListImplementation<Torrent, Label>, server: Server) {
         torrents = TorrentMapper(query: querySubject)
         self.implementation = implementation
 
@@ -149,11 +127,11 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
         case let .filterSelected(source):
             let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
             labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
-            eventSubject.send(.filter(source: source, labels: mappedLabels))
+            eventSubject.send(.filter(source: source, labels: mappedLabels.eraseToAnyPublisher()))
 
         case let .itemSelected(index):
             let subject = torrents.subject(at: index)
-            let viewModel = implementation.detailViewModel(for: subject, labels: labels)
+            let viewModel = implementation.detailViewModel(subject, labels)
             eventSubject.send(.detail(viewModel: viewModel))
 
         case .settingsSelected:
@@ -189,9 +167,11 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     func addLink(_ url: String) {
         implementation.addLink(url)
             .ui()
-            .sink { [weak self] title, message in
-                self?.showError(title: title, message: message)
-            }
+            .sink(receiveCompletion: { [weak self] in
+                if case let .failure(error) = $0 {
+                    self?.showError(title: error.title, message: error.message)
+                }
+            }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
 
@@ -218,7 +198,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func remove(_ torrents: [Torrent], removeData: Bool) {
-        implementation.remove(torrents, removeData: removeData)
+        implementation.remove(torrents, removeData)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -229,7 +209,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func setLabel(for torrents: [Torrent], label: Label) {
-        implementation.setLabel(label, for: torrents)
+        implementation.setLabel(label, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -251,7 +231,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func updateTrackers(for torrents: [Torrent]) {
-        implementation.updateTrackers(for: torrents)
+        implementation.updateTrackers(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -262,7 +242,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     }
 
     private func moveDownloadFolder(for torrents: [Torrent], to path: String) {
-        implementation.moveDownloadFolder(for: torrents, to: path)
+        implementation.moveDownloadFolder(path, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -343,8 +323,7 @@ final class StandardTorrentListViewModel<Implementation: StandardTorrentListView
     // MARK: View Functions
 
     private func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        let subject = torrents.subject(at: index)
-        return implementation.detailViewModel(for: subject, labels: labels)
+        implementation.detailViewModel(torrents.subject(at: index), labels)
     }
 
     private func contextMenuForItem(at index: Int) -> UIMenu? {

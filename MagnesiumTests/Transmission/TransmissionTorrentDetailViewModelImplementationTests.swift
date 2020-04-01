@@ -4,19 +4,17 @@ import XCTest
 
 class TransmissionTorrentDetailViewModelImplementationTests: TestCase {
     private var client: MockTransmissionClient!
-    private var refresher: MockTorrentRefresher!
     private var implementation: TransmissionTorrentDetailViewModelImplementation!
 
     override func setUp() {
         super.setUp()
         client = MockTransmissionClient()
-        refresher = MockTorrentRefresher()
-        implementation = TransmissionTorrentDetailViewModelImplementation(client: client, refresher: refresher)
+        implementation = TransmissionTorrentDetailViewModelImplementation(session: .init(client: client))
     }
 
     func test_refresh_shouldCallRefresher() {
         _ = implementation.refresh().wait()
-        XCTAssertEqual(refresher.refreshTorrentsCallCount, 1)
+        XCTAssertEqual(client.requestParamRequest.map(\.method), ["torrent-get"])
     }
 
     func test_pause_shouldStop() {

@@ -44,27 +44,3 @@ extension TransmissionError: LocalizedError {
         }
     }
 }
-
-extension Request {
-    static var torrentsForApp: Request<[TransmissionTorrent]> {
-        let properties: [Torrent.PropertyKeys] = [
-            .dateAdded,
-            .downloadPath,
-            .downloadRate,
-            .eta,
-            .hash,
-            .name,
-            .peers,
-            .progress,
-            .seeds,
-            .size,
-            .status,
-            .totalPeers,
-            .trackers,
-            .uploaded,
-            .uploadRate,
-        ]
-
-        return Self.torrents(properties: properties).map { $0.compactMap(TransmissionTorrent.init) }
-    }
-}

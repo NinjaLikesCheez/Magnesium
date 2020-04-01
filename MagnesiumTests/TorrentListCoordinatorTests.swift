@@ -84,7 +84,7 @@ class TorrentListCoordinatorTests: TestCase {
     func test_filter_shouldPresentFilterViewController() {
         viewModel.eventSubject.send(.filter(
             source: .view(UIView(), rect: .zero),
-            labels: CurrentValueSubject([])
+            labels: Just([]).eraseToAnyPublisher()
         ))
         let viewController = coordinator.presentable.viewController
         let navigationController = viewController.presentedViewController as! UINavigationController

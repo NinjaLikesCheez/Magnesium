@@ -20,9 +20,9 @@ struct FilterViewValues {
 }
 
 final class FilterViewModel: ViewModel {
-    private let labels: CurrentValueSubject<[StandardLabel], Never>
     private let eventSubject = PassthroughSubject<FilterViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
+    private var labels = [StandardLabel]()
     private var cancellables = Set<AnyCancellable>()
     let values: FilterViewValues
 
@@ -30,9 +30,12 @@ final class FilterViewModel: ViewModel {
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(labels: CurrentValueSubject<[StandardLabel], Never>) {
-        self.labels = labels
+    init(labels: AnyPublisher<[StandardLabel], Never>) {
         values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
+
+        labels.sink { [weak self] in
+            self?.labels = $0
+        }.store(in: &cancellables)
 
         Current.preferences.valueUpdatedPublisher(for: .sortOption)
             .asVoid()
@@ -82,7 +85,7 @@ final class FilterViewModel: ViewModel {
 
     private func handleLabelSelected(from source: PopoverSource) {
         var filterOptions = Current.preferences[.filterOptions]
-        let labels: [StandardLabel?] = [nil] + self.labels.value
+        let labels: [StandardLabel?] = [nil] + self.labels
         let labelActions = labels.map { label in
             AlertAction(
                 title: label.map(\.displayName) ?? L10n.allFilter,
@@ -133,7 +136,7 @@ final class FilterViewModel: ViewModel {
             .state(filterOptions.state?.localizedString ?? L10n.allFilter),
         ])
 
-        if !labels.value.isEmpty {
+        if !labels.isEmpty {
             let labelName = filterOptions.label.map {
                 $0.isEmpty ? L10n.noneLabel : $0
             }

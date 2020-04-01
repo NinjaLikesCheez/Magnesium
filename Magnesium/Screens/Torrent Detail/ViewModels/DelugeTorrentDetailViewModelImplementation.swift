@@ -5,12 +5,14 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     typealias Label = DelugeLabel
     typealias File = DelugeTorrentFile
 
-    private let client: DelugeClient
-    private let refresher: TorrentRefresher
+    private let session: DelugeSession
 
-    init(client: DelugeClient, refresher: TorrentRefresher) {
-        self.client = client
-        self.refresher = refresher
+    private var client: DelugeClient {
+        session.client
+    }
+
+    init(session: DelugeSession) {
+        self.session = session
     }
 
     private func torrentFiles(in items: [DelugeTorrentItem]) -> [DelugeTorrentFile] {
@@ -25,7 +27,7 @@ final class DelugeTorrentDetailViewModelImplementation: StandardTorrentDetailVie
     }
 
     func refresh() -> AnyPublisher<Void, Error> {
-        refresher.refreshTorrents()
+        session.refresh().asVoid().eraseToAnyPublisher()
     }
 
     func updateFiles(_ torrent: DelugeTorrent) -> AnyPublisher<[DelugeTorrentFile], Error> {

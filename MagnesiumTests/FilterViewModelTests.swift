@@ -16,7 +16,7 @@ class FilterViewModelTests: TestCase {
         cancellables = Set()
         let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
         labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
-        viewModel = FilterViewModel(labels: mappedLabels)
+        viewModel = FilterViewModel(labels: mappedLabels.eraseToAnyPublisher())
     }
 
     func test_sections_withoutLabels_shouldEmitExpectedValues() throws {

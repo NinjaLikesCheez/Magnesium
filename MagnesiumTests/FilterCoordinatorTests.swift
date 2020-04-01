@@ -10,7 +10,7 @@ class FilterCoordinatorTests: TestCase {
     override func setUp() {
         super.setUp()
         window = UIWindow()
-        coordinator = FilterCoordinator(labels: CurrentValueSubject([]))
+        coordinator = FilterCoordinator(labels: Just([]).eraseToAnyPublisher())
 
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController

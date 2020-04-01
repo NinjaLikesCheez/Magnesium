@@ -5,13 +5,15 @@ included:
 file_name:
   excluded:
     - Deluge+App.swift
-    - DelugeRequest+App.swift
-    - Transmission+App.swift
-    - Publishers+AsOptional.swift
     - Deluge+Mocks.swift
-    - Transmission+Mocks.swift
+    - DelugeRequest+App.swift
     - PreferenceKeys.swift
+    - Publishers+AsOptional.swift
     - SnapshotExtensions.swift
+    - StandardTorrentListViewModel+Deluge.swift
+    - StandardTorrentListViewModel+Transmission.swift
+    - Transmission+App.swift
+    - Transmission+Mocks.swift
 
 identifier_name:
   excluded:

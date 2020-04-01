@@ -116,7 +116,7 @@ final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
         viewController.present(documentPicker, animated: true, completion: nil)
     }
 
-    private func showFilter(from source: PopoverSource, labels: CurrentValueSubject<[StandardLabel], Never>) {
+    private func showFilter(from source: PopoverSource, labels: AnyPublisher<[StandardLabel], Never>) {
         let coordinator = FilterCoordinator(labels: labels)
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
@@ -198,8 +198,10 @@ private extension TorrentListCoordinator {
                 return nil
             }
             let client = Current.deluge(settings.url, keychain.password)
-            let implementation = DelugeTorrentListViewModelImplementation(client: client)
-            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: server)
+            let viewModel = StandardTorrentListViewModel(
+                implementation: .deluge(.init(client: client)),
+                server: server
+            )
             return .init(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
@@ -210,8 +212,10 @@ private extension TorrentListCoordinator {
                 return nil
             }
             let client = Current.transmission(settings.url, settings.username, keychain.password)
-            let implementation = TransmissionTorrentListViewModelImplementation(client: client)
-            let viewModel = StandardTorrentListViewModel(implementation: implementation, server: server)
+            let viewModel = StandardTorrentListViewModel(
+                implementation: .transmission(.init(client: client)),
+                server: server
+            )
             return .init(viewModel)
         }
     }
