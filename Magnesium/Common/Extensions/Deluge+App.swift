@@ -14,7 +14,39 @@ extension Deluge: DelugeClient {}
 
 extension DelugeTorrentFile {
     var standard: StandardTorrentFile {
-        .init(index: index, name: name, size: size, progress: progress)
+        .init(index: index, name: name, size: size, progress: progress, priority: priority.standard)
+    }
+}
+
+extension Priority {
+    var standard: TorrentPriority {
+        switch self {
+        case .disabled:
+            return .disabled
+        case .low:
+            return .low
+        case .normal:
+            return .normal
+        case .high:
+            return .high
+        default:
+            return .normal
+        }
+    }
+}
+
+extension TorrentPriority {
+    var deluge: Priority {
+        switch self {
+        case .disabled:
+            return .disabled
+        case .low:
+            return .low
+        case .normal:
+            return .normal
+        case .high:
+            return .high
+        }
     }
 }
 

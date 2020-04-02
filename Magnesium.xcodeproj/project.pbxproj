@@ -137,6 +137,11 @@
 		E9A2899323EF4535004C74F8 /* FilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899223EF4535004C74F8 /* FilterSection.swift */; };
 		E9A2899523EF4546004C74F8 /* FilterItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899423EF4546004C74F8 /* FilterItem.swift */; };
 		E9A2899723EF477C004C74F8 /* FilterItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A2899623EF477C004C74F8 /* FilterItemTableViewCell.swift */; };
+		E9A5D2472438197F002B7AC9 /* TorrentPriority.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A5D2462438197F002B7AC9 /* TorrentPriority.swift */; };
+		E9A5D24924381A4D002B7AC9 /* StandardTorrentDetailImplementation+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A5D24824381A4D002B7AC9 /* StandardTorrentDetailImplementation+Mocks.swift */; };
+		E9A5D24B24381CAE002B7AC9 /* StandardTorrentListImplementation+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A5D24A24381CAE002B7AC9 /* StandardTorrentListImplementation+Mocks.swift */; };
+		E9A5D24D24381CEC002B7AC9 /* TorrentDetailViewValues+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A5D24C24381CEC002B7AC9 /* TorrentDetailViewValues+Mocks.swift */; };
+		E9A5D24F24381FDB002B7AC9 /* TorrentListViewValues+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A5D24E24381FDB002B7AC9 /* TorrentListViewValues+Mocks.swift */; };
 		E9A80E88242693E0000E6FF4 /* FilterSectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A80E87242693E0000E6FF4 /* FilterSectionType.swift */; };
 		E9A80E8A24269812000E6FF4 /* SettingsSectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A80E8924269812000E6FF4 /* SettingsSectionType.swift */; };
 		E9A80E8C24269942000E6FF4 /* TorrentDetailSectionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A80E8B24269942000E6FF4 /* TorrentDetailSectionType.swift */; };
@@ -333,6 +338,11 @@
 		E9A2899223EF4535004C74F8 /* FilterSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSection.swift; sourceTree = "<group>"; };
 		E9A2899423EF4546004C74F8 /* FilterItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterItem.swift; sourceTree = "<group>"; };
 		E9A2899623EF477C004C74F8 /* FilterItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterItemTableViewCell.swift; sourceTree = "<group>"; };
+		E9A5D2462438197F002B7AC9 /* TorrentPriority.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TorrentPriority.swift; sourceTree = "<group>"; };
+		E9A5D24824381A4D002B7AC9 /* StandardTorrentDetailImplementation+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StandardTorrentDetailImplementation+Mocks.swift"; sourceTree = "<group>"; };
+		E9A5D24A24381CAE002B7AC9 /* StandardTorrentListImplementation+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StandardTorrentListImplementation+Mocks.swift"; sourceTree = "<group>"; };
+		E9A5D24C24381CEC002B7AC9 /* TorrentDetailViewValues+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorrentDetailViewValues+Mocks.swift"; sourceTree = "<group>"; };
+		E9A5D24E24381FDB002B7AC9 /* TorrentListViewValues+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TorrentListViewValues+Mocks.swift"; sourceTree = "<group>"; };
 		E9A80E87242693E0000E6FF4 /* FilterSectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSectionType.swift; sourceTree = "<group>"; };
 		E9A80E8924269812000E6FF4 /* SettingsSectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSectionType.swift; sourceTree = "<group>"; };
 		E9A80E8B24269942000E6FF4 /* TorrentDetailSectionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSectionType.swift; sourceTree = "<group>"; };
@@ -600,6 +610,10 @@
 				E9847C5323E64EE600B05D3A /* MockTransmissionClient.swift */,
 				E9AC4FB623EB9F2200E6BC65 /* Server+Mocks.swift */,
 				E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */,
+				E9A5D24824381A4D002B7AC9 /* StandardTorrentDetailImplementation+Mocks.swift */,
+				E9A5D24A24381CAE002B7AC9 /* StandardTorrentListImplementation+Mocks.swift */,
+				E9A5D24C24381CEC002B7AC9 /* TorrentDetailViewValues+Mocks.swift */,
+				E9A5D24E24381FDB002B7AC9 /* TorrentListViewValues+Mocks.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -679,6 +693,7 @@
 				E9C8258323C5787E003B1D72 /* StandardTorrent.swift */,
 				E91793A123E8FDC8000BEA89 /* StandardTorrentFile.swift */,
 				E9C39ADF23CC27A800BB3556 /* TextInputItem.swift */,
+				E9A5D2462438197F002B7AC9 /* TorrentPriority.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
 			);
 			path = Models;
@@ -1190,6 +1205,7 @@
 				E91DDED12411E1430024908B /* TorrentDetailViewModelEvent.swift in Sources */,
 				E9A2899523EF4546004C74F8 /* FilterItem.swift in Sources */,
 				E90DC4FA23CEC6A100FB53E6 /* SettingsViewModel.swift in Sources */,
+				E9A5D2472438197F002B7AC9 /* TorrentPriority.swift in Sources */,
 				E95C4D9B23E3DE0000202CAA /* FilterViewController.swift in Sources */,
 				E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */,
 				E9786AF623D38D5600E4157E /* Deluge+App.swift in Sources */,
@@ -1221,6 +1237,7 @@
 				E943D55024313CA000890791 /* TestCase.swift in Sources */,
 				E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */,
 				E9DD561E243002AE00B1145B /* FilterViewControllerTests.swift in Sources */,
+				E9A5D24F24381FDB002B7AC9 /* TorrentListViewValues+Mocks.swift in Sources */,
 				E9E411B723D933AD00A7EFED /* StandardTorrentListViewModelTests.swift in Sources */,
 				E9091D3823E2698B0034C353 /* DelugeSettingsViewModelTests.swift in Sources */,
 				E9DD561F243002AE00B1145B /* TorrentDetailSectionHeaderViewTests.swift in Sources */,
@@ -1241,6 +1258,7 @@
 				E9DD561C243002AE00B1145B /* SnapshotExtensions.swift in Sources */,
 				E9DD561A243002AE00B1145B /* TorrentDetailInfoTableViewCellTests.swift in Sources */,
 				E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */,
+				E9A5D24B24381CAE002B7AC9 /* StandardTorrentListImplementation+Mocks.swift in Sources */,
 				E9091D3423E25F580034C353 /* SettingsViewModelTests.swift in Sources */,
 				E9DD5620243002AE00B1145B /* TorrentDetailViewControllerTests.swift in Sources */,
 				E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */,
@@ -1249,7 +1267,9 @@
 				E9C5B59A23F87DF60054D7EE /* TransmissionTorrentListImplementationTests.swift in Sources */,
 				E92D5CE723FB234800A4CB51 /* TransmissionTorrentFileTests.swift in Sources */,
 				E9DD5619243002AE00B1145B /* TorrentDetailFileTableViewCellTests.swift in Sources */,
+				E9A5D24D24381CEC002B7AC9 /* TorrentDetailViewValues+Mocks.swift in Sources */,
 				E9847C5823E6605900B05D3A /* TransmissionSettingsViewModelTests.swift in Sources */,
+				E9A5D24924381A4D002B7AC9 /* StandardTorrentDetailImplementation+Mocks.swift in Sources */,
 				E92D5CE523FB207900A4CB51 /* TransmissionTorrentDetailImplementationTests.swift in Sources */,
 				E9DD5622243002AE00B1145B /* NoServersViewControllerTests.swift in Sources */,
 				E9B0375C243015EF002A88F1 /* SettingsViewControllerTests.swift in Sources */,
@@ -1531,7 +1551,7 @@
 			repositoryURL = "https://github.com/jameshurst/Deluge-Swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.0.1;
 			};
 		};
 		E981B52E24232945002C96D6 /* XCRemoteSwiftPackageReference "Transmission-Swift" */ = {
@@ -1539,7 +1559,7 @@
 			repositoryURL = "https://github.com/jameshurst/Transmission-Swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 1.0.1;
 			};
 		};
 		E9DD56072430029800B1145B /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {

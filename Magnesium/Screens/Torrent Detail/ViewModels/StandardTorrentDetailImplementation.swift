@@ -10,4 +10,9 @@ struct StandardTorrentDetailImplementation {
     var setLabel: (StandardLabel, StandardTorrent) -> AnyPublisher<Void, Error>
     var updateTrackers: (StandardTorrent) -> AnyPublisher<Void, Error>
     var moveDownloadFolder: (String, StandardTorrent) -> AnyPublisher<Void, Error>
+    var setPriority: (
+        StandardTorrent,
+        [StandardTorrentFile],
+        [StandardTorrentFile: TorrentPriority]
+    ) -> AnyPublisher<Void, Error>
 }

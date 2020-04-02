@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/jameshurst/Deluge-Swift.git",
         "state": {
           "branch": null,
-          "revision": "87ad92aba703502a57ce43466d046ba3080f2287",
-          "version": "1.0.0"
+          "revision": "487cf845a34d4a21edb5a8b84cdf7cdee3ba324a",
+          "version": "1.0.1"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/jameshurst/Transmission-Swift.git",
         "state": {
           "branch": null,
-          "revision": "507866e502760a42debf8fb0ab718d7ba50d412c",
-          "version": "1.0.0"
+          "revision": "1ea1de39919b8871d600eef04538628b125a47b4",
+          "version": "1.0.1"
         }
       }
     ]

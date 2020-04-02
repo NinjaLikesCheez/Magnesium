@@ -66,4 +66,18 @@ class TransmissionTorrentDetailImplementationTests: TestCase {
         _ = implementation.moveDownloadFolder("/new", .mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
+
+    func test_setPriority_should_setOptions_withPriority() {
+        _ = implementation.setPriority(
+            .mock(hash: "A"),
+            [],
+            [
+                .mock(index: 0): .disabled,
+                .mock(index: 1, priority: .disabled): .low,
+                .mock(index: 2): .normal,
+                .mock(index: 3): .high,
+            ]
+        )
+        assertSnapshot(matching: client.requests, as: .requests)
+    }
 }

@@ -1,4 +1,5 @@
 import Combine
+import Transmission
 
 extension StandardTorrentDetailImplementation {
     static func transmission(session: TransmissionSession) -> Self {
@@ -12,7 +13,8 @@ extension StandardTorrentDetailImplementation {
             verify: { verify(client: client, torrent: $0) },
             setLabel: { _, _ in Just(()).setFailureType(to: Error.self).eraseToAnyPublisher() },
             updateTrackers: { updateTrackers(client: client, torrent: $0) },
-            moveDownloadFolder: { moveDownloadFolder(client: client, path: $0, torrent: $1) }
+            moveDownloadFolder: { moveDownloadFolder(client: client, path: $0, torrent: $1) },
+            setPriority: { setPriority(client: client, torrent: $0, files: $1, priorities: $2) }
         )
     }
 
@@ -60,5 +62,62 @@ extension StandardTorrentDetailImplementation {
         torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(ids: [torrent.hash], path: path)).eraseError().eraseToAnyPublisher()
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity
+    private static func setPriority(
+        client: TransmissionClient,
+        torrent: StandardTorrent,
+        files: [StandardTorrentFile],
+        priorities: [StandardTorrentFile: TorrentPriority]
+    ) -> AnyPublisher<Void, Error> {
+        var low = [Int]()
+        var normal = [Int]()
+        var high = [Int]()
+        var wanted = [Int]()
+        var unwanted = [Int]()
+
+        for (file, priority) in priorities {
+            switch priority {
+            case .low:
+                low.append(file.index)
+            case .normal:
+                normal.append(file.index)
+            case .high:
+                high.append(file.index)
+            case .disabled:
+                break
+            }
+
+            if file.priority == .disabled, priority != .disabled {
+                wanted.append(file.index)
+            } else if file.priority != .disabled, priority == .disabled {
+                unwanted.append(file.index)
+            }
+        }
+
+        var options = [TorrentOption]()
+
+        if !low.isEmpty {
+            options.append(.priorityLow(indices: low))
+        }
+
+        if !normal.isEmpty {
+            options.append(.priorityNormal(indices: normal))
+        }
+
+        if !high.isEmpty {
+            options.append(.priorityHigh(indices: high))
+        }
+
+        if !wanted.isEmpty {
+            options.append(.filesWanted(indices: wanted))
+        }
+
+        if !unwanted.isEmpty {
+            options.append(.filesUnwanted(indices: unwanted))
+        }
+
+        return client.request(.setOptions(ids: [torrent.hash], options: options)).eraseError().eraseToAnyPublisher()
     }
 }

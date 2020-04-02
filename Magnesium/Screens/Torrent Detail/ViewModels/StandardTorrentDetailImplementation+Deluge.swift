@@ -12,7 +12,8 @@ extension StandardTorrentDetailImplementation {
             verify: { verify(client: client, torrent: $0) },
             setLabel: { setLabel(client: client, label: $0, torrent: $1) },
             updateTrackers: { updateTrackers(client: client, torrent: $0) },
-            moveDownloadFolder: { moveDownloadFolder(client: client, path: $0, torrent: $1) }
+            moveDownloadFolder: { moveDownloadFolder(client: client, path: $0, torrent: $1) },
+            setPriority: { setPriority(client: client, torrent: $0, files: $1, priorities: $2) }
         )
     }
 
@@ -82,5 +83,23 @@ extension StandardTorrentDetailImplementation {
         torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(hashes: [torrent.hash], path: path)).eraseError().eraseToAnyPublisher()
+    }
+
+    private static func setPriority(
+        client: DelugeClient,
+        torrent: StandardTorrent,
+        files: [StandardTorrentFile],
+        priorities: [StandardTorrentFile: TorrentPriority]
+    ) -> AnyPublisher<Void, Error> {
+        var allPriorities = files.sorted(by: { $0.index < $1.index }).map(\.priority)
+        for (file, priority) in priorities {
+            guard file.index < allPriorities.count else { continue }
+            allPriorities[file.index] = priority
+        }
+
+        return client.request(.setOptions(
+            hashes: [torrent.hash],
+            options: [.filePriorities(allPriorities.map(\.deluge))]
+        )).eraseError().eraseToAnyPublisher()
     }
 }

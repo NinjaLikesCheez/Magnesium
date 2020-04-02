@@ -121,7 +121,7 @@ class AppCoordinatorTests: TestCase {
     }
 
     func test_listCoordinatorEvent_torrentsUpdated_whenHashNotRemoved_shouldDismissDetail() throws {
-        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(.mock(hash: "A")))))
         let previousDetailViewController = splitViewController.detailViewController
         XCTAssertNotNil(previousDetailViewController)
         coordinator.handle(.torrentsUpdated(hashes: ["A", "B"]))
@@ -129,7 +129,7 @@ class AppCoordinatorTests: TestCase {
     }
 
     func test_listCoordinatorEvent_torrentsUpdated_whenHashRemoved_shouldDismissDetail() throws {
-        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(hash: "A"))))
+        coordinator.handle(.showDetail(viewModel: AnyViewModel(MockTorrentDetailViewModel(.mock(hash: "A")))))
         let previousDetailViewController = splitViewController.detailViewController
         XCTAssertNotNil(previousDetailViewController)
         coordinator.handle(.torrentsUpdated(hashes: ["B"]))
@@ -200,13 +200,10 @@ private final class MockSplitViewController: PresentableSplitViewController {
 private final class MockTorrentDetailViewModel: ViewModel {
     let values: TorrentDetailViewValues
     let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func receive(_ event: TorrentDetailViewEvent) {}
 
-    init(hash: String = "") {
-        values = TorrentDetailViewValues(
-            hash: hash,
-            sections: Just([]).eraseToAnyPublisher(),
-            isRefreshing: Just(false).eraseToAnyPublisher()
-        )
+    init(_ values: TorrentDetailViewValues = .mock()) {
+        self.values = values
     }
+
+    func receive(_ event: TorrentDetailViewEvent) {}
 }

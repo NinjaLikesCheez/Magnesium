@@ -1,4 +1,6 @@
 import Foundation
+import SnapshotTesting
+import UIKit
 
 extension String {
     // swiftformat:disable all

@@ -235,6 +235,22 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             break
         }
     }
+
+    override func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let menu = viewModel.values.contextMenu(indexPath) else {
+            return nil
+        }
+
+        return .init(
+            identifier: indexPath as NSCopying,
+            previewProvider: nil,
+            actionProvider: { _ in menu }
+        )
+    }
 }
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {

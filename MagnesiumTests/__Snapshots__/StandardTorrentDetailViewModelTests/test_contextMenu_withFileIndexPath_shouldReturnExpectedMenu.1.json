@@ -1,0 +1,26 @@
+{
+  "children" : [
+    {
+      "state" : 0,
+      "title" : "Disabled",
+      "type" : "action"
+    },
+    {
+      "state" : 0,
+      "title" : "Low Priority",
+      "type" : "action"
+    },
+    {
+      "state" : 1,
+      "title" : "Normal Priority",
+      "type" : "action"
+    },
+    {
+      "state" : 0,
+      "title" : "High Priority",
+      "type" : "action"
+    }
+  ],
+  "title" : "",
+  "type" : "menu"
+}

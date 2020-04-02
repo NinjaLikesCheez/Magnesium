@@ -3,17 +3,18 @@ import CommonModels
 import Deluge
 @testable import Magnesium
 import Preferences
+import SnapshotTesting
 import ViewModel
 import XCTest
 
 final class StandardTorrentListViewModelTests: TestCase {
-    private var implementation: MockImplementation!
+    private var implementation: MockStandardTorrentListImplementation!
     private var viewModel: StandardTorrentListViewModel!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        implementation = MockImplementation()
+        implementation = MockStandardTorrentListImplementation()
         viewModel = StandardTorrentListViewModel(implementation: .mock(implementation), server: .mock(.deluge))
     }
 
@@ -663,8 +664,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: detailViewModel
 
     func test_detailViewModel_shouldReturnExpectedViewModel() {
-        let detailViewModel = viewModel.values.detailViewModel(0)!.base as AnyObject
-        XCTAssertType(detailViewModel, MockDetailViewModel.self)
+        XCTAssertNotNil(viewModel.values.detailViewModel(0))
     }
 
     // MARK: contextMenu
@@ -675,63 +675,21 @@ final class StandardTorrentListViewModelTests: TestCase {
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let menu = viewModel.values.contextMenu(0)!
-        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
-            var output = String(repeating: " ", count: level * 2)
-            output += "\(menu.title)\n"
-            if let menu = menu as? UIMenu {
-                output += menu.children
-                    .map { menuString($0, level: level + 1) }
-                    .joined()
-            }
-            return output
+        guard let menu = viewModel.values.contextMenu(0) else {
+            XCTFail("Expected menu")
+            return
         }
-        // swiftformat:disable indent
-        let expected = """
 
-              Pause
-              Verify Files
-              Move Download Folder
-              Update Trackers
-              Remove
-                Keep Data
-                Remove Data
-
-            """
-        // swiftformat:enable indent
-        XCTAssertEqual(menuString(menu), expected)
+        assertSnapshot(matching: menu, as: .json)
     }
 
     func test_contextMenu_withActiveTorrent_shouldReturnExpectedMenu() {
-        let menu = viewModel.values.contextMenu(0)!
-        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
-            var output = String(repeating: " ", count: level * 2)
-            output += "\(menu.title)\n"
-            if let menu = menu as? UIMenu {
-                output += menu.children
-                    .map { menuString($0, level: level + 1) }
-                    .joined()
-            }
-            return output
+        guard let menu = viewModel.values.contextMenu(0) else {
+            XCTFail("Expected menu")
+            return
         }
-        // swiftformat:disable indent
-        let expected = """
 
-              Pause
-              Set Label
-                None
-                label1
-                label2
-              Verify Files
-              Move Download Folder
-              Update Trackers
-              Remove
-                Keep Data
-                Remove Data
-
-            """
-        // swiftformat:enable indent
-        XCTAssertEqual(menuString(menu), expected)
+        assertSnapshot(matching: menu, as: .json)
     }
 
     func test_contextMenu_withInactiveTorrent_shouldReturnExpectedMenu() {
@@ -743,35 +701,12 @@ final class StandardTorrentListViewModelTests: TestCase {
             .eraseToAnyPublisher()
         viewModel.receive(.refresh)
 
-        let menu = viewModel.values.contextMenu(0)!
-        func menuString(_ menu: UIMenuElement, level: Int = 0) -> String {
-            var output = String(repeating: " ", count: level * 2)
-            output += "\(menu.title)\n"
-            if let menu = menu as? UIMenu {
-                output += menu.children
-                    .map { menuString($0, level: level + 1) }
-                    .joined()
-            }
-            return output
+        guard let menu = viewModel.values.contextMenu(0) else {
+            XCTFail("Expected menu")
+            return
         }
-        // swiftformat:disable indent
-        let expected = """
 
-              Resume
-              Set Label
-                None
-                label1
-                label2
-              Verify Files
-              Move Download Folder
-              Update Trackers
-              Remove
-                Keep Data
-                Remove Data
-
-            """
-        // swiftformat:enable indent
-        XCTAssertEqual(menuString(menu), expected)
+        assertSnapshot(matching: menu, as: .json)
     }
 
     // MARK: leadingSwipeActionsConfiguration
@@ -867,149 +802,4 @@ final class StandardTorrentListViewModelTests: TestCase {
         XCTAssertEqual(alert.message, "Mock")
         XCTAssertEqual(alert.actions.map(\.title), ["Keep Data", "Remove Data", "Cancel"])
     }
-}
-
-// MARK: - Mocks
-
-private extension StandardTorrentListImplementation {
-    static func mock(_ impl: MockImplementation) -> StandardTorrentListImplementation {
-        .init(
-            updated: impl.updatedSubject.eraseToAnyPublisher(),
-            refresh: impl.refresh,
-            detailViewModel: impl.detailViewModel(torrent:labels:),
-            addLink: impl.addLink(url:),
-            pause: impl.pause(torrents:),
-            resume: impl.resume(torrents:),
-            remove: impl.remove(torrents:removeData:),
-            verify: impl.verify(_:),
-            setLabel: impl.setLabel(label:torrents:),
-            updateTrackers: impl.updateTrackers(torrents:),
-            moveDownloadFolder: impl.moveDownloadFolder(path:torrents:)
-        )
-    }
-}
-
-private final class MockImplementation {
-    typealias AddLinkError = StandardTorrentListImplementation.AddLinkError
-
-    let updatedSubject = PassthroughSubject<([StandardTorrent], [StandardLabel]), Never>()
-
-    private(set) var refreshCallCount = 0
-    var refreshResult = Just((
-        [
-            StandardTorrent.mock(dateAdded: Date(), name: "Mock"),
-            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), name: "Mock 2"),
-        ],
-        [
-            StandardLabel.mock(name: ""),
-            StandardLabel.mock(name: "label1"),
-            StandardLabel.mock(name: "label2"),
-        ]
-    )).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func refresh() -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error> {
-        refreshCallCount += 1
-        return refreshResult
-    }
-
-    private(set) var detailViewModelCallCount = 0
-    private(set) var detailViewModelParamTorrent = [CurrentValueSubject<StandardTorrent, Never>]()
-    private(set) var detailViewModelParamLabels = [CurrentValueSubject<[StandardLabel], Never>]()
-    var detailViewModelResult = AnyViewModel(MockDetailViewModel())
-    func detailViewModel(
-        torrent: CurrentValueSubject<StandardTorrent, Never>,
-        labels: CurrentValueSubject<[StandardLabel], Never>
-    ) -> AnyTorrentDetailViewModel {
-        detailViewModelCallCount += 1
-        detailViewModelParamTorrent.append(torrent)
-        detailViewModelParamLabels.append(labels)
-        return detailViewModelResult
-    }
-
-    private(set) var addLinkCallCount = 0
-    private(set) var addLinkParamURL = [String]()
-    var addLinkResult = Empty<Void, AddLinkError>(completeImmediately: true).eraseToAnyPublisher()
-    func addLink(url: String) -> AnyPublisher<Void, AddLinkError> {
-        addLinkCallCount += 1
-        addLinkParamURL.append(url)
-        return addLinkResult
-    }
-
-    private(set) var pauseCallCount = 0
-    private(set) var pauseParamTorrents = [[StandardTorrent]]()
-    var pauseResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func pause(torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        pauseCallCount += 1
-        pauseParamTorrents.append(torrents)
-        return pauseResult
-    }
-
-    private(set) var resumeCallCount = 0
-    private(set) var resumeParamTorrents = [[StandardTorrent]]()
-    var resumeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func resume(torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        resumeCallCount += 1
-        resumeParamTorrents.append(torrents)
-        return resumeResult
-    }
-
-    private(set) var removeCallCount = 0
-    private(set) var removeParamTorrents = [[StandardTorrent]]()
-    private(set) var removeParamRemoveData = [Bool]()
-    var removeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func remove(torrents: [StandardTorrent], removeData: Bool) -> AnyPublisher<Void, Error> {
-        removeCallCount += 1
-        removeParamTorrents.append(torrents)
-        removeParamRemoveData.append(removeData)
-        return removeResult
-    }
-
-    private(set) var verifyCallCount = 0
-    private(set) var verifyParamTorrents = [[StandardTorrent]]()
-    var verifyResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func verify(_ torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        verifyCallCount += 1
-        verifyParamTorrents.append(torrents)
-        return verifyResult
-    }
-
-    private(set) var setLabelCallCount = 0
-    private(set) var setLabelParamLabel = [StandardLabel]()
-    private(set) var setLabelParamTorrents = [[StandardTorrent]]()
-    var setLabelResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func setLabel(label: StandardLabel, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        setLabelCallCount += 1
-        setLabelParamLabel.append(label)
-        setLabelParamTorrents.append(torrents)
-        return setLabelResult
-    }
-
-    private(set) var updateTrackersCallCount = 0
-    private(set) var updateTrackersParamTorrents = [[StandardTorrent]]()
-    var updateTrackersResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func updateTrackers(torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        updateTrackersCallCount += 1
-        updateTrackersParamTorrents.append(torrents)
-        return updateTrackersResult
-    }
-
-    private(set) var moveDownloadFolderCallCount = 0
-    private(set) var moveDownloadFolderParamPath = [String]()
-    private(set) var moveDownloadFolderParamTorrents = [[StandardTorrent]]()
-    var moveDownloadFolderResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func moveDownloadFolder(path: String, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
-        moveDownloadFolderCallCount += 1
-        moveDownloadFolderParamTorrents.append(torrents)
-        moveDownloadFolderParamPath.append(path)
-        return moveDownloadFolderResult
-    }
-}
-
-private final class MockDetailViewModel: ViewModel {
-    let values = TorrentDetailViewValues(
-        hash: "",
-        sections: Just([]).eraseToAnyPublisher(),
-        isRefreshing: Just(false).eraseToAnyPublisher()
-    )
-    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func receive(_ event: TorrentDetailViewEvent) {}
 }

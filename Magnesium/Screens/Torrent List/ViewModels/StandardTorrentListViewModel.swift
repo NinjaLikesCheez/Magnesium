@@ -37,7 +37,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .ui()
             .eraseToAnyPublisher()
 
-        let items = torrents.values
+        let items = torrents.valuesPublisher
             .map { $0.map { TorrentListItem(torrent: $0) } }
             .ui()
             .eraseToAnyPublisher()
@@ -47,13 +47,13 @@ final class StandardTorrentListViewModel: ViewModel {
             .ui()
             .eraseToAnyPublisher()
 
-        let totalDownloadSpeed = torrents.allValues
+        let totalDownloadSpeed = torrents.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
             .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
 
-        let totalUploadSpeed = torrents.allValues
+        let totalUploadSpeed = torrents.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
@@ -95,7 +95,7 @@ final class StandardTorrentListViewModel: ViewModel {
             }
             .store(in: &cancellables)
 
-        torrents.values
+        torrents.valuesPublisher
             .ui()
             .sink { [weak self] torrents in
                 self?.eventSubject.send(.torrentsUpdated(hashes: torrents.map(\.value.hash)))
@@ -130,8 +130,8 @@ final class StandardTorrentListViewModel: ViewModel {
             eventSubject.send(.filter(source: source, labels: mappedLabels.eraseToAnyPublisher()))
 
         case let .itemSelected(index):
-            let subject = torrents.subject(at: index)
-            let viewModel = implementation.detailViewModel(subject, labels)
+            let torrent = torrents.values[index]
+            let viewModel = implementation.detailViewModel(torrent, labels)
             eventSubject.send(.detail(viewModel: viewModel))
 
         case .settingsSelected:
@@ -141,16 +141,16 @@ final class StandardTorrentListViewModel: ViewModel {
             querySubject.send(query)
 
         case let .resumeSelected(indices):
-            resume(indices.map { torrents.subject(at: $0).value })
+            resume(indices.map { torrents.values[$0].value })
 
         case let .pauseSelected(indices):
-            pause(indices.map { torrents.subject(at: $0).value })
+            pause(indices.map { torrents.values[$0].value })
 
         case let .removeSelected(indices, source):
-            presentRemoveOptions(for: indices.map { torrents.subject(at: $0).value }, from: source)
+            presentRemoveOptions(for: indices.map { torrents.values[$0].value }, from: source)
 
         case let .moreOptionsSelected(indices, source):
-            presentActivities(for: indices.map { torrents.subject(at: $0).value }, source: source)
+            presentActivities(for: indices.map { torrents.values[$0].value }, source: source)
 
         case let .multiSelectUpdated(indices):
             multiSelectCountSubject.send(indices.count)
@@ -323,11 +323,11 @@ final class StandardTorrentListViewModel: ViewModel {
     // MARK: View Functions
 
     private func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        implementation.detailViewModel(torrents.subject(at: index), labels)
+        implementation.detailViewModel(torrents.values[index], labels)
     }
 
     private func contextMenuForItem(at index: Int) -> UIMenu? {
-        let torrent = torrents.subject(at: index).value
+        let torrent = torrents.values[index].value
         var actions = [UIMenuElement]()
 
         if torrent.isActive {
@@ -408,7 +408,7 @@ final class StandardTorrentListViewModel: ViewModel {
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrents.subject(at: index).value
+        let torrent = torrents.values[index].value
         if torrent.isActive {
             return SwipeActionsConfiguration(actions: [
                 SwipeAction(
@@ -438,7 +438,7 @@ final class StandardTorrentListViewModel: ViewModel {
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrents.subject(at: index).value
+        let torrent = torrents.values[index].value
         return SwipeActionsConfiguration(actions: [
             SwipeAction(
                 image: UIImage(systemName: "trash.fill"),

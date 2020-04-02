@@ -71,4 +71,18 @@ class DelugeTorrentDetailImplementationTests: TestCase {
         _ = implementation.moveDownloadFolder("/new", .mock(hash: "A"))
         assertSnapshot(matching: client.requests, as: .requests)
     }
+
+    func test_setPriority_should_setOptions_withPriority() {
+        _ = implementation.setPriority(
+            .mock(hash: "A"),
+            [.mock(index: 0), .mock(index: 1), .mock(index: 2), .mock(index: 3), .mock(index: 4)],
+            [
+                .mock(index: 0): .disabled,
+                .mock(index: 1): .low,
+                .mock(index: 2): .normal,
+                .mock(index: 3): .high,
+            ]
+        )
+        assertSnapshot(matching: client.requests, as: .requests)
+    }
 }

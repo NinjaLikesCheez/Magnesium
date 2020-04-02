@@ -72,7 +72,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
-        values = ServerSettingsViewValues(
+        values = .init(
             title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
             saveButtonTitle: server == nil ? L10n.add : L10n.save,
             canDelete: server != nil,

@@ -7,9 +7,8 @@ import XCTest
 class TorrentDetailViewControllerTests: TestCase {
     func test_view() {
         let torrent = StandardTorrent.mock(label: "label", name: "Name")
-        let values = TorrentDetailViewValues(
-            hash: "",
-            sections: Just([
+        let values = TorrentDetailViewValues.mock(
+            sections: [
                 .init(type: .header, items: [.header(.init(torrent: .init(torrent)))]),
                 .init(type: .info, items: [
                     .info(.init(
@@ -31,8 +30,7 @@ class TorrentDetailViewControllerTests: TestCase {
                     .file(.init(file: .init(.mock(index: 0, name: "Name")))),
                     .file(.init(file: .init(.mock(index: 1, name: "Name")))),
                 ]),
-            ]).eraseToAnyPublisher(),
-            isRefreshing: Just(false).eraseToAnyPublisher()
+            ]
         )
         let viewModel = StaticViewModel(values: values, type: TorrentDetailViewEvent.self)
         let viewController = TorrentDetailViewController(viewModel: viewModel)

@@ -125,6 +125,9 @@
 /* Failed to Set Label */
 "error_set_label" = "Failed to Set Label";
 
+/* Failed to Set Priority */
+"error_set_priority" = "Failed to Set Priority";
+
 /* Unable to Add Link */
 "error_torrent_link_validation" = "Unable to Add Link";
 

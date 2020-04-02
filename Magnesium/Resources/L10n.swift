@@ -199,6 +199,10 @@ enum L10n {
         NSLocalizedString("error_move_download_folder", comment: "Failed to Move Download Folder")
     }
 
+    static var setPriorityError: String {
+        NSLocalizedString("error_set_priority", comment: "Failed to Set Priority")
+    }
+
     // MARK: Servers
 
     static var deluge: String {

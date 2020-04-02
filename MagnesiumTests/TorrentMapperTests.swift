@@ -11,12 +11,6 @@ class TorrentMapperTests: TestCase {
         super.setUp()
     }
 
-    private func getValues(from mapper: TorrentMapper) -> [StandardTorrent] {
-        var values: [StandardTorrent]!
-        _ = mapper.values.sink { values = $0.map(\.value) }
-        return values
-    }
-
     func test_sort_withName() {
         let torrents = [
             StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "B", uploadRate: 0),
@@ -33,10 +27,10 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .name, direction: .ascending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedAscending)
 
         preferences[.sortOption] = SortOption(property: .name, direction: .descending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedDescending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedDescending)
     }
 
     func test_sort_withDateAdded() {
@@ -58,10 +52,10 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .dateAdded, direction: .ascending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedAscending)
 
         preferences[.sortOption] = SortOption(property: .dateAdded, direction: .descending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedDescending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedDescending)
     }
 
     func test_sort_withDownloadSpeed() {
@@ -82,10 +76,10 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .downloadSpeed, direction: .ascending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedAscending)
 
         preferences[.sortOption] = SortOption(property: .downloadSpeed, direction: .descending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedDescending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedDescending)
     }
 
     func test_sort_withUploadSpeed() {
@@ -106,10 +100,10 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .uploadSpeed, direction: .ascending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedAscending)
 
         preferences[.sortOption] = SortOption(property: .uploadSpeed, direction: .descending)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedDescending)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expectedDescending)
     }
 
     func test_filter_withState() {
@@ -125,7 +119,7 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(state: .downloading)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }
 
     func test_filter_withLabel() {
@@ -140,7 +134,7 @@ class TorrentMapperTests: TestCase {
         mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(label: "test")
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }
 
     func test_search_shouldConsiderSpaceAndDotEqual() {
@@ -154,7 +148,7 @@ class TorrentMapperTests: TestCase {
 
         let mapper = TorrentMapper(query: CurrentValueSubject("test tor"))
         mapper.update(with: torrents)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }
 
     func test_search_shouldBeCaseInsensitive() {
@@ -168,6 +162,6 @@ class TorrentMapperTests: TestCase {
 
         let mapper = TorrentMapper(query: CurrentValueSubject("TEST TOR"))
         mapper.update(with: torrents)
-        XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
+        XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }
 }

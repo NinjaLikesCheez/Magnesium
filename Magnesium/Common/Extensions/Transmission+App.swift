@@ -12,7 +12,28 @@ extension Transmission: TransmissionClient {}
 
 extension TransmissionTorrentFile {
     var standard: StandardTorrentFile {
-        .init(index: index, name: name, size: size, progress: Float(downloaded) / Float(size))
+        .init(
+            index: index,
+            name: name,
+            size: size,
+            progress: Float(downloaded) / Float(size),
+            priority: isWanted ? priority.standard : .disabled
+        )
+    }
+}
+
+extension Priority {
+    var standard: TorrentPriority {
+        switch self {
+        case .low:
+            return .low
+        case .normal:
+            return .normal
+        case .high:
+            return .high
+        default:
+            return .normal
+        }
     }
 }
 

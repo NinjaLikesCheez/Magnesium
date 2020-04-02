@@ -72,11 +72,7 @@ class TorrentDetailCoordinatorTests: TestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel {
-    let values = TorrentDetailViewValues(
-        hash: "",
-        sections: Just([]).eraseToAnyPublisher(),
-        isRefreshing: Just(false).eraseToAnyPublisher()
-    )
+    let values = TorrentDetailViewValues.mock()
     let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     var events: AnyPublisher<TorrentDetailViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
     func receive(_ event: TorrentDetailViewEvent) {}

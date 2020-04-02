@@ -13,23 +13,33 @@ class ValueMapper<K: Hashable, V> {
     private let mapSubject = CurrentValueMapSubject<K, V>([:])
     private let valuesSubject = CurrentValueArraySubject<V>([])
     /// A publisher that emits all values. This publisher does not perform deduplication.
-    let allValues: AnyPublisher<[CurrentValueSubject<V, Never>], Never>
+    let allValuesPublisher: AnyPublisher<[CurrentValueSubject<V, Never>], Never>
 
     /// A publisher that emits the deduplicated filtered values.
-    var values: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
+    var valuesPublisher: AnyPublisher<[CurrentValueSubject<V, Never>], Never> {
         valuesSubject.eraseToAnyPublisher()
+    }
+
+    /// All the values contained in this mapper.
+    var allValues: [CurrentValueSubject<V, Never>] {
+        Array(mapSubject.value.values)
+    }
+
+    /// The filtered values contained in this mapper.
+    var values: [CurrentValueSubject<V, Never>] {
+        valuesSubject.value
     }
 
     /// Creates a value mapper using the given filter publisher.
     /// - Parameter filter: A publisher that emits filter functions. When this publisher emits, the values will be
     /// updated with the new filter function.
     init(filter: AnyPublisher<FilterFunction, Never>) {
-        allValues = mapSubject.map { Array($0.values) }.eraseToAnyPublisher()
+        allValuesPublisher = mapSubject.map { Array($0.values) }.eraseToAnyPublisher()
         mapSubject
             .removeDuplicates { $0.keys == $1.keys }
             .combineLatest(filter)
             .map { $0.1(Array($0.0.values)) }
-            .subscribe(valuesSubject)
+            .sink { [weak self] in self?.valuesSubject.send($0) }
             .store(in: &cancellables)
     }
 
@@ -47,12 +57,5 @@ class ValueMapper<K: Hashable, V> {
                     return current
                 }
         )
-    }
-
-    /// Returns the subject at a given index.
-    /// - Parameter index: The requested index.
-    /// - Returns: The subject at the requested index.
-    func subject(at index: Int) -> CurrentValueSubject<V, Never> {
-        valuesSubject.value[index]
     }
 }

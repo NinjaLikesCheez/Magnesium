@@ -2,19 +2,25 @@ import Combine
 import CommonModels
 import Foundation
 import Preferences
+import UIKit
 import ViewModel
 
 final class StandardTorrentDetailViewModel: ViewModel {
     private let implementation: StandardTorrentDetailImplementation
     private let torrent: CurrentValueSubject<StandardTorrent, Never>
     private let labels: CurrentValueSubject<[StandardLabel], Never>
+    private let sections = CurrentValueSubject<[TorrentDetailSection], Never>([])
     private let files: ValueMapper<Int, StandardTorrentFile>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var autoRefreshTimer: Timer?
     private var timerIntervalObserver: AnyCancellable?
-    let values: TorrentDetailViewValues
+    private var _values: TorrentDetailViewValues!
+
+    var values: TorrentDetailViewValues {
+        _values
+    }
 
     var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
@@ -46,21 +52,25 @@ final class StandardTorrentDetailViewModel: ViewModel {
             }
         }.eraseToAnyPublisher())
 
-        let sections = files.values
+        let sections = files.valuesPublisher
             .map { files in
                 Self.createSections(
                     subject: torrent,
                     files: files
                 )
             }
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.sections.send($0)
+            })
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
 
-        values = .init(
+        _values = .init(
             hash: torrent.value.hash,
             sections: sections,
-            isRefreshing: isRefreshingSubject.ui().eraseToAnyPublisher()
+            isRefreshing: isRefreshingSubject.ui().eraseToAnyPublisher(),
+            contextMenu: contextMenuForItem(at:)
         )
 
         refreshFiles()
@@ -151,6 +161,8 @@ final class StandardTorrentDetailViewModel: ViewModel {
     deinit {
         autoRefreshTimer?.invalidate()
     }
+
+    // MARK: View Events
 
     func receive(_ event: TorrentDetailViewEvent) {
         switch event {
@@ -340,6 +352,69 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
     private func showError(title: String, message: String?) {
         eventSubject.send(.alert(.init(title: title, message: message, style: .alert, action: .ok)))
+    }
+
+    // MARK: View Functions
+
+    private func contextMenuForItem(at indexPath: IndexPath) -> UIMenu? {
+        switch sections.value[indexPath.section].items[indexPath.row] {
+        case let .file(item):
+            guard let file = files.values.first(where: { $0.value.index == item.id }) else {
+                return nil
+            }
+
+            return UIMenu(title: "", children: [
+                UIAction(
+                    title: "Disabled",
+                    state: file.value.priority == .disabled ? .on : .off,
+                    handler: { [weak self] _ in
+                        self?.setPriority(.disabled, for: [file.value])
+                    }
+                ),
+                UIAction(
+                    title: "Low Priority",
+                    state: file.value.priority == .low ? .on : .off,
+                    handler: { [weak self] _ in
+                        self?.setPriority(.low, for: [file.value])
+                    }
+                ),
+                UIAction(
+                    title: "Normal Priority",
+                    state: file.value.priority == .normal ? .on : .off,
+                    handler: { [weak self] _ in
+                        self?.setPriority(.normal, for: [file.value])
+                    }
+                ),
+                UIAction(
+                    title: "High Priority",
+                    state: file.value.priority == .high ? .on : .off,
+                    handler: { [weak self] _ in
+                        self?.setPriority(.high, for: [file.value])
+                    }
+                ),
+            ])
+        default:
+            return nil
+        }
+    }
+
+    // internal for testing
+    func setPriority(_ priority: TorrentPriority, for files: [StandardTorrentFile]) {
+        let priorityMap = files.reduce(into: [StandardTorrentFile: TorrentPriority]()) { $0[$1] = priority }
+        implementation.setPriority(torrent.value, self.files.allValues.map(\.value), priorityMap)
+            .append(
+                implementation.refreshFiles(torrent.value)
+                    .asVoid()
+                    .replaceError(with: ())
+                    .setFailureType(to: Error.self)
+                    .eraseToAnyPublisher()
+            )
+            .ui()
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.setPriorityError, message: error.localizedDescription)
+            }, receiveValue: { _ in })
+            .store(in: &cancellables)
     }
 
     // MARK: Auto Refresh

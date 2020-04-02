@@ -187,30 +187,14 @@ class TorrentListCoordinatorTests: TestCase {
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel {
-    let values = TorrentListViewValues(
-        title: Just("").eraseToAnyPublisher(),
-        items: Just([]).eraseToAnyPublisher(),
-        isLoading: Just(false).eraseToAnyPublisher(),
-        isEditing: Just(false).eraseToAnyPublisher(),
-        hasActiveFilters: Just(false).eraseToAnyPublisher(),
-        editActionsEnabled: Just(false).eraseToAnyPublisher(),
-        status: Just("").eraseToAnyPublisher(),
-        detailViewModel: { _ in .init(MockDetailViewModel()) },
-        contextMenu: { _ in nil },
-        leadingSwipeActionsConfiguration: { _, _ in nil },
-        trailingSwipeActionsConfiguration: { _, _ in nil }
-    )
+    let values = TorrentListViewValues.mock()
     let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     var events: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
     func receive(_ event: TorrentListViewEvent) {}
 }
 
 private final class MockDetailViewModel: ViewModel {
-    let values = TorrentDetailViewValues(
-        hash: "",
-        sections: Just([]).eraseToAnyPublisher(),
-        isRefreshing: Just(false).eraseToAnyPublisher()
-    )
+    let values = TorrentDetailViewValues.mock()
     let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
     func receive(_ event: TorrentDetailViewEvent) {}
 }

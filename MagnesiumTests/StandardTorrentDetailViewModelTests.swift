@@ -3,13 +3,14 @@ import CommonModels
 import Deluge
 @testable import Magnesium
 import Preferences
+import SnapshotTesting
 import ViewModel
 import XCTest
 
 final class StandardTorrentDetailViewModelTests: TestCase {
     private var torrent: CurrentValueSubject<StandardTorrent, Never>!
     private var labels: CurrentValueSubject<[StandardLabel], Never>!
-    private var implementation: MockImplementation!
+    private var implementation: MockStandardTorrentDetailImplementation!
     private var viewModel: StandardTorrentDetailViewModel!
     private var preferences: Preferences { Current.preferences }
 
@@ -17,7 +18,12 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         super.setUp()
         torrent = CurrentValueSubject(.mock(downloadPath: "/downloads", name: "Mock"))
         labels = CurrentValueSubject([.mock(), .mock(name: "label1"), .mock(name: "label2")])
-        implementation = MockImplementation()
+        implementation = MockStandardTorrentDetailImplementation()
+        implementation.refreshFilesResult = Just([
+            StandardTorrentFile.mock(index: 0, name: "file.rar"),
+            StandardTorrentFile.mock(index: 1, name: "file.r01"),
+            StandardTorrentFile.mock(index: 2, name: "file.r00"),
+        ]).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel = StandardTorrentDetailViewModel(
             implementation: .mock(implementation),
             torrent: torrent,
@@ -432,113 +438,42 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
-}
 
-// MARK: - Mocks
+    // MARK: contextMenu
 
-private extension StandardTorrentDetailImplementation {
-    static func mock(_ impl: MockImplementation) -> StandardTorrentDetailImplementation {
-        .init(
-            refresh: impl.refresh,
-            refreshFiles: impl.refreshFiles(torrent:),
-            pause: impl.pause(torrent:),
-            resume: impl.resume(torrent:),
-            remove: impl.remove(torrent:removeData:),
-            verify: impl.verify(torrent:),
-            setLabel: impl.setLabel(label:for:),
-            updateTrackers: impl.updateTrackers(torrent:),
-            moveDownloadFolder: impl.moveDownloadFolder(path:torrent:)
-        )
-    }
-}
-
-private final class MockImplementation {
-    private(set) var refreshCallCount = 0
-    var refreshResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func refresh() -> AnyPublisher<Void, Error> {
-        refreshCallCount += 1
-        return refreshResult
+    func test_contextMenu_withoutFileIndexPath_shouldReturnNil() {
+        _ = viewModel.values.sections.first().wait()
+        XCTAssertNil(viewModel.values.contextMenu(.init(row: 0, section: 0)))
     }
 
-    private(set) var refreshFilesCallCount = 0
-    private(set) var refreshFilesParamTorrent = [StandardTorrent]()
-    var refreshFilesResult = Just([
-        StandardTorrentFile.mock(index: 0, name: "file.rar"),
-        StandardTorrentFile.mock(index: 1, name: "file.r01"),
-        StandardTorrentFile.mock(index: 2, name: "file.r00"),
-    ]).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func refreshFiles(torrent: StandardTorrent) -> AnyPublisher<[StandardTorrentFile], Error> {
-        refreshFilesCallCount += 1
-        refreshFilesParamTorrent.append(torrent)
-        return refreshFilesResult
+    func test_contextMenu_withFileIndexPath_shouldReturnExpectedMenu() {
+        _ = viewModel.values.sections.first().wait()
+        guard let menu = viewModel.values.contextMenu(.init(row: 0, section: 2)) else {
+            XCTFail("Expected menu")
+            return
+        }
+        assertSnapshot(matching: menu, as: .json)
     }
 
-    private(set) var pauseCallCount = 0
-    private(set) var pauseParamTorrent = [StandardTorrent]()
-    var pauseResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func pause(torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        pauseCallCount += 1
-        pauseParamTorrent.append(torrent)
-        return pauseResult
+    func test_setPriority_shouldCallImplementationSetPriorityAndRefreshFiles() throws {
+        viewModel.setPriority(.normal, for: [.mock(), .mock()])
+        XCTAssertEqual(implementation.setPriorityCallCount, 1)
+        XCTAssertEqual(implementation.refreshFilesCallCount, 2)
     }
 
-    private(set) var resumeCallCount = 0
-    private(set) var resumeParamTorrent = [StandardTorrent]()
-    var resumeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func resume(torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        resumeCallCount += 1
-        resumeParamTorrent.append(torrent)
-        return resumeResult
+    func test_setPriority_whenFails_shouldEmitAlert() throws {
+        implementation.setPriorityResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        let alert = try getAlert {
+            self.viewModel.setPriority(.normal, for: [.mock(), .mock()])
+        }
+        XCTAssertEqual(alert.title, "Failed to Set Priority")
     }
 
-    private(set) var removeCallCount = 0
-    private(set) var removeParamTorrent = [StandardTorrent]()
-    private(set) var removeParamRemoveData = [Bool]()
-    var removeResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func remove(torrent: StandardTorrent, removeData: Bool) -> AnyPublisher<Void, Error> {
-        removeCallCount += 1
-        removeParamTorrent.append(torrent)
-        removeParamRemoveData.append(removeData)
-        return removeResult
-    }
-
-    private(set) var verifyCallCount = 0
-    private(set) var verifyParamTorrent = [StandardTorrent]()
-    var verifyResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func verify(torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        verifyCallCount += 1
-        verifyParamTorrent.append(torrent)
-        return verifyResult
-    }
-
-    private(set) var setLabelCallCount = 0
-    private(set) var setLabelParamLabel = [StandardLabel]()
-    private(set) var setLabelParamTorrent = [StandardTorrent]()
-    var setLabelResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func setLabel(label: StandardLabel, for torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        setLabelCallCount += 1
-        setLabelParamLabel.append(label)
-        setLabelParamTorrent.append(torrent)
-        return setLabelResult
-    }
-
-    private(set) var updateTrackersCallCount = 0
-    private(set) var updateTrackersParamTorrent = [StandardTorrent]()
-    var updateTrackersResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func updateTrackers(torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        updateTrackersCallCount += 1
-        updateTrackersParamTorrent.append(torrent)
-        return updateTrackersResult
-    }
-
-    private(set) var moveDownloadFolderCallCount = 0
-    private(set) var moveDownloadFolderParamPath = [String]()
-    private(set) var moveDownloadFolderParamTorrent = [StandardTorrent]()
-    var moveDownloadFolderResult = Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-    func moveDownloadFolder(path: String, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
-        moveDownloadFolderCallCount += 1
-        moveDownloadFolderParamPath.append(path)
-        moveDownloadFolderParamTorrent.append(torrent)
-        return moveDownloadFolderResult
+    func test_setPriority_whenRefreshFails_shouldNotEmitAlert() {
+        implementation.refreshFilesResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        let event = viewModel.events.first().wait {
+            self.viewModel.setPriority(.normal, for: [.mock(), .mock()])
+        }
+        XCTAssertFalse(event.hasValue())
     }
 }

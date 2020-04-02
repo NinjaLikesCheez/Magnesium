@@ -6,19 +6,7 @@ import XCTest
 
 class TorrentListViewControllerTests: TestCase {
     func test_emptyState() {
-        let values = TorrentListViewValues(
-            title: Just("Server").eraseToAnyPublisher(),
-            items: Just([]).eraseToAnyPublisher(),
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isEditing: Just(false).eraseToAnyPublisher(),
-            hasActiveFilters: Just(false).eraseToAnyPublisher(),
-            editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
-        )
+        let values = TorrentListViewValues.mock(title: "Server")
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -26,19 +14,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_loadingState() {
-        let values = TorrentListViewValues(
-            title: Just("Server").eraseToAnyPublisher(),
-            items: Just([]).eraseToAnyPublisher(),
-            isLoading: Just(true).eraseToAnyPublisher(),
-            isEditing: Just(false).eraseToAnyPublisher(),
-            hasActiveFilters: Just(false).eraseToAnyPublisher(),
-            editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
-        )
+        let values = TorrentListViewValues.mock(title: "Server", isLoading: true)
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -47,18 +23,10 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_items() {
         let torrents = [StandardTorrent.visualMock]
-        let values = TorrentListViewValues(
-            title: Just("Server").eraseToAnyPublisher(),
-            items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isEditing: Just(false).eraseToAnyPublisher(),
-            hasActiveFilters: Just(false).eraseToAnyPublisher(),
-            editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("↓ 1.5 MB/s ↑ 454 KB/s").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
+        let values = TorrentListViewValues.mock(
+            title: "Server",
+            items: torrents.map { .init(torrent: .init($0)) },
+            status: "↓ 1.5 MB/s ↑ 454 KB/s"
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -68,19 +36,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_activeFilters() {
-        let values = TorrentListViewValues(
-            title: Just("Server").eraseToAnyPublisher(),
-            items: Just([]).eraseToAnyPublisher(),
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isEditing: Just(false).eraseToAnyPublisher(),
-            hasActiveFilters: Just(true).eraseToAnyPublisher(),
-            editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
-        )
+        let values = TorrentListViewValues.mock(title: "Server", hasActiveFilters: true)
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -89,18 +45,10 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_editing() {
         let torrents = [StandardTorrent.visualMock]
-        let values = TorrentListViewValues(
-            title: Just("0 Selected").eraseToAnyPublisher(),
-            items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isEditing: Just(true).eraseToAnyPublisher(),
-            hasActiveFilters: Just(false).eraseToAnyPublisher(),
-            editActionsEnabled: Just(false).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
+        let values = TorrentListViewValues.mock(
+            title: "0 Selected",
+            items: torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) },
+            isEditing: true
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -111,18 +59,11 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_editing_withSelection() {
         let torrents = [StandardTorrent.visualMock]
-        let values = TorrentListViewValues(
-            title: Just("1 Selected").eraseToAnyPublisher(),
-            items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isEditing: Just(true).eraseToAnyPublisher(),
-            hasActiveFilters: Just(false).eraseToAnyPublisher(),
-            editActionsEnabled: Just(true).eraseToAnyPublisher(),
-            status: Just("").eraseToAnyPublisher(),
-            detailViewModel: { _ in nil },
-            contextMenu: { _ in nil },
-            leadingSwipeActionsConfiguration: { _, _ in nil },
-            trailingSwipeActionsConfiguration: { _, _ in nil }
+        let values = TorrentListViewValues.mock(
+            title: "1 Selected",
+            items: torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) },
+            isEditing: true,
+            editActionsEnabled: true
         )
         let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)

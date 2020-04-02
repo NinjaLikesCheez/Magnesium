@@ -1,0 +1,25 @@
+[
+  {
+    "args" : {
+      "files-unwanted" : [
+        0
+      ],
+      "files-wanted" : [
+        1
+      ],
+      "ids" : [
+        "A"
+      ],
+      "priority-high" : [
+        3
+      ],
+      "priority-low" : [
+        1
+      ],
+      "priority-normal" : [
+        2
+      ]
+    },
+    "method" : "torrent-set"
+  }
+]

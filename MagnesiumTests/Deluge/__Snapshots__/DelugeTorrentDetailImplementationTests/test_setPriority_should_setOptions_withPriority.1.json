@@ -1,0 +1,19 @@
+[
+  {
+    "args" : [
+      [
+        "A"
+      ],
+      {
+        "file_priorities" : [
+          0,
+          1,
+          4,
+          7,
+          4
+        ]
+      }
+    ],
+    "method" : "core.set_torrent_options"
+  }
+]
