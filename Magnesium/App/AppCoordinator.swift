@@ -3,7 +3,7 @@ import CommonModels
 import Coordinator
 import UIKit
 
-final class AppCoordinator: Coordinator, AlertPresenter {
+final class AppCoordinator: Coordinator {
     private let window: UIWindow
     private let session: Session
     private let splitViewController: PresentableSplitViewController
@@ -174,7 +174,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
         splitViewController.showDetailViewController(navigationController, sender: nil)
     }
 
-    private func commitTorrentDetail(for coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>) {
+    private func commitTorrentDetail(for coordinator: TorrentDetailCoordinator) {
         addChildCoordinator(coordinator) { [weak self] coordinator, event in
             self?.handle(event, from: coordinator)
         }
@@ -263,7 +263,7 @@ final class AppCoordinator: Coordinator, AlertPresenter {
 
     private func handleTorrentsUpdated(hashes: [String]) {
         let coordinators = childCoordinators.values
-            .compactMap { $0.base as? TorrentDetailCoordinator<AnyTorrentDetailViewModel> }
+            .compactMap { $0.base as? TorrentDetailCoordinator }
         for coordinator in coordinators {
             let viewController = coordinator.presentable.viewController
             guard let identifiable = viewController as? TorrentDetailViewControllerIdentifiable,

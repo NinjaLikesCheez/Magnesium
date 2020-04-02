@@ -6,7 +6,7 @@ enum SettingsCoordinatorEvent {
     case complete
 }
 
-final class SettingsCoordinator: Coordinator, AlertPresenter {
+final class SettingsCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
     let viewModelEvents: AnyPublisher<SettingsViewModelEvent, Never>

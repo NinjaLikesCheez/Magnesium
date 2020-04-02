@@ -5,17 +5,17 @@ import UIKit
 
 enum TorrentListCoordinatorEvent {
     case showDetail(viewModel: AnyTorrentDetailViewModel)
-    case commitDetail(coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>)
+    case commitDetail(coordinator: TorrentDetailCoordinator)
     case showSettings
     case torrentsUpdated(hashes: [String])
 }
 
-final class TorrentListCoordinator: NSObject, Coordinator, AlertPresenter {
+final class TorrentListCoordinator: NSObject, Coordinator {
     private let viewModel: AnyTorrentListViewModel
     private let session: Session
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
-    private var previewCoordinatorMap = [Int: TorrentDetailCoordinator<AnyTorrentDetailViewModel>]()
+    private var previewCoordinatorMap = [Int: TorrentDetailCoordinator]()
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: viewController, session: session)
     let viewModelEvents: AnyPublisher<TorrentListViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()

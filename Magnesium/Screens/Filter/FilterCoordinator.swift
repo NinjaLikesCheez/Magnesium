@@ -5,7 +5,7 @@ enum FilterCoordinatorEvent {
     case complete
 }
 
-final class FilterCoordinator: Coordinator, AlertPresenter {
+final class FilterCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()
     let viewModelEvents: AnyPublisher<FilterViewModelEvent, Never>

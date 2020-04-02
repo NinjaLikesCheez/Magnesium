@@ -8,7 +8,7 @@ import XCTest
 class TorrentDetailCoordinatorTests: TestCase {
     private var window: UIWindow!
     private var viewModel: MockViewModel!
-    private var coordinator: TorrentDetailCoordinator<AnyTorrentDetailViewModel>!
+    private var coordinator: TorrentDetailCoordinator!
     private var cancellables: Set<AnyCancellable>!
 
     override func setUp() {

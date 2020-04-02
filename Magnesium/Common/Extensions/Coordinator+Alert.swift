@@ -2,11 +2,7 @@ import CommonModels
 import Coordinator
 import UIKit
 
-protocol AlertPresenter {
-    func showAlert(_ alert: Alert, useTopViewController: Bool)
-}
-
-extension AlertPresenter where Self: Coordinator {
+extension Coordinator {
     func showAlert(_ alert: Alert, useTopViewController: Bool = false) {
         let alertController = alert.createAlertController()
 

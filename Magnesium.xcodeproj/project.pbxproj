@@ -109,7 +109,7 @@
 		E97B543123B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */; };
 		E97DAD8A23CE265100F3E888 /* StandardTorrentListImplementation+Transmission.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97DAD8923CE265100F3E888 /* StandardTorrentListImplementation+Transmission.swift */; };
 		E9801EF223D37E1400181FFD /* TorrentMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */; };
-		E9801EF723D37FC200181FFD /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9801EF623D37FC200181FFD /* AlertPresenter.swift */; };
+		E9801EF723D37FC200181FFD /* Coordinator+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9801EF623D37FC200181FFD /* Coordinator+Alert.swift */; };
 		E981B52D2423293A002C96D6 /* Deluge in Frameworks */ = {isa = PBXBuildFile; productRef = E981B52C2423293A002C96D6 /* Deluge */; };
 		E981B53024232945002C96D6 /* Transmission in Frameworks */ = {isa = PBXBuildFile; productRef = E981B52F24232945002C96D6 /* Transmission */; };
 		E9843B3523F39A9D005FBF7E /* AlertAction+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */; };
@@ -311,7 +311,7 @@
 		E97B543023B51892006FFCC9 /* TorrentDetailSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSectionHeaderView.swift; sourceTree = "<group>"; };
 		E97DAD8923CE265100F3E888 /* StandardTorrentListImplementation+Transmission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StandardTorrentListImplementation+Transmission.swift"; sourceTree = "<group>"; };
 		E9801EF123D37E1400181FFD /* TorrentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentMapperTests.swift; sourceTree = "<group>"; };
-		E9801EF623D37FC200181FFD /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
+		E9801EF623D37FC200181FFD /* Coordinator+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coordinator+Alert.swift"; sourceTree = "<group>"; };
 		E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlertAction+App.swift"; sourceTree = "<group>"; };
 		E9843B3B23F3AACB005FBF7E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E9847C5123E6474C00B05D3A /* Transmission+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Transmission+Mocks.swift"; sourceTree = "<group>"; };
@@ -432,6 +432,7 @@
 			children = (
 				E94FDF1423F2409A0052BA9A /* Activity+App.swift */,
 				E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */,
+				E9801EF623D37FC200181FFD /* Coordinator+Alert.swift */,
 				E9786AF523D38D5600E4157E /* Deluge+App.swift */,
 				E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */,
 				E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */,
@@ -620,7 +621,6 @@
 		E9637857241335950068E051 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				E9801EF623D37FC200181FFD /* AlertPresenter.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -1121,7 +1121,7 @@
 				E9624D3E23D236130051EA99 /* TransmissionSettingsViewModel.swift in Sources */,
 				E96908FD23E9068400A95D31 /* RefreshIntervalViewModel.swift in Sources */,
 				E91DDEB72411DD6D0024908B /* ServerSettingsViewEvent.swift in Sources */,
-				E9801EF723D37FC200181FFD /* AlertPresenter.swift in Sources */,
+				E9801EF723D37FC200181FFD /* Coordinator+Alert.swift in Sources */,
 				E9A0BD9323D0040300AEC254 /* AddServerViewModel.swift in Sources */,
 				E91DDEC62411E09A0024908B /* AnyTorrentListViewModel.swift in Sources */,
 				E91DDED32411E1540024908B /* TorrentDetailViewEvent.swift in Sources */,

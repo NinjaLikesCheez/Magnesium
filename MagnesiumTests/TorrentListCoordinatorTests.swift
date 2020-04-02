@@ -144,13 +144,12 @@ class TorrentListCoordinatorTests: TestCase {
         XCTAssertNotNil(viewController)
         XCTAssertEqual(coordinator.childCoordinators.count, 1)
         let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
-        XCTAssertType(childCoordinator, TorrentDetailCoordinator<AnyTorrentDetailViewModel>.self)
+        XCTAssertType(childCoordinator, TorrentDetailCoordinator.self)
     }
 
     func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
         XCTAssertNotNil(coordinator.previewForItem(at: 0))
-        let childCoordinator = coordinator.childCoordinators.values.first?.base
-            as? TorrentDetailCoordinator<AnyTorrentDetailViewModel>
+        let childCoordinator = coordinator.childCoordinators.values.first?.base as? TorrentDetailCoordinator
 
         let event = try coordinator.events.first().wait {
             self.coordinator.commitPreviewForItem(at: 0)

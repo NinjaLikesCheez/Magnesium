@@ -6,7 +6,7 @@ enum AddServerCoordinatorEvent {
     case complete
 }
 
-final class AddServerCoordinator: Coordinator, AlertPresenter {
+final class AddServerCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController<AddServerViewModel>
     let viewModelEvents: AnyPublisher<AddServerViewModelEvent, Never>
