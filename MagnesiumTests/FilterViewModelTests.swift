@@ -5,14 +5,14 @@ import Preferences
 import XCTest
 
 class FilterViewModelTests: TestCase {
-    private var labels: CurrentValueSubject<[MockLabel], Never>!
+    private var labels: CurrentValueSubject<[StandardLabel], Never>!
     private var viewModel: FilterViewModel!
     private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        labels = CurrentValueSubject([MockLabel(), MockLabel(name: "test")])
+        labels = CurrentValueSubject([.mock(), .mock(name: "test")])
         cancellables = Set()
         let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
         labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
@@ -54,7 +54,7 @@ class FilterViewModelTests: TestCase {
 
     func test_sections_whenLabelsUpdated_shouldEmit() {
         let sections = viewModel.values.sections.dropFirst().first().wait {
-            self.labels.send(self.labels.value + [MockLabel(name: "new")])
+            self.labels.send(self.labels.value + [.mock(name: "new")])
         }
         XCTAssertTrue(sections.hasValue())
     }

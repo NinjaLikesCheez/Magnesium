@@ -11,12 +11,12 @@ struct TorrentListItem: Identifiable {
     var progressString: AnyPublisher<String, Never>
     var ratioOrETA: AnyPublisher<String, Never>
 
-    init<Torrent: StandardTorrent>(torrent: CurrentValueSubject<Torrent, Never>) {
+    init(torrent: CurrentValueSubject<StandardTorrent, Never>) {
         id = torrent.value.hash
         name = torrent.map(\.name).ui().eraseToAnyPublisher()
         progress = torrent.map(\.progress).ui().eraseToAnyPublisher()
-        progressColor = torrent.map(\.standardState.displayColor).ui().eraseToAnyPublisher()
-        state = torrent.map(\.standardState.localizedString).ui().eraseToAnyPublisher()
+        progressColor = torrent.map(\.state.displayColor).ui().eraseToAnyPublisher()
+        state = torrent.map(\.state.localizedString).ui().eraseToAnyPublisher()
         speed = torrent.map(\.localizedSpeed).ui().eraseToAnyPublisher()
         progressString = torrent.map(\.localizedProgress).ui().eraseToAnyPublisher()
         ratioOrETA = torrent.map(\.localizedRatioOrETA).ui().eraseToAnyPublisher()

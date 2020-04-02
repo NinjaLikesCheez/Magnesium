@@ -6,11 +6,7 @@ import XCTest
 
 class TransmissionTorrentDetailImplementationTests: TestCase {
     private var client: MockTransmissionClient!
-    private var implementation: StandardTorrentDetailImplementation<
-        TransmissionTorrent,
-        Never,
-        TransmissionTorrentFile
-    >!
+    private var implementation: StandardTorrentDetailImplementation!
 
     override func setUp() {
         super.setUp()
@@ -25,15 +21,15 @@ class TransmissionTorrentDetailImplementationTests: TestCase {
 
     func test_refreshFiles_shouldGetTorrentFiles() throws {
         let files: [TransmissionTorrentFile] = [
-            .mock(index: 0, name: "f0"),
-            .mock(index: 0, name: "f1"),
+            .mock(index: 0, name: "f0", size: 1),
+            .mock(index: 0, name: "f1", size: 1),
         ]
         client.results.append((
             method: "torrent-get",
             result: Just(files as Any).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
         ))
         let results = try implementation.refreshFiles(.mock()).wait().value()
-        XCTAssertEqual(results, files)
+        XCTAssertEqual(results, files.map(\.standard))
     }
 
     func test_pause_shouldStop() {

@@ -46,7 +46,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_items() {
-        let torrents = [MockTorrent.visualMock]
+        let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues(
             title: Just("Server").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
@@ -88,7 +88,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_editing() {
-        let torrents = [MockTorrent.visualMock]
+        let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues(
             title: Just("0 Selected").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
@@ -110,7 +110,7 @@ class TorrentListViewControllerTests: TestCase {
     }
 
     func test_editing_withSelection() {
-        let torrents = [MockTorrent.visualMock]
+        let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues(
             title: Just("1 Selected").eraseToAnyPublisher(),
             items: Just(torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) }).eraseToAnyPublisher(),
@@ -140,16 +140,16 @@ class TorrentListViewControllerTests: TestCase {
     }
 }
 
-private extension MockTorrent {
-    static var visualMock: MockTorrent {
-        .init(
-            name: "Name 1",
-            downloadRate: 1_540_527,
-            uploadRate: 465_158,
-            eta: 67 * 63 * 1,
-            progress: 0.4,
+private extension StandardTorrent {
+    static var visualMock: StandardTorrent {
+        .mock(
             downloaded: Int64(5_000_000_000 * 0.4),
-            size: 5_000_000_000
+            downloadRate: 1_540_527,
+            eta: 67 * 63 * 1,
+            name: "Name 1",
+            progress: 0.4,
+            size: 5_000_000_000,
+            uploadRate: 465_158
         )
     }
 }

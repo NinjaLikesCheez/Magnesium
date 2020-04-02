@@ -8,6 +8,6 @@ class TransmissionTorrentFileTests: TestCase {
 
     func test_progress_shouldEqualDownloadedOverSize() {
         let file = TransmissionTorrentFile.mock(size: 100_000_000, downloaded: 10_000_000)
-        XCTAssertEqual(file.progress, 0.1)
+        XCTAssertEqual(file.standard.progress, 0.1)
     }
 }

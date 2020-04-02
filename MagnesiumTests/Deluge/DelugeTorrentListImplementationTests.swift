@@ -7,7 +7,7 @@ import XCTest
 
 class DelugeTorrentListImplementationTests: TestCase {
     private var client: MockDelugeClient!
-    private var implementation: StandardTorrentListImplementation<DelugeTorrent, DelugeLabel>!
+    private var implementation: StandardTorrentListImplementation!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -26,7 +26,7 @@ class DelugeTorrentListImplementationTests: TestCase {
             CurrentValueSubject(.mock()),
             CurrentValueSubject([])
         ).base as AnyObject
-        XCTAssertType(viewModel, StandardTorrentDetailViewModel<DelugeTorrent, DelugeLabel, DelugeTorrentFile>.self)
+        XCTAssertType(viewModel, StandardTorrentDetailViewModel.self)
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {

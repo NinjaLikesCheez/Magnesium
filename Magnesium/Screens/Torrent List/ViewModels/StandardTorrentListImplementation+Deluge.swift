@@ -3,7 +3,7 @@ import Deluge
 import Foundation
 import ViewModel
 
-extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Label == DelugeLabel {
+extension StandardTorrentListImplementation {
     static func deluge(_ session: DelugeSession) -> Self {
         let client = session.client
         let updatePublisher = Publishers.CombineLatest(session.torrents, session.labels)
@@ -24,14 +24,14 @@ extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Labe
         )
     }
 
-    private static func refresh(session: DelugeSession) -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
+    private static func refresh(session: DelugeSession) -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error> {
         session.refresh()
     }
 
     private static func detailViewModel(
         session: DelugeSession,
-        torrent: CurrentValueSubject<DelugeTorrent, Never>,
-        labels: CurrentValueSubject<[DelugeLabel], Never>
+        torrent: CurrentValueSubject<StandardTorrent, Never>,
+        labels: CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         let viewModel = StandardTorrentDetailViewModel(
             implementation: .deluge(session: session),
@@ -67,17 +67,17 @@ extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Labe
             .eraseToAnyPublisher()
     }
 
-    private static func pause(client: DelugeClient, torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
+    private static func pause(client: DelugeClient, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
         client.request(.pause(hashes: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
-    private static func resume(client: DelugeClient, torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
+    private static func resume(client: DelugeClient, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
         client.request(.resume(hashes: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func remove(
         client: DelugeClient,
-        torrents: [DelugeTorrent],
+        torrents: [StandardTorrent],
         removeData: Bool
     ) -> AnyPublisher<Void, Error> {
         client.request(.remove(hashes: torrents.map(\.hash), removeData: removeData))
@@ -86,14 +86,14 @@ extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Labe
             .eraseToAnyPublisher()
     }
 
-    private static func verify(client: DelugeClient, torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
+    private static func verify(client: DelugeClient, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
         client.request(.recheck(hashes: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func setLabel(
         client: DelugeClient,
-        label: DelugeLabel,
-        torrents: [DelugeTorrent]
+        label: StandardLabel,
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         let requests = torrents.map {
             client.request(.setLabel(hash: $0.hash, label: label.name)).eraseError()
@@ -101,14 +101,14 @@ extension StandardTorrentListImplementation where Torrent == DelugeTorrent, Labe
         return Publishers.MergeMany(requests).collect().asVoid().eraseToAnyPublisher()
     }
 
-    private static func updateTrackers(client: DelugeClient, torrents: [DelugeTorrent]) -> AnyPublisher<Void, Error> {
+    private static func updateTrackers(client: DelugeClient, torrents: [StandardTorrent]) -> AnyPublisher<Void, Error> {
         client.request(.reannounce(hashes: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func moveDownloadFolder(
         client: DelugeClient,
         path: String,
-        torrents: [DelugeTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(hashes: torrents.map(\.hash), path: path)).eraseError().eraseToAnyPublisher()
     }

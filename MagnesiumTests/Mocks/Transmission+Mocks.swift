@@ -47,44 +47,6 @@ extension Torrent {
     }
 }
 
-extension TransmissionTorrent {
-    static func mock(
-        dateAdded: Date = Date(),
-        downloadPath: String = "/",
-        downloadRate: Int64 = 0,
-        eta: TimeInterval = 0,
-        hash: String = randomHash(),
-        name: String = "",
-        peers: Int = 0,
-        progress: Float = 0,
-        seeds: Int = 0,
-        size: Int64 = 0,
-        standardState: TorrentState = .downloading,
-        totalPeers: Int = 0,
-        trackerStrings: [String] = [],
-        uploaded: Int64 = 0,
-        uploadRate: Int64 = 0
-    ) -> Self {
-        .init(
-            dateAdded: dateAdded,
-            downloadPath: downloadPath,
-            downloadRate: downloadRate,
-            eta: eta,
-            hash: hash,
-            name: name,
-            peers: peers,
-            progress: progress,
-            seeds: seeds,
-            size: size,
-            standardState: standardState,
-            totalPeers: totalPeers,
-            trackerStrings: trackerStrings,
-            uploaded: uploaded,
-            uploadRate: uploadRate
-        )
-    }
-}
-
 extension TransmissionTorrentFile {
     static func mock(
         index: Int = 0,
@@ -93,8 +55,8 @@ extension TransmissionTorrentFile {
         downloaded: Int64 = 0,
         priority: Priority = .normal,
         isWanted: Bool = true
-    ) -> TransmissionTorrentFile {
-        TransmissionTorrentFile(
+    ) -> Self {
+        .init(
             index: index,
             name: name,
             size: size,

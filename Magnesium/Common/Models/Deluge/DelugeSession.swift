@@ -3,10 +3,10 @@ import Deluge
 
 struct DelugeSession {
     let client: DelugeClient
-    let torrents = CurrentValueSubject<[DelugeTorrent], Never>([])
-    let labels = CurrentValueSubject<[DelugeLabel], Never>([])
+    let torrents = CurrentValueSubject<[StandardTorrent], Never>([])
+    let labels = CurrentValueSubject<[StandardLabel], Never>([])
 
-    func refresh() -> AnyPublisher<([DelugeTorrent], [DelugeLabel]), Error> {
+    func refresh() -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error> {
         client.request(.updateUIForApp)
             .handleEvents(receiveOutput: {
                 self.torrents.send($0)
@@ -18,7 +18,7 @@ struct DelugeSession {
 }
 
 private extension Request {
-    static var updateUIForApp: Request<([DelugeTorrent], [DelugeLabel])> {
+    static var updateUIForApp: Request<([StandardTorrent], [StandardLabel])> {
         let properties: [Torrent.PropertyKeys] = [
             .dateAdded,
             .downloaded,
@@ -39,6 +39,6 @@ private extension Request {
             .uploadRate,
         ]
 
-        return Self.updateUI(properties: properties).map { ($0.compactMap(DelugeTorrent.init), $1) }
+        return Self.updateUI(properties: properties).map { ($0.compactMap(StandardTorrent.init), $1.map(\.standard)) }
     }
 }

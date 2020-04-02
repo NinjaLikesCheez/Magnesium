@@ -2,7 +2,7 @@ import Combine
 import Foundation
 import ViewModel
 
-extension StandardTorrentListImplementation where Torrent == TransmissionTorrent, Label == Never {
+extension StandardTorrentListImplementation {
     static func transmission(_ session: TransmissionSession) -> Self {
         let client = session.client
         return .init(
@@ -20,14 +20,16 @@ extension StandardTorrentListImplementation where Torrent == TransmissionTorrent
         )
     }
 
-    private static func refresh(session: TransmissionSession) -> AnyPublisher<([TransmissionTorrent], [Never]), Error> {
+    private static func refresh(
+        session: TransmissionSession
+    ) -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error> {
         session.refresh().map { ($0, []) }.eraseToAnyPublisher()
     }
 
     private static func detailViewModel(
         session: TransmissionSession,
-        torrent: CurrentValueSubject<TransmissionTorrent, Never>,
-        labels: CurrentValueSubject<[Never], Never>
+        torrent: CurrentValueSubject<StandardTorrent, Never>,
+        labels: CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         let viewModel = StandardTorrentDetailViewModel(
             implementation: .transmission(session: session),
@@ -57,21 +59,21 @@ extension StandardTorrentListImplementation where Torrent == TransmissionTorrent
 
     private static func pause(
         client: TransmissionClient,
-        torrents: [TransmissionTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.stop(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func resume(
         client: TransmissionClient,
-        torrents: [TransmissionTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.start(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func remove(
         client: TransmissionClient,
-        torrents: [TransmissionTorrent],
+        torrents: [StandardTorrent],
         removeData: Bool
     ) -> AnyPublisher<Void, Error> {
         client.request(.remove(ids: torrents.map(\.hash), removeData: removeData))
@@ -81,14 +83,14 @@ extension StandardTorrentListImplementation where Torrent == TransmissionTorrent
 
     private static func verify(
         client: TransmissionClient,
-        torrents: [TransmissionTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.verify(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
 
     private static func updateTrackers(
         client: TransmissionClient,
-        torrents: [TransmissionTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.reannounce(ids: torrents.map(\.hash))).eraseError().eraseToAnyPublisher()
     }
@@ -96,7 +98,7 @@ extension StandardTorrentListImplementation where Torrent == TransmissionTorrent
     private static func moveDownloadFolder(
         client: TransmissionClient,
         path: String,
-        torrents: [TransmissionTorrent]
+        torrents: [StandardTorrent]
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(ids: torrents.map(\.hash), path: path)).eraseError().eraseToAnyPublisher()
     }

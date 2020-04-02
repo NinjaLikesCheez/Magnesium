@@ -1,23 +1,23 @@
 import Combine
 
-struct StandardTorrentListImplementation<Torrent: StandardTorrent, Label: StandardLabel> {
+struct StandardTorrentListImplementation {
     struct AddLinkError: Error {
         let title: String
         let message: String
     }
 
-    var updated: AnyPublisher<([Torrent], [Label]), Never>
-    var refresh: () -> AnyPublisher<([Torrent], [Label]), Error>
+    var updated: AnyPublisher<([StandardTorrent], [StandardLabel]), Never>
+    var refresh: () -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error>
     var detailViewModel: (
-        CurrentValueSubject<Torrent, Never>,
-        CurrentValueSubject<[Label], Never>
+        CurrentValueSubject<StandardTorrent, Never>,
+        CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel
     var addLink: (String) -> AnyPublisher<Void, AddLinkError>
-    var pause: ([Torrent]) -> AnyPublisher<Void, Error>
-    var resume: ([Torrent]) -> AnyPublisher<Void, Error>
-    var remove: ([Torrent], Bool) -> AnyPublisher<Void, Error>
-    var verify: ([Torrent]) -> AnyPublisher<Void, Error>
-    var setLabel: (Label, [Torrent]) -> AnyPublisher<Void, Error>
-    var updateTrackers: ([Torrent]) -> AnyPublisher<Void, Error>
-    var moveDownloadFolder: (String, [Torrent]) -> AnyPublisher<Void, Error>
+    var pause: ([StandardTorrent]) -> AnyPublisher<Void, Error>
+    var resume: ([StandardTorrent]) -> AnyPublisher<Void, Error>
+    var remove: ([StandardTorrent], Bool) -> AnyPublisher<Void, Error>
+    var verify: ([StandardTorrent]) -> AnyPublisher<Void, Error>
+    var setLabel: (StandardLabel, [StandardTorrent]) -> AnyPublisher<Void, Error>
+    var updateTrackers: ([StandardTorrent]) -> AnyPublisher<Void, Error>
+    var moveDownloadFolder: (String, [StandardTorrent]) -> AnyPublisher<Void, Error>
 }

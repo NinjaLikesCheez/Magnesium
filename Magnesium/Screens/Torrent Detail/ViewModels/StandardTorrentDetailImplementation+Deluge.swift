@@ -1,7 +1,6 @@
 import Combine
 
-// swiftlint:disable:next line_length
-extension StandardTorrentDetailImplementation where Torrent == DelugeTorrent, Label == DelugeLabel, File == DelugeTorrentFile {
+extension StandardTorrentDetailImplementation {
     static func deluge(session: DelugeSession) -> Self {
         let client = session.client
         return .init(
@@ -17,11 +16,11 @@ extension StandardTorrentDetailImplementation where Torrent == DelugeTorrent, La
         )
     }
 
-    private static func torrentFiles(in items: [DelugeTorrentItem]) -> [DelugeTorrentFile] {
-        items.reduce(into: [DelugeTorrentFile]()) { result, item in
+    private static func torrentFiles(in items: [DelugeTorrentItem]) -> [StandardTorrentFile] {
+        items.reduce(into: [StandardTorrentFile]()) { result, item in
             switch item {
             case let .file(file):
-                result.append(file)
+                result.append(file.standard)
             case let .directory(_, items):
                 result.append(contentsOf: torrentFiles(in: items))
             }
@@ -34,25 +33,25 @@ extension StandardTorrentDetailImplementation where Torrent == DelugeTorrent, La
 
     private static func refreshFiles(
         client: DelugeClient,
-        torrent: DelugeTorrent
-    ) -> AnyPublisher<[DelugeTorrentFile], Error> {
+        torrent: StandardTorrent
+    ) -> AnyPublisher<[StandardTorrentFile], Error> {
         client.request(.torrentItems(hash: torrent.hash))
             .map(torrentFiles(in:))
             .eraseError()
             .eraseToAnyPublisher()
     }
 
-    private static func pause(client: DelugeClient, torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+    private static func pause(client: DelugeClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.pause(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
-    private static func resume(client: DelugeClient, torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+    private static func resume(client: DelugeClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.resume(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     private static func remove(
         client: DelugeClient,
-        torrent: DelugeTorrent,
+        torrent: StandardTorrent,
         removeData: Bool
     ) -> AnyPublisher<Void, Error> {
         client.request(.remove(hashes: [torrent.hash], removeData: removeData))
@@ -61,26 +60,26 @@ extension StandardTorrentDetailImplementation where Torrent == DelugeTorrent, La
             .eraseToAnyPublisher()
     }
 
-    private static func verify(client: DelugeClient, torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+    private static func verify(client: DelugeClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.recheck(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     private static func setLabel(
         client: DelugeClient,
-        label: DelugeLabel,
-        torrent: DelugeTorrent
+        label: StandardLabel,
+        torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.setLabel(hash: torrent.hash, label: label.name)).eraseError().eraseToAnyPublisher()
     }
 
-    private static func updateTrackers(client: DelugeClient, torrent: DelugeTorrent) -> AnyPublisher<Void, Error> {
+    private static func updateTrackers(client: DelugeClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.reannounce(hashes: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     private static func moveDownloadFolder(
         client: DelugeClient,
         path: String,
-        torrent: DelugeTorrent
+        torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(hashes: [torrent.hash], path: path)).eraseError().eraseToAnyPublisher()
     }

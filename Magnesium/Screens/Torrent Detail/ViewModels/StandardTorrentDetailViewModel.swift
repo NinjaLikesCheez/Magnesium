@@ -4,15 +4,11 @@ import Foundation
 import Preferences
 import ViewModel
 
-final class StandardTorrentDetailViewModel<
-    Torrent: StandardTorrent,
-    Label: StandardLabel,
-    File: StandardTorrentFile
->: ViewModel {
-    private let implementation: StandardTorrentDetailImplementation<Torrent, Label, File>
-    private let torrent: CurrentValueSubject<Torrent, Never>
-    private let labels: CurrentValueSubject<[Label], Never>
-    private let files: ValueMapper<Int, File>
+final class StandardTorrentDetailViewModel: ViewModel {
+    private let implementation: StandardTorrentDetailImplementation
+    private let torrent: CurrentValueSubject<StandardTorrent, Never>
+    private let labels: CurrentValueSubject<[StandardLabel], Never>
+    private let files: ValueMapper<Int, StandardTorrentFile>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
     private let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
@@ -25,9 +21,9 @@ final class StandardTorrentDetailViewModel<
     }
 
     init(
-        implementation: StandardTorrentDetailImplementation<Torrent, Label, File>,
-        torrent: CurrentValueSubject<Torrent, Never>,
-        labels: CurrentValueSubject<[Label], Never>
+        implementation: StandardTorrentDetailImplementation,
+        torrent: CurrentValueSubject<StandardTorrent, Never>,
+        labels: CurrentValueSubject<[StandardLabel], Never>
     ) {
         self.implementation = implementation
         self.torrent = torrent
@@ -50,12 +46,10 @@ final class StandardTorrentDetailViewModel<
             }
         }.eraseToAnyPublisher())
 
-        let sections = torrent
-            .combineLatest(files.values)
-            .map { torrentValue, files in
+        let sections = files.values
+            .map { files in
                 Self.createSections(
                     subject: torrent,
-                    torrent: torrentValue,
                     files: files
                 )
             }
@@ -75,10 +69,11 @@ final class StandardTorrentDetailViewModel<
     }
 
     private static func createSections(
-        subject: CurrentValueSubject<Torrent, Never>,
-        torrent: Torrent,
-        files: [CurrentValueSubject<File, Never>]
+        subject: CurrentValueSubject<StandardTorrent, Never>,
+        files: [CurrentValueSubject<StandardTorrentFile, Never>]
     ) -> [TorrentDetailSection] {
+        let torrent = subject.value
+
         var sections = [TorrentDetailSection]()
         sections.append(.init(type: .header, items: [
             .header(.init(torrent: subject)),
@@ -140,8 +135,8 @@ final class StandardTorrentDetailViewModel<
             )),
         ]))
 
-        if !torrent.trackerStrings.isEmpty {
-            sections.append(.init(type: .trackers, items: torrent.trackerStrings.map { .tracker($0) }))
+        if !torrent.trackers.isEmpty {
+            sections.append(.init(type: .trackers, items: torrent.trackers.map { .tracker($0) }))
         }
 
         if !files.isEmpty {
@@ -286,7 +281,7 @@ final class StandardTorrentDetailViewModel<
             .store(in: &cancellables)
     }
 
-    private func setLabel(_ label: Label) {
+    private func setLabel(_ label: StandardLabel) {
         implementation.setLabel(label, torrent.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()

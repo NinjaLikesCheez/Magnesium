@@ -4,10 +4,10 @@ import Preferences
 import UIKit
 import ViewModel
 
-final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: StandardLabel>: ViewModel {
-    private let implementation: StandardTorrentListImplementation<Torrent, Label>
-    private let torrents: TorrentMapper<String, Torrent>
-    private let labels = CurrentValueSubject<[Label], Never>([])
+final class StandardTorrentListViewModel: ViewModel {
+    private let implementation: StandardTorrentListImplementation
+    private let torrents: TorrentMapper
+    private let labels = CurrentValueSubject<[StandardLabel], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
     private let isEditingSubject = CurrentValueSubject<Bool, Never>(false)
     private let multiSelectCountSubject = CurrentValueSubject<Int, Never>(0)
@@ -25,7 +25,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
         eventSubject.eraseToAnyPublisher()
     }
 
-    init(implementation: StandardTorrentListImplementation<Torrent, Label>, server: Server) {
+    init(implementation: StandardTorrentListImplementation, server: Server) {
         torrents = TorrentMapper(query: querySubject)
         self.implementation = implementation
 
@@ -91,7 +91,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
         implementation.updated
             .sink { [weak self] update in
                 self?.labels.send(update.1)
-                self?.torrents.update(with: update.0.map { ($0.hash, $0) })
+                self?.torrents.update(with: update.0)
             }
             .store(in: &cancellables)
 
@@ -175,7 +175,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func pause(_ torrents: [Torrent]) {
+    private func pause(_ torrents: [StandardTorrent]) {
         implementation.pause(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -186,7 +186,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func resume(_ torrents: [Torrent]) {
+    private func resume(_ torrents: [StandardTorrent]) {
         implementation.resume(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -197,7 +197,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func remove(_ torrents: [Torrent], removeData: Bool) {
+    private func remove(_ torrents: [StandardTorrent], removeData: Bool) {
         implementation.remove(torrents, removeData)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -208,7 +208,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func setLabel(for torrents: [Torrent], label: Label) {
+    private func setLabel(for torrents: [StandardTorrent], label: StandardLabel) {
         implementation.setLabel(label, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -219,7 +219,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func verify(_ torrents: [Torrent]) {
+    private func verify(_ torrents: [StandardTorrent]) {
         implementation.verify(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -230,7 +230,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func updateTrackers(for torrents: [Torrent]) {
+    private func updateTrackers(for torrents: [StandardTorrent]) {
         implementation.updateTrackers(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -241,7 +241,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func moveDownloadFolder(for torrents: [Torrent], to path: String) {
+    private func moveDownloadFolder(for torrents: [StandardTorrent], to path: String) {
         implementation.moveDownloadFolder(path, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
@@ -252,7 +252,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
             .store(in: &cancellables)
     }
 
-    private func presentRemoveOptions(for torrents: [Torrent], from source: PopoverSource) {
+    private func presentRemoveOptions(for torrents: [StandardTorrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
         let alert = Alert(title: L10n.remove, message: message, style: .actionSheet(source)) {
             AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
@@ -268,7 +268,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
         eventSubject.send(.alert(alert))
     }
 
-    private func presentLabelSelection(for torrents: [Torrent], from source: PopoverSource) {
+    private func presentLabelSelection(for torrents: [StandardTorrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
         let labelActions = labels.value.map { label in
             AlertAction(title: label.displayName, style: .default) {
@@ -284,7 +284,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
         eventSubject.send(.alert(alert))
     }
 
-    private func presentActivities(for torrents: [Torrent], source: PopoverSource) {
+    private func presentActivities(for torrents: [StandardTorrent], source: PopoverSource) {
         var activities = [Activity]()
 
         if !labels.value.isEmpty {
@@ -491,7 +491,7 @@ final class StandardTorrentListViewModel<Torrent: StandardTorrent, Label: Standa
         return implementation.refresh()
             .handleEvents(receiveOutput: { [weak self] update in
                 self?.labels.send(update.1)
-                self?.torrents.update(with: update.0.map { ($0.hash, $0) })
+                self?.torrents.update(with: update.0)
                 self?.isLoadingSubject.send(false)
             }, receiveCompletion: { [weak self] _ in
                 self?.isLoadingSubject.send(false)

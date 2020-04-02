@@ -2,7 +2,7 @@ import Combine
 import Foundation
 import Preferences
 
-final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
+final class TorrentMapper: ValueMapper<String, StandardTorrent> {
     init(query: CurrentValueSubject<String?, Never>) {
         let sortOption = Current.preferences.valuePublisher(for: .sortOption)
         let filterOptions = Current.preferences.valuePublisher(for: .filterOptions)
@@ -14,7 +14,7 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
 
                     if let state = filter.state {
                         filtered = filtered.filter { subject in
-                            subject.value.standardState == state
+                            subject.value.state == state
                         }
                     }
 
@@ -40,6 +40,15 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
         super.init(filter: filter)
     }
 
+    @available(*, unavailable)
+    override func update(with new: [(String, StandardTorrent)]) {
+        fatalError("Unimplemented")
+    }
+
+    func update(with torrents: [StandardTorrent]) {
+        super.update(with: torrents.map { ($0.hash, $0) })
+    }
+
     private static func search(needle: String, haystack: String) -> Bool {
         let delimiters = CharacterSet([" ", ".", "-", "_"])
         let normalizedNeedle = needle.lowercased().components(separatedBy: delimiters).joined(separator: " ")
@@ -48,10 +57,10 @@ final class TorrentMapper<K: Hashable, V: StandardTorrent>: ValueMapper<K, V> {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    private static func sort<T: StandardTorrent>(
-        _ torrents: [CurrentValueSubject<T, Never>],
+    private static func sort(
+        _ torrents: [CurrentValueSubject<StandardTorrent, Never>],
         using sortOption: SortOption
-    ) -> [CurrentValueSubject<T, Never>] {
+    ) -> [CurrentValueSubject<StandardTorrent, Never>] {
         let compare: (StandardTorrent, StandardTorrent) -> ComparisonResult
         switch sortOption.property {
         case .name:

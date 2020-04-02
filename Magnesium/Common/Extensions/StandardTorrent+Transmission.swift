@@ -1,38 +1,7 @@
 import Foundation
 import Transmission
 
-/// A Transmission torrent.
-struct TransmissionTorrent: StandardTorrent {
-    var dateAdded: Date
-    var downloadPath: String
-    var downloadRate: Int64
-    var eta: TimeInterval
-    var hash: String
-    var name: String
-    var peers: Int
-    var progress: Float
-    var seeds: Int
-    var size: Int64
-    var standardState: TorrentState
-    var totalPeers: Int
-    var trackerStrings: [String]
-    var uploaded: Int64
-    var uploadRate: Int64
-
-    var downloaded: Int64 {
-        Int64(Float(size) * progress)
-    }
-
-    var totalSeeds: Int {
-        totalPeers
-    }
-
-    var label: String {
-        ""
-    }
-}
-
-extension TransmissionTorrent {
+extension StandardTorrent {
     private static func state(for status: Torrent.Status) -> TorrentState {
         switch status {
         case .paused:
@@ -65,15 +34,17 @@ extension TransmissionTorrent {
             let progress = torrent.progress,
             let seeds = torrent.seeds,
             let size = torrent.size,
-            let standardState = torrent.status.map(Self.state),
+            let state = torrent.status.map(Self.state),
             let totalPeers = torrent.totalPeers,
-            let trackerStrings = torrent.trackers?.map(\.host),
+            let trackers = torrent.trackers?.map(\.host),
             let uploaded = torrent.uploaded,
             let uploadRate = torrent.uploadRate
         else {
             return nil
         }
 
+        downloaded = Int64(Float(size) * progress)
+        label = ""
         self.dateAdded = dateAdded
         self.downloadPath = downloadPath
         self.downloadRate = downloadRate
@@ -84,10 +55,11 @@ extension TransmissionTorrent {
         self.progress = progress
         self.seeds = seeds
         self.size = size
-        self.standardState = standardState
+        self.state = state
         self.totalPeers = totalPeers
-        self.trackerStrings = trackerStrings
+        self.trackers = trackers
         self.uploaded = uploaded
         self.uploadRate = uploadRate
+        totalSeeds = totalPeers
     }
 }

@@ -3,9 +3,9 @@ import Transmission
 
 struct TransmissionSession {
     let client: TransmissionClient
-    let torrents = CurrentValueSubject<[TransmissionTorrent], Never>([])
+    let torrents = CurrentValueSubject<[StandardTorrent], Never>([])
 
-    func refresh() -> AnyPublisher<[TransmissionTorrent], Error> {
+    func refresh() -> AnyPublisher<[StandardTorrent], Error> {
         client.request(.torrentsForApp)
             .handleEvents(receiveOutput: {
                 self.torrents.send($0)
@@ -16,7 +16,7 @@ struct TransmissionSession {
 }
 
 private extension Request {
-    static var torrentsForApp: Request<[TransmissionTorrent]> {
+    static var torrentsForApp: Request<[StandardTorrent]> {
         let properties: [Torrent.PropertyKeys] = [
             .dateAdded,
             .downloadPath,
@@ -35,6 +35,6 @@ private extension Request {
             .uploadRate,
         ]
 
-        return Self.torrents(properties: properties).map { $0.compactMap(TransmissionTorrent.init) }
+        return Self.torrents(properties: properties).map { $0.compactMap(StandardTorrent.init) }
     }
 }

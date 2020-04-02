@@ -20,9 +20,8 @@ class TransmissionTorrentTests: TestCase {
         ]
 
         for pair in pairs {
-            let torrent = Torrent.mock(status: pair.0)
-            let appTorrent = TransmissionTorrent(torrent)
-            XCTAssertEqual(appTorrent?.standardState, pair.1)
+            let torrent = StandardTorrent(.mock(status: pair.0))
+            XCTAssertEqual(torrent?.state, pair.1)
         }
     }
 
@@ -31,12 +30,7 @@ class TransmissionTorrentTests: TestCase {
             Tracker(id: 0, host: "udp://tracker.example.com:9000"),
             Tracker(id: 0, host: "http://tracker.example.com:9000/announce"),
         ]
-        let torrent = Torrent.mock(trackers: trackers)
-        let appTorrent = TransmissionTorrent(torrent)
-        XCTAssertEqual(appTorrent?.trackerStrings, trackers.map(\.host))
-    }
-
-    func test_label_shouldBeEmpty() {
-        XCTAssertTrue(TransmissionTorrent.mock().label.isEmpty)
+        let torrent = StandardTorrent(.mock(trackers: trackers))
+        XCTAssertEqual(torrent?.trackers, trackers.map(\.host))
     }
 }

@@ -11,26 +11,26 @@ class TorrentMapperTests: TestCase {
         super.setUp()
     }
 
-    private func getValues(from mapper: TorrentMapper<Int, MockTorrent>) -> [MockTorrent] {
-        var values: [MockTorrent]?
+    private func getValues(from mapper: TorrentMapper) -> [StandardTorrent] {
+        var values: [StandardTorrent]!
         _ = mapper.values.sink { values = $0.map(\.value) }
-        return values!
+        return values
     }
 
     func test_sort_withName() {
         let torrents = [
-            MockTorrent(name: "B", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "A", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "a", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "C", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "B", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "A", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "a", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "C", uploadRate: 0),
         ]
         let expectedAscending: [String] = [torrents[1].hash, torrents[2].hash].sorted()
             + [torrents[0].hash, torrents[3].hash]
         let expectedDescending: [String] = [torrents[3].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[2].hash].sorted()
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .name, direction: .ascending)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
@@ -42,11 +42,11 @@ class TorrentMapperTests: TestCase {
     func test_sort_withDateAdded() {
         let date = Date()
         let torrents = [
-            MockTorrent(name: "B", dateAdded: date.addingTimeInterval(1), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "A1", dateAdded: date, downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "a2", dateAdded: date, downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "A1", dateAdded: date, downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "C", dateAdded: date.addingTimeInterval(2), downloadRate: 0, uploadRate: 0),
+            StandardTorrent.mock(dateAdded: date.addingTimeInterval(1), downloadRate: 0, name: "B", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: date, downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: date, downloadRate: 0, name: "a2", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: date, downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: date.addingTimeInterval(2), downloadRate: 0, name: "C", uploadRate: 0),
         ]
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
@@ -54,8 +54,8 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .dateAdded, direction: .ascending)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
@@ -66,11 +66,11 @@ class TorrentMapperTests: TestCase {
 
     func test_sort_withDownloadSpeed() {
         let torrents = [
-            MockTorrent(name: "B", dateAdded: Date(), downloadRate: 1, uploadRate: 0),
-            MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "a2", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "C", dateAdded: Date(), downloadRate: 2, uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 1, name: "B", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "a2", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 2, name: "C", uploadRate: 0),
         ]
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
@@ -78,8 +78,8 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .downloadSpeed, direction: .ascending)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
@@ -90,11 +90,11 @@ class TorrentMapperTests: TestCase {
 
     func test_sort_withUploadSpeed() {
         let torrents = [
-            MockTorrent(name: "B", dateAdded: Date(), downloadRate: 0, uploadRate: 1),
-            MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "a2", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "A1", dateAdded: Date(), downloadRate: 0, uploadRate: 0),
-            MockTorrent(name: "C", dateAdded: Date(), downloadRate: 0, uploadRate: 2),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "B", uploadRate: 1),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "a2", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "A1", uploadRate: 0),
+            StandardTorrent.mock(dateAdded: Date(), downloadRate: 0, name: "C", uploadRate: 2),
         ]
         let expectedAscending = [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash, torrents[0].hash, torrents[4].hash]
@@ -102,8 +102,8 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .uploadSpeed, direction: .ascending)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expectedAscending)
@@ -114,15 +114,15 @@ class TorrentMapperTests: TestCase {
 
     func test_filter_withState() {
         let torrents = [
-            MockTorrent(standardState: .downloading, dateAdded: Date(timeIntervalSinceNow: 0)),
-            MockTorrent(standardState: .seeding, dateAdded: Date(timeIntervalSinceNow: -1)),
-            MockTorrent(standardState: .error, dateAdded: Date(timeIntervalSinceNow: -2)),
-            MockTorrent(standardState: .downloading, dateAdded: Date(timeIntervalSinceNow: -3)),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: 0), state: .downloading),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), state: .seeding),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -2), state: .error),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -3), state: .downloading),
         ]
         let expected = [torrents[0].hash, torrents[3].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(state: .downloading)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
@@ -130,14 +130,14 @@ class TorrentMapperTests: TestCase {
 
     func test_filter_withLabel() {
         let torrents = [
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: 0), label: "test"),
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -1), label: ""),
-            MockTorrent(dateAdded: Date(timeIntervalSinceNow: -2), label: "test"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: 0), label: "test"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), label: ""),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -2), label: "test"),
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject(nil))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(label: "test")
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
@@ -145,29 +145,29 @@ class TorrentMapperTests: TestCase {
 
     func test_search_shouldConsiderSpaceAndDotEqual() {
         let torrents = [
-            MockTorrent(name: "test.torrent", dateAdded: Date(timeIntervalSinceNow: 0)),
-            MockTorrent(name: "torrent.test", dateAdded: Date(timeIntervalSinceNow: -1)),
-            MockTorrent(name: "test torrent", dateAdded: Date(timeIntervalSinceNow: -2)),
-            MockTorrent(name: "test/torrent", dateAdded: Date(timeIntervalSinceNow: -3)),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: 0), name: "test.torrent"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), name: "torrent.test"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -2), name: "test torrent"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -3), name: "test/torrent"),
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject("test tor"))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject("test tor"))
+        mapper.update(with: torrents)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
     }
 
     func test_search_shouldBeCaseInsensitive() {
         let torrents = [
-            MockTorrent(name: "test.torrent", dateAdded: Date(timeIntervalSinceNow: 0)),
-            MockTorrent(name: "torrent.test", dateAdded: Date(timeIntervalSinceNow: -1)),
-            MockTorrent(name: "TEST torrent", dateAdded: Date(timeIntervalSinceNow: -2)),
-            MockTorrent(name: "test/torrent", dateAdded: Date(timeIntervalSinceNow: -3)),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: 0), name: "test.torrent"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), name: "torrent.test"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -2), name: "TEST torrent"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -3), name: "test/torrent"),
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper<Int, MockTorrent>(query: CurrentValueSubject("TEST TOR"))
-        mapper.update(with: Array(torrents.enumerated()))
+        let mapper = TorrentMapper(query: CurrentValueSubject("TEST TOR"))
+        mapper.update(with: torrents)
         XCTAssertEqual(getValues(from: mapper).map(\.hash), expected)
     }
 }

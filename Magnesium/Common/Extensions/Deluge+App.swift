@@ -11,8 +11,18 @@ protocol DelugeClient {
 }
 
 extension Deluge: DelugeClient {}
-extension DelugeTorrentFile: StandardTorrentFile {}
-extension DelugeLabel: StandardLabel {}
+
+extension DelugeTorrentFile {
+    var standard: StandardTorrentFile {
+        .init(index: index, name: name, size: size, progress: progress)
+    }
+}
+
+extension DelugeLabel {
+    var standard: StandardLabel {
+        .init(name: name, count: count)
+    }
+}
 
 extension DelugeError: LocalizedError {
     public var errorDescription: String? {

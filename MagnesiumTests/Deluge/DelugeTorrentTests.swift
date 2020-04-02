@@ -18,16 +18,14 @@ class DelugeTorrentTests: TestCase {
         ]
 
         for pair in pairs {
-            let torrent = Torrent.mock(state: pair.0)
-            let appTorrent = DelugeTorrent(torrent)
-            XCTAssertEqual(appTorrent?.standardState, pair.1)
+            let torrent = StandardTorrent(.mock(state: pair.0))
+            XCTAssertEqual(torrent?.state, pair.1)
         }
     }
 
     func test_init_trackers_shouldMapToExpectedTrackerStrings() {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
-        let torrent = Torrent.mock(trackers: trackers.map(Tracker.init(url:)))
-        let appTorrent = DelugeTorrent(torrent)
-        XCTAssertEqual(appTorrent?.trackerStrings, trackers)
+        let torrent = StandardTorrent(.mock(trackers: trackers.map(Tracker.init(url:))))
+        XCTAssertEqual(torrent?.trackers, trackers)
     }
 }

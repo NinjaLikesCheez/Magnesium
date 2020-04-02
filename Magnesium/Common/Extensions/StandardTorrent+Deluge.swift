@@ -1,28 +1,7 @@
 import Deluge
 import Foundation
 
-struct DelugeTorrent: StandardTorrent {
-    var hash: String
-    var dateAdded: Date
-    var downloaded: Int64
-    var downloadPath: String
-    var downloadRate: Int64
-    var eta: TimeInterval
-    var label: String
-    var name: String
-    var peers: Int
-    var progress: Float
-    var seeds: Int
-    var size: Int64
-    var standardState: TorrentState
-    var totalPeers: Int
-    var totalSeeds: Int
-    var trackerStrings: [String]
-    var uploaded: Int64
-    var uploadRate: Int64
-}
-
-extension DelugeTorrent {
+extension StandardTorrent {
     private static func state(for state: Torrent.State) -> TorrentState {
         switch state {
         case .downloading:
@@ -51,10 +30,10 @@ extension DelugeTorrent {
             let progress = torrent.progress,
             let seeds = torrent.seeds,
             let size = torrent.size,
-            let standardState = torrent.state.map(Self.state),
+            let state = torrent.state.map(Self.state),
             let totalPeers = torrent.totalPeers,
             let totalSeeds = torrent.totalSeeds,
-            let trackerStrings = torrent.trackers?.map(\.url),
+            let trackers = torrent.trackers?.map(\.url),
             let uploaded = torrent.uploaded,
             let uploadRate = torrent.uploadRate,
             let name = torrent.name
@@ -74,10 +53,10 @@ extension DelugeTorrent {
         self.progress = progress
         self.seeds = seeds
         self.size = size
-        self.standardState = standardState
+        self.state = state
         self.totalPeers = totalPeers
         self.totalSeeds = totalSeeds
-        self.trackerStrings = trackerStrings
+        self.trackers = trackers
         self.uploaded = uploaded
         self.uploadRate = uploadRate
     }

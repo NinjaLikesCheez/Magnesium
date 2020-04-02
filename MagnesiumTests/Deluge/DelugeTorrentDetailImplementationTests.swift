@@ -6,7 +6,7 @@ import XCTest
 
 class DelugeTorrentDetailImplementationTests: TestCase {
     private var client: MockDelugeClient!
-    private var implementation: StandardTorrentDetailImplementation<DelugeTorrent, DelugeLabel, DelugeTorrentFile>!
+    private var implementation: StandardTorrentDetailImplementation!
 
     override func setUp() {
         super.setUp()

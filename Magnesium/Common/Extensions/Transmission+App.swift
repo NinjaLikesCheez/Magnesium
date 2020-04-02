@@ -10,9 +10,9 @@ protocol TransmissionClient {
 
 extension Transmission: TransmissionClient {}
 
-extension TransmissionTorrentFile: StandardTorrentFile {
-    var progress: Float {
-        Float(downloaded) / Float(size)
+extension TransmissionTorrentFile {
+    var standard: StandardTorrentFile {
+        .init(index: index, name: name, size: size, progress: Float(downloaded) / Float(size))
     }
 }
 

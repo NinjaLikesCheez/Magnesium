@@ -48,7 +48,7 @@ class TorrentDetailCoordinatorTests: TestCase {
     func test_activities_shouldPresentActivityViewController() {
         viewModel.eventSubject.send(.activities(
             [],
-            torrent: DelugeTorrent.mock(),
+            torrent: .mock(),
             source: .view(UIView(), rect: .zero)
         ))
         let viewController = coordinator.presentable.viewController

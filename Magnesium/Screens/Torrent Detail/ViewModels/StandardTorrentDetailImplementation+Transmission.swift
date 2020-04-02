@@ -1,7 +1,6 @@
 import Combine
 
-// swiftlint:disable:next line_length
-extension StandardTorrentDetailImplementation where Torrent == TransmissionTorrent, Label == Never, File == TransmissionTorrentFile {
+extension StandardTorrentDetailImplementation {
     static func transmission(session: TransmissionSession) -> Self {
         let client = session.client
         return .init(
@@ -23,34 +22,34 @@ extension StandardTorrentDetailImplementation where Torrent == TransmissionTorre
 
     private static func refreshFiles(
         client: TransmissionClient,
-        torrent: TransmissionTorrent
-    ) -> AnyPublisher<[TransmissionTorrentFile], Error> {
-        client.request(.torrentFiles(id: torrent.hash)).eraseError().eraseToAnyPublisher()
+        torrent: StandardTorrent
+    ) -> AnyPublisher<[StandardTorrentFile], Error> {
+        client.request(.torrentFiles(id: torrent.hash)).map { $0.map(\.standard) }.eraseError().eraseToAnyPublisher()
     }
 
-    private static func pause(client: TransmissionClient, torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+    private static func pause(client: TransmissionClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.stop(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
-    private static func resume(client: TransmissionClient, torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+    private static func resume(client: TransmissionClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.start(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     private static func remove(
         client: TransmissionClient,
-        torrent: TransmissionTorrent,
+        torrent: StandardTorrent,
         removeData: Bool
     ) -> AnyPublisher<Void, Error> {
         client.request(.remove(ids: [torrent.hash], removeData: removeData)).eraseError().eraseToAnyPublisher()
     }
 
-    private static func verify(client: TransmissionClient, torrent: TransmissionTorrent) -> AnyPublisher<Void, Error> {
+    private static func verify(client: TransmissionClient, torrent: StandardTorrent) -> AnyPublisher<Void, Error> {
         client.request(.verify(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
 
     private static func updateTrackers(
         client: TransmissionClient,
-        torrent: TransmissionTorrent
+        torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.reannounce(ids: [torrent.hash])).eraseError().eraseToAnyPublisher()
     }
@@ -58,7 +57,7 @@ extension StandardTorrentDetailImplementation where Torrent == TransmissionTorre
     private static func moveDownloadFolder(
         client: TransmissionClient,
         path: String,
-        torrent: TransmissionTorrent
+        torrent: StandardTorrent
     ) -> AnyPublisher<Void, Error> {
         client.request(.move(ids: [torrent.hash], path: path)).eraseError().eraseToAnyPublisher()
     }

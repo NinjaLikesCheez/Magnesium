@@ -7,7 +7,7 @@ import XCTest
 
 class TransmissionTorrentListImplementationTests: TestCase {
     private var client: MockTransmissionClient!
-    private var implementation: StandardTorrentListImplementation<TransmissionTorrent, Never>!
+    private var implementation: StandardTorrentListImplementation!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
@@ -26,10 +26,7 @@ class TransmissionTorrentListImplementationTests: TestCase {
             CurrentValueSubject(.mock()),
             CurrentValueSubject([])
         ).base as AnyObject
-        XCTAssertType(
-            viewModel,
-            StandardTorrentDetailViewModel<TransmissionTorrent, Never, TransmissionTorrentFile>.self
-        )
+        XCTAssertType(viewModel, StandardTorrentDetailViewModel.self)
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {

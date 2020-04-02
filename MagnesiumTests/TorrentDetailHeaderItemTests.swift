@@ -3,41 +3,41 @@ import Combine
 import XCTest
 
 class TorrentDetailHeaderItemTests: TestCase {
-    private var torrent: CurrentValueSubject<MockTorrent, Never>!
+    private var torrent: CurrentValueSubject<StandardTorrent, Never>!
     private var item: TorrentDetailHeaderItem!
 
     override func setUp() {
         super.setUp()
-        torrent = CurrentValueSubject(MockTorrent())
+        torrent = CurrentValueSubject(.mock())
         item = TorrentDetailHeaderItem(torrent: torrent)
     }
 
     func test_name() {
-        torrent.send(MockTorrent(name: "name"))
+        torrent.send(.mock(name: "name"))
         XCTAssertEqual(item.name.first().wait(), "name")
     }
 
     func test_label() {
-        torrent.send(MockTorrent(label: "label"))
+        torrent.send(.mock(label: "label"))
         XCTAssertEqual(item.label.first().wait(), "label")
     }
 
     func test_isActive_withActiveStates_shouldBeTrue() throws {
         for state in [TorrentState.downloading, .seeding] {
-            torrent.send(MockTorrent(standardState: state))
+            torrent.send(.mock(state: state))
             XCTAssertTrue(item.isActive.first().wait())
         }
     }
 
     func test_isActive_withInactiveState_shouldBeFalse() {
         for state in [TorrentState.paused, .checking, .queued, .error] {
-            torrent.send(MockTorrent(standardState: state))
+            torrent.send(.mock(state: state))
             XCTAssertFalse(item.isActive.first().wait())
         }
     }
 
     func test_progress() {
-        torrent.send(MockTorrent(progress: 0.189_838))
+        torrent.send(.mock(progress: 0.189_838))
         XCTAssertEqual(item.progress.first().wait(), 0.189_838)
     }
 
@@ -52,7 +52,7 @@ class TorrentDetailHeaderItemTests: TestCase {
         ]
 
         for (state, result) in pairs {
-            torrent.send(MockTorrent(standardState: state))
+            torrent.send(.mock(state: state))
             XCTAssertEqual(item.progressColor.first().wait(), result, String(describing: state))
         }
     }
@@ -68,7 +68,7 @@ class TorrentDetailHeaderItemTests: TestCase {
         ]
 
         for (state, result) in pairs {
-            torrent.send(MockTorrent(standardState: state))
+            torrent.send(.mock(state: state))
             XCTAssertEqual(item.status.first().wait(), "\(result) (0.00%)")
         }
     }

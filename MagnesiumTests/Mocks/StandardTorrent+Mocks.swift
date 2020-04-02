@@ -1,36 +1,35 @@
 import CryptoKit
-import Deluge
 import Foundation
 @testable import Magnesium
 
-private func randomHash() -> String {
-    let uuid = UUID().uuidString
-    let hashed = Insecure.SHA1.hash(data: uuid.data(using: .utf8)!)
-    return hashed.compactMap { String(format: "%02x", $0) }.joined()
-}
+extension StandardTorrent {
+    static func createHash() -> String {
+        let data = UUID().uuidString.data(using: .utf8)!
+        let hashed = Insecure.SHA1.hash(data: data)
+        return hashed.compactMap { String(format: "%02x", $0) }.joined()
+    }
 
-extension Torrent {
     static func mock(
         dateAdded: Date = Date(),
         downloaded: Int64 = 0,
-        downloadPath: String = "/",
+        downloadPath: String = "",
         downloadRate: Int64 = 0,
         eta: TimeInterval = 0,
-        hash: String = randomHash(),
+        hash: String = Self.createHash(),
         label: String = "",
         name: String = "",
         peers: Int = 0,
         progress: Float = 0,
         seeds: Int = 0,
         size: Int64 = 0,
-        state: Torrent.State = .downloading,
+        state: TorrentState = .downloading,
         totalPeers: Int = 0,
         totalSeeds: Int = 0,
-        trackers: [Tracker] = [],
+        trackers: [String] = [],
         uploaded: Int64 = 0,
         uploadRate: Int64 = 0
     ) -> Self {
-        .init(
+        self.init(
             dateAdded: dateAdded,
             downloaded: downloaded,
             downloadPath: downloadPath,
@@ -49,25 +48,6 @@ extension Torrent {
             trackers: trackers,
             uploaded: uploaded,
             uploadRate: uploadRate
-        )
-    }
-}
-
-extension DelugeLabel {
-    static func mock(name: String = "", count: Int = 0) -> Self {
-        .init(name: name, count: count)
-    }
-}
-
-extension DelugeTorrentFile {
-    static func mock(index: Int, name: String, progress: Float = 0) -> Self {
-        .init(
-            index: index,
-            name: name,
-            path: "",
-            size: 0,
-            progress: progress,
-            priority: .normal
         )
     }
 }

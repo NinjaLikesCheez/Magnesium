@@ -1,25 +1,27 @@
 import Foundation
 
-protocol StandardTorrent {
-    var hash: String { get }
-    var name: String { get }
-    var standardState: TorrentState { get }
-    var dateAdded: Date { get }
-    var downloadRate: Int64 { get }
-    var uploadRate: Int64 { get }
-    var eta: TimeInterval { get }
-    var progress: Float { get }
-    var downloaded: Int64 { get }
-    var uploaded: Int64 { get }
-    var size: Int64 { get }
-    var seeds: Int { get }
-    var totalSeeds: Int { get }
-    var peers: Int { get }
-    var totalPeers: Int { get }
-    var trackerStrings: [String] { get }
-    var label: String { get }
-    var downloadPath: String { get }
+struct StandardTorrent {
+    var dateAdded: Date
+    var downloaded: Int64
+    var downloadPath: String
+    var downloadRate: Int64
+    var eta: TimeInterval
+    var hash: String
+    var label: String
+    var name: String
+    var peers: Int
+    var progress: Float
+    var seeds: Int
+    var size: Int64
+    var state: TorrentState
+    var totalPeers: Int
+    var totalSeeds: Int
+    var trackers: [String]
+    var uploaded: Int64
+    var uploadRate: Int64
 }
+
+extension StandardTorrent: Equatable {}
 
 extension StandardTorrent {
     var ratio: Double {
@@ -27,15 +29,15 @@ extension StandardTorrent {
     }
 
     var isActive: Bool {
-        standardState == .downloading || standardState == .seeding
+        state == .downloading || state == .seeding
     }
 
     var localizedSpeed: String {
-        if standardState == .downloading {
+        if state == .downloading {
             let download = L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
             let upload = L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
             return "\(download) \(upload)"
-        } else if standardState == .seeding {
+        } else if state == .seeding {
             return L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
         } else {
             return ""
@@ -60,7 +62,7 @@ extension StandardTorrent {
     }
 
     var localizedRatioOrETA: String {
-        if standardState == .downloading {
+        if state == .downloading {
             return formattedETA
         } else {
             return L10n.torrentRatio(formattedRatio())

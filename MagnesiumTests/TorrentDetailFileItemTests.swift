@@ -3,12 +3,12 @@ import Combine
 import XCTest
 
 class TorrentDetailFileItemTests: TestCase {
-    private var file: CurrentValueSubject<MockTorrentFile, Never>!
+    private var file: CurrentValueSubject<StandardTorrentFile, Never>!
     private var item: TorrentDetailFileItem!
 
     override func setUp() {
         super.setUp()
-        file = CurrentValueSubject(MockTorrentFile(
+        file = CurrentValueSubject(.mock(
             index: 0,
             name: "file.rar",
             progress: 0.189_838
