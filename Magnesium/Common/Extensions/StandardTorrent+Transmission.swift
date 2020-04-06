@@ -24,7 +24,9 @@ extension StandardTorrent {
     }
 
     init?(_ torrent: Torrent) {
-        guard let dateAdded = torrent.dateAdded,
+        guard let bytesUnchecked = torrent.bytesUnchecked,
+            let bytesValid = torrent.bytesValid,
+            let dateAdded = torrent.dateAdded,
             let downloadPath = torrent.downloadPath,
             let downloadRate = torrent.downloadRate,
             let eta = torrent.eta,
@@ -43,7 +45,7 @@ extension StandardTorrent {
             return nil
         }
 
-        downloaded = Int64(Float(size) * progress)
+        downloaded = bytesUnchecked + bytesValid
         label = ""
         self.dateAdded = dateAdded
         self.downloadPath = downloadPath

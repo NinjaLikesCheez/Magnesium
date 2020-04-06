@@ -11,6 +11,8 @@ private func randomHash() -> String {
 
 extension Torrent {
     static func mock(
+        bytesUnchecked: Int64 = 0,
+        bytesValid: Int64 = 0,
         dateAdded: Date = Date(),
         downloadPath: String = "/",
         downloadRate: Int64 = 0,
@@ -28,6 +30,8 @@ extension Torrent {
         uploadRate: Int64 = 0
     ) -> Self {
         .init(
+            bytesUnchecked: bytesUnchecked,
+            bytesValid: bytesValid,
             dateAdded: dateAdded,
             downloadPath: downloadPath,
             downloadRate: downloadRate,

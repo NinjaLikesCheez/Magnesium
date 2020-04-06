@@ -18,6 +18,8 @@ struct TransmissionSession {
 private extension Request {
     static var torrentsForApp: Request<[StandardTorrent]> {
         let properties: [Torrent.PropertyKeys] = [
+            .bytesUnchecked,
+            .bytesValid,
             .dateAdded,
             .downloadPath,
             .downloadRate,

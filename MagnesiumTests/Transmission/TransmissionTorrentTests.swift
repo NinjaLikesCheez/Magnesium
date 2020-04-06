@@ -33,4 +33,9 @@ class TransmissionTorrentTests: TestCase {
         let torrent = StandardTorrent(.mock(trackers: trackers))
         XCTAssertEqual(torrent?.trackers, trackers.map(\.host))
     }
+
+    func test_init_downloaded_shouldEqualUncheckedPlusValid() {
+        let torrent = StandardTorrent(.mock(bytesUnchecked: 1000, bytesValid: 2000))
+        XCTAssertEqual(torrent?.downloaded, 3000)
+    }
 }
