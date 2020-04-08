@@ -15,7 +15,7 @@ extension TorrentListViewValues {
         editActionsEnabled: Bool = false,
         status: String = "",
         detailViewModel: @escaping (Int) -> AnyTorrentDetailViewModel = { _ in .init(MockDetailViewModel()) },
-        contextMenu: @escaping (Int) -> UIMenu? = { _ in nil },
+        contextMenu: @escaping (Int) -> Menu? = { _ in nil },
         leadingSwipeActionsConfiguration: @escaping (Int, PopoverSource)
             -> SwipeActionsConfiguration? = { _, _ in nil },
         trailingSwipeActionsConfiguration: @escaping (Int, PopoverSource)

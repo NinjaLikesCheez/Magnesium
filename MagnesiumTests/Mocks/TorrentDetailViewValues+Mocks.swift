@@ -1,4 +1,5 @@
 import Combine
+import CommonModels
 @testable import Magnesium
 import UIKit
 
@@ -7,7 +8,7 @@ extension TorrentDetailViewValues {
         hash: String = "",
         sections: [TorrentDetailSection] = [],
         isRefreshing: Bool = false,
-        contextMenu: @escaping (IndexPath) -> UIMenu? = { _ in nil }
+        contextMenu: @escaping (IndexPath) -> Menu? = { _ in nil }
     ) -> Self {
         .init(
             hash: hash,

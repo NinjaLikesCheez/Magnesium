@@ -326,82 +326,81 @@ final class StandardTorrentListViewModel: ViewModel {
         implementation.detailViewModel(torrents.values[index], labels)
     }
 
-    private func contextMenuForItem(at index: Int) -> UIMenu? {
+    private func contextMenuForItem(at index: Int) -> Menu? {
         let torrent = torrents.values[index].value
-        var actions = [UIMenuElement]()
+        var items = [MenuItem]()
 
         if torrent.isActive {
-            actions.append(UIAction(title: L10n.pause, image: UIImage(systemName: "pause")) { [weak self] _ in
+            items.append(.action(.init(title: L10n.pause, image: UIImage(systemName: "pause")) { [weak self] in
                 self?.pause([torrent])
-            })
+            }))
         } else {
-            actions.append(UIAction(title: L10n.resume, image: UIImage(systemName: "play")) { [weak self] _ in
+            items.append(.action(.init(title: L10n.resume, image: UIImage(systemName: "play")) { [weak self] in
                 self?.resume([torrent])
-            })
+            }))
         }
 
         if !labels.value.isEmpty {
-            let children = labels.value.map { label in
-                UIAction(title: label.displayName) { [weak self] _ in
+            let children: [MenuItem] = labels.value.map { label in
+                .action(.init(title: label.displayName) { [weak self] in
                     self?.setLabel(for: [torrent], label: label)
-                }
+                })
             }
-            actions.append(UIMenu(title: L10n.setLabel, image: UIImage(systemName: "tag"), children: children))
+            items.append(.menu(.init(title: L10n.setLabel, image: UIImage(systemName: "tag"), children: children)))
         }
 
-        actions.append(UIAction(title: L10n.verifyFiles, image: UIImage(systemName: "tray.full")) { [weak self] _ in
+        items.append(.action(.init(title: L10n.verifyFiles, image: UIImage(systemName: "tray.full")) { [weak self] in
             self?.verify([torrent])
-        })
+        }))
 
-        actions.append(UIAction(
+        items.append(.action(.init(
             title: L10n.moveDownloadFolder,
             image: UIImage(systemName: "tray.and.arrow.down"),
-            handler: { [weak self] _ in
+            handler: { [weak self] in
                 guard let strongSelf = self else { return }
                 let subject = PassthroughSubject<String, Never>()
-                subject
-                    .sink { [weak self] path in
-                        self?.moveDownloadFolder(for: [torrent], to: path)
-                    }
-                    .store(in: &strongSelf.cancellables)
+                subject.sink { [weak self] path in
+                    self?.moveDownloadFolder(for: [torrent], to: path)
+                }.store(in: &strongSelf.cancellables)
                 strongSelf.eventSubject.send(.moveDownloadFolder(
                     currentPath: torrent.downloadPath,
                     subject: subject
                 ))
             }
-        ))
+        )))
 
-        actions.append(UIAction(
+        items.append(.action(.init(
             title: L10n.updateTrackers,
             image: UIImage(systemName: "arrow.clockwise"),
-            handler: { [weak self] _ in
+            handler: { [weak self] in
                 self?.updateTrackers(for: [torrent])
             }
-        ))
-        actions.append(UIMenu(
+        )))
+
+        items.append(.menu(.init(
             title: L10n.remove,
             image: UIImage(systemName: "trash"),
-            options: .destructive,
+            options: [.destructive],
             children: [
-                UIAction(
+                .action(.init(
                     title: L10n.removeTorrentOptionKeepData,
                     image: UIImage(systemName: "trash"),
-                    handler: { [weak self] _ in
+                    handler: { [weak self] in
                         self?.remove([torrent], removeData: false)
                     }
-                ),
-                UIAction(
+                )),
+                .action(.init(
                     title: L10n.removeTorrentOptionRemoveData,
                     image: UIImage(systemName: "trash"),
-                    attributes: .destructive,
-                    handler: { [weak self] _ in
+                    attributes: [.destructive],
+                    handler: { [weak self] in
                         self?.remove([torrent], removeData: true)
                     }
-                ),
+                )),
             ]
-        ))
+        )))
 
-        return UIMenu(title: "", children: actions)
+        return Menu(children: items)
     }
 
     private func leadingSwipeActionsConfigurationForItem(

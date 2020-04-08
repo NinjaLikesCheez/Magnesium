@@ -452,27 +452,99 @@ final class StandardTorrentDetailViewModelTests: TestCase {
             XCTFail("Expected menu")
             return
         }
-        assertSnapshot(matching: menu, as: .json)
+        assertSnapshot(matching: menu, as: .dump)
     }
 
-    func test_setPriority_shouldCallImplementationSetPriorityAndRefreshFiles() throws {
-        viewModel.setPriority(.normal, for: [.mock(), .mock()])
-        XCTAssertEqual(implementation.setPriorityCallCount, 1)
-        XCTAssertEqual(implementation.refreshFilesCallCount, 2)
+    func test_contextMenu_whenPrioritySelected_shouldCallImplementationSetPriorityAndRefreshFiles() throws {
+        let pairs: [(String, TorrentPriority)] = [
+            ("Disabled", .disabled),
+            ("Low Priority", .low),
+            ("Normal Priority", .normal),
+            ("High Priority", .high),
+        ]
+
+        for (title, priority) in pairs {
+            setUp()
+
+            _ = viewModel.values.sections.first().wait()
+
+            guard let menu = viewModel.values.contextMenu(.init(row: 0, section: 2)) else {
+                XCTFail("Expected menu")
+                continue
+            }
+
+            let actions = menu.children.compactMap { try? extract(case: MenuItem.action, from: $0) }
+            guard let action = actions.first(where: { $0.title == title }) else {
+                XCTFail("Actions did not contain \"\(title)\"")
+                continue
+            }
+
+            action.handler()
+            XCTAssertEqual(
+                implementation.setPriorityParamPriorities.map { Array($0.values) },
+                [[priority]],
+                String(describing: action)
+            )
+            XCTAssertEqual(implementation.refreshFilesCallCount, 2, String(describing: action))
+        }
     }
 
-    func test_setPriority_whenFails_shouldEmitAlert() throws {
+    func test_contextMenu_action_whenPriorityIsCurrent_shouldBeInOnState() throws {
+        let pairs: [(String, TorrentPriority)] = [
+            ("Disabled", .disabled),
+            ("Low Priority", .low),
+            ("Normal Priority", .normal),
+            ("High Priority", .high),
+        ]
+
+        for (title, priority) in pairs {
+            setUp()
+            implementation.refreshFilesResult = Just([
+                StandardTorrentFile.mock(index: 0, priority: priority),
+            ]).setFailureType(to: Error.self).eraseToAnyPublisher()
+
+            viewModel.receive(.refresh)
+            _ = viewModel.values.sections.first().wait()
+
+            guard let menu = viewModel.values.contextMenu(.init(row: 0, section: 2)) else {
+                XCTFail("Expected menu")
+                continue
+            }
+
+            let actions = menu.children.compactMap { try? extract(case: MenuItem.action, from: $0) }
+            guard let action = actions.first(where: { $0.title == title }) else {
+                XCTFail("Actions did not contain \"\(title)\"")
+                continue
+            }
+
+            XCTAssertEqual(action.state, .on, String(describing: action))
+        }
+    }
+
+    func test_contextMenu_whenPrioritySelected_andFails_shouldEmitAlert() throws {
         implementation.setPriorityResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        _ = viewModel.values.sections.first().wait()
+
+        let menu = viewModel.values.contextMenu(.init(row: 0, section: 2))
+        let action = menu?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Disabled" }
         let alert = try getAlert {
-            self.viewModel.setPriority(.normal, for: [.mock(), .mock()])
+            action?.handler()
         }
         XCTAssertEqual(alert.title, "Failed to Set Priority")
     }
 
-    func test_setPriority_whenRefreshFails_shouldNotEmitAlert() {
+    func test_contextMenu_whenRefreshFiles_shouldNotEmitAlert() {
         implementation.refreshFilesResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
+        _ = viewModel.values.sections.first().wait()
+
+        let menu = viewModel.values.contextMenu(.init(row: 0, section: 2))
+        let action = menu?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Disabled" }
         let event = viewModel.events.first().wait {
-            self.viewModel.setPriority(.normal, for: [.mock(), .mock()])
+            action?.handler()
         }
         XCTAssertFalse(event.hasValue())
     }

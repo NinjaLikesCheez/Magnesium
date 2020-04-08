@@ -395,6 +395,24 @@ enum L10n {
         NSLocalizedString("torrent_info_download_folder", comment: "Download Folder")
     }
 
+    // MARK: Priority
+
+    static var disabledPriority: String {
+        NSLocalizedString("priority_disabled", comment: "Disabled")
+    }
+
+    static var lowPriority: String {
+        NSLocalizedString("priority_low", comment: "Low Priority")
+    }
+
+    static var normalPriority: String {
+        NSLocalizedString("priority_normal", comment: "Normal Priority")
+    }
+
+    static var highPriority: String {
+        NSLocalizedString("priority_high", comment: "High Priority")
+    }
+
     // MARK: Label
 
     static var noneLabel: String {

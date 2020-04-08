@@ -356,50 +356,49 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
     // MARK: View Functions
 
-    private func contextMenuForItem(at indexPath: IndexPath) -> UIMenu? {
+    private func contextMenuForItem(at indexPath: IndexPath) -> Menu? {
         switch sections.value[indexPath.section].items[indexPath.row] {
         case let .file(item):
             guard let file = files.values.first(where: { $0.value.index == item.id }) else {
                 return nil
             }
 
-            return UIMenu(title: "", children: [
-                UIAction(
-                    title: "Disabled",
+            return Menu(children: [
+                .action(.init(
+                    title: L10n.disabledPriority,
                     state: file.value.priority == .disabled ? .on : .off,
-                    handler: { [weak self] _ in
+                    handler: { [weak self] in
                         self?.setPriority(.disabled, for: [file.value])
                     }
-                ),
-                UIAction(
-                    title: "Low Priority",
+                )),
+                .action(.init(
+                    title: L10n.lowPriority,
                     state: file.value.priority == .low ? .on : .off,
-                    handler: { [weak self] _ in
+                    handler: { [weak self] in
                         self?.setPriority(.low, for: [file.value])
                     }
-                ),
-                UIAction(
-                    title: "Normal Priority",
+                )),
+                .action(.init(
+                    title: L10n.normalPriority,
                     state: file.value.priority == .normal ? .on : .off,
-                    handler: { [weak self] _ in
+                    handler: { [weak self] in
                         self?.setPriority(.normal, for: [file.value])
                     }
-                ),
-                UIAction(
-                    title: "High Priority",
+                )),
+                .action(.init(
+                    title: L10n.highPriority,
                     state: file.value.priority == .high ? .on : .off,
-                    handler: { [weak self] _ in
+                    handler: { [weak self] in
                         self?.setPriority(.high, for: [file.value])
                     }
-                ),
+                )),
             ])
         default:
             return nil
         }
     }
 
-    // internal for testing
-    func setPriority(_ priority: TorrentPriority, for files: [StandardTorrentFile]) {
+    private func setPriority(_ priority: TorrentPriority, for files: [StandardTorrentFile]) {
         let priorityMap = files.reduce(into: [StandardTorrentFile: TorrentPriority]()) { $0[$1] = priority }
         implementation.setPriority(torrent.value, self.files.allValues.map(\.value), priorityMap)
             .append(

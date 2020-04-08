@@ -419,7 +419,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 self?.delegate?.previewForItem(at: indexPath.row)
             },
             actionProvider: { [weak self] _ in
-                self?.viewModel.values.contextMenu(indexPath.row)
+                self?.viewModel.values.contextMenu(indexPath.row)?.createUIMenu()
             }
         )
     }

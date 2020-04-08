@@ -1,0 +1,33 @@
+▿ Menu
+  ▿ children: 4 elements
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        - image: Optional<UIImage>.none
+        - state: State.off
+        - title: "Disabled"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        - image: Optional<UIImage>.none
+        - state: State.off
+        - title: "Low Priority"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        - image: Optional<UIImage>.none
+        - state: State.on
+        - title: "Normal Priority"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        - image: Optional<UIImage>.none
+        - state: State.off
+        - title: "High Priority"
+  - image: Optional<UIImage>.none
+  - options: 0 elements
+  - title: ""

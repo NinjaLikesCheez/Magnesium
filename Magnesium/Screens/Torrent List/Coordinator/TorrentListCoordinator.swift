@@ -200,7 +200,7 @@ private extension TorrentListCoordinator {
                 implementation: .deluge(.init(client: client)),
                 server: server
             )
-            return .init(viewModel)
+            return AnyTorrentListViewModel(viewModel)
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
@@ -214,7 +214,7 @@ private extension TorrentListCoordinator {
                 implementation: .transmission(.init(client: client)),
                 server: server
             )
-            return .init(viewModel)
+            return AnyTorrentListViewModel(viewModel)
         }
     }
 }

@@ -1,6 +1,5 @@
 import Combine
 import Coordinator
-import Preferences
 
 enum NoServersCoordinatorEvent {
     case showSettings

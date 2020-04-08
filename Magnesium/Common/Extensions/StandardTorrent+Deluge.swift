@@ -1,5 +1,4 @@
 import Deluge
-import Foundation
 
 extension StandardTorrent {
     private static func state(for state: Torrent.State) -> TorrentState {

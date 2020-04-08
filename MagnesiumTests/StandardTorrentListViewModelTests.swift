@@ -211,7 +211,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_resumeSelected_shouldCallImplementationResumeAndRefresh() {
         viewModel.receive(.resumeSelected(indices: [0, 1]))
         XCTAssertEqual(implementation.resumeCallCount, 1)
-        XCTAssertEqual(implementation.resumeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.resumeParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -237,7 +237,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_pauseSelected_shouldCallImplementationPauseAndRefresh() {
         viewModel.receive(.pauseSelected(indices: [0, 1]))
         XCTAssertEqual(implementation.pauseCallCount, 1)
-        XCTAssertEqual(implementation.pauseParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.pauseParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -284,7 +284,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         alert.actions.first { $0.title == "Keep Data" }?.handler?()
         XCTAssertEqual(implementation.removeCallCount, 1)
-        XCTAssertEqual(implementation.removeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.removeParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.removeParamRemoveData, [false])
     }
 
@@ -320,7 +320,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         alert.actions.first { $0.title == "Remove Data" }?.handler?()
         XCTAssertEqual(implementation.removeCallCount, 1)
-        XCTAssertEqual(implementation.removeParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.removeParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.removeParamRemoveData, [true])
     }
 
@@ -411,7 +411,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         alert.actions.first { $0.title == "label1" }?.handler?()
         XCTAssertEqual(implementation.setLabelCallCount, 1)
-        XCTAssertEqual(implementation.setLabelParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.setLabelParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.setLabelParamLabel[0].name, "label1")
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
@@ -455,7 +455,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         activities.first { $0.title == "Verify Files" }?.handler()
         XCTAssertEqual(implementation.verifyCallCount, 1)
-        XCTAssertEqual(implementation.verifyParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.verifyParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -585,7 +585,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         activities.first { $0.title == "Update Trackers" }?.handler()
         XCTAssertEqual(implementation.updateTrackersCallCount, 1)
-        XCTAssertEqual(implementation.updateTrackersParamTorrents[0].map(\.name), ["Mock", "Mock 2"])
+        XCTAssertEqual(implementation.updateTrackersParamTorrents.map { $0.map(\.name) }, [["Mock", "Mock 2"]])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -680,7 +680,7 @@ final class StandardTorrentListViewModelTests: TestCase {
             return
         }
 
-        assertSnapshot(matching: menu, as: .json)
+        assertSnapshot(matching: menu, as: .dump)
     }
 
     func test_contextMenu_withActiveTorrent_shouldReturnExpectedMenu() {
@@ -689,7 +689,7 @@ final class StandardTorrentListViewModelTests: TestCase {
             return
         }
 
-        assertSnapshot(matching: menu, as: .json)
+        assertSnapshot(matching: menu, as: .dump)
     }
 
     func test_contextMenu_withInactiveTorrent_shouldReturnExpectedMenu() {
@@ -706,7 +706,99 @@ final class StandardTorrentListViewModelTests: TestCase {
             return
         }
 
-        assertSnapshot(matching: menu, as: .json)
+        assertSnapshot(matching: menu, as: .dump)
+    }
+
+    func test_contextMenu_pause_shouldPauseAndRefresh() {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Pause" }
+        action?.handler()
+        XCTAssertEqual(implementation.pauseCallCount, 1)
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_resume_shouldResumeAndRefresh() {
+        implementation.refreshResult = Just(([.mock(name: "Mock", state: .paused)], []))
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        viewModel.receive(.refresh)
+
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Resume" }
+        action?.handler()
+        XCTAssertEqual(implementation.resumeCallCount, 1)
+        XCTAssertEqual(implementation.refreshCallCount, 3)
+    }
+
+    func test_contextMenu_setLabel_shouldSetLabelAndRefresh() throws {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.menu, from: $0) }
+            .first?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "label1" }
+        action?.handler()
+        XCTAssertEqual(implementation.setLabelCallCount, 1)
+        XCTAssertEqual(implementation.setLabelParamLabel, [.mock(name: "label1")])
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_verifyFiles_shouldVerifyFilesAndRefresh() {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Verify Files" }
+        action?.handler()
+        XCTAssertEqual(implementation.verifyCallCount, 1)
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_moveDownloadFolder_shouldMoveDownloadFolderAndRefresh() throws {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Move Download Folder" }
+        let event = try viewModel.events.first().wait {
+            action?.handler()
+        }.value()
+        let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
+        subject.send("/new")
+        subject.send(completion: .finished)
+        XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
+        XCTAssertEqual(implementation.moveDownloadFolderParamPath, ["/new"])
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_updateTrackers_shouldUpdateTrackersAndRefresh() {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Update Trackers" }
+        action?.handler()
+        XCTAssertEqual(implementation.updateTrackersCallCount, 1)
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_remove_keepData_shouldRemoveAndRefresh() {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.menu, from: $0) }
+            .first { $0.title == "Remove" }?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Keep Data" }
+        action?.handler()
+        XCTAssertEqual(implementation.removeCallCount, 1)
+        XCTAssertEqual(implementation.removeParamRemoveData, [false])
+        XCTAssertEqual(implementation.refreshCallCount, 2)
+    }
+
+    func test_contextMenu_remove_removeData_shouldRemoveAndRefresh() {
+        let action = viewModel.values.contextMenu(0)?.children
+            .compactMap { try? extract(case: MenuItem.menu, from: $0) }
+            .first { $0.title == "Remove" }?.children
+            .compactMap { try? extract(case: MenuItem.action, from: $0) }
+            .first { $0.title == "Remove Data" }
+        action?.handler()
+        XCTAssertEqual(implementation.removeCallCount, 1)
+        XCTAssertEqual(implementation.removeParamRemoveData, [true])
+        XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
     // MARK: leadingSwipeActionsConfiguration
@@ -734,7 +826,6 @@ final class StandardTorrentListViewModelTests: TestCase {
         let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.pauseCallCount, 1)
-        XCTAssertEqual(implementation.pauseParamTorrents[0].map(\.name), ["Mock"])
         XCTAssertEqual(implementation.refreshCallCount, 2)
     }
 
@@ -756,7 +847,6 @@ final class StandardTorrentListViewModelTests: TestCase {
         let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.resumeCallCount, 1)
-        XCTAssertEqual(implementation.resumeParamTorrents[0].map(\.name), ["Mock"])
         XCTAssertEqual(implementation.refreshCallCount, 3)
     }
 

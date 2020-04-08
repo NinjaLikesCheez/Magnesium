@@ -245,10 +245,10 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             return nil
         }
 
-        return .init(
+        return UIContextMenuConfiguration(
             identifier: indexPath as NSCopying,
             previewProvider: nil,
-            actionProvider: { _ in menu }
+            actionProvider: { _ in menu.createUIMenu() }
         )
     }
 }

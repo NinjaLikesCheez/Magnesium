@@ -1,0 +1,90 @@
+▿ Menu
+  ▿ children: 6 elements
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: play) {15, 16.333333333333336} baseline=2,contentInsets={1, 2, 1.0000000000000018, 0.33333333333333393},alignmentRectInsets={-1.9999999999999982, 0, -1.9999999999999982, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        - state: State.off
+        - title: "Resume"
+    ▿ MenuItem
+      ▿ menu: Menu
+        ▿ children: 3 elements
+          ▿ MenuItem
+            ▿ action: MenuAction
+              - attributes: 0 elements
+              - handler: (Function)
+              - image: Optional<UIImage>.none
+              - state: State.off
+              - title: "None"
+          ▿ MenuItem
+            ▿ action: MenuAction
+              - attributes: 0 elements
+              - handler: (Function)
+              - image: Optional<UIImage>.none
+              - state: State.off
+              - title: "label1"
+          ▿ MenuItem
+            ▿ action: MenuAction
+              - attributes: 0 elements
+              - handler: (Function)
+              - image: Optional<UIImage>.none
+              - state: State.off
+              - title: "label2"
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: tag) {23, 21} baseline=5,contentInsets={1, 2, 1, 2},alignmentRectInsets={-0.33333333333333215, 0, 1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        - options: 0 elements
+        - title: "Set Label"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: tray.full) {23.666666666666668, 16.333333333333336} baseline=2,contentInsets={1, 2, 1.0000000000000018, 2},alignmentRectInsets={-1.9999999999999982, 0, -1.9999999999999982, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        - state: State.off
+        - title: "Verify Files"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: tray.and.arrow.down) {23.666666666666668, 20.666666666666668} baseline=3.66667,contentInsets={1, 2, 1, 2},alignmentRectInsets={0.66666666666666785, 0, -0.33333333333333348, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        - state: State.off
+        - title: "Move Download Folder"
+    ▿ MenuItem
+      ▿ action: MenuAction
+        - attributes: 0 elements
+        - handler: (Function)
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: arrow.clockwise) {17.666666666666664, 20} baseline=3,contentInsets={1, 1.3333333333333333, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        - state: State.off
+        - title: "Update Trackers"
+    ▿ MenuItem
+      ▿ menu: Menu
+        ▿ children: 2 elements
+          ▿ MenuItem
+            ▿ action: MenuAction
+              - attributes: 0 elements
+              - handler: (Function)
+              ▿ image: Optional<UIImage>
+                - some: <UIImage symbol(system: trash) {18.999999999999996, 20.666666666666668} baseline=3.66667,contentInsets={1, 1.3333333333333333, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -0.33333333333333348, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+              - state: State.off
+              - title: "Keep Data"
+          ▿ MenuItem
+            ▿ action: MenuAction
+              ▿ attributes: 1 element
+                - Attribute.destructive
+              - handler: (Function)
+              ▿ image: Optional<UIImage>
+                - some: <UIImage symbol(system: trash) {18.999999999999996, 20.666666666666668} baseline=3.66667,contentInsets={1, 1.3333333333333333, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -0.33333333333333348, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+              - state: State.off
+              - title: "Remove Data"
+        ▿ image: Optional<UIImage>
+          - some: <UIImage symbol(system: trash) {18.999999999999996, 20.666666666666668} baseline=3.66667,contentInsets={1, 1.3333333333333333, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -0.33333333333333348, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+        ▿ options: 1 element
+          - Option.destructive
+        - title: "Remove"
+  - image: Optional<UIImage>.none
+  - options: 0 elements
+  - title: ""

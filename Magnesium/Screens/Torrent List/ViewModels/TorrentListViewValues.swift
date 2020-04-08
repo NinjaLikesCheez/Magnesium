@@ -1,6 +1,5 @@
 import Combine
 import CommonModels
-import UIKit
 
 struct TorrentListViewValues {
     var showAddButton: Bool = true
@@ -13,7 +12,7 @@ struct TorrentListViewValues {
     var editActionsEnabled: AnyPublisher<Bool, Never>
     var status: AnyPublisher<String, Never>
     var detailViewModel: (Int) -> AnyTorrentDetailViewModel?
-    var contextMenu: (Int) -> UIMenu?
+    var contextMenu: (Int) -> Menu?
     var leadingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
     var trailingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
 }

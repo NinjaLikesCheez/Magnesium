@@ -188,6 +188,18 @@
 /* No Servers */
 "no_servers_title" = "No Servers";
 
+/* Disabled */
+"priority_disabled" = "Disabled";
+
+/* High Priority */
+"priority_high" = "High Priority";
+
+/* Low Priority */
+"priority_low" = "Low Priority";
+
+/* Normal Priority */
+"priority_normal" = "Normal Priority";
+
 /* Never */
 "refresh_interval_never" = "Never";
 
