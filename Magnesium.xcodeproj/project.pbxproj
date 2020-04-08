@@ -86,7 +86,6 @@
 		E969090123E90F3000A95D31 /* RefreshIntervalViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090023E90F3000A95D31 /* RefreshIntervalViewModelTests.swift */; };
 		E969090323E9135900A95D31 /* AppCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E969090223E9135900A95D31 /* AppCoordinatorTests.swift */; };
 		E96A4EF32426A93200D00131 /* CommonModels in Frameworks */ = {isa = PBXBuildFile; productRef = E96A4EF22426A93200D00131 /* CommonModels */; };
-		E96A4EF52426AA2600D00131 /* Prelude in Frameworks */ = {isa = PBXBuildFile; productRef = E96A4EF42426AA2600D00131 /* Prelude */; };
 		E96A4EF72426AA4E00D00131 /* Prelude.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96A4EF62426AA4E00D00131 /* Prelude.swift */; };
 		E96B0065237A43740091FA71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0064237A43740091FA71 /* AppDelegate.swift */; };
 		E96B0067237A43740091FA71 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96B0066237A43740091FA71 /* SceneDelegate.swift */; };
@@ -199,6 +198,7 @@
 		E9E411B723D933AD00A7EFED /* StandardTorrentListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E411B623D933AD00A7EFED /* StandardTorrentListViewModelTests.swift */; };
 		E9E7037423F85BBA0095A0B3 /* StandardTorrent+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7037323F85BBA0095A0B3 /* StandardTorrent+Mocks.swift */; };
 		E9E7037623F85CBF0095A0B3 /* StandardLabel+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E7037523F85CBF0095A0B3 /* StandardLabel+Mocks.swift */; };
+		E9E98FAA243E8FB200C6F9D2 /* Extensions in Frameworks */ = {isa = PBXBuildFile; productRef = E9E98FA9243E8FB200C6F9D2 /* Extensions */; };
 		E9E9F0F423807044007C6D2D /* TorrentDetailViewValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F323807044007C6D2D /* TorrentDetailViewValues.swift */; };
 		E9F24E0B23CE3B160089E45F /* DelugeSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */; };
 		E9F24E0F23CE4ECB0089E45F /* DelugeServerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */; };
@@ -410,6 +410,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9E98FAA243E8FB200C6F9D2 /* Extensions in Frameworks */,
 				E99F9C092420497500DDC08B /* Deluge in Frameworks */,
 				E981B52D2423293A002C96D6 /* Deluge in Frameworks */,
 				E99F9C032420497500DDC08B /* Coordinator in Frameworks */,
@@ -418,7 +419,6 @@
 				E981B53024232945002C96D6 /* Transmission in Frameworks */,
 				E96E25A72425BCFC007DB2A0 /* Keychain in Frameworks */,
 				E99F9C072420497500DDC08B /* ViewModel in Frameworks */,
-				E96A4EF52426AA2600D00131 /* Prelude in Frameworks */,
 				E96A4EF32426A93200D00131 /* CommonModels in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -954,7 +954,7 @@
 				E981B52F24232945002C96D6 /* Transmission */,
 				E96E25A62425BCFC007DB2A0 /* Keychain */,
 				E96A4EF22426A93200D00131 /* CommonModels */,
-				E96A4EF42426AA2600D00131 /* Prelude */,
+				E9E98FA9243E8FB200C6F9D2 /* Extensions */,
 			);
 			productName = Magnesium;
 			productReference = E96B0061237A43740091FA71 /* Magnesium.app */;
@@ -1581,10 +1581,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = CommonModels;
 		};
-		E96A4EF42426AA2600D00131 /* Prelude */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Prelude;
-		};
 		E96E25A62425BCFC007DB2A0 /* Keychain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Keychain;
@@ -1627,6 +1623,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E9DD56072430029800B1145B /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
+		};
+		E9E98FA9243E8FB200C6F9D2 /* Extensions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Extensions;
 		};
 		E9F85AE2243156CA00AF13B3 /* CombineWaiting */ = {
 			isa = XCSwiftPackageProductDependency;
