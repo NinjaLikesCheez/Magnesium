@@ -330,7 +330,6 @@
 		E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LPLinkMetadata+StandardTorrent.swift"; sourceTree = "<group>"; };
 		E99B67FB24341E44002CF6A7 /* StandardTorrentListImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTorrentListImplementation.swift; sourceTree = "<group>"; };
 		E99B67FD2434318C002CF6A7 /* StandardTorrentDetailImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTorrentDetailImplementation.swift; sourceTree = "<group>"; };
-		E99F9BAB242048CB00DDC08B /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
 		E99FC25723D13A340019A992 /* TorrentListCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentListCoordinator.swift; sourceTree = "<group>"; };
 		E99FC25923D13C270019A992 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		E99FC26723D148CC0019A992 /* TorrentDetailCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailCoordinator.swift; sourceTree = "<group>"; };
@@ -381,6 +380,7 @@
 		E9CC160D23AD5CD400EA1B4C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E9CE4C3323B453BE001D1C63 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
 		E9CF491E23E3B18200026723 /* FilterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewModel.swift; sourceTree = "<group>"; };
+		E9DD196B243E8A01004E4414 /* Components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Components; sourceTree = "<group>"; };
 		E9DD560A243002AD00B1145B /* TorrentListViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TorrentListViewControllerTests.swift; sourceTree = "<group>"; };
 		E9DD560B243002AE00B1145B /* SizingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizingView.swift; sourceTree = "<group>"; };
 		E9DD560C243002AE00B1145B /* TorrentDetailFileTableViewCellTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TorrentDetailFileTableViewCellTests.swift; sourceTree = "<group>"; };
@@ -653,7 +653,7 @@
 			children = (
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
-				E99F9AE7242048BC00DDC08B /* Libraries */,
+				E9DD196B243E8A01004E4414 /* Components */,
 				E96B0062237A43740091FA71 /* Products */,
 				E99F9C012420497500DDC08B /* Frameworks */,
 			);
@@ -758,14 +758,6 @@
 				E9843B2B23F390F7005FBF7E /* Localization */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		E99F9AE7242048BC00DDC08B /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				E99F9BAB242048CB00DDC08B /* Components */,
-			);
-			path = Libraries;
 			sourceTree = "<group>";
 		};
 		E99F9C012420497500DDC08B /* Frameworks */ = {
