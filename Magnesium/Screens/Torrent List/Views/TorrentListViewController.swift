@@ -467,6 +467,17 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         )?.createUISwipeActionsConfiguration()
     }
 
+    override func tableView(
+        _ tableView: UITableView,
+        shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath
+    ) -> Bool {
+        true
+    }
+
+    override func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
+        viewModel.receive(.editSelected)
+    }
+
     // MARK: UISearchResultsUpdating
 
     func updateSearchResults(for searchController: UISearchController) {
