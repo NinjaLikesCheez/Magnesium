@@ -36,7 +36,7 @@ final class RefreshIntervalViewModel: ViewModel {
         })
     }
 
-    func receive(_ event: RefreshIntervalViewEvent) {
+    func send(_ event: RefreshIntervalViewEvent) {
         switch event {
         case let .optionSelected(index: index):
             let interval = options[index].0

@@ -39,7 +39,7 @@ platform :ios do
         output_directory: "fastlane/coverage_report",
         ignore: [
           "fastlane/*",
-          "Libraries/*",
+          "Components/*",
           "Magnesium/App/AppDelegate.swift",
           "Magnesium/App/SceneDelegate.swift"
           ]

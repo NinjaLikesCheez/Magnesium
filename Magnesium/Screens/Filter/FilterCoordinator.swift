@@ -8,7 +8,7 @@ enum FilterCoordinatorEvent {
 final class FilterCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()
-    let viewModelEvents: AnyPublisher<FilterViewModelEvent, Never>
+    let viewModelEventPublisher: AnyPublisher<FilterViewModelEvent, Never>
     var childCoordinators = [AnyHashable: AnyCoordinator]()
     var cancellables = Set<AnyCancellable>()
 
@@ -16,7 +16,7 @@ final class FilterCoordinator: Coordinator {
         navigationController
     }
 
-    var events: AnyPublisher<FilterCoordinatorEvent, Never> {
+    var eventPublisher: AnyPublisher<FilterCoordinatorEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -24,10 +24,10 @@ final class FilterCoordinator: Coordinator {
         let viewModel = FilterViewModel(labels: labels)
         let viewController = FilterViewController(viewModel: viewModel)
         navigationController = .init(rootViewController: viewController)
-        viewModelEvents = viewModel.events
+        viewModelEventPublisher = viewModel.eventPublisher
     }
 
-    func receive(_ event: FilterViewModelEvent) {
+    func send(_ event: FilterViewModelEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

@@ -20,7 +20,7 @@ final class AddServerViewModel: ViewModel {
     private let serverTypes: [ServerType] = [.deluge, .transmission]
     let values: AddServerViewValues
 
-    var events: AnyPublisher<AddServerViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<AddServerViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -28,7 +28,7 @@ final class AddServerViewModel: ViewModel {
         values = .init(types: serverTypes.map(\.localizedString))
     }
 
-    func receive(_ event: AddServerViewEvent) {
+    func send(_ event: AddServerViewEvent) {
         switch event {
         case let .typeSelected(index: index):
             eventSubject.send(.addServer(serverTypes[index]))

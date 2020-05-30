@@ -47,14 +47,14 @@ class ServerSettingsCoordinatorTests: TestCase {
     // MARK: handle - ServerSettingsEvent
 
     func test_serverSettings_completeEvent_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(.complete)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(.complete)
         }.value()
         XCTAssertCase(event, .complete)
     }
 
     func test_serverSettings_alertEvent_shouldPresentAlertController() {
-        coordinator.receive(.alert(Alert(title: "", style: .alert)))
+        coordinator.send(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController.presentedViewController
         XCTAssertType(viewController, UIAlertController.self)
     }

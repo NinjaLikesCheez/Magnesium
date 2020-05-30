@@ -30,20 +30,20 @@ class SettingsCoordinatorTests: TestCase {
     // MARK: - SettingsEvent
 
     func test_settingsEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(.complete)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(.complete)
         }.value()
         XCTAssertEqual(event, .complete)
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.receive(.alert(Alert(title: "", style: .alert)))
+        coordinator.send(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
         XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
-        coordinator.receive(.editServer(.mock(.transmission)))
+        coordinator.send(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -51,7 +51,7 @@ class SettingsCoordinatorTests: TestCase {
     }
 
     func test_settingsEvent_editServer_withDelugeServer_shouldPushServerSettingsViewController() {
-        coordinator.receive(.editServer(.mock(.deluge)))
+        coordinator.send(.editServer(.mock(.deluge)))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -59,7 +59,7 @@ class SettingsCoordinatorTests: TestCase {
     }
 
     func test_settingsEvent_addServer_shouldPushAddServerViewController() {
-        coordinator.receive(.addServer)
+        coordinator.send(.addServer)
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -67,7 +67,7 @@ class SettingsCoordinatorTests: TestCase {
     }
 
     func test_settingsEvent_showRefreshIntervalSettings_shouldPushRefreshIntervalViewController() {
-        coordinator.receive(.showRefreshIntervalSettings)
+        coordinator.send(.showRefreshIntervalSettings)
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController as! UINavigationController
         let viewController = navigationController.viewControllers[1]
@@ -79,7 +79,7 @@ class SettingsCoordinatorTests: TestCase {
     func test_serverSettingsCoordinatorEvent_complete_shouldPopViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.receive(.editServer(.mock(.transmission)))
+        coordinator.send(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         XCTAssertEqual(navigationController.viewControllers.count, 2)
 
@@ -96,7 +96,7 @@ class SettingsCoordinatorTests: TestCase {
     func test_addServerCoordinatorEvent_completeEvent_shouldPopRootViewController() {
         let navigationController = coordinator.presentable.viewController as! UINavigationController
 
-        coordinator.receive(.editServer(.mock(.transmission)))
+        coordinator.send(.editServer(.mock(.transmission)))
         RunLoop.main.run(until: Date())
         navigationController.pushViewController(UIViewController(), animated: false)
         XCTAssertEqual(navigationController.viewControllers.count, 3)

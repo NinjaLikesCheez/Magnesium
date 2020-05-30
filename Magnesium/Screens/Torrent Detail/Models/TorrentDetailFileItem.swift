@@ -6,10 +6,10 @@ struct TorrentDetailFileItem: Identifiable {
     var size: AnyPublisher<String, Never>
     var progress: AnyPublisher<String, Never>
 
-    init(file: CurrentValueSubject<StandardTorrentFile, Never>) {
-        id = file.value.index
-        name = file.map(\.name).ui().eraseToAnyPublisher()
-        size = file.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
-        progress = file.map { Formatters.percentage.string(for: $0.progress) ?? "" }.ui().eraseToAnyPublisher()
+    init(fileSubject: CurrentValueSubject<StandardTorrentFile, Never>) {
+        id = fileSubject.value.index
+        name = fileSubject.map(\.name).ui().eraseToAnyPublisher()
+        size = fileSubject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
+        progress = fileSubject.map { Formatters.percentage.string(for: $0.progress) ?? "" }.ui().eraseToAnyPublisher()
     }
 }

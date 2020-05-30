@@ -10,7 +10,7 @@ class RefreshIntervalViewControllerTests: TestCase {
             .init(title: "2 seconds", isSelected: Just(true).eraseToAnyPublisher()),
             .init(title: "5 seconds", isSelected: Just(false).eraseToAnyPublisher()),
         ])
-        let viewModel = StaticViewModel(values: values, type: RefreshIntervalViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: RefreshIntervalViewEvent.self)
         let viewController = RefreshIntervalViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)

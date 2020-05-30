@@ -42,14 +42,12 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         return button
     }()
 
-    private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "gear"),
-            style: .plain,
-            target: self,
-            action: #selector(settingsButtonTapped(_:))
-        )
-    }()
+    private lazy var settingsBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "gear"),
+        style: .plain,
+        target: self,
+        action: #selector(settingsButtonTapped(_:))
+    )
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -92,11 +90,11 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.settingsSelected)
+        viewModel.send(.settingsSelected)
     }
 
     @objc
     private func addSeverButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.addServerSelected)
+        viewModel.send(.addServerSelected)
     }
 }

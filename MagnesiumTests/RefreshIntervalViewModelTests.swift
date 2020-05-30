@@ -21,7 +21,7 @@ class RefreshIntervalViewModelTests: TestCase {
     func test_options_values() {
         let values = [0, 2, 5]
         for (index, value) in values.enumerated() {
-            viewModel.receive(.optionSelected(index: index))
+            viewModel.send(.optionSelected(index: index))
             XCTAssertEqual(preferences[.autoRefreshInterval], value)
         }
     }
@@ -33,14 +33,14 @@ class RefreshIntervalViewModelTests: TestCase {
 
     func test_option_whenNoLongerCurrent_shouldDeselect() {
         let isSelected = viewModel.values.options.first { $0.title == "2 seconds" }?.isSelected.wait {
-            self.viewModel.receive(.optionSelected(index: 0))
+            self.viewModel.send(.optionSelected(index: 0))
         }.values()
         XCTAssertEqual(isSelected, [true, false])
     }
 
     func test_option_whenSelected_shouldBecomeSelected() {
         let isSelected = viewModel.values.options.first?.isSelected.wait {
-            self.viewModel.receive(.optionSelected(index: 0))
+            self.viewModel.send(.optionSelected(index: 0))
         }.values()
         XCTAssertEqual(isSelected, [false, true])
     }

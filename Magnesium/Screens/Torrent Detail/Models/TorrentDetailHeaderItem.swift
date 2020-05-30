@@ -10,13 +10,13 @@ struct TorrentDetailHeaderItem: Identifiable {
     var status: AnyPublisher<String, Never>
     var label: AnyPublisher<String, Never>
 
-    init(torrent: CurrentValueSubject<StandardTorrent, Never>) {
-        id = torrent.value.hash
-        name = torrent.map(\.name).ui().eraseToAnyPublisher()
-        isActive = torrent.map(\.isActive).ui().eraseToAnyPublisher()
-        progress = torrent.map(\.progress).ui().eraseToAnyPublisher()
-        progressColor = torrent.map(\.state.displayColor).ui().eraseToAnyPublisher()
-        status = torrent
+    init(torrentSubject: CurrentValueSubject<StandardTorrent, Never>) {
+        id = torrentSubject.value.hash
+        name = torrentSubject.map(\.name).ui().eraseToAnyPublisher()
+        isActive = torrentSubject.map(\.isActive).ui().eraseToAnyPublisher()
+        progress = torrentSubject.map(\.progress).ui().eraseToAnyPublisher()
+        progressColor = torrentSubject.map(\.state.displayColor).ui().eraseToAnyPublisher()
+        status = torrentSubject
             .map {
                 L10n.torrentStatusAndProgress(
                     status: $0.state.localizedString,
@@ -25,6 +25,6 @@ struct TorrentDetailHeaderItem: Identifiable {
             }
             .ui()
             .eraseToAnyPublisher()
-        label = torrent.map(\.label).ui().eraseToAnyPublisher()
+        label = torrentSubject.map(\.label).ui().eraseToAnyPublisher()
     }
 }

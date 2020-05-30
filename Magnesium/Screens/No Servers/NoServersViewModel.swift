@@ -14,11 +14,11 @@ enum NoServersViewEvent {
 final class NoServersViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<NoServersViewModelEvent, Never>()
 
-    var events: AnyPublisher<NoServersViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<NoServersViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
-    func receive(_ event: NoServersViewEvent) {
+    func send(_ event: NoServersViewEvent) {
         switch event {
         case .settingsSelected:
             eventSubject.send(.showSettings)

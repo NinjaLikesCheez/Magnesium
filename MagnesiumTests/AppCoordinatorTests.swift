@@ -199,11 +199,11 @@ private final class MockSplitViewController: PresentableSplitViewController {
 
 private final class MockTorrentDetailViewModel: ViewModel {
     let values: TorrentDetailViewValues
-    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
+    let eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
 
     init(_ values: TorrentDetailViewValues = .mock()) {
         self.values = values
     }
 
-    func receive(_ event: TorrentDetailViewEvent) {}
+    func send(_ event: TorrentDetailViewEvent) {}
 }

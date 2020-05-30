@@ -69,7 +69,7 @@ final class FilterViewController<VM: ViewModel>: UITableViewController where VM.
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.doneSelected)
+        viewModel.send(.doneSelected)
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -81,11 +81,11 @@ final class FilterViewController<VM: ViewModel>: UITableViewController where VM.
 
         switch dataSource.itemIdentifier(for: indexPath) {
         case .sort:
-            viewModel.receive(.sortSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.send(.sortSelected(source: .view(cell, rect: cell.bounds)))
         case .state:
-            viewModel.receive(.stateSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.send(.stateSelected(source: .view(cell, rect: cell.bounds)))
         case .label:
-            viewModel.receive(.labelSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.send(.labelSelected(source: .view(cell, rect: cell.bounds)))
         case .none:
             break
         }

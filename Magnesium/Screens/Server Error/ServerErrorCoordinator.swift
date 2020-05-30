@@ -10,7 +10,7 @@ final class ServerErrorCoordinator: Coordinator {
     private let server: Server
     private let eventSubject = PassthroughSubject<ServerErrorCoordinatorEvent, Never>()
     private let viewController: ServerErrorViewController<ServerErrorViewModel>
-    let viewModelEvents: AnyPublisher<ServerErrorViewModelEvent, Never>
+    let viewModelEventPublisher: AnyPublisher<ServerErrorViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -18,7 +18,7 @@ final class ServerErrorCoordinator: Coordinator {
         viewController
     }
 
-    var events: AnyPublisher<ServerErrorCoordinatorEvent, Never> {
+    var eventPublisher: AnyPublisher<ServerErrorCoordinatorEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -26,10 +26,10 @@ final class ServerErrorCoordinator: Coordinator {
         self.server = server
         let viewModel = ServerErrorViewModel()
         viewController = .init(viewModel: viewModel)
-        viewModelEvents = viewModel.events
+        viewModelEventPublisher = viewModel.eventPublisher
     }
 
-    func receive(_ event: ServerErrorViewModelEvent) {
+    func send(_ event: ServerErrorViewModelEvent) {
         switch event {
         case .showSettings:
             eventSubject.send(.showSettings)

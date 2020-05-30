@@ -30,7 +30,7 @@ final class SettingsViewModel: ViewModel {
     private var sectionsSubject = CurrentValueSubject<[SettingsSection], Never>([])
     let values: SettingsViewValues
 
-    var events: AnyPublisher<SettingsViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<SettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -49,7 +49,7 @@ final class SettingsViewModel: ViewModel {
         updateSections()
     }
 
-    func receive(_ event: SettingsViewEvent) {
+    func send(_ event: SettingsViewEvent) {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)

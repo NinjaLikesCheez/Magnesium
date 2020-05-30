@@ -6,8 +6,8 @@ import ViewModel
 
 final class StandardTorrentListViewModel: ViewModel {
     private let implementation: StandardTorrentListImplementation
-    private let torrents: TorrentMapper
-    private let labels = CurrentValueSubject<[StandardLabel], Never>([])
+    private let torrentMapper: TorrentMapper
+    private let labelsSubject = CurrentValueSubject<[StandardLabel], Never>([])
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(true)
     private let isEditingSubject = CurrentValueSubject<Bool, Never>(false)
     private let multiSelectCountSubject = CurrentValueSubject<Int, Never>(0)
@@ -21,12 +21,12 @@ final class StandardTorrentListViewModel: ViewModel {
         _values
     }
 
-    var events: AnyPublisher<TorrentListViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<TorrentListViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init(implementation: StandardTorrentListImplementation, server: Server) {
-        torrents = TorrentMapper(query: querySubject)
+        torrentMapper = TorrentMapper(querySubject: querySubject)
         self.implementation = implementation
 
         let title = isEditingSubject
@@ -37,8 +37,8 @@ final class StandardTorrentListViewModel: ViewModel {
             .ui()
             .eraseToAnyPublisher()
 
-        let items = torrents.valuesPublisher
-            .map { $0.map { TorrentListItem(torrent: $0) } }
+        let items = torrentMapper.valuesPublisher
+            .map { $0.map { TorrentListItem(torrentSubject: $0) } }
             .ui()
             .eraseToAnyPublisher()
 
@@ -47,13 +47,13 @@ final class StandardTorrentListViewModel: ViewModel {
             .ui()
             .eraseToAnyPublisher()
 
-        let totalDownloadSpeed = torrents.allValuesPublisher
+        let totalDownloadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
             .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
             .eraseToAnyPublisher()
 
-        let totalUploadSpeed = torrents.allValuesPublisher
+        let totalUploadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
@@ -72,10 +72,18 @@ final class StandardTorrentListViewModel: ViewModel {
             hasActiveFilters: hasActiveFilters,
             editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher(),
             status: status,
-            detailViewModel: detailViewModelForItem(at:),
-            contextMenu: contextMenuForItem(at:),
-            leadingSwipeActionsConfiguration: leadingSwipeActionsConfigurationForItem(at:source:),
-            trailingSwipeActionsConfiguration: trailingSwipeActionsConfigurationForItem(at:source:)
+            detailViewModel: { [weak self] in
+                self?.detailViewModelForItem(at: $0)
+            },
+            contextMenu: { [weak self] in
+                self?.contextMenuForItem(at: $0)
+            },
+            leadingSwipeActionsConfiguration: { [weak self] in
+                self?.leadingSwipeActionsConfigurationForItem(at: $0, source: $1)
+            },
+            trailingSwipeActionsConfiguration: { [weak self] in
+                self?.trailingSwipeActionsConfigurationForItem(at: $0, source: $1)
+            }
         )
 
         refresh()
@@ -90,12 +98,12 @@ final class StandardTorrentListViewModel: ViewModel {
 
         implementation.updated
             .sink { [weak self] update in
-                self?.labels.send(update.1)
-                self?.torrents.update(with: update.0)
+                self?.labelsSubject.send(update.1)
+                self?.torrentMapper.update(with: update.0)
             }
             .store(in: &cancellables)
 
-        torrents.valuesPublisher
+        torrentMapper.valuesPublisher
             .ui()
             .sink { [weak self] torrents in
                 self?.eventSubject.send(.torrentsUpdated(hashes: torrents.map(\.value.hash)))
@@ -110,7 +118,7 @@ final class StandardTorrentListViewModel: ViewModel {
     // MARK: View Events
 
     // swiftlint:disable:next cyclomatic_complexity
-    func receive(_ event: TorrentListViewEvent) {
+    func send(_ event: TorrentListViewEvent) {
         switch event {
         case .refresh:
             refresh()
@@ -125,13 +133,13 @@ final class StandardTorrentListViewModel: ViewModel {
             eventSubject.send(.add(source: source, linkSubject: linkSubject))
 
         case let .filterSelected(source):
-            let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
-            labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
+            let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labelsSubject.value)
+            labelsSubject.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
             eventSubject.send(.filter(source: source, labels: mappedLabels.eraseToAnyPublisher()))
 
         case let .itemSelected(index):
-            let torrent = torrents.values[index]
-            let viewModel = implementation.detailViewModel(torrent, labels)
+            let torrent = torrentMapper.values[index]
+            let viewModel = implementation.detailViewModel(torrent, labelsSubject)
             eventSubject.send(.detail(viewModel: viewModel))
 
         case .settingsSelected:
@@ -141,16 +149,16 @@ final class StandardTorrentListViewModel: ViewModel {
             querySubject.send(query)
 
         case let .resumeSelected(indices):
-            resume(indices.map { torrents.values[$0].value })
+            resume(indices.map { torrentMapper.values[$0].value })
 
         case let .pauseSelected(indices):
-            pause(indices.map { torrents.values[$0].value })
+            pause(indices.map { torrentMapper.values[$0].value })
 
         case let .removeSelected(indices, source):
-            presentRemoveOptions(for: indices.map { torrents.values[$0].value }, from: source)
+            presentRemoveOptions(for: indices.map { torrentMapper.values[$0].value }, from: source)
 
         case let .moreOptionsSelected(indices, source):
-            presentActivities(for: indices.map { torrents.values[$0].value }, source: source)
+            presentActivities(for: indices.map { torrentMapper.values[$0].value }, source: source)
 
         case let .multiSelectUpdated(indices):
             multiSelectCountSubject.send(indices.count)
@@ -254,40 +262,42 @@ final class StandardTorrentListViewModel: ViewModel {
 
     private func presentRemoveOptions(for torrents: [StandardTorrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        let alert = Alert(title: L10n.remove, message: message, style: .actionSheet(source)) {
-            AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
-                self.remove(torrents, removeData: false)
-            }
-
-            AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
-                self.remove(torrents, removeData: true)
-            }
-
-            AlertAction.cancel
-        }
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(
+            title: L10n.remove,
+            message: message,
+            style: .actionSheet(source),
+            actions: [
+                .init(title: L10n.removeTorrentOptionKeepData, style: .default) {
+                    self.remove(torrents, removeData: false)
+                },
+                .init(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+                    self.remove(torrents, removeData: true)
+                },
+                .cancel,
+            ]
+        )))
     }
 
     private func presentLabelSelection(for torrents: [StandardTorrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
-        let labelActions = labels.value.map { label in
+        let labelActions = labelsSubject.value.map { label in
             AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(for: torrents, label: label)
             }
         }
-        let alert = Alert(
+
+        eventSubject.send(.alert(.init(
             title: L10n.setLabel,
             message: message,
             style: .actionSheet(source),
             actions: labelActions + [.cancel]
-        )
-        eventSubject.send(.alert(alert))
+        )))
     }
 
     private func presentActivities(for torrents: [StandardTorrent], source: PopoverSource) {
         var activities = [Activity]()
 
-        if !labels.value.isEmpty {
+        if !labelsSubject.value.isEmpty {
             activities.append(.setLabel {
                 self.presentLabelSelection(for: torrents, from: source)
             })
@@ -316,18 +326,17 @@ final class StandardTorrentListViewModel: ViewModel {
     }
 
     private func showError(title: String, message: String?) {
-        let alert = Alert(title: title, message: message, style: .alert, action: .ok)
-        eventSubject.send(.alert(alert))
+        eventSubject.send(.alert(.init(title: title, message: message, style: .alert, action: .ok)))
     }
 
     // MARK: View Functions
 
     private func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        implementation.detailViewModel(torrents.values[index], labels)
+        implementation.detailViewModel(torrentMapper.values[index], labelsSubject)
     }
 
     private func contextMenuForItem(at index: Int) -> Menu? {
-        let torrent = torrents.values[index].value
+        let torrent = torrentMapper.values[index].value
         var items = [MenuItem]()
 
         if torrent.isActive {
@@ -340,8 +349,8 @@ final class StandardTorrentListViewModel: ViewModel {
             }))
         }
 
-        if !labels.value.isEmpty {
-            let children: [MenuItem] = labels.value.map { label in
+        if !labelsSubject.value.isEmpty {
+            let children: [MenuItem] = labelsSubject.value.map { label in
                 .action(.init(title: label.displayName) { [weak self] in
                     self?.setLabel(for: [torrent], label: label)
                 })
@@ -407,7 +416,7 @@ final class StandardTorrentListViewModel: ViewModel {
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrents.values[index].value
+        let torrent = torrentMapper.values[index].value
         if torrent.isActive {
             return SwipeActionsConfiguration(actions: [
                 SwipeAction(
@@ -437,7 +446,7 @@ final class StandardTorrentListViewModel: ViewModel {
         at index: Int,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrents.values[index].value
+        let torrent = torrentMapper.values[index].value
         return SwipeActionsConfiguration(actions: [
             SwipeAction(
                 image: UIImage(systemName: "trash.fill"),
@@ -489,8 +498,8 @@ final class StandardTorrentListViewModel: ViewModel {
         isLoadingSubject.send(true)
         return implementation.refresh()
             .handleEvents(receiveOutput: { [weak self] update in
-                self?.labels.send(update.1)
-                self?.torrents.update(with: update.0)
+                self?.labelsSubject.send(update.1)
+                self?.torrentMapper.update(with: update.0)
                 self?.isLoadingSubject.send(false)
             }, receiveCompletion: { [weak self] _ in
                 self?.isLoadingSubject.send(false)

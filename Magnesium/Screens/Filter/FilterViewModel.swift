@@ -26,7 +26,7 @@ final class FilterViewModel: ViewModel {
     private var cancellables = Set<AnyCancellable>()
     let values: FilterViewValues
 
-    var events: AnyPublisher<FilterViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<FilterViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -49,7 +49,7 @@ final class FilterViewModel: ViewModel {
         updateSections()
     }
 
-    func receive(_ event: FilterViewEvent) {
+    func send(_ event: FilterViewEvent) {
         switch event {
         case .doneSelected:
             eventSubject.send(.complete)

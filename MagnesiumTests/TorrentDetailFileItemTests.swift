@@ -3,24 +3,24 @@ import Combine
 import XCTest
 
 class TorrentDetailFileItemTests: TestCase {
-    private var file: CurrentValueSubject<StandardTorrentFile, Never>!
+    private var fileSubject: CurrentValueSubject<StandardTorrentFile, Never>!
     private var item: TorrentDetailFileItem!
 
     override func setUp() {
         super.setUp()
-        file = CurrentValueSubject(.mock(
+        fileSubject = CurrentValueSubject(.mock(
             index: 0,
             name: "file.rar",
             progress: 0.189_838
         ))
-        item = TorrentDetailFileItem(file: file)
+        item = TorrentDetailFileItem(fileSubject: fileSubject)
     }
 
     func test_id_shouldBeEqualToIndex() {
-        var file = self.file.value
-        XCTAssertEqual(TorrentDetailFileItem(file: CurrentValueSubject(file)).id, item.id)
+        var file = fileSubject.value
+        XCTAssertEqual(TorrentDetailFileItem(fileSubject: CurrentValueSubject(file)).id, item.id)
         file.index = 1
-        XCTAssertNotEqual(TorrentDetailFileItem(file: CurrentValueSubject(file)).id, item.id)
+        XCTAssertNotEqual(TorrentDetailFileItem(fileSubject: CurrentValueSubject(file)).id, item.id)
     }
 
     func test_name() {

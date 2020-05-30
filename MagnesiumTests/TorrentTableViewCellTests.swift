@@ -33,7 +33,7 @@ private extension TorrentTableViewCell {
     static func mock(torrent: StandardTorrent) -> TorrentTableViewCell {
         let cell = TorrentTableViewCell()
         cell.backgroundColor = .systemBackground
-        cell.configure(with: .init(torrent: .init(torrent)))
+        cell.configure(with: .init(torrentSubject: .init(torrent)))
         return cell
     }
 }

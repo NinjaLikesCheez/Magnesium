@@ -43,14 +43,12 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController 
         return button
     }()
 
-    private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "gear"),
-            style: .plain,
-            target: self,
-            action: #selector(settingsButtonTapped(_:))
-        )
-    }()
+    private lazy var settingsBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "gear"),
+        style: .plain,
+        target: self,
+        action: #selector(settingsButtonTapped(_:))
+    )
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -93,11 +91,11 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController 
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.settingsSelected)
+        viewModel.send(.settingsSelected)
     }
 
     @objc
     private func editServerButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.editServerSelected)
+        viewModel.send(.editServerSelected)
     }
 }

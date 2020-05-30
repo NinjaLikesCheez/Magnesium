@@ -20,83 +20,68 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
     weak var delegate: TorrentListViewDelegate?
-    private lazy var statusView = StatusView()
 
-    private lazy var settingsBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "gear"),
-            style: .plain,
-            target: self,
-            action: #selector(settingsButtonTapped(_:))
-        )
-    }()
+    private lazy var settingsBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "gear"),
+        style: .plain,
+        target: self,
+        action: #selector(settingsButtonTapped(_:))
+    )
 
-    private lazy var selectBarButtonItem: UIBarButtonItem = {
-        .init(
-            title: "Select",
-            style: .plain,
-            target: self,
-            action: #selector(selectButtonTapped(_:))
-        )
-    }()
+    private lazy var selectBarButtonItem = UIBarButtonItem(
+        title: "Select",
+        style: .plain,
+        target: self,
+        action: #selector(selectButtonTapped(_:))
+    )
 
-    private lazy var doneBarButtonItem: UIBarButtonItem = {
-        .init(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped(_:)))
-    }()
+    private lazy var doneBarButtonItem = UIBarButtonItem(
+        barButtonSystemItem: .done,
+        target: self,
+        action: #selector(doneButtonTapped(_:))
+    )
 
-    private lazy var addBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "plus"),
-            style: .plain,
-            target: self,
-            action: #selector(addButtonTapped(_:))
-        )
-    }()
+    private lazy var addBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "plus"),
+        style: .plain,
+        target: self,
+        action: #selector(addButtonTapped(_:))
+    )
 
-    private lazy var filterBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: nil,
-            style: .plain,
-            target: self,
-            action: #selector(filterButtonTapped(_:))
-        )
-    }()
+    private lazy var filterBarButtonItem = UIBarButtonItem(
+        image: nil,
+        style: .plain,
+        target: self,
+        action: #selector(filterButtonTapped(_:))
+    )
 
-    private lazy var resumeBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "play.circle"),
-            style: .plain,
-            target: self,
-            action: #selector(resumeButtonTapped(_:))
-        )
-    }()
+    private lazy var resumeBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "play.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(resumeButtonTapped(_:))
+    )
 
-    private lazy var pauseBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "pause.circle"),
-            style: .plain,
-            target: self,
-            action: #selector(pauseButtonTapped(_:))
-        )
-    }()
+    private lazy var pauseBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "pause.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(pauseButtonTapped(_:))
+    )
 
-    private lazy var removeBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "trash.circle"),
-            style: .plain,
-            target: self,
-            action: #selector(removeButtonTapped(_:))
-        )
-    }()
+    private lazy var removeBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "trash.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(removeButtonTapped(_:))
+    )
 
-    private lazy var moreBarButtonItem: UIBarButtonItem = {
-        .init(
-            image: UIImage(systemName: "ellipsis.circle"),
-            style: .plain,
-            target: self,
-            action: #selector(moreButtonTapped(_:))
-        )
-    }()
+    private lazy var moreBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "ellipsis.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(moreButtonTapped(_:))
+    )
 
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController()
@@ -121,6 +106,12 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         label.text = "No Torrents"
         label.textColor = .placeholderText
         return label
+    }()
+
+    private lazy var statusView: ToolbarInfoView = {
+        let view = ToolbarInfoView()
+        view.configure(content: viewModel.values.status)
+        return view
     }()
 
     // MARK: Initialization
@@ -153,8 +144,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
-
-        statusView.configure(status: viewModel.values.status)
 
         if viewModel.values.showFilterButton {
             viewModel.values.hasActiveFilters
@@ -276,7 +265,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             tableView.beginUpdates()
             tableView.endUpdates()
         }
-        viewModel.receive(.multiSelectUpdated(indices: []))
+        viewModel.send(.multiSelectUpdated(indices: []))
         configureNormalBarButtonItems()
         configureNormalToolbarItems()
     }
@@ -335,72 +324,72 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     @objc
     private func settingsButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.settingsSelected)
+        viewModel.send(.settingsSelected)
     }
 
     @objc
     private func filterButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.filterSelected(source: .barButton(sender)))
+        viewModel.send(.filterSelected(source: .barButton(sender)))
     }
 
     @objc
     private func addButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.addSelected(source: .barButton(sender)))
+        viewModel.send(.addSelected(source: .barButton(sender)))
     }
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        viewModel.receive(.refresh)
+        viewModel.send(.refresh)
     }
 
     @objc
     private func selectButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.editSelected)
+        viewModel.send(.editSelected)
     }
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.doneEditingSelected)
+        viewModel.send(.doneEditingSelected)
     }
 
     @objc
     private func resumeButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.receive(.resumeSelected(indices: indices))
+        viewModel.send(.resumeSelected(indices: indices))
     }
 
     @objc
     private func pauseButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.receive(.pauseSelected(indices: indices))
+        viewModel.send(.pauseSelected(indices: indices))
     }
 
     @objc
     private func removeButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.receive(.removeSelected(indices: indices, source: .barButton(sender)))
+        viewModel.send(.removeSelected(indices: indices, source: .barButton(sender)))
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
         guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
-        viewModel.receive(.moreOptionsSelected(indices: indices, source: .barButton(sender)))
+        viewModel.send(.moreOptionsSelected(indices: indices, source: .barButton(sender)))
     }
 
     // MARK: UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard !isEditing else {
-            viewModel.receive(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
+            viewModel.send(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
             return
         }
 
-        viewModel.receive(.itemSelected(index: indexPath.row))
+        viewModel.send(.itemSelected(index: indexPath.row))
     }
 
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if isEditing {
-            viewModel.receive(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
+            viewModel.send(.multiSelectUpdated(indices: tableView.indexPathsForSelectedRows?.map(\.row) ?? []))
         }
     }
 
@@ -475,13 +464,13 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }
 
     override func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
-        viewModel.receive(.editSelected)
+        viewModel.send(.editSelected)
     }
 
     // MARK: UISearchResultsUpdating
 
     func updateSearchResults(for searchController: UISearchController) {
-        viewModel.receive(.search(query: searchController.searchBar.text))
+        viewModel.send(.search(query: searchController.searchBar.text))
     }
 }
 

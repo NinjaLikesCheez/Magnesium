@@ -67,6 +67,14 @@ enum L10n {
         NSLocalizedString("action_add_torrent", comment: "Add Torrent")
     }
 
+    static var edit: String {
+        NSLocalizedString("action_edit", comment: "Edit")
+    }
+
+    static var setPriority: String {
+        NSLocalizedString("action_set_priority", comment: "Set Priority")
+    }
+
     // MARK: Screens
 
     static var torrentInfoScreenTitle: String {
@@ -393,6 +401,11 @@ enum L10n {
 
     static var torrentInfoDownloadFolder: String {
         NSLocalizedString("torrent_info_download_folder", comment: "Download Folder")
+    }
+
+    static func fileCount(_ count: Int) -> String {
+        let format = NSLocalizedString("file_count", comment: "{number} Files")
+        return .localizedStringWithFormat(format, count)
     }
 
     // MARK: Priority

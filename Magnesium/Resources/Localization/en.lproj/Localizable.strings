@@ -1,4 +1,3 @@
-
 /* Add */
 "action_add" = "Add";
 
@@ -16,6 +15,9 @@
 
 /* Delete Server */
 "action_delete_server" = "Delete Server";
+
+/* Edit */
+"action_edit" = "Edit";
 
 /* Edit Server */
 "action_edit_server" = "Edit Server";
@@ -40,6 +42,9 @@
 
 /* Set Label */
 "action_set_label" = "Set Label";
+
+/* Set Priority */
+"action_set_priority" = "Set Priority";
 
 /* Update Trackers */
 "action_update_trackers" = "Update Trackers";
@@ -364,3 +369,4 @@
 
 /* ↑ {bytes}/s */
 "torrent_upload_speed" = "↑ %@/s";
+

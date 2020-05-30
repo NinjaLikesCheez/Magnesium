@@ -4,8 +4,8 @@ import UIKit
 
 class MockCoordinator<T: Presentable & UIViewController>: Coordinator {
     let viewController: T
-    let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    let viewModelEvents: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let eventPublisher: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let viewModelEventPublisher: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
     var presentable: Presentable { viewController }

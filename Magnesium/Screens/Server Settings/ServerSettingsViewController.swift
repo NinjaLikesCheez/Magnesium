@@ -13,14 +13,12 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var saveBarButtonItem: UIBarButtonItem = {
-        .init(
-            title: viewModel.values.saveButtonTitle,
-            style: .done,
-            target: self,
-            action: #selector(performSave)
-        )
-    }()
+    private lazy var saveBarButtonItem = UIBarButtonItem(
+        title: viewModel.values.saveButtonTitle,
+        style: .done,
+        target: self,
+        action: #selector(performSave)
+    )
 
     private lazy var loadingBarButtonItem: UIBarButtonItem = {
         let activityView = UIActivityIndicatorView()
@@ -71,12 +69,12 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
     @objc
     private func cancelButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.cancelSelected)
+        viewModel.send(.cancelSelected)
     }
 
     @objc
     private func performSave() {
-        viewModel.receive(.saveSelected)
+        viewModel.send(.saveSelected)
     }
 
     private func isLoadingChanged(_ isLoading: Bool) {
@@ -145,7 +143,7 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
 
         if indexPath.section == Section.delete.rawValue {
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.receive(.deleteSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.send(.deleteSelected(source: .view(cell, rect: cell.bounds)))
         }
     }
 }

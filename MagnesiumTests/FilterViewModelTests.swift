@@ -5,22 +5,22 @@ import Preferences
 import XCTest
 
 class FilterViewModelTests: TestCase {
-    private var labels: CurrentValueSubject<[StandardLabel], Never>!
+    private var labelsSubject: CurrentValueSubject<[StandardLabel], Never>!
     private var viewModel: FilterViewModel!
     private var cancellables: Set<AnyCancellable>!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        labels = CurrentValueSubject([.mock(), .mock(name: "test")])
+        labelsSubject = CurrentValueSubject([.mock(), .mock(name: "test")])
         cancellables = Set()
-        let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labels.value)
-        labels.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
+        let mappedLabels = CurrentValueSubject<[StandardLabel], Never>(labelsSubject.value)
+        labelsSubject.sink { [weak mappedLabels] in mappedLabels?.send($0) }.store(in: &cancellables)
         viewModel = FilterViewModel(labels: mappedLabels.eraseToAnyPublisher())
     }
 
     func test_sections_withoutLabels_shouldEmitExpectedValues() throws {
-        labels.send([])
+        labelsSubject.send([])
         let sections = try viewModel.values.sections.first().wait().value()
         let expected = [
             FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
@@ -54,38 +54,38 @@ class FilterViewModelTests: TestCase {
 
     func test_sections_whenLabelsUpdated_shouldEmit() {
         let sections = viewModel.values.sections.dropFirst().first().wait {
-            self.labels.send(self.labels.value + [.mock(name: "new")])
+            self.labelsSubject.send(self.labelsSubject.value + [.mock(name: "new")])
         }
         XCTAssertTrue(sections.hasValue())
     }
 
     func test_sections_withSameLabelsPublished_shouldNotEmit() {
-        labels.send(labels.value)
+        labelsSubject.send(labelsSubject.value)
         let sections = viewModel.values.sections.dropFirst().first().wait {
-            self.labels.send(self.labels.value)
+            self.labelsSubject.send(self.labelsSubject.value)
         }
         XCTAssertFalse(sections.hasValue())
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.doneSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.doneSelected)
         }.value()
         XCTAssertCase(event, .complete)
     }
 
     func test_sortSelected_shouldEmitAlert() throws {
         let expected = ["Date Added", "Name", "Download Speed", "Upload Speed", "Cancel"]
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), expected)
     }
 
     func test_sortSelected__whenExistingOptionSelected_shouldInvert() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         let previousOption = preferences[.sortOption]
@@ -95,8 +95,8 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_sortSelected_withNewOption_shouldSetNewOption() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.sortSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Name" }?.handler?()
@@ -105,8 +105,8 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_stateSelected_shouldEmitAlert() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.stateSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         let expected = ["All", "Downloading", "Seeding", "Paused", "Checking", "Queued", "Error", "Cancel"]
@@ -114,8 +114,8 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_stateSelected_withNewOption_shouldSetNewOption() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.stateSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Downloading" }?.handler?()
@@ -124,16 +124,16 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_labelSelected_shouldEmitAlert() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), ["All", "None", "test", "Cancel"])
     }
 
     func test_labelSelected_whenAllSelected_shouldRemoveLabelFilter() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "All" }?.handler?()
@@ -142,8 +142,8 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_labelSelected_whenNoneSelected_shouldSetEmptyLabel() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "None" }?.handler?()
@@ -152,8 +152,8 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_labelSelected_withNewOption_shouldSetNewOption() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.labelSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "test" }?.handler?()

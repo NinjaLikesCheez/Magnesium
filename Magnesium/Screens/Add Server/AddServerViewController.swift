@@ -36,7 +36,7 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
 
     @objc
     private func cancelButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.cancelSelected)
+        viewModel.send(.cancelSelected)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -51,6 +51,6 @@ final class AddServerViewController<VM: ViewModel>: PresentableTableViewControll
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.receive(.typeSelected(index: indexPath.row))
+        viewModel.send(.typeSelected(index: indexPath.row))
     }
 }

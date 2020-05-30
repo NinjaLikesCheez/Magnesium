@@ -3,3 +3,4 @@ fastlane/
 .bundle/
 vendor/
 tools/.bin/
+tools/.mint/

@@ -17,7 +17,7 @@ final class TorrentListCoordinator: NSObject, Coordinator {
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
     private var previewCoordinatorMap = [Int: TorrentDetailCoordinator]()
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: viewController, session: session)
-    let viewModelEvents: AnyPublisher<TorrentListViewModelEvent, Never>
+    let viewModelEventPublisher: AnyPublisher<TorrentListViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -25,7 +25,7 @@ final class TorrentListCoordinator: NSObject, Coordinator {
         viewController
     }
 
-    var events: AnyPublisher<TorrentListCoordinatorEvent, Never> {
+    var eventPublisher: AnyPublisher<TorrentListCoordinatorEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -38,12 +38,12 @@ final class TorrentListCoordinator: NSObject, Coordinator {
         self.viewModel = viewModel
         self.session = session
         viewController = .init(viewModel: viewModel)
-        viewModelEvents = viewModel.events
+        viewModelEventPublisher = viewModel.eventPublisher
         super.init()
         viewController.delegate = self
     }
 
-    func receive(_ event: TorrentListViewModelEvent) {
+    func send(_ event: TorrentListViewModelEvent) {
         switch event {
         case let .alert(alert):
             showAlert(alert)
@@ -74,17 +74,20 @@ final class TorrentListCoordinator: NSObject, Coordinator {
     }
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
-        let alert = Alert(title: L10n.addTorrent, message: L10n.addTorrentMethodPrompt, style: .actionSheet(source)) {
-            AlertAction(title: L10n.addTorrentMethodLink, style: .default) {
-                self.showAddLink(subject: linkSubject)
-            }
-
-            AlertAction(title: L10n.addTorrentMethodFile, style: .default) {
-                self.showAddFile()
-            }
-
-            AlertAction.cancel
-        }
+        let alert = Alert(
+            title: L10n.addTorrent,
+            message: L10n.addTorrentMethodPrompt,
+            style: .actionSheet(source),
+            actions: [
+                .init(title: L10n.addTorrentMethodLink, style: .default) {
+                    self.showAddLink(subject: linkSubject)
+                },
+                .init(title: L10n.addTorrentMethodFile, style: .default) {
+                    self.showAddFile()
+                },
+                .cancel,
+            ]
+        )
         showAlert(alert)
     }
 

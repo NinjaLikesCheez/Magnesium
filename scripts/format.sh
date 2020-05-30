@@ -1,1 +1,1 @@
-tools/swiftformat Magnesium MagnesiumTests
+tools/mint run swiftformat Magnesium MagnesiumTests

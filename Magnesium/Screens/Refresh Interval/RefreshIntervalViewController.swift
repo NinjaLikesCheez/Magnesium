@@ -42,6 +42,6 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        viewModel.receive(.optionSelected(index: indexPath.row))
+        viewModel.send(.optionSelected(index: indexPath.row))
     }
 }

@@ -13,15 +13,15 @@ class NoServersViewModelTests: TestCase {
     // MARK: NoServersViewEvent
 
     func test_noServersViewEvent_settingsSelected_shouldEmitShowSettings() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.settingsSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.settingsSelected)
         }.value()
         XCTAssertCase(event, .showSettings)
     }
 
     func test_noServersViewEvent_addServerSelected_showEmitAddServer() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.addServerSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.addServerSelected)
         }.value()
         XCTAssertCase(event, .addServer)
     }

@@ -7,11 +7,13 @@ import ViewModel
 
 final class StandardTorrentDetailViewModel: ViewModel {
     private let implementation: StandardTorrentDetailImplementation
-    private let torrent: CurrentValueSubject<StandardTorrent, Never>
-    private let labels: CurrentValueSubject<[StandardLabel], Never>
-    private let sections = CurrentValueSubject<[TorrentDetailSection], Never>([])
-    private let files: ValueMapper<Int, StandardTorrentFile>
+    private let torrentSubject: CurrentValueSubject<StandardTorrent, Never>
+    private let labelsSubject: CurrentValueSubject<[StandardLabel], Never>
+    private let sectionsSubject = CurrentValueSubject<[TorrentDetailSection], Never>([])
+    private let fileMapper: ValueMapper<Int, StandardTorrentFile>
     private let isRefreshingSubject = CurrentValueSubject<Bool, Never>(false)
+    private let editSectionSubject = CurrentValueSubject<TorrentDetailSectionType?, Never>(nil)
+    private let multiSelectCountSubject = CurrentValueSubject<Int, Never>(0)
     private let eventSubject = PassthroughSubject<TorrentDetailViewModelEvent, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var autoRefreshTimer: Timer?
@@ -22,20 +24,20 @@ final class StandardTorrentDetailViewModel: ViewModel {
         _values
     }
 
-    var events: AnyPublisher<TorrentDetailViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init(
         implementation: StandardTorrentDetailImplementation,
-        torrent: CurrentValueSubject<StandardTorrent, Never>,
-        labels: CurrentValueSubject<[StandardLabel], Never>
+        torrentSubject: CurrentValueSubject<StandardTorrent, Never>,
+        labelsSubject: CurrentValueSubject<[StandardLabel], Never>
     ) {
         self.implementation = implementation
-        self.torrent = torrent
-        self.labels = labels
+        self.torrentSubject = torrentSubject
+        self.labelsSubject = labelsSubject
 
-        files = ValueMapper(filter: Just {
+        fileMapper = ValueMapper(filter: Just {
             $0.sorted {
                 let result = $0.value.name.compare(
                     $1.value.name,
@@ -52,25 +54,42 @@ final class StandardTorrentDetailViewModel: ViewModel {
             }
         }.eraseToAnyPublisher())
 
-        let sections = files.valuesPublisher
+        let sections = fileMapper.valuesPublisher
             .map { files in
                 Self.createSections(
-                    subject: torrent,
+                    torrentSubject: torrentSubject,
                     files: files
                 )
             }
             .handleEvents(receiveOutput: { [weak self] in
-                self?.sections.send($0)
+                self?.sectionsSubject.send($0)
             })
             .removeDuplicates()
             .ui()
             .eraseToAnyPublisher()
 
+        let toolbarInfo = editSectionSubject
+            .combineLatest(multiSelectCountSubject)
+            .map { editSection, count -> String in
+                switch editSection {
+                case .files:
+                    return L10n.selectedCount(count)
+                default:
+                    return ""
+                }
+            }
+            .ui()
+            .eraseToAnyPublisher()
+
         _values = .init(
-            hash: torrent.value.hash,
+            hash: torrentSubject.value.hash,
             sections: sections,
             isRefreshing: isRefreshingSubject.ui().eraseToAnyPublisher(),
-            contextMenu: contextMenuForItem(at:)
+            toolbarInfo: toolbarInfo,
+            editSection: editSectionSubject.ui().eraseToAnyPublisher(),
+            contextMenu: { [weak self] in
+                self?.contextMenuForItem(at: $0)
+            }
         )
 
         refreshFiles()
@@ -79,69 +98,76 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private static func createSections(
-        subject: CurrentValueSubject<StandardTorrent, Never>,
+        torrentSubject: CurrentValueSubject<StandardTorrent, Never>,
         files: [CurrentValueSubject<StandardTorrentFile, Never>]
     ) -> [TorrentDetailSection] {
-        let torrent = subject.value
+        let torrent = torrentSubject.value
 
         var sections = [TorrentDetailSection]()
         sections.append(.init(type: .header, items: [
-            .header(.init(torrent: subject)),
+            .header(.init(torrentSubject: torrentSubject)),
         ]))
         sections.append(.init(type: .info, items: [
             .info(.init(
                 name: L10n.torrentInfoSize,
-                value: subject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
+                value: torrentSubject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoDownloadSpeed,
-                value: subject
+                value: torrentSubject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoUploadSpeed,
-                value: subject
+                value: torrentSubject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoDownloaded,
-                value: subject.map { Formatters.bytes.string(fromByteCount: $0.downloaded) }.ui().eraseToAnyPublisher()
+                value: torrentSubject
+                    .map { Formatters.bytes.string(fromByteCount: $0.downloaded) }
+                    .ui()
+                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoUploaded,
-                value: subject.map { Formatters.bytes.string(fromByteCount: $0.uploaded) }.ui().eraseToAnyPublisher()
+                value: torrentSubject
+                    .map { Formatters.bytes.string(fromByteCount: $0.uploaded) }
+                    .ui()
+                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoETA,
-                value: subject.map(\.formattedETA).ui().eraseToAnyPublisher()
+                value: torrentSubject.map(\.formattedETA).ui().eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoRatio,
-                value: subject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
+                value: torrentSubject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoPeers,
-                value: subject
+                value: torrentSubject
                     .map { L10n.torrentPeers(peers: $0.peers, totalPeers: $0.totalPeers) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoSeed,
-                value: subject.map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
+                value: torrentSubject
+                    .map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.torrentInfoDownloadFolder,
-                value: subject.map { ($0.downloadPath as NSString).lastPathComponent }
+                value: torrentSubject.map { ($0.downloadPath as NSString).lastPathComponent }
                     .ui()
                     .eraseToAnyPublisher(),
-                expandedValue: subject.map(\.downloadPath).ui().eraseToAnyPublisher()
+                expandedValue: torrentSubject.map(\.downloadPath).ui().eraseToAnyPublisher()
             )),
         ]))
 
@@ -151,7 +177,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
         if !files.isEmpty {
             sections.append(.init(type: .files, items: files.map {
-                .file(.init(file: $0))
+                .file(.init(fileSubject: $0))
             }))
         }
 
@@ -164,26 +190,35 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
     // MARK: View Events
 
-    func receive(_ event: TorrentDetailViewEvent) {
+    // swiftlint:disable:next cyclomatic_complexity
+    func send(_ event: TorrentDetailViewEvent) {
         switch event {
-        case .appear:
-            handleAppear()
-        case .disappear:
-            handleDisappear()
+        case .appeared:
+            handleAppeared()
+        case .disappeared:
+            handleDisappeared()
         case .refresh:
             handleRefresh()
-        case let .moreOptions(source):
-            handleMoreOptions(from: source)
-        case .pause:
+        case let .moreOptionsSelected(source):
+            presentActivities(from: source)
+        case .pauseSelected:
             pause()
-        case .resume:
+        case .resumeSelected:
             resume()
-        case let .remove(source):
+        case let .removeSelected(source):
             presentRemoveOptions(from: source)
+        case let .editSectionSelected(section):
+            editSectionSubject.send(section)
+        case .doneEditingSelected:
+            editSectionSubject.send(nil)
+        case let .multiSelectUpdated(indices):
+            multiSelectCountSubject.send(indices.count)
+        case let .setFilePrioritySelected(indexPaths, source):
+            presentFilePrioritySelection(for: indexPaths, from: source)
         }
     }
 
-    private func handleAppear() {
+    private func handleAppeared() {
         if let timer = autoRefreshTimer, timer.isValid {
             return
         }
@@ -194,7 +229,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             })
     }
 
-    private func handleDisappear() {
+    private func handleDisappeared() {
         autoRefreshTimer?.invalidate()
         timerIntervalObserver?.cancel()
     }
@@ -214,11 +249,11 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .store(in: &cancellables)
     }
 
-    private func handleMoreOptions(from source: PopoverSource) {
-        let torrent = self.torrent.value
+    private func presentActivities(from source: PopoverSource) {
+        let torrent = torrentSubject.value
         var activities = [Activity]()
 
-        if !labels.value.isEmpty {
+        if !labelsSubject.value.isEmpty {
             activities.append(.setLabel {
                 self.presentLabelSelection(from: source)
             })
@@ -246,7 +281,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func pause() {
-        implementation.pause(torrent.value)
+        implementation.pause(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -257,7 +292,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func resume() {
-        implementation.resume(torrent.value)
+        implementation.resume(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -268,7 +303,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func remove(removeData: Bool) {
-        implementation.remove(torrent.value, removeData)
+        implementation.remove(torrentSubject.value, removeData)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -283,7 +318,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func verify() {
-        implementation.verify(torrent.value)
+        implementation.verify(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -294,7 +329,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func setLabel(_ label: StandardLabel) {
-        implementation.setLabel(label, torrent.value)
+        implementation.setLabel(label, torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -305,7 +340,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func updateTrackers() {
-        implementation.updateTrackers(torrent.value)
+        implementation.updateTrackers(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -316,7 +351,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func moveDownloadFolder(to path: String) {
-        implementation.moveDownloadFolder(path, torrent.value)
+        implementation.moveDownloadFolder(path, torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
             .ui()
             .sink(receiveCompletion: { [weak self] completion in
@@ -327,27 +362,60 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
-        let alert = Alert(style: .actionSheet(source)) { () -> [AlertAction] in
-            AlertAction(title: L10n.removeTorrentOptionKeepData, style: .default) {
+        eventSubject.send(.alert(.init(style: .actionSheet(source), actions: [
+            .init(title: L10n.removeTorrentOptionKeepData, style: .default) {
                 self.remove(removeData: false)
-            }
-
-            AlertAction(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+            },
+            .init(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
                 self.remove(removeData: true)
-            }
-
-            AlertAction.cancel
-        }
-        eventSubject.send(.alert(alert))
+            },
+            .cancel,
+        ])))
     }
 
     private func presentLabelSelection(from source: PopoverSource) {
-        let labelActions = labels.value.map { label in
+        let labelActions = labelsSubject.value.map { label in
             AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(label)
             }
         }
         eventSubject.send(.alert(.init(style: .actionSheet(source), actions: labelActions + [.cancel])))
+    }
+
+    private func presentFilePrioritySelection(for indexPaths: [IndexPath], from source: PopoverSource) {
+        let files = indexPaths.reduce(into: [StandardTorrentFile]()) {
+            switch sectionsSubject.value[$1.section].items[$1.row] {
+            case let .file(item):
+                guard let file = self.fileMapper.map[item.id] else {
+                    return
+                }
+
+                $0.append(file.value)
+            default:
+                break
+            }
+        }
+
+        eventSubject.send(.alert(.init(
+            title: L10n.setPriority,
+            message: L10n.fileCount(files.count),
+            style: .actionSheet(source),
+            actions: [
+                .init(title: L10n.disabledPriority, style: .default) { [weak self] in
+                    self?.setPriority(.disabled, for: files)
+                },
+                .init(title: L10n.lowPriority, style: .default) { [weak self] in
+                    self?.setPriority(.low, for: files)
+                },
+                .init(title: L10n.normalPriority, style: .default) { [weak self] in
+                    self?.setPriority(.normal, for: files)
+                },
+                .init(title: L10n.highPriority, style: .default) { [weak self] in
+                    self?.setPriority(.high, for: files)
+                },
+                .cancel,
+            ]
+        )))
     }
 
     private func showError(title: String, message: String?) {
@@ -357,9 +425,9 @@ final class StandardTorrentDetailViewModel: ViewModel {
     // MARK: View Functions
 
     private func contextMenuForItem(at indexPath: IndexPath) -> Menu? {
-        switch sections.value[indexPath.section].items[indexPath.row] {
+        switch sectionsSubject.value[indexPath.section].items[indexPath.row] {
         case let .file(item):
-            guard let file = files.values.first(where: { $0.value.index == item.id }) else {
+            guard let file = fileMapper.map[item.id] else {
                 return nil
             }
 
@@ -400,9 +468,9 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
     private func setPriority(_ priority: TorrentPriority, for files: [StandardTorrentFile]) {
         let priorityMap = files.reduce(into: [StandardTorrentFile: TorrentPriority]()) { $0[$1] = priority }
-        implementation.setPriority(torrent.value, self.files.allValues.map(\.value), priorityMap)
+        implementation.setPriority(torrentSubject.value, fileMapper.map.values.map(\.value), priorityMap)
             .append(
-                implementation.refreshFiles(torrent.value)
+                implementation.refreshFiles(torrentSubject.value)
                     .asVoid()
                     .replaceError(with: ())
                     .setFailureType(to: Error.self)
@@ -435,9 +503,9 @@ final class StandardTorrentDetailViewModel: ViewModel {
     }
 
     private func refreshFiles() -> AnyPublisher<Void, Error> {
-        implementation.refreshFiles(torrent.value)
+        implementation.refreshFiles(torrentSubject.value)
             .handleEvents(receiveOutput: { [weak self] new in
-                self?.files.update(with: new.map { ($0.index, $0) })
+                self?.fileMapper.update(with: new.map { ($0.index, $0) })
             })
             .asVoid()
             .eraseToAnyPublisher()

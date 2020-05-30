@@ -20,9 +20,9 @@ class ValueMapper<K: Hashable, V> {
         valuesSubject.eraseToAnyPublisher()
     }
 
-    /// All the values contained in this mapper.
-    var allValues: [CurrentValueSubject<V, Never>] {
-        Array(mapSubject.value.values)
+    /// A map of the keys and values contained in this mapper.
+    var map: [K: CurrentValueSubject<V, Never>] {
+        mapSubject.value
     }
 
     /// The filtered values contained in this mapper.

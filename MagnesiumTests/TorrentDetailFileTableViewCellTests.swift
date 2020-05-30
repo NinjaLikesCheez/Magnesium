@@ -23,7 +23,7 @@ private extension TorrentDetailFileTableViewCell {
     static func mock(file: StandardTorrentFile, isLastRow: Bool) -> TorrentDetailFileTableViewCell {
         let cell = TorrentDetailFileTableViewCell()
         cell.backgroundColor = .systemBackground
-        cell.configure(with: .init(file: .init(file)), isLastRow: isLastRow)
+        cell.configure(with: .init(fileSubject: .init(file)), isLastRow: isLastRow)
         return cell
     }
 }

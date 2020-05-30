@@ -27,7 +27,7 @@ class ServerSettingsViewControllerTests: TestCase {
                 ),
             ]
         )
-        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -35,7 +35,7 @@ class ServerSettingsViewControllerTests: TestCase {
 
     func test_editServer() {
         let values = ServerSettingsViewValues.editServer
-        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -44,7 +44,7 @@ class ServerSettingsViewControllerTests: TestCase {
     func test_whenLoading() {
         var values = ServerSettingsViewValues.editServer
         values.isLoading = Just(true).eraseToAnyPublisher()
-        let viewModel = StaticViewModel(values: values, type: ServerSettingsViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: ServerSettingsViewEvent.self)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)

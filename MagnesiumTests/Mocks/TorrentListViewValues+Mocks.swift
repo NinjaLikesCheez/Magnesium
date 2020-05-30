@@ -39,6 +39,6 @@ extension TorrentListViewValues {
 
 private final class MockDetailViewModel: ViewModel {
     let values = TorrentDetailViewValues.mock()
-    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func receive(_ event: TorrentDetailViewEvent) {}
+    let eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
+    func send(_ event: TorrentDetailViewEvent) {}
 }

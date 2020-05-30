@@ -9,7 +9,7 @@ class TorrentDetailViewControllerTests: TestCase {
         let torrent = StandardTorrent.mock(label: "label", name: "Name")
         let values = TorrentDetailViewValues.mock(
             sections: [
-                .init(type: .header, items: [.header(.init(torrent: .init(torrent)))]),
+                .init(type: .header, items: [.header(.init(torrentSubject: .init(torrent)))]),
                 .init(type: .info, items: [
                     .info(.init(
                         name: "Name",
@@ -27,15 +27,41 @@ class TorrentDetailViewControllerTests: TestCase {
                     .tracker("http://tracker.example.com:9000/announce"),
                 ]),
                 .init(type: .files, items: [
-                    .file(.init(file: .init(.mock(index: 0, name: "Name")))),
-                    .file(.init(file: .init(.mock(index: 1, name: "Name")))),
+                    .file(.init(fileSubject: .init(.mock(index: 0, name: "File 1")))),
+                    .file(.init(fileSubject: .init(.mock(index: 1, name: "File 2")))),
                 ]),
             ]
         )
-        let viewModel = StaticViewModel(values: values, type: TorrentDetailViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentDetailViewEvent.self)
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         viewController.loadViewIfNeeded()
         let navigationController = UINavigationController(rootViewController: viewController)
+        assertSnapshot(matching: navigationController, as: .wait(for: 0.1, on: .image))
+    }
+
+    func test_editSection_files() {
+        let values = TorrentDetailViewValues.mock(
+            sections: [
+                .init(type: .files, items: [
+                    .file(.init(fileSubject: .init(.mock(index: 0, name: "File 1")))),
+                    .file(.init(fileSubject: .init(.mock(index: 1, name: "File 2")))),
+                ]),
+            ],
+            editSection: .files,
+            toolbarInfo: L10n.selectedCount(1)
+        )
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentDetailViewEvent.self)
+        let viewController = TorrentDetailViewController(viewModel: viewModel)
+        let navigationController = UINavigationController(rootViewController: viewController)
+        viewController.loadViewIfNeeded()
+
+        let expectation = self.expectation(description: #function)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            viewController.tableView.selectRow(at: .init(row: 0, section: 0), animated: false, scrollPosition: .none)
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1)
+
         assertSnapshot(matching: navigationController, as: .wait(for: 0.1, on: .image))
     }
 }

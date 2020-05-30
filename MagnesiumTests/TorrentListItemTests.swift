@@ -9,21 +9,21 @@ class TorrentListItemTests: TestCase {
     override func setUp() {
         super.setUp()
         subject = CurrentValueSubject(.mock())
-        item = TorrentListItem(torrent: subject)
+        item = TorrentListItem(torrentSubject: subject)
     }
 
     func test_identity_shouldBeEqualToHash() {
         let torrent1 = StandardTorrent.mock(hash: "A")
         var torrent2 = StandardTorrent.mock(hash: "A")
         XCTAssertEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)).id,
-            TorrentListItem(torrent: CurrentValueSubject(torrent2)).id
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).id,
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).id
         )
 
         torrent2.hash = "B"
         XCTAssertNotEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)).id,
-            TorrentListItem(torrent: CurrentValueSubject(torrent2)).id
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).id,
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).id
         )
     }
 
@@ -31,14 +31,14 @@ class TorrentListItemTests: TestCase {
         let torrent1 = StandardTorrent.mock(hash: "A")
         var torrent2 = StandardTorrent.mock(hash: "A")
         XCTAssertEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)),
-            TorrentListItem(torrent: CurrentValueSubject(torrent2))
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)),
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2))
         )
 
         torrent2.hash = "B"
         XCTAssertNotEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)),
-            TorrentListItem(torrent: CurrentValueSubject(torrent2))
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)),
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2))
         )
     }
 
@@ -46,14 +46,14 @@ class TorrentListItemTests: TestCase {
         let torrent1 = StandardTorrent.mock(hash: "A")
         var torrent2 = StandardTorrent.mock(hash: "A")
         XCTAssertEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)).hashValue,
-            TorrentListItem(torrent: CurrentValueSubject(torrent2)).hashValue
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).hashValue,
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).hashValue
         )
 
         torrent2.hash = "B"
         XCTAssertNotEqual(
-            TorrentListItem(torrent: CurrentValueSubject(torrent1)).hashValue,
-            TorrentListItem(torrent: CurrentValueSubject(torrent2)).hashValue
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).hashValue,
+            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).hashValue
         )
     }
 

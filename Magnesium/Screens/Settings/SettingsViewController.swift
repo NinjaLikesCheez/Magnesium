@@ -83,7 +83,7 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController where V
 
     @objc
     private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.doneSelected)
+        viewModel.send(.doneSelected)
     }
 
     // MARK: UITableViewDelegate
@@ -93,13 +93,13 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController where V
         case .changeServer:
             tableView.deselectRow(at: indexPath, animated: false)
             guard let cell = tableView.cellForRow(at: indexPath) else { return }
-            viewModel.receive(.changeServerSelected(source: .view(cell, rect: cell.bounds)))
+            viewModel.send(.changeServerSelected(source: .view(cell, rect: cell.bounds)))
         case .server:
-            viewModel.receive(.serverSelected(index: indexPath.row))
+            viewModel.send(.serverSelected(index: indexPath.row))
         case .addServer:
-            viewModel.receive(.addServerSelected)
+            viewModel.send(.addServerSelected)
         case .refreshInterval:
-            viewModel.receive(.refreshIntervalSelected)
+            viewModel.send(.refreshIntervalSelected)
         case .none:
             break
         }

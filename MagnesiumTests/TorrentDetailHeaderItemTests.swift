@@ -9,7 +9,7 @@ class TorrentDetailHeaderItemTests: TestCase {
     override func setUp() {
         super.setUp()
         torrent = CurrentValueSubject(.mock())
-        item = TorrentDetailHeaderItem(torrent: torrent)
+        item = TorrentDetailHeaderItem(torrentSubject: torrent)
     }
 
     func test_name() {

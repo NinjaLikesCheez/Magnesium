@@ -20,15 +20,15 @@ class NoServersCoordinatorTests: TestCase {
     // MARK: - NoServersEvent
 
     func test_noServersEvent_showSettings_shouldEmitShowSettings() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(.showSettings)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(.showSettings)
         }.value()
         XCTAssertCase(event, .showSettings)
     }
 
     func test_noServersEvent_addServer_shouldEmitAddServerEvent() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(.addServer)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(.addServer)
         }.value()
         XCTAssertCase(event, .addServer)
     }

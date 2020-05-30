@@ -50,7 +50,6 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 
     private func setup() {
-        selectionStyle = .none
         setupViews()
         setupLayoutConstraints()
     }
@@ -70,6 +69,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
         progressLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
         progressLabel.setContentHuggingPriority(.defaultHigh + 1, for: .horizontal)
+        sizeLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
 
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
@@ -90,6 +90,11 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1 / traitCollection.displayScale),
         ])
+    }
+
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        selectedBackgroundView = editing ? UIImageView(image: UIImage(color: .systemGray5)) : nil
     }
 
     func configure(with item: TorrentDetailFileItem, isLastRow: Bool) {

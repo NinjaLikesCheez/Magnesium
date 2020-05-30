@@ -12,7 +12,7 @@ extension StandardTorrentListImplementation {
         return .init(
             updated: updatePublisher,
             refresh: { refresh(session: session) },
-            detailViewModel: { detailViewModel(session: session, torrent: $0, labels: $1) },
+            detailViewModel: { detailViewModel(session: session, torrentSubject: $0, labelsSubject: $1) },
             addLink: { addLink(client: client, url: $0) },
             pause: { pause(client: client, torrents: $0) },
             resume: { resume(client: client, torrents: $0) },
@@ -30,13 +30,13 @@ extension StandardTorrentListImplementation {
 
     private static func detailViewModel(
         session: DelugeSession,
-        torrent: CurrentValueSubject<StandardTorrent, Never>,
-        labels: CurrentValueSubject<[StandardLabel], Never>
+        torrentSubject: CurrentValueSubject<StandardTorrent, Never>,
+        labelsSubject: CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         let viewModel = StandardTorrentDetailViewModel(
             implementation: .deluge(session: session),
-            torrent: torrent,
-            labels: labels
+            torrentSubject: torrentSubject,
+            labelsSubject: labelsSubject
         )
         return AnyViewModel(viewModel)
     }

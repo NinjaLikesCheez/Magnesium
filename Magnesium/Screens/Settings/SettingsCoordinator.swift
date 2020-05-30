@@ -9,7 +9,7 @@ enum SettingsCoordinatorEvent {
 final class SettingsCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()
-    let viewModelEvents: AnyPublisher<SettingsViewModelEvent, Never>
+    let viewModelEventPublisher: AnyPublisher<SettingsViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -17,7 +17,7 @@ final class SettingsCoordinator: Coordinator {
         navigationController
     }
 
-    var events: AnyPublisher<SettingsCoordinatorEvent, Never> {
+    var eventPublisher: AnyPublisher<SettingsCoordinatorEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -25,10 +25,10 @@ final class SettingsCoordinator: Coordinator {
         let viewModel = SettingsViewModel(session: session)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController = .init(rootViewController: viewController)
-        viewModelEvents = viewModel.events
+        viewModelEventPublisher = viewModel.eventPublisher
     }
 
-    func receive(_ event: SettingsViewModelEvent) {
+    func send(_ event: SettingsViewModelEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

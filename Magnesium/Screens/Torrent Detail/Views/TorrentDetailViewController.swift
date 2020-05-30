@@ -11,9 +11,35 @@ protocol TorrentDetailViewControllerIdentifiable {
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
-    private var dataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem>!
+    private var dataSource: DataSource!
     private var isFirstSnapshot = true
     private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
+
+    private lazy var doneBarButtonItem = UIBarButtonItem(
+        barButtonSystemItem: .done,
+        target: self,
+        action: #selector(doneButtonTapped(_:))
+    )
+
+    private lazy var moreBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "ellipsis.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(moreButtonTapped(_:))
+    )
+
+    private lazy var filePriorityBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "arrow.up.arrow.down.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(filePriorityButtonTapped(_:))
+    )
+
+    private lazy var toolbarInfoView: ToolbarInfoView = {
+        let view = ToolbarInfoView()
+        view.configure(content: viewModel.values.toolbarInfo)
+        return view
+    }()
 
     var torrentHash: String {
         viewModel.values.hash
@@ -24,14 +50,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         super.init(style: .insetGrouped)
         title = L10n.torrentInfoScreenTitle
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.rightBarButtonItems = [
-            .init(
-                image: UIImage(systemName: "ellipsis.circle"),
-                style: .plain,
-                target: self,
-                action: #selector(moreButtonTapped(_:))
-            ),
-        ]
+        navigationItem.rightBarButtonItem = moreBarButtonItem
     }
 
     @available(*, unavailable)
@@ -59,26 +78,38 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
                 self?.update(with: sections)
             }
             .store(in: &cancellables)
+
+        viewModel.values.editSection
+            .sink { [weak self] section in
+                if let section = section {
+                    self?.configureEditingState(for: section)
+                } else {
+                    self?.configureNormalState()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        viewModel.receive(.appear)
+        viewModel.send(.appeared)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        viewModel.receive(.disappear)
+        viewModel.send(.disappeared)
     }
 
     private func configureTableView() {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.separatorStyle = .none
         tableView.contentInset.top = 20
+        tableView.allowsMultipleSelectionDuringEditing = true
         tableView.register(TorrentDetailHeaderTableViewCell.self, forCellReuseIdentifier: "header")
         tableView.register(TorrentDetailInfoTableViewCell.self, forCellReuseIdentifier: "info")
         tableView.register(TorrentDetailTrackerTableViewCell.self, forCellReuseIdentifier: "tracker")
         tableView.register(TorrentDetailFileTableViewCell.self, forCellReuseIdentifier: "file")
+        tableView.register(TorrentDetailSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: "header")
         tableView.tableHeaderView = {
             var frame = CGRect.zero
             frame.size.height = .leastNormalMagnitude
@@ -164,41 +195,122 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        viewModel.receive(.refresh)
+        viewModel.send(.refresh)
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.receive(.moreOptions(source: .barButton(sender)))
+        viewModel.send(.moreOptionsSelected(source: .barButton(sender)))
+    }
+
+    @objc
+    private func doneButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.send(.doneEditingSelected)
+    }
+
+    @objc
+    private func filePriorityButtonTapped(_ sender: UIBarButtonItem) {
+        guard let indexPaths = tableView.indexPathsForSelectedRows else { return }
+        viewModel.send(.setFilePrioritySelected(indexPaths: indexPaths, source: .barButton(sender)))
+    }
+
+    private func configureNormalState() {
+        guard isEditing else {
+            return
+        }
+
+        setEditing(false, animated: true)
+        reconfigureHeaders()
+
+        navigationController?.setToolbarHidden(true, animated: true)
+
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
+
+        viewModel.send(.multiSelectUpdated(indexPaths: []))
+        navigationItem.rightBarButtonItem = moreBarButtonItem
+    }
+
+    private func configureEditingState(for section: TorrentDetailSectionType) {
+        dataSource.editSection = section
+        setEditing(true, animated: true)
+        reconfigureHeaders()
+
+        switch section {
+        case .files:
+            toolbarItems = [
+                .init(barButtonSystemItem: .fixedSpace, target: nil, action: nil),
+                .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                .init(customView: toolbarInfoView),
+                .init(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+                filePriorityBarButtonItem,
+            ]
+        default:
+            toolbarItems = nil
+        }
+
+        navigationController?.setToolbarHidden(false, animated: true)
+
+        UIView.performWithoutAnimation {
+            tableView.beginUpdates()
+            tableView.endUpdates()
+        }
+
+        navigationItem.rightBarButtonItem = doneBarButtonItem
+    }
+
+    private func reconfigureHeaders() {
+        for section in 0 ..< dataSource.snapshot().numberOfSections {
+            guard let header = tableView.headerView(forSection: section) as? TorrentDetailSectionHeaderView else {
+                continue
+            }
+
+            configure(header: header, forSection: section)
+        }
     }
 
     // MARK: UITableViewDelegate
 
-    private func titleForSection(_ type: TorrentDetailSectionType) -> String? {
-        switch type {
-        case .header:
-            return nil
-        case .info:
-            return L10n.torrentInfoSectionInfo
-        case .trackers:
-            return L10n.torrentInfoSectionTrackers
-        case .files:
-            return L10n.torrentInfoSectionFiles
-        }
-    }
-
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        let section = dataSource.snapshot().sectionIdentifiers[section]
-        guard titleForSection(section) != nil else { return .leastNormalMagnitude }
-        return UITableView.automaticDimension
+        shouldShowHeader(forSection: section) ? UITableView.automaticDimension : .leastNormalMagnitude
     }
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let section = dataSource.snapshot().sectionIdentifiers[section]
-        guard let title = titleForSection(section) else { return nil }
-        let header = TorrentDetailSectionHeaderView()
-        header.configure(title: title)
+        guard shouldShowHeader(forSection: section),
+            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header")
+            as? TorrentDetailSectionHeaderView
+        else {
+            return nil
+        }
+
+        configure(header: header, forSection: section)
         return header
+    }
+
+    private func shouldShowHeader(forSection section: Int) -> Bool {
+        let section = dataSource.snapshot().sectionIdentifiers[section]
+        return section != .header
+    }
+
+    private func configure(header: TorrentDetailSectionHeaderView, forSection section: Int) {
+        switch dataSource.snapshot().sectionIdentifiers[section] {
+        case .header:
+            break
+        case .info:
+            header.configure(title: L10n.torrentInfoSectionInfo)
+        case .trackers:
+            header.configure(title: L10n.torrentInfoSectionTrackers)
+        case .files:
+            header.configure(
+                title: L10n.torrentInfoSectionFiles,
+                action: !isEditing ? L10n.edit : nil,
+                actionHandler: { [weak self] in
+                    self?.viewModel.send(.editSectionSelected(.files))
+                }
+            )
+        }
     }
 
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -210,6 +322,13 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard !isEditing else {
+            viewModel.send(.multiSelectUpdated(indexPaths: tableView.indexPathsForSelectedRows ?? []))
+            return
+        }
+
+        tableView.deselectRow(at: indexPath, animated: true)
+
         switch dataSource.itemIdentifier(for: indexPath) {
         case let .info(item):
             guard !expandedInfoIDs.contains(item.id),
@@ -236,6 +355,12 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         }
     }
 
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        if isEditing {
+            viewModel.send(.multiSelectUpdated(indexPaths: tableView.indexPathsForSelectedRows ?? []))
+        }
+    }
+
     override func tableView(
         _ tableView: UITableView,
         contextMenuConfigurationForRowAt indexPath: IndexPath,
@@ -251,23 +376,40 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             actionProvider: { _ in menu.createUIMenu() }
         )
     }
+
+    override func tableView(
+        _ tableView: UITableView,
+        shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath
+    ) -> Bool {
+        true
+    }
 }
 
 extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.receive(.pause)
+        viewModel.send(.pauseSelected)
     }
 
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell) {
-        viewModel.receive(.resume)
+        viewModel.send(.resumeSelected)
     }
 
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView) {
-        viewModel.receive(.remove(source: .view(sender, rect: sender.bounds)))
+        viewModel.send(.removeSelected(source: .view(sender, rect: sender.bounds)))
     }
 
     func headerDidResize(_ header: TorrentDetailHeaderTableViewCell) {
         tableView.beginUpdates()
         tableView.endUpdates()
+    }
+}
+
+private extension TorrentDetailViewController {
+    private class DataSource: UITableViewDiffableDataSource<TorrentDetailSectionType, TorrentDetailItem> {
+        var editSection: TorrentDetailSectionType?
+
+        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+            snapshot().sectionIdentifiers[indexPath.section] == editSection
+        }
     }
 }

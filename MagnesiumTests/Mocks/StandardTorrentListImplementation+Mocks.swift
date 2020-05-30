@@ -8,7 +8,7 @@ extension StandardTorrentListImplementation {
         .init(
             updated: impl.updatedSubject.eraseToAnyPublisher(),
             refresh: impl.refresh,
-            detailViewModel: impl.detailViewModel(torrent:labels:),
+            detailViewModel: impl.detailViewModel(torrentSubject:labelsSubject:),
             addLink: impl.addLink(url:),
             pause: impl.pause(torrents:),
             resume: impl.resume(torrents:),
@@ -48,12 +48,12 @@ final class MockStandardTorrentListImplementation {
     private(set) var detailViewModelParamLabels = [CurrentValueSubject<[StandardLabel], Never>]()
     var detailViewModelResult = AnyViewModel(MockDetailViewModel())
     func detailViewModel(
-        torrent: CurrentValueSubject<StandardTorrent, Never>,
-        labels: CurrentValueSubject<[StandardLabel], Never>
+        torrentSubject: CurrentValueSubject<StandardTorrent, Never>,
+        labelsSubject: CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         detailViewModelCallCount += 1
-        detailViewModelParamTorrent.append(torrent)
-        detailViewModelParamLabels.append(labels)
+        detailViewModelParamTorrent.append(torrentSubject)
+        detailViewModelParamLabels.append(labelsSubject)
         return detailViewModelResult
     }
 
@@ -138,6 +138,6 @@ final class MockStandardTorrentListImplementation {
 
 private final class MockDetailViewModel: ViewModel {
     let values = TorrentDetailViewValues.mock()
-    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func receive(_ event: TorrentDetailViewEvent) {}
+    let eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
+    func send(_ event: TorrentDetailViewEvent) {}
 }

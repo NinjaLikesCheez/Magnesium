@@ -7,7 +7,7 @@ import XCTest
 class TorrentListViewControllerTests: TestCase {
     func test_emptyState() {
         let values = TorrentListViewValues.mock(title: "Server")
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -15,7 +15,7 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_loadingState() {
         let values = TorrentListViewValues.mock(title: "Server", isLoading: true)
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -25,10 +25,10 @@ class TorrentListViewControllerTests: TestCase {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "Server",
-            items: torrents.map { .init(torrent: .init($0)) },
+            items: torrents.map { .init(torrentSubject: .init($0)) },
             status: "↓ 1.5 MB/s ↑ 454 KB/s"
         )
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()
@@ -37,7 +37,7 @@ class TorrentListViewControllerTests: TestCase {
 
     func test_activeFilters() {
         let values = TorrentListViewValues.mock(title: "Server", hasActiveFilters: true)
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
@@ -47,10 +47,10 @@ class TorrentListViewControllerTests: TestCase {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "0 Selected",
-            items: torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) },
+            items: torrents.map { TorrentListItem(torrentSubject: CurrentValueSubject($0)) },
             isEditing: true
         )
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()
@@ -61,11 +61,11 @@ class TorrentListViewControllerTests: TestCase {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "1 Selected",
-            items: torrents.map { TorrentListItem(torrent: CurrentValueSubject($0)) },
+            items: torrents.map { TorrentListItem(torrentSubject: CurrentValueSubject($0)) },
             isEditing: true,
             editActionsEnabled: true
         )
-        let viewModel = StaticViewModel(values: values, type: TorrentListViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: TorrentListViewEvent.self)
         let viewController = TorrentListViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()

@@ -8,7 +8,7 @@ extension StandardTorrentListImplementation {
         return .init(
             updated: session.torrents.dropFirst().map { ($0, []) }.eraseToAnyPublisher(),
             refresh: { refresh(session: session) },
-            detailViewModel: { detailViewModel(session: session, torrent: $0, labels: $1) },
+            detailViewModel: { detailViewModel(session: session, torrentSubject: $0, labelsSubject: $1) },
             addLink: { addLink(client: client, url: $0) },
             pause: { pause(client: client, torrents: $0) },
             resume: { resume(client: client, torrents: $0) },
@@ -28,13 +28,13 @@ extension StandardTorrentListImplementation {
 
     private static func detailViewModel(
         session: TransmissionSession,
-        torrent: CurrentValueSubject<StandardTorrent, Never>,
-        labels: CurrentValueSubject<[StandardLabel], Never>
+        torrentSubject: CurrentValueSubject<StandardTorrent, Never>,
+        labelsSubject: CurrentValueSubject<[StandardLabel], Never>
     ) -> AnyTorrentDetailViewModel {
         let viewModel = StandardTorrentDetailViewModel(
             implementation: .transmission(session: session),
-            torrent: torrent,
-            labels: labels
+            torrentSubject: torrentSubject,
+            labelsSubject: labelsSubject
         )
         return AnyViewModel(viewModel)
     }

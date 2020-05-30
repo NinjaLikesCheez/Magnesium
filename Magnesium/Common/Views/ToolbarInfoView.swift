@@ -1,10 +1,10 @@
 import Combine
 import UIKit
 
-final class StatusView: UIView {
+final class ToolbarInfoView: UIView {
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var speedLabel: UILabel = {
+    private lazy var contentLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = .preferredFont(forTextStyle: .footnote)
@@ -28,25 +28,25 @@ final class StatusView: UIView {
     }
 
     private func setupViews() {
-        addSubview(speedLabel)
+        addSubview(contentLabel)
     }
 
     private func setupLayoutConstraints() {
-        speedLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            speedLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            speedLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            speedLabel.topAnchor.constraint(equalTo: topAnchor),
-            speedLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            contentLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentLabel.topAnchor.constraint(equalTo: topAnchor),
+            contentLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
 
-    func configure(status: AnyPublisher<String, Never>) {
+    func configure(content: AnyPublisher<String, Never>) {
         cancellables.removeAll()
-        status
+        content
             .asOptional()
-            .assign(to: \.text, on: speedLabel)
+            .assign(to: \.text, on: contentLabel)
             .store(in: &cancellables)
     }
 }

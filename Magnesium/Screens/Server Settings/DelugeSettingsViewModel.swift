@@ -15,7 +15,7 @@ final class DelugeSettingsViewModel: ViewModel {
     private var cancellables = Set<AnyCancellable>()
     let values: ServerSettingsViewValues
 
-    var events: AnyPublisher<ServerSettingsViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<ServerSettingsViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
@@ -88,7 +88,7 @@ final class DelugeSettingsViewModel: ViewModel {
         }
     }
 
-    func receive(_ event: ServerSettingsViewEvent) {
+    func send(_ event: ServerSettingsViewEvent) {
         switch event {
         case .saveSelected:
             handleSaveSelected()
@@ -159,15 +159,13 @@ final class DelugeSettingsViewModel: ViewModel {
 
     private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
-        let alert = Alert(title: nil, message: L10n.deleteServerConfirmation, style: .actionSheet(source)) {
-            AlertAction(title: L10n.deleteServer, style: .destructive) {
+        eventSubject.send(.alert(.init(message: L10n.deleteServerConfirmation, style: .actionSheet(source), actions: [
+            .init(title: L10n.deleteServer, style: .destructive) {
                 Current.preferences.remove(server: server)
                 self.eventSubject.send(.complete)
-            }
-
-            AlertAction.cancel
-        }
-        eventSubject.send(.alert(alert))
+            },
+            .cancel,
+        ])))
     }
 
     private func showError(_ error: DelugeError) {

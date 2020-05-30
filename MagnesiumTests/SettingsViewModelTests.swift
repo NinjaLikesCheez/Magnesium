@@ -29,8 +29,8 @@ class SettingsViewModelTests: TestCase {
     }
 
     func test_doneSelected_shouldEmitCompleteEvent() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.doneSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.doneSelected)
         }.value()
         XCTAssertCase(event, .complete)
     }
@@ -41,8 +41,8 @@ class SettingsViewModelTests: TestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), ["Server 1", "Server 2", "Cancel"])
@@ -55,8 +55,8 @@ class SettingsViewModelTests: TestCase {
         preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.changeServerSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         let previousID = session.server!.id
@@ -70,23 +70,23 @@ class SettingsViewModelTests: TestCase {
         preferences.addOrUpdate(server: server1)
         preferences.addOrUpdate(server: server2)
 
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.serverSelected(index: 1))
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.serverSelected(index: 1))
         }.value()
         let server = try extract(case: type(of: event).editServer, from: event)
         XCTAssertEqual(server.id, server2.id)
     }
 
     func test_addServerSelected_shouldEmitAddServerEvent() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.addServerSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.addServerSelected)
         }.value()
         XCTAssertCase(event, .addServer)
     }
 
     func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() throws {
-        let event = try viewModel.events.first().wait {
-            self.viewModel.receive(.refreshIntervalSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            self.viewModel.send(.refreshIntervalSelected)
         }.value()
         XCTAssertCase(event, .showRefreshIntervalSettings)
     }

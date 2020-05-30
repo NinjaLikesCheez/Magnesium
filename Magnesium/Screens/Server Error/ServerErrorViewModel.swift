@@ -14,11 +14,11 @@ enum ServerErrorViewEvent {
 final class ServerErrorViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<ServerErrorViewModelEvent, Never>()
 
-    var events: AnyPublisher<ServerErrorViewModelEvent, Never> {
+    var eventPublisher: AnyPublisher<ServerErrorViewModelEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
-    func receive(_ event: ServerErrorViewEvent) {
+    func send(_ event: ServerErrorViewEvent) {
         switch event {
         case .settingsSelected:
             eventSubject.send(.showSettings)

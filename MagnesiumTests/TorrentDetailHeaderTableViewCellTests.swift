@@ -18,7 +18,7 @@ private extension TorrentDetailHeaderTableViewCell {
     static func mock(torrent: StandardTorrent) -> TorrentDetailHeaderTableViewCell {
         let cell = TorrentDetailHeaderTableViewCell()
         cell.backgroundColor = .systemBackground
-        cell.configure(with: .init(torrent: .init(torrent)))
+        cell.configure(with: .init(torrentSubject: .init(torrent)))
         return cell
     }
 }

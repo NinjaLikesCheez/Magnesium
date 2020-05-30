@@ -9,7 +9,7 @@ class AddServerViewControllerTests: TestCase {
             "Deluge",
             "Transmission",
         ])
-        let viewModel = StaticViewModel(values: values, type: AddServerViewEvent.self)
+        let viewModel = StaticViewModel(values: values, viewEvent: AddServerViewEvent.self)
         let viewController = AddServerViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)

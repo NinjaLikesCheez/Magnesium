@@ -25,15 +25,15 @@ class AddServerCoordinatorTests: TestCase {
     // MARK: AddServerViewModelEvent
 
     func test_addServerEvent_addServer_shouldPushViewController() {
-        coordinator.receive(.addServer(.deluge))
+        coordinator.send(.addServer(.deluge))
         RunLoop.main.run(until: Date())
         let navigationController = coordinator.presentable.viewController.navigationController!
         XCTAssertEqual(navigationController.viewControllers.count, 2)
     }
 
     func test_addServerEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(AddServerViewModelEvent.complete)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(AddServerViewModelEvent.complete)
         }.value()
         XCTAssertCase(event, .complete)
     }
@@ -41,7 +41,7 @@ class AddServerCoordinatorTests: TestCase {
     // MARK: ServerSettingsCoordinatorEvent
 
     func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.first().wait {
+        let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.handle(ServerSettingsCoordinatorEvent.complete)
         }.value()
         XCTAssertCase(event, .complete)

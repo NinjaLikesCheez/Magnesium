@@ -96,8 +96,8 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "web://site"
 
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.saveSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.saveSelected)
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.title, "Unable to Add Server")
@@ -114,7 +114,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[1].value.value = "http://example.com"
 
         let values = viewModel.values.isLoading.dropFirst().wait {
-            viewModel.receive(.saveSelected)
+            viewModel.send(.saveSelected)
         }
         XCTAssertEqual(values, [true, false])
     }
@@ -123,7 +123,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         let viewModel = addViewModel!
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "http://example.com"
-        viewModel.receive(.saveSelected)
+        viewModel.send(.saveSelected)
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
@@ -137,8 +137,8 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "http://example.com"
 
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.saveSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.saveSelected)
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.title, "Authentication Failed")
@@ -148,7 +148,7 @@ class TransmissionSettingsViewModelTests: TestCase {
     func test_saveSelected_withoutData_shouldDoNothing() {
         let viewModel = addViewModel!
         let event = viewModel.values.isLoading.dropFirst().first().wait {
-            viewModel.receive(.saveSelected)
+            viewModel.send(.saveSelected)
         }
         XCTAssertFalse(event.hasValue())
     }
@@ -169,7 +169,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[1].value.value = settings.url.absoluteString
         viewModel.values.inputs[2].value.value = settings.username
         viewModel.values.inputs[3].value.value = keychain.password
-        viewModel.receive(.saveSelected)
+        viewModel.send(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
         XCTAssertEqual(server.data, expectedData)
@@ -192,7 +192,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[1].value.value = settings.url.absoluteString
         viewModel.values.inputs[2].value.value = settings.username
         viewModel.values.inputs[3].value.value = keychain.password
-        viewModel.receive(.saveSelected)
+        viewModel.send(.saveSelected)
         let server = preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
         XCTAssertEqual(server.data, expectedData)
@@ -210,8 +210,8 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[1].value.value = "http://example.com"
         viewModel.values.inputs[2].value.value = "password"
 
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.saveSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.saveSelected)
         }.value()
         XCTAssertCase(event, .complete)
     }
@@ -223,24 +223,24 @@ class TransmissionSettingsViewModelTests: TestCase {
         ))
 
         let viewModel = editViewModel!
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.saveSelected)
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.saveSelected)
         }.value()
         XCTAssertCase(event, .complete)
     }
 
     func test_deleteSelected_withoutServer_shouldDoNothing() {
         let viewModel = addViewModel!
-        let event = viewModel.events.first().wait {
-            viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        let event = viewModel.eventPublisher.first().wait {
+            viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }
         XCTAssertFalse(event.hasValue())
     }
 
     func test_deleteSelected_withServer_shouldEmitAlert() throws {
         let viewModel = editViewModel!
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertNil(alert.title)
@@ -253,8 +253,8 @@ class TransmissionSettingsViewModelTests: TestCase {
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() throws {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
-        let event = try viewModel.events.first().wait {
-            viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        let event = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Delete Server" }?.handler?()
@@ -265,12 +265,12 @@ class TransmissionSettingsViewModelTests: TestCase {
         preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
 
-        let alertEvent = try viewModel.events.first().wait {
-            viewModel.receive(.deleteSelected(source: .view(UIView(), rect: .zero)))
+        let alertEvent = try viewModel.eventPublisher.first().wait {
+            viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }.value()
         let alert = try extract(case: type(of: alertEvent).alert, from: alertEvent)
 
-        let event = try viewModel.events.first().wait {
+        let event = try viewModel.eventPublisher.first().wait {
             alert.actions.first { $0.title == "Delete Server" }?.handler?()
         }.value()
         XCTAssertCase(event, .complete)

@@ -1,11 +1,16 @@
 import CommonModels
+import Foundation
 
 enum TorrentDetailViewEvent {
-    case appear
-    case disappear
+    case appeared
+    case disappeared
     case refresh
-    case moreOptions(source: PopoverSource)
-    case pause
-    case resume
-    case remove(source: PopoverSource)
+    case moreOptionsSelected(source: PopoverSource)
+    case pauseSelected
+    case resumeSelected
+    case removeSelected(source: PopoverSource)
+    case editSectionSelected(TorrentDetailSectionType)
+    case doneEditingSelected
+    case multiSelectUpdated(indexPaths: [IndexPath])
+    case setFilePrioritySelected(indexPaths: [IndexPath], source: PopoverSource)
 }

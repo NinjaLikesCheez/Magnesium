@@ -8,8 +8,8 @@ final class AppCoordinator: Coordinator {
     private let session: Session
     private let splitViewController: PresentableSplitViewController
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: splitViewController, session: session)
-    let events: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
-    let viewModelEvents: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let eventPublisher: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
+    let viewModelEventPublisher: AnyPublisher<Never, Never> = Empty().eraseToAnyPublisher()
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -233,13 +233,12 @@ final class AppCoordinator: Coordinator {
             title: L10n.addTorrentToServerPrompt(serverName: server.name),
             message: fileURL.lastPathComponent,
             style: .alert,
-            actions: {
-                AlertAction(title: L10n.addTorrent, style: .default) {
+            actions: [
+                .init(title: L10n.addTorrent, style: .default) {
                     self.addTorrentFlow.add(type: .file(fileURL))
-                }
-
-                AlertAction.cancel
-            }
+                },
+                .cancel,
+            ]
         )
         showAlert(alert, useTopViewController: true)
     }
@@ -250,13 +249,12 @@ final class AppCoordinator: Coordinator {
             title: L10n.addTorrentToServerPrompt(serverName: server.name),
             message: magnetURL.absoluteString,
             style: .alert,
-            actions: {
-                AlertAction(title: L10n.addTorrent, style: .default) {
+            actions: [
+                .init(title: L10n.addTorrent, style: .default) {
                     self.addTorrentFlow.add(type: .magnet(magnetURL))
-                }
-
-                AlertAction.cancel
-            }
+                },
+                .cancel,
+            ]
         )
         showAlert(alert, useTopViewController: true)
     }

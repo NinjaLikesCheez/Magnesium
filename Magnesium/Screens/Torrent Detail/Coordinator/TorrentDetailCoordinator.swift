@@ -11,7 +11,7 @@ enum TorrentDetailCoordinatorEvent {
 final class TorrentDetailCoordinator: Coordinator {
     private let viewController: TorrentDetailViewController<AnyTorrentDetailViewModel>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()
-    let viewModelEvents: AnyPublisher<TorrentDetailViewModelEvent, Never>
+    let viewModelEventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
     var childCoordinators = [AnyHashable: AnyCoordinator]()
 
@@ -19,16 +19,16 @@ final class TorrentDetailCoordinator: Coordinator {
         viewController
     }
 
-    var events: AnyPublisher<TorrentDetailCoordinatorEvent, Never> {
+    var eventPublisher: AnyPublisher<TorrentDetailCoordinatorEvent, Never> {
         eventSubject.eraseToAnyPublisher()
     }
 
     init(viewModel: AnyTorrentDetailViewModel) {
         viewController = .init(viewModel: viewModel)
-        viewModelEvents = viewModel.events
+        viewModelEventPublisher = viewModel.eventPublisher
     }
 
-    func receive(_ event: TorrentDetailViewModelEvent) {
+    func send(_ event: TorrentDetailViewModelEvent) {
         switch event {
         case .complete:
             eventSubject.send(.complete)

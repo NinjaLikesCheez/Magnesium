@@ -25,14 +25,14 @@ class FilterCoordinatorTests: TestCase {
     // MARK: handle - FilterEvent
 
     func test_filterEvent_complete_shouldEmitCompleteEvent() throws {
-        let event = try coordinator.events.first().wait {
-            self.coordinator.receive(.complete)
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.send(.complete)
         }.value()
         XCTAssertEqual(event, .complete)
     }
 
     func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.receive(.alert(Alert(title: "", style: .alert)))
+        coordinator.send(.alert(Alert(title: "", style: .alert)))
         let viewController = coordinator.presentable.viewController
         XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }

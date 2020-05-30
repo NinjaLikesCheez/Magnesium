@@ -23,7 +23,7 @@ class TorrentMapperTests: TestCase {
         let expectedDescending: [String] = [torrents[3].hash, torrents[0].hash]
             + [torrents[1].hash, torrents[2].hash].sorted()
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .name, direction: .ascending)
@@ -48,7 +48,7 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .dateAdded, direction: .ascending)
@@ -72,7 +72,7 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .downloadSpeed, direction: .ascending)
@@ -96,7 +96,7 @@ class TorrentMapperTests: TestCase {
             + [torrents[1].hash, torrents[3].hash].sorted()
             + [torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.sortOption] = SortOption(property: .uploadSpeed, direction: .ascending)
@@ -115,7 +115,7 @@ class TorrentMapperTests: TestCase {
         ]
         let expected = [torrents[0].hash, torrents[3].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(state: .downloading)
@@ -130,7 +130,7 @@ class TorrentMapperTests: TestCase {
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject(nil))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject(nil))
         mapper.update(with: torrents)
 
         preferences[.filterOptions] = FilterOptions(label: "test")
@@ -146,7 +146,7 @@ class TorrentMapperTests: TestCase {
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject("test tor"))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject("test tor"))
         mapper.update(with: torrents)
         XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }
@@ -160,7 +160,7 @@ class TorrentMapperTests: TestCase {
         ]
         let expected = [torrents[0].hash, torrents[2].hash]
 
-        let mapper = TorrentMapper(query: CurrentValueSubject("TEST TOR"))
+        let mapper = TorrentMapper(querySubject: CurrentValueSubject("TEST TOR"))
         mapper.update(with: torrents)
         XCTAssertEqual(mapper.values.map(\.value.hash), expected)
     }

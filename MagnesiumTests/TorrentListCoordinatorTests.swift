@@ -21,7 +21,9 @@ class TorrentListCoordinatorTests: TestCase {
         session = Session()
         coordinator = TorrentListCoordinator(viewModel: AnyTorrentListViewModel(viewModel), session: session)
         cancellables = Set()
-        coordinator.viewModelEvents.sink { [weak coordinator] in coordinator?.receive($0) }.store(in: &cancellables)
+        coordinator.viewModelEventPublisher
+            .sink { [weak coordinator] in coordinator?.send($0) }
+            .store(in: &cancellables)
         // the view controller needs to be in a key window to perform a presentation
         window.rootViewController = coordinator.presentable.viewController
         window.makeKeyAndVisible()
@@ -94,7 +96,7 @@ class TorrentListCoordinatorTests: TestCase {
 
     func test_detail_shouldEmitShowDetailEvent() throws {
         let detailViewModel = AnyViewModel(MockDetailViewModel())
-        let event = try coordinator.events.first().wait {
+        let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
         }.value()
         let viewModel = try extract(case: TorrentListCoordinatorEvent.showDetail, from: event)
@@ -102,7 +104,7 @@ class TorrentListCoordinatorTests: TestCase {
     }
 
     func test_settings_shouldEmitShowSettingsEvent() throws {
-        let event = try coordinator.events.first().wait {
+        let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.settings)
         }.value()
         XCTAssertCase(event, .showSettings)
@@ -122,7 +124,7 @@ class TorrentListCoordinatorTests: TestCase {
     }
 
     func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() throws {
-        let event = try coordinator.events.first().wait {
+        let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
         }.value()
         XCTAssertCase(event, type(of: event).torrentsUpdated)
@@ -151,7 +153,7 @@ class TorrentListCoordinatorTests: TestCase {
         XCTAssertNotNil(coordinator.previewForItem(at: 0))
         let childCoordinator = coordinator.childCoordinators.values.first?.base as? TorrentDetailCoordinator
 
-        let event = try coordinator.events.first().wait {
+        let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.commitPreviewForItem(at: 0)
         }.value()
         let committedCoordinator = try extract(case: type(of: event).commitDetail, from: event)
@@ -189,12 +191,12 @@ class TorrentListCoordinatorTests: TestCase {
 private final class MockViewModel: ViewModel {
     let values = TorrentListViewValues.mock()
     let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
-    var events: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
-    func receive(_ event: TorrentListViewEvent) {}
+    var eventPublisher: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
+    func send(_ event: TorrentListViewEvent) {}
 }
 
 private final class MockDetailViewModel: ViewModel {
     let values = TorrentDetailViewValues.mock()
-    let events: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func receive(_ event: TorrentDetailViewEvent) {}
+    let eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
+    func send(_ event: TorrentDetailViewEvent) {}
 }
