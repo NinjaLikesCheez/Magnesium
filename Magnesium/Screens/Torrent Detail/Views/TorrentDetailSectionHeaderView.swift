@@ -46,7 +46,8 @@ final class TorrentDetailSectionHeaderView: UITableViewHeaderFooterView {
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -6),
+            titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -6)
+                .withPriority(.required - 1),
 
             actionButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 12),
             actionButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),

@@ -7,3 +7,4 @@ enum TorrentPriority {
 
 extension TorrentPriority: Equatable {}
 extension TorrentPriority: Hashable {}
+extension TorrentPriority: CaseIterable {}

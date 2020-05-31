@@ -8,3 +8,12 @@ struct StandardTorrentFile {
 
 extension StandardTorrentFile: Equatable {}
 extension StandardTorrentFile: Hashable {}
+
+extension StandardTorrentFile {
+    var localizedProgress: String {
+        L10n.fileProgress(
+            size: Formatters.bytes.string(fromByteCount: size),
+            progress: Formatters.percentage.string(for: progress) ?? ""
+        )
+    }
+}

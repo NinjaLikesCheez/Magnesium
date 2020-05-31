@@ -4,18 +4,25 @@ import XCTest
 
 class TorrentDetailFileTableViewCellTests: TestCase {
     func test_view() {
-        let cell = TorrentDetailFileTableViewCell.mock(file: .mock(name: "Name"), isLastRow: false)
+        let cell = TorrentDetailFileTableViewCell.mock(file: .mock(), isLastRow: false)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
     func test_view_whenLastRow() {
-        let cell = TorrentDetailFileTableViewCell.mock(file: .mock(name: "Name"), isLastRow: true)
+        let cell = TorrentDetailFileTableViewCell.mock(file: .mock(), isLastRow: true)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
     func test_longName() {
         let cell = TorrentDetailFileTableViewCell.mock(file: .mock(name: .snapshotLong), isLastRow: false)
         assertSnapshot(matching: SizingView(cell), as: .image)
+    }
+
+    func test_priorities() {
+        for priority in TorrentPriority.allCases {
+            let cell = TorrentDetailFileTableViewCell.mock(file: .mock(priority: priority), isLastRow: false)
+            assertSnapshot(matching: SizingView(cell), as: .image, named: String(describing: priority))
+        }
     }
 }
 

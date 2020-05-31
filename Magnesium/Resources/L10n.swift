@@ -286,7 +286,7 @@ enum L10n {
     }
 
     static func torrentProgress(downloaded: String, size: String, progress: String) -> String {
-        let format = NSLocalizedString("torrent_progress", comment: "{downloaded} / {uploaded} ({percentage})")
+        let format = NSLocalizedString("torrent_progress", comment: "{downloaded} / {size} ({percentage})")
         return .localizedStringWithFormat(format, downloaded, size, progress)
     }
 
@@ -410,6 +410,11 @@ enum L10n {
     static func fileCount(_ count: Int) -> String {
         let format = NSLocalizedString("file_count", comment: "{number} Files")
         return .localizedStringWithFormat(format, count)
+    }
+
+    static func fileProgress(size: String, progress: String) -> String {
+        let format = NSLocalizedString("file_progress", comment: "{size} ({percentage})")
+        return .localizedStringWithFormat(format, size, progress)
     }
 
     // MARK: Priority

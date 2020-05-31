@@ -4,6 +4,13 @@ import UIKit
 final class TorrentDetailFileTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
 
+    private lazy var topStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [nameLabel, priorityImageViewContainer])
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        return stackView
+    }()
+
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
@@ -12,15 +19,15 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         return label
     }()
 
-    private lazy var sizeLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .secondaryLabel
-        return label
+    private lazy var priorityImageViewContainer = UIView()
+
+    private lazy var priorityImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.preferredSymbolConfiguration = .init(textStyle: .subheadline)
+        return imageView
     }()
 
-    private lazy var progressLabel: UILabel = {
+    private lazy var infoLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = .preferredFont(forTextStyle: .subheadline)
@@ -55,35 +62,44 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        contentView.addSubview(nameLabel)
-        contentView.addSubview(progressLabel)
-        contentView.addSubview(sizeLabel)
+        priorityImageViewContainer.addSubview(priorityImageView)
+
+        contentView.addSubview(topStackView)
+        contentView.addSubview(infoLabel)
         contentView.addSubview(separatorView)
     }
 
     private func setupLayoutConstraints() {
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        progressLabel.translatesAutoresizingMaskIntoConstraints = false
-        sizeLabel.translatesAutoresizingMaskIntoConstraints = false
-        separatorView.translatesAutoresizingMaskIntoConstraints = false
+        // priorityImageViewContainer
 
-        progressLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
-        progressLabel.setContentHuggingPriority(.defaultHigh + 1, for: .horizontal)
-        sizeLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
+        priorityImageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            nameLabel.trailingAnchor.constraint(equalTo: progressLabel.leadingAnchor, constant: -8),
+            priorityImageView.leadingAnchor.constraint(equalTo: priorityImageViewContainer.leadingAnchor),
+            priorityImageView.trailingAnchor.constraint(equalTo: priorityImageViewContainer.trailingAnchor),
+            priorityImageView.topAnchor.constraint(equalTo: priorityImageViewContainer.topAnchor),
+            priorityImageView.bottomAnchor.constraint(lessThanOrEqualTo: priorityImageViewContainer.bottomAnchor),
+        ])
 
-            progressLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressLabel.topAnchor.constraint(equalTo: nameLabel.topAnchor),
-            progressLabel.bottomAnchor.constraint(equalTo: sizeLabel.bottomAnchor),
+        // main content
 
-            sizeLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2),
-            sizeLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
-            sizeLabel.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
-            sizeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+        topStackView.translatesAutoresizingMaskIntoConstraints = false
+        infoLabel.translatesAutoresizingMaskIntoConstraints = false
+        separatorView.translatesAutoresizingMaskIntoConstraints = false
+
+        priorityImageView.setContentHuggingPriority(.required, for: .horizontal)
+        priorityImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        infoLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .vertical)
+
+        NSLayoutConstraint.activate([
+            topStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            topStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            topStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+
+            infoLabel.leadingAnchor.constraint(equalTo: topStackView.leadingAnchor),
+            infoLabel.trailingAnchor.constraint(equalTo: topStackView.trailingAnchor),
+            infoLabel.topAnchor.constraint(equalTo: topStackView.bottomAnchor, constant: 2),
+            infoLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
 
             separatorView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
@@ -103,14 +119,18 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             .assign(to: \.text, on: nameLabel)
             .store(in: &cancellables)
 
-        item.size
+        item.info
             .asOptional()
-            .assign(to: \.text, on: sizeLabel)
+            .assign(to: \.text, on: infoLabel)
             .store(in: &cancellables)
 
-        item.progress
-            .asOptional()
-            .assign(to: \.text, on: progressLabel)
+        item.priorityImage
+            .assign(to: \.image, on: priorityImageView)
+            .store(in: &cancellables)
+
+        item.priorityImage
+            .map { $0 == nil }
+            .assign(to: \.isHidden, on: priorityImageViewContainer)
             .store(in: &cancellables)
 
         separatorView.isHidden = isLastRow

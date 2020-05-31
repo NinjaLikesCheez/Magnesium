@@ -1,5 +1,6 @@
 import Combine
 @testable import Magnesium
+import SnapshotTesting
 import XCTest
 
 class TorrentDetailFileItemTests: TestCase {
@@ -11,6 +12,7 @@ class TorrentDetailFileItemTests: TestCase {
         fileSubject = CurrentValueSubject(.mock(
             index: 0,
             name: "file.rar",
+            size: 100_000_000,
             progress: 0.189_838
         ))
         item = TorrentDetailFileItem(fileSubject: fileSubject)
@@ -27,7 +29,7 @@ class TorrentDetailFileItemTests: TestCase {
         XCTAssertEqual(item.name.first().wait(), "file.rar")
     }
 
-    func test_progress() {
-        XCTAssertEqual(item.progress.first().wait(), "19%")
+    func test_info() {
+        XCTAssertEqual(item.info.first().wait(), "95.4 MB (19%)")
     }
 }
