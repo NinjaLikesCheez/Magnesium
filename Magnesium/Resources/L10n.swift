@@ -75,6 +75,10 @@ enum L10n {
         NSLocalizedString("action_set_priority", comment: "Set Priority")
     }
 
+    static var selectAll: String {
+        NSLocalizedString("action_select_all", comment: "Select All")
+    }
+
     // MARK: Screens
 
     static var torrentInfoScreenTitle: String {

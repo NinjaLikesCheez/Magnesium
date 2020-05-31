@@ -35,6 +35,13 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         action: #selector(filePriorityButtonTapped(_:))
     )
 
+    private lazy var selectAllBarButtonItem = UIBarButtonItem(
+        title: L10n.selectAll,
+        style: .plain,
+        target: self,
+        action: #selector(selectAllButtonTapped(_:))
+    )
+
     private lazy var toolbarInfoView: ToolbarInfoView = {
         let view = ToolbarInfoView()
         view.configure(content: viewModel.values.toolbarInfo)
@@ -214,6 +221,22 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         viewModel.send(.setFilePrioritySelected(indexPaths: indexPaths, source: .barButton(sender)))
     }
 
+    @objc
+    private func selectAllButtonTapped(_ sender: UIBarButtonItem) {
+        guard let editSection = dataSource.editSection,
+            let sectionIndex = dataSource.snapshot().indexOfSection(editSection)
+        else {
+            return
+        }
+
+        for row in 0 ..< tableView.numberOfRows(inSection: sectionIndex) {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            _ = tableView.delegate?.tableView?(tableView, willSelectRowAt: indexPath)
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+            tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
+        }
+    }
+
     private func configureNormalState() {
         guard isEditing else {
             return
@@ -230,6 +253,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         }
 
         viewModel.send(.multiSelectUpdated(indexPaths: []))
+        navigationItem.leftBarButtonItem = nil
         navigationItem.rightBarButtonItem = moreBarButtonItem
     }
 
@@ -258,6 +282,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             tableView.endUpdates()
         }
 
+        navigationItem.leftBarButtonItem = selectAllBarButtonItem
         navigationItem.rightBarButtonItem = doneBarButtonItem
     }
 
@@ -322,22 +347,12 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard !isEditing else {
-            viewModel.send(.multiSelectUpdated(indexPaths: tableView.indexPathsForSelectedRows ?? []))
-            return
-        }
-
-        tableView.deselectRow(at: indexPath, animated: true)
-
-        switch dataSource.itemIdentifier(for: indexPath) {
-        case let .info(item):
-            guard !expandedInfoIDs.contains(item.id),
-                item.expandedValue != nil,
-                let cell = tableView.cellForRow(at: indexPath) as? TorrentDetailInfoTableViewCell
-            else {
-                return
-            }
-
+        if case let .info(item) = dataSource.itemIdentifier(for: indexPath),
+            !expandedInfoIDs.contains(item.id),
+            item.expandedValue != nil,
+            let cell = tableView.cellForRow(at: indexPath) as? TorrentDetailInfoTableViewCell
+        // swiftformat:disable:next braces
+        {
             expandedInfoIDs.insert(item.id)
 
             let isLastRow = indexPath.row >= tableView.numberOfRows(inSection: indexPath.section) - 1
@@ -350,8 +365,16 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             }
 
             cell.animateExpansion()
-        default:
-            break
+        }
+
+        if isEditing {
+            if !dataSource.tableView(tableView, canEditRowAt: indexPath) {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+
+            viewModel.send(.multiSelectUpdated(indexPaths: tableView.indexPathsForSelectedRows ?? []))
+        } else {
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
 

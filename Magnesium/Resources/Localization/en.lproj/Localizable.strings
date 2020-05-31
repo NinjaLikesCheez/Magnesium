@@ -40,6 +40,9 @@
 /* Save */
 "action_save" = "Save";
 
+/* Select All */
+"action_select_all" = "Select All";
+
 /* Set Label */
 "action_set_label" = "Set Label";
 
