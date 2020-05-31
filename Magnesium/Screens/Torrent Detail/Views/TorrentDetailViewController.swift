@@ -404,7 +404,11 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         _ tableView: UITableView,
         shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath
     ) -> Bool {
-        true
+        dataSource.snapshot().sectionIdentifiers[indexPath.section] == .files
+    }
+
+    override func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
+        viewModel.send(.editSectionSelected(dataSource.snapshot().sectionIdentifiers[indexPath.section]))
     }
 }
 
