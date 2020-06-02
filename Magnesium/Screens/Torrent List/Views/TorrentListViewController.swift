@@ -271,6 +271,7 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
     }
 
     private func configureEditingState() {
+        tableView.setEditing(false, animated: true) // required to close swipe actions
         setEditing(true, animated: true)
         UIView.performWithoutAnimation {
             tableView.beginUpdates()
