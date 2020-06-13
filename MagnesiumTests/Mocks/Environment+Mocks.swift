@@ -16,7 +16,7 @@ extension Environment {
         fileSystem: FileSystem = .mock,
         defaults: Defaults = .mock
     ) -> Environment {
-        Environment(
+        .init(
             deluge: deluge,
             transmission: transmission,
             preferences: preferences,
