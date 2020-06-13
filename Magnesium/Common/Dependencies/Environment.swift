@@ -31,5 +31,5 @@ extension Environment {
 #if DEBUG
     var Current: Environment = .live // swiftlint:disable:this identifier_name
 #else
-    var Current: Environment = .live // swiftlint:disable:this identifier_name
+    let Current: Environment = .live // swiftlint:disable:this identifier_name
 #endif
