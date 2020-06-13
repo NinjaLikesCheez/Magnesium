@@ -509,6 +509,7 @@
 				E99FC25923D13C270019A992 /* AppCoordinator.swift */,
 				E96B0064237A43740091FA71 /* AppDelegate.swift */,
 				E9E1840923F6550500F93E0F /* LaunchScreen.storyboard */,
+				E96A4EF62426AA4E00D00131 /* Prelude.swift */,
 				E96B0066237A43740091FA71 /* SceneDelegate.swift */,
 			);
 			path = App;
@@ -552,7 +553,6 @@
 			children = (
 				E9AB4B1F24258AF20058FFD4 /* Environment.swift */,
 				E952A13424268A690050F108 /* FileSystem.swift */,
-				E96A4EF62426AA4E00D00131 /* Prelude.swift */,
 				E9B980952426C1EE0090AF37 /* Defaults.swift */,
 			);
 			path = Dependencies;
