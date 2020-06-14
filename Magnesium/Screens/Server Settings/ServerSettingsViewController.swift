@@ -44,11 +44,9 @@ final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewCon
         tableView.register(TextInputTableViewCell.self, forCellReuseIdentifier: "textInput")
         tableView.register(ButtonTableViewCell.self, forCellReuseIdentifier: "button")
 
-        viewModel.values.isLoading
-            .sink { [weak self] isLoading in
-                self?.isLoadingChanged(isLoading)
-            }
-            .store(in: &cancellables)
+        viewModel.values.isLoading.sink { [weak self] isLoading in
+            self?.isLoadingChanged(isLoading)
+        }.store(in: &cancellables)
 
         viewModel.values.isSaveButtonEnabled
             .assign(to: \.isEnabled, on: saveBarButtonItem)

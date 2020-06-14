@@ -96,12 +96,10 @@ final class StandardTorrentListViewModel: ViewModel {
             })
             .store(in: &cancellables)
 
-        implementation.updated
-            .sink { [weak self] update in
-                self?.labelsSubject.send(update.1)
-                self?.torrentMapper.update(with: update.0)
-            }
-            .store(in: &cancellables)
+        implementation.updated.sink { [weak self] update in
+            self?.labelsSubject.send(update.1)
+            self?.torrentMapper.update(with: update.0)
+        }.store(in: &cancellables)
 
         torrentMapper.valuesPublisher
             .ui()
@@ -309,11 +307,9 @@ final class StandardTorrentListViewModel: ViewModel {
 
         activities.append(.moveDownloadFolder {
             let subject = PassthroughSubject<String, Never>()
-            subject
-                .sink { [weak self] path in
-                    self?.moveDownloadFolder(for: torrents, to: path)
-                }
-                .store(in: &self.cancellables)
+            subject.sink { [weak self] path in
+                self?.moveDownloadFolder(for: torrents, to: path)
+            }.store(in: &self.cancellables)
             let currentPath = Set(torrents.map(\.downloadPath)).count == 1 ? torrents[0].downloadPath : nil
             self.eventSubject.send(.moveDownloadFolder(currentPath: currentPath, subject: subject))
         })

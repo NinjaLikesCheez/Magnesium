@@ -3,22 +3,6 @@ import CommonModels
 import Preferences
 import ViewModel
 
-enum FilterViewModelEvent {
-    case complete
-    case alert(Alert)
-}
-
-enum FilterViewEvent {
-    case doneSelected
-    case sortSelected(source: PopoverSource)
-    case stateSelected(source: PopoverSource)
-    case labelSelected(source: PopoverSource)
-}
-
-struct FilterViewValues {
-    var sections: AnyPublisher<[FilterSection], Never>
-}
-
 final class FilterViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<FilterViewModelEvent, Never>()
     private var sectionsSubject = CurrentValueSubject<[FilterSection], Never>([])
@@ -41,9 +25,7 @@ final class FilterViewModel: ViewModel {
             .asVoid()
             .merge(with: Current.preferences.valueUpdatedPublisher(for: .filterOptions).asVoid())
             .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).asVoid())
-            .sink { [weak self] _ in
-                self?.updateSections()
-            }
+            .sink { [weak self] _ in self?.updateSections() }
             .store(in: &cancellables)
 
         updateSections()

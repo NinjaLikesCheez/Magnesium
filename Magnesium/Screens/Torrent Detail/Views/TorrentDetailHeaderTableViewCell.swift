@@ -222,7 +222,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             .store(in: &cancellables)
 
         item.isActive
-            .sink(receiveValue: { [weak self] in self?.isActive = $0 })
+            .sink { [weak self] in self?.isActive = $0 }
             .store(in: &cancellables)
 
         item.progress

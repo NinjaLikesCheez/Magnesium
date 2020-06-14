@@ -1,0 +1,3 @@
+enum SettingsCoordinatorEvent {
+    case complete
+}

@@ -2,10 +2,6 @@ import Combine
 import Coordinator
 import ViewModel
 
-enum ServerSettingsCoordinatorEvent {
-    case complete
-}
-
 final class ServerSettingsCoordinator: Coordinator {
     private let viewController: ServerSettingsViewController<AnyServerSettingsViewModel>
     private let eventSubject = PassthroughSubject<ServerSettingsCoordinatorEvent, Never>()

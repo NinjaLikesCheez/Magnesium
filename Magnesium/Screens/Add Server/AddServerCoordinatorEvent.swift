@@ -1,0 +1,3 @@
+enum AddServerCoordinatorEvent {
+    case complete
+}

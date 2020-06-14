@@ -60,11 +60,9 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController where V
 
         tableView.dataSource = dataSource
 
-        viewModel.values.sections
-            .sink { [weak self] sections in
-                self?.update(sections: sections)
-            }
-            .store(in: &cancellables)
+        viewModel.values.sections.sink { [weak self] sections in
+            self?.update(sections: sections)
+        }.store(in: &cancellables)
     }
 
     @available(*, unavailable)

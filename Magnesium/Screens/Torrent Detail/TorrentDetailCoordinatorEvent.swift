@@ -1,0 +1,3 @@
+enum TorrentDetailCoordinatorEvent {
+    case complete
+}

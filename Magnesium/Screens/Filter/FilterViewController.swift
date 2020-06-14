@@ -51,11 +51,9 @@ final class FilterViewController<VM: ViewModel>: UITableViewController where VM.
 
         tableView.dataSource = dataSource
 
-        viewModel.values.sections
-            .sink { [weak self] sections in
-                self?.update(sections: sections)
-            }
-            .store(in: &cancellables)
+        viewModel.values.sections.sink { [weak self] sections in
+            self?.update(sections: sections)
+        }.store(in: &cancellables)
     }
 
     private func update(sections: [FilterSection]) {

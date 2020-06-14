@@ -2,19 +2,6 @@ import Combine
 import Preferences
 import ViewModel
 
-enum RefreshIntervalViewEvent {
-    case optionSelected(index: Int)
-}
-
-struct RefreshIntervalViewValues {
-    var options: [RefreshIntervalOptionItem]
-}
-
-struct RefreshIntervalOptionItem {
-    var title: String
-    var isSelected: AnyPublisher<Bool, Never>
-}
-
 final class RefreshIntervalViewModel: ViewModel {
     let values: RefreshIntervalViewValues
 

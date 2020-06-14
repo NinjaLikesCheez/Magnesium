@@ -1,16 +1,6 @@
 import Combine
 import ViewModel
 
-enum ServerErrorViewModelEvent {
-    case showSettings
-    case editServer
-}
-
-enum ServerErrorViewEvent {
-    case settingsSelected
-    case editServerSelected
-}
-
 final class ServerErrorViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<ServerErrorViewModelEvent, Never>()
 

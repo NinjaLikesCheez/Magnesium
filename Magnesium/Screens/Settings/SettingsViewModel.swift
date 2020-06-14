@@ -3,26 +3,6 @@ import CommonModels
 import Preferences
 import ViewModel
 
-enum SettingsViewModelEvent {
-    case complete
-    case alert(Alert)
-    case editServer(Server)
-    case addServer
-    case showRefreshIntervalSettings
-}
-
-enum SettingsViewEvent {
-    case doneSelected
-    case changeServerSelected(source: PopoverSource)
-    case serverSelected(index: Int)
-    case addServerSelected
-    case refreshIntervalSelected
-}
-
-struct SettingsViewValues {
-    var sections: AnyPublisher<[SettingsSection], Never>
-}
-
 final class SettingsViewModel: ViewModel {
     private let session: Session
     private var cancellables = Set<AnyCancellable>()
@@ -41,9 +21,7 @@ final class SettingsViewModel: ViewModel {
         Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())
             .merge(with: Current.preferences.valueUpdatedPublisher(for: .autoRefreshInterval).asVoid())
-            .sink { [weak self] _ in
-                self?.updateSections()
-            }
+            .sink { [weak self] _ in self?.updateSections() }
             .store(in: &cancellables)
 
         updateSections()

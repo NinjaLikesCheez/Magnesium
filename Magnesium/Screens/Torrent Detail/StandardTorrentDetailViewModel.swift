@@ -265,11 +265,9 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
         activities.append(.moveDownloadFolder {
             let subject = PassthroughSubject<String, Never>()
-            subject
-                .sink { [weak self] path in
-                    self?.moveDownloadFolder(to: path)
-                }
-                .store(in: &self.cancellables)
+            subject.sink { [weak self] path in
+                self?.moveDownloadFolder(to: path)
+            }.store(in: &self.cancellables)
             self.eventSubject.send(.moveDownloadFolder(currentPath: torrent.downloadPath, subject: subject))
         })
 

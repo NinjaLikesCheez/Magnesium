@@ -4,10 +4,6 @@ import Coordinator
 import UIKit
 import ViewModel
 
-enum TorrentDetailCoordinatorEvent {
-    case complete
-}
-
 final class TorrentDetailCoordinator: Coordinator {
     private let viewController: TorrentDetailViewController<AnyTorrentDetailViewModel>
     private let eventSubject = PassthroughSubject<TorrentDetailCoordinatorEvent, Never>()

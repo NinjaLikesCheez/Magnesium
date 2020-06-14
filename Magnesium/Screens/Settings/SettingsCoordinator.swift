@@ -2,10 +2,6 @@ import Combine
 import Coordinator
 import UIKit
 
-enum SettingsCoordinatorEvent {
-    case complete
-}
-
 final class SettingsCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<SettingsCoordinatorEvent, Never>()

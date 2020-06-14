@@ -1,0 +1,3 @@
+enum ServerSettingsCoordinatorEvent {
+    case complete
+}

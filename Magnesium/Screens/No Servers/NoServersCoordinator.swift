@@ -1,11 +1,6 @@
 import Combine
 import Coordinator
 
-enum NoServersCoordinatorEvent {
-    case showSettings
-    case addServer
-}
-
 final class NoServersCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<NoServersCoordinatorEvent, Never>()
     private let viewController: NoServersViewController<NoServersViewModel>

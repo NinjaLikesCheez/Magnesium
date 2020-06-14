@@ -3,13 +3,6 @@ import CommonModels
 import Coordinator
 import UIKit
 
-enum TorrentListCoordinatorEvent {
-    case showDetail(viewModel: AnyTorrentDetailViewModel)
-    case commitDetail(coordinator: TorrentDetailCoordinator)
-    case showSettings
-    case torrentsUpdated(hashes: [String])
-}
-
 final class TorrentListCoordinator: NSObject, Coordinator {
     private let viewModel: AnyTorrentListViewModel
     private let session: Session

@@ -1,10 +1,6 @@
 import Combine
 import Coordinator
 
-enum FilterCoordinatorEvent {
-    case complete
-}
-
 final class FilterCoordinator: Coordinator {
     private let navigationController: PresentableNavigationController
     private let eventSubject = PassthroughSubject<FilterCoordinatorEvent, Never>()

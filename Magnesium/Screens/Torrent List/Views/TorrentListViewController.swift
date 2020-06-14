@@ -146,33 +146,27 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
         if viewModel.values.showFilterButton {
-            viewModel.values.hasActiveFilters
-                .sink { [weak self] in
-                    self?.filterBarButtonItem.image = UIImage(systemName: $0
-                        ? "line.horizontal.3.decrease.circle.fill"
-                        : "line.horizontal.3.decrease.circle")
-                }
-                .store(in: &cancellables)
+            viewModel.values.hasActiveFilters.sink { [weak self] in
+                self?.filterBarButtonItem.image = UIImage(systemName: $0
+                    ? "line.horizontal.3.decrease.circle.fill"
+                    : "line.horizontal.3.decrease.circle")
+            }.store(in: &cancellables)
         }
 
-        viewModel.values.isLoading
-            .sink { [weak self] isLoading in
-                if !isLoading {
-                    self?.activityView.stopAnimating()
-                    self?.refreshControl?.endRefreshing()
-                }
+        viewModel.values.isLoading.sink { [weak self] isLoading in
+            if !isLoading {
+                self?.activityView.stopAnimating()
+                self?.refreshControl?.endRefreshing()
             }
-            .store(in: &cancellables)
+        }.store(in: &cancellables)
 
-        viewModel.values.isEditing
-            .sink { [weak self] isEditing in
-                if isEditing {
-                    self?.configureEditingState()
-                } else {
-                    self?.configureNormalState()
-                }
+        viewModel.values.isEditing.sink { [weak self] isEditing in
+            if isEditing {
+                self?.configureEditingState()
+            } else {
+                self?.configureNormalState()
             }
-            .store(in: &cancellables)
+        }.store(in: &cancellables)
 
         viewModel.values.items
             .map { !$0.isEmpty }
@@ -194,11 +188,9 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
             .assign(to: \.separatorStyle, on: tableView)
             .store(in: &cancellables)
 
-        viewModel.values.items
-            .sink { [weak self] items in
-                self?.update(with: items)
-            }
-            .store(in: &cancellables)
+        viewModel.values.items.sink { [weak self] items in
+            self?.update(with: items)
+        }.store(in: &cancellables)
 
         for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
             viewModel.values.editActionsEnabled

@@ -72,29 +72,23 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
-        viewModel.values.isRefreshing
-            .sink { [weak self] isLoading in
-                if !isLoading {
-                    self?.refreshControl?.endRefreshing()
-                }
+        viewModel.values.isRefreshing.sink { [weak self] isLoading in
+            if !isLoading {
+                self?.refreshControl?.endRefreshing()
             }
-            .store(in: &cancellables)
+        }.store(in: &cancellables)
 
-        viewModel.values.sections
-            .sink { [weak self] sections in
-                self?.update(with: sections)
-            }
-            .store(in: &cancellables)
+        viewModel.values.sections.sink { [weak self] sections in
+            self?.update(with: sections)
+        }.store(in: &cancellables)
 
-        viewModel.values.editSection
-            .sink { [weak self] section in
-                if let section = section {
-                    self?.configureEditingState(for: section)
-                } else {
-                    self?.configureNormalState()
-                }
+        viewModel.values.editSection.sink { [weak self] section in
+            if let section = section {
+                self?.configureEditingState(for: section)
+            } else {
+                self?.configureNormalState()
             }
-            .store(in: &cancellables)
+        }.store(in: &cancellables)
     }
 
     override func viewDidAppear(_ animated: Bool) {

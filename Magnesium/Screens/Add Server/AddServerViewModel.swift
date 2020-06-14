@@ -1,20 +1,6 @@
 import Combine
 import ViewModel
 
-enum AddServerViewModelEvent {
-    case addServer(ServerType)
-    case complete
-}
-
-enum AddServerViewEvent {
-    case typeSelected(index: Int)
-    case cancelSelected
-}
-
-struct AddServerViewValues {
-    var types: [String]
-}
-
 final class AddServerViewModel: ViewModel {
     private let eventSubject = PassthroughSubject<AddServerViewModelEvent, Never>()
     private let serverTypes: [ServerType] = [.deluge, .transmission]

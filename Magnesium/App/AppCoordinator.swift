@@ -37,9 +37,9 @@ final class AppCoordinator: Coordinator {
         self.splitViewController.delegate = self
         self.splitViewController.preferredDisplayMode = .allVisible
 
-        self.session.serverPublisher
-            .sink { [weak self] in self?.show(server: $0) }
-            .store(in: &cancellables)
+        self.session.serverPublisher.sink { [weak self] in
+            self?.show(server: $0)
+        }.store(in: &cancellables)
 
         window.rootViewController = splitViewController
         window.makeKeyAndVisible()

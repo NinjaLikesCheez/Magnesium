@@ -2,10 +2,6 @@ import Combine
 import Coordinator
 import UIKit
 
-enum AddServerCoordinatorEvent {
-    case complete
-}
-
 final class AddServerCoordinator: Coordinator {
     private let eventSubject = PassthroughSubject<AddServerCoordinatorEvent, Never>()
     private let viewController: AddServerViewController<AddServerViewModel>

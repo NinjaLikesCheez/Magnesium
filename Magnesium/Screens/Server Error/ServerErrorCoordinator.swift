@@ -1,11 +1,6 @@
 import Combine
 import Coordinator
 
-enum ServerErrorCoordinatorEvent {
-    case showSettings
-    case editServer(Server)
-}
-
 final class ServerErrorCoordinator: Coordinator {
     private let server: Server
     private let eventSubject = PassthroughSubject<ServerErrorCoordinatorEvent, Never>()
