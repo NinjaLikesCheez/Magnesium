@@ -84,8 +84,6 @@ final class SettingsViewController<VM: ViewModel>: UITableViewController where V
         viewModel.send(.doneSelected)
     }
 
-    // MARK: UITableViewDelegate
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch dataSource.itemIdentifier(for: indexPath) {
         case .changeServer:

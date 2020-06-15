@@ -12,9 +12,7 @@ final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController 
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.textLabel?.text = item.title
             item.isSelected
-                .map { isSelected -> UITableViewCell.AccessoryType in
-                    isSelected ? .checkmark : .none
-                }
+                .map { $0 ? UITableViewCell.AccessoryType.checkmark : UITableViewCell.AccessoryType.none }
                 .assign(to: \.accessoryType, on: cell)
                 .store(in: &cancellables)
             return cell

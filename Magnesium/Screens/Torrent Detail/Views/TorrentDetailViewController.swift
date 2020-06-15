@@ -52,6 +52,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         viewModel.values.hash
     }
 
+    // MARK: Initialization
+
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
@@ -64,6 +66,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -178,6 +182,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
         tableView.dataSource = dataSource
     }
 
+    // MARK: Methods
+
     private func update(with sections: [TorrentDetailSection]) {
         let animated = !isFirstSnapshot
         isFirstSnapshot = false
@@ -193,6 +199,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             self.dataSource.apply(snapshot, animatingDifferences: animated)
         }
     }
+
+    // MARK: Actions
 
     @objc
     private func refreshControlTriggered(_ sender: UIRefreshControl) {
@@ -230,6 +238,8 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
             tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
         }
     }
+
+    // MARK: Editing
 
     private func configureNormalState() {
         guard isEditing else {

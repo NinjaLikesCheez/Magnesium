@@ -199,6 +199,23 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(false, animated: animated)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let center = CGPoint(
+            x: tableView.bounds.width * 0.5,
+            y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
+        )
+        activityView.sizeToFit()
+        activityView.center = center
+        emptyStateView.sizeToFit()
+        emptyStateView.center = center
+    }
+
     private func configureTableView() {
         tableView.rowHeight = TorrentTableViewCell.estimatedHeight
         tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
@@ -222,6 +239,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         tableView.dataSource = dataSource
     }
 
+    // MARK: Methods
+
     private func update(with items: [TorrentListItem]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, TorrentListItem>()
         snapshot.appendSections([.main])
@@ -230,23 +249,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         DispatchQueue.global(qos: .userInteractive).async {
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setToolbarHidden(false, animated: animated)
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let center = CGPoint(
-            x: tableView.bounds.width * 0.5,
-            y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
-        )
-        activityView.sizeToFit()
-        activityView.center = center
-        emptyStateView.sizeToFit()
-        emptyStateView.center = center
     }
 
     // MARK: Editing
