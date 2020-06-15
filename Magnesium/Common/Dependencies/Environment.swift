@@ -16,7 +16,7 @@ struct Environment {
 }
 
 extension Environment {
-    static let live: Environment = .init(
+    static let live = Environment(
         deluge: Deluge.init,
         transmission: Transmission.init,
         preferences: UserDefaultsPreferences(),
