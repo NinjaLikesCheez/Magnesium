@@ -28,7 +28,7 @@ class TransmissionTorrentDetailImplementationTests: TestCase {
             method: "torrent-get",
             result: Just(files as Any).setFailureType(to: TransmissionError.self).eraseToAnyPublisher()
         ))
-        let results = try implementation.refreshFiles(.mock()).wait().value()
+        let results = try implementation.refreshFiles(.mock()).wait().singleValue()
         XCTAssertEqual(results, files.map(\.standard))
     }
 

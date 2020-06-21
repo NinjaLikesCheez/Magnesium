@@ -89,7 +89,7 @@ class DelugeSettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.saveSelected)
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.title, "Unable to Add Server")
         XCTAssertEqual(
@@ -132,7 +132,7 @@ class DelugeSettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.saveSelected)
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.title, "Authentication Failed")
         XCTAssertEqual(alert.message, "Unable to authenticate. Verify that your credentials are correct.")
@@ -143,7 +143,7 @@ class DelugeSettingsViewModelTests: TestCase {
         let event = viewModel.values.isLoading.dropFirst().first().wait {
             viewModel.send(.saveSelected)
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     func test_saveSelected_withoutServer_shouldAddServer() throws {
@@ -203,7 +203,7 @@ class DelugeSettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.saveSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 
@@ -216,7 +216,7 @@ class DelugeSettingsViewModelTests: TestCase {
         let viewModel = editViewModel!
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.saveSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 
@@ -225,14 +225,14 @@ class DelugeSettingsViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     func test_deleteSelected_withServer_shouldEmitAlert() throws {
         let viewModel = editViewModel!
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertNil(alert.title)
         XCTAssertEqual(alert.message, "Are you sure you want to delete this server?")
@@ -246,7 +246,7 @@ class DelugeSettingsViewModelTests: TestCase {
         let viewModel = editViewModel!
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Delete Server" }?.handler?()
         XCTAssertTrue(preferences.getServers().isEmpty)
@@ -257,12 +257,12 @@ class DelugeSettingsViewModelTests: TestCase {
         let viewModel = editViewModel!
         let alertEvent = try viewModel.eventPublisher.first().wait {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: alertEvent).alert, from: alertEvent)
 
         let event = try viewModel.eventPublisher.first().wait {
             alert.actions.first { $0.title == "Delete Server" }?.handler?()
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
         XCTAssertTrue(preferences.getServers().isEmpty)
     }

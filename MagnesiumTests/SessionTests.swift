@@ -20,7 +20,7 @@ class SessionTests: TestCase {
         let server = Server(name: "Server", type: .deluge, data: Data(), keychainData: nil)
         let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: server)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(updated, server)
         XCTAssertEqual(session.server, server)
     }
@@ -31,7 +31,7 @@ class SessionTests: TestCase {
         server.name = "New Name"
         let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.addOrUpdate(server: server)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(updated, server)
         XCTAssertEqual(session.server, server)
     }
@@ -44,7 +44,7 @@ class SessionTests: TestCase {
         XCTAssertEqual(session.server, firstServer)
         let updated = try session.serverPublisher.dropFirst().first().wait {
             self.preferences.remove(server: firstServer)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(updated, secondServer)
         XCTAssertEqual(session.server, secondServer)
     }
@@ -58,7 +58,7 @@ class SessionTests: TestCase {
         let result = session.serverPublisher.dropFirst().first().wait {
             self.preferences[.selectedServerID] = secondServer.id
         }
-        XCTAssertFalse(result.hasValue())
+        XCTAssertTrue(result.values().isEmpty)
         XCTAssertEqual(session.server, firstServer)
     }
 
@@ -70,7 +70,7 @@ class SessionTests: TestCase {
         XCTAssertEqual(session.server, firstServer)
         let updated = try session.serverPublisher.dropFirst().first().wait {
             self.session.setServer(secondServer)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(updated, secondServer)
         XCTAssertEqual(session.server, secondServer)
     }

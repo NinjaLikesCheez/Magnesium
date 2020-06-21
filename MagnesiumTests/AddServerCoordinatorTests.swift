@@ -34,7 +34,7 @@ class AddServerCoordinatorTests: TestCase {
     func test_addServerEvent_complete_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(AddServerViewModelEvent.complete)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 
@@ -43,7 +43,7 @@ class AddServerCoordinatorTests: TestCase {
     func test_serverSettingsCoordinatorEvent_complete_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.handle(ServerSettingsCoordinatorEvent.complete)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 }

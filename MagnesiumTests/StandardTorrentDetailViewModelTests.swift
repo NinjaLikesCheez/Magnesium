@@ -32,7 +32,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     }
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
-        let event = try viewModel.eventPublisher.first().wait(executing: actions).value()
+        let event = try viewModel.eventPublisher.first().wait(executing: actions).singleValue()
         return try extract(case: type(of: event).alert, from: event)
     }
 
@@ -110,7 +110,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     // MARK: moreOptionsSelected
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
-        let event = try viewModel.eventPublisher.first().wait(executing: actions).value()
+        let event = try viewModel.eventPublisher.first().wait(executing: actions).singleValue()
         return try extract(case: type(of: event).activities, from: event).0
     }
 
@@ -200,7 +200,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (path, _) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
@@ -212,7 +212,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
@@ -227,7 +227,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: TorrentDetailViewModelEvent.moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
@@ -345,7 +345,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     func test_editSectionSelected_shouldEmitNewEditSection() throws {
         let editSection = try viewModel.values.editSection.dropFirst().first().wait {
             self.viewModel.send(.editSectionSelected(.files))
-        }.value()
+        }.singleValue()
         XCTAssertEqual(editSection, .files)
     }
 
@@ -354,7 +354,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     func test_doneEditingSelected_shouldEmitNilEditSection() throws {
         let editSection = try viewModel.values.editSection.dropFirst().first().wait {
             self.viewModel.send(.doneEditingSelected)
-        }.value()
+        }.singleValue()
         XCTAssertNil(editSection)
     }
 
@@ -376,7 +376,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     // MARK: sections
 
     func test_sections_shouldHaveHeader() throws {
-        let sections = try viewModel.values.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().singleValue()
         XCTAssertEqual(sections.first?.type, .header)
         XCTAssertEqual(sections.first?.items.count, 1)
     }
@@ -389,8 +389,8 @@ final class StandardTorrentDetailViewModelTests: TestCase {
             case let .info(item):
                 return (
                     item.name,
-                    try item.value.first().wait().value(),
-                    try item.expandedValue?.first().wait().value()
+                    try item.value.first().wait().singleValue(),
+                    try item.expandedValue?.first().wait().singleValue()
                 )
             default:
                 XCTFail("Unexpected item")
@@ -416,7 +416,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         ]
         // swiftlint:enable comma
         // swiftformat:enable all
-        let section = try viewModel.values.sections.first().wait().value()[1]
+        let section = try viewModel.values.sections.first().wait().singleValue()[1]
         let rows = try getInfoRows(in: section)
         XCTAssertEqual(rows.count, expected.count, String(describing: rows))
         for (row, expected) in zip(rows, expected) {
@@ -430,17 +430,17 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         let trackers = ["udp://tracker.example.com:9000", "http://tracker.example.com:9000/announce"]
         torrentSubject.send(.mock(trackers: trackers))
 
-        let section = try viewModel.values.sections.first().wait().value()[2]
+        let section = try viewModel.values.sections.first().wait().singleValue()[2]
         XCTAssertEqual(section.type, .trackers)
         let extracted = try section.items.map { try extract(case: TorrentDetailItem.tracker, from: $0) }
         XCTAssertEqual(extracted, trackers)
     }
 
     func test_sections_files_shouldBeSorted() throws {
-        let section = try viewModel.values.sections.first().wait().value()[2]
+        let section = try viewModel.values.sections.first().wait().singleValue()[2]
         XCTAssertEqual(section.type, .files)
         let files = try section.items.map {
-            try extract(case: TorrentDetailItem.file, from: $0).name.first().wait().value()
+            try extract(case: TorrentDetailItem.file, from: $0).name.first().wait().singleValue()
         }
         XCTAssertEqual(files, ["file.r00", "file.r01", "file.rar"])
     }
@@ -448,7 +448,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     // MARK: eta
 
     func test_eta_whenZero_shouldFormatProperly() throws {
-        let sections = try viewModel.values.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().singleValue()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "ETA" }?.1
         XCTAssertEqual(eta, "∞")
     }
@@ -458,14 +458,14 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     func test_ratio_whenInfinite_shouldFormatProperly() throws {
         torrentSubject.send(.mock(uploaded: 1))
         XCTAssertTrue(torrentSubject.value.ratio.isInfinite)
-        let sections = try viewModel.values.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().singleValue()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
 
     func test_ratio_whenNaN_shouldFormatProperly() throws {
         XCTAssertTrue(torrentSubject.value.ratio.isNaN)
-        let sections = try viewModel.values.sections.first().wait().value()
+        let sections = try viewModel.values.sections.first().wait().singleValue()
         let eta = try getInfoRows(in: sections[1]).first { $0.0 == "Ratio" }?.1
         XCTAssertEqual(eta, "∞")
     }
@@ -577,20 +577,20 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             action?.handler()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: toolbarInfo
 
     func test_toolbarInfo_whenNotEditing_shouldBeEmpty() throws {
-        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().value()
+        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().singleValue()
         XCTAssertTrue(toolbarInfo.isEmpty)
     }
 
     func test_toolbarInfo_whenEditingFiles_shouldBeSelectionCount() throws {
         viewModel.send(.editSectionSelected(.files))
         viewModel.send(.multiSelectUpdated(indexPaths: [.init(row: 0, section: 0)]))
-        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().value()
+        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().singleValue()
         XCTAssertEqual(toolbarInfo, "1 Selected")
     }
 
@@ -598,7 +598,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         viewModel.send(.editSectionSelected(.files))
         viewModel.send(.multiSelectUpdated(indexPaths: [.init(row: 0, section: 0)]))
         viewModel.send(.doneEditingSelected)
-        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().value()
+        let toolbarInfo = try viewModel.values.toolbarInfo.first().wait().singleValue()
         XCTAssertTrue(toolbarInfo.isEmpty)
     }
 }

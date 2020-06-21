@@ -27,7 +27,7 @@ class RefreshIntervalViewModelTests: TestCase {
     }
 
     func test_option_whenIsCurrent_shouldBeSelected() throws {
-        let isSelected = try viewModel.values.options.first { $0.title == "2 seconds" }?.isSelected.wait().value()
+        let isSelected = try viewModel.values.options.first { $0.title == "2 seconds" }?.isSelected.wait().singleValue()
         XCTAssertEqual(isSelected, .some(true))
     }
 

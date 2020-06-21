@@ -749,7 +749,6 @@
 		E96B0058237A43740091FA71 = {
 			isa = PBXGroup;
 			children = (
-				E93200E42496BDF3009F60C6 /* AddServerViewModelEvent.swift */,
 				E96B0063237A43740091FA71 /* Magnesium */,
 				E9CC160A23AD5CD400EA1B4C /* MagnesiumTests */,
 				E9DD196B243E8A01004E4414 /* Components */,
@@ -819,6 +818,7 @@
 				E97233FB23CFF9C300038D30 /* AddServerViewController.swift */,
 				E93200E62496BE02009F60C6 /* AddServerViewEvent.swift */,
 				E9A0BD9223D0040300AEC254 /* AddServerViewModel.swift */,
+				E93200E42496BDF3009F60C6 /* AddServerViewModelEvent.swift */,
 				E93200E82496BE0F009F60C6 /* AddServerViewValues.swift */,
 			);
 			path = "Add Server";

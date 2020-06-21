@@ -49,7 +49,7 @@ class ServerSettingsCoordinatorTests: TestCase {
     func test_serverSettings_completeEvent_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.complete)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 

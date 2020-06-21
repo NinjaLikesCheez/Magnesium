@@ -31,7 +31,7 @@ class SettingsViewModelTests: TestCase {
     func test_doneSelected_shouldEmitCompleteEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.doneSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 
@@ -43,7 +43,7 @@ class SettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertEqual(alert.actions.map(\.title), ["Server 1", "Server 2", "Cancel"])
     }
@@ -57,7 +57,7 @@ class SettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         let previousID = session.server!.id
         alert.actions.first { $0.title == "Server 2" }?.handler?()
@@ -72,7 +72,7 @@ class SettingsViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.serverSelected(index: 1))
-        }.value()
+        }.singleValue()
         let server = try extract(case: type(of: event).editServer, from: event)
         XCTAssertEqual(server.id, server2.id)
     }
@@ -80,14 +80,14 @@ class SettingsViewModelTests: TestCase {
     func test_addServerSelected_shouldEmitAddServerEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.addServerSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .addServer)
     }
 
     func test_refreshIntervalSelected_shouldEmitShowRefreshIntervalSettingsEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.refreshIntervalSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .showRefreshIntervalSettings)
     }
 }

@@ -22,14 +22,14 @@ class NoServersCoordinatorTests: TestCase {
     func test_noServersEvent_showSettings_shouldEmitShowSettings() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.showSettings)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .showSettings)
     }
 
     func test_noServersEvent_addServer_shouldEmitAddServerEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.addServer)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .addServer)
     }
 }

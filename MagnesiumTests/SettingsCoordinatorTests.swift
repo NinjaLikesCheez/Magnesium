@@ -32,7 +32,7 @@ class SettingsCoordinatorTests: TestCase {
     func test_settingsEvent_complete_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.complete)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(event, .complete)
     }
 

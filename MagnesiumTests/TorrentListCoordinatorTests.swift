@@ -98,7 +98,7 @@ class TorrentListCoordinatorTests: TestCase {
         let detailViewModel = AnyViewModel(MockDetailViewModel())
         let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.detail(viewModel: detailViewModel))
-        }.value()
+        }.singleValue()
         let viewModel = try extract(case: TorrentListCoordinatorEvent.showDetail, from: event)
         XCTAssertTrue(detailViewModel === viewModel)
     }
@@ -106,7 +106,7 @@ class TorrentListCoordinatorTests: TestCase {
     func test_settings_shouldEmitShowSettingsEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.settings)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .showSettings)
     }
 
@@ -126,7 +126,7 @@ class TorrentListCoordinatorTests: TestCase {
     func test_torrentsUpdated_shouldEmitTorrentsUpdatedEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.torrentsUpdated(hashes: []))
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).torrentsUpdated)
     }
 
@@ -155,7 +155,7 @@ class TorrentListCoordinatorTests: TestCase {
 
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.commitPreviewForItem(at: 0)
-        }.value()
+        }.singleValue()
         let committedCoordinator = try extract(case: type(of: event).commitDetail, from: event)
         XCTAssertTrue(childCoordinator === committedCoordinator)
     }

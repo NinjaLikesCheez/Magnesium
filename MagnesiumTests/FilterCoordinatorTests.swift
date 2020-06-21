@@ -27,7 +27,7 @@ class FilterCoordinatorTests: TestCase {
     func test_filterEvent_complete_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.complete)
-        }.value()
+        }.singleValue()
         XCTAssertEqual(event, .complete)
     }
 

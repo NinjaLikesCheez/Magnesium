@@ -37,7 +37,7 @@ class TorrentDetailCoordinatorTests: TestCase {
     func test_complete_shouldEmitCompleteEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.viewModel.eventSubject.send(.complete)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .complete)
     }
 

@@ -22,14 +22,14 @@ class ServerErrorCoordinatorTests: TestCase {
     func test_serverErrorEvent_showSettings_shouldEmitShowSettings() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.showSettings)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .showSettings)
     }
 
     func test_serverErrorEvent_editServer_shouldEmitEditServerEvent() throws {
         let event = try coordinator.eventPublisher.first().wait {
             self.coordinator.send(.editServer)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).editServer)
     }
 }

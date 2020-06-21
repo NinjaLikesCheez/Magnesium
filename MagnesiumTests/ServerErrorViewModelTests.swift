@@ -15,14 +15,14 @@ class ServerErrorViewModelTests: TestCase {
     func test_serverErrorViewEvent_settingsSelected_shouldEmitShowSettings() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.settingsSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .showSettings)
     }
 
     func test_serverErrorViewEvent_editServerSelected_showEmitEditServer() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.editServerSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .editServer)
     }
 }

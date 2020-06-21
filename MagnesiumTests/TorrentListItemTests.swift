@@ -113,7 +113,7 @@ class TorrentListItemTests: TestCase {
         let states: [TorrentState] = [.paused, .checking, .queued, .error]
         for state in states {
             subject.send(.mock(state: state))
-            XCTAssertTrue(try item.speed.first().wait().value().isEmpty)
+            XCTAssertTrue(try item.speed.first().wait().singleValue().isEmpty)
         }
     }
 

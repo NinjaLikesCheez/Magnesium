@@ -28,7 +28,7 @@ class DelugeTorrentDetailImplementationTests: TestCase {
             method: "web.get_torrent_files",
             result: Just(items as Any).setFailureType(to: DelugeError.self).eraseToAnyPublisher()
         ))
-        let files = try implementation.refreshFiles(.mock()).wait().value()
+        let files = try implementation.refreshFiles(.mock()).wait().singleValue()
         XCTAssertEqual(files, [.mock(index: 0, name: "f0"), .mock(index: 1, name: "f1")])
     }
 

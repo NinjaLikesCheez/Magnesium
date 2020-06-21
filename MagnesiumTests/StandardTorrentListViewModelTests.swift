@@ -19,7 +19,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     private func getAlert(actions: @escaping () -> Void) throws -> Alert {
-        let event = try viewModel.eventPublisher.first().wait(executing: actions).value()
+        let event = try viewModel.eventPublisher.first().wait(executing: actions).singleValue()
         return try extract(case: type(of: event).alert, from: event)
     }
 
@@ -77,7 +77,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let items = viewModel.values.items.dropFirst().first().wait {
             self.implementation.updatedSubject.send(([], []))
         }
-        XCTAssertTrue(items.hasValue())
+        XCTAssertFalse(items.values().isEmpty)
     }
 
     // MARK: - Handle TorrentListViewEvent
@@ -118,7 +118,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.dropFirst().first().wait {
             self.viewModel.send(.refresh)
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     func test_refresh_withChanges_shouldEmitTorrentsUpdatedEvent() throws {
@@ -126,7 +126,7 @@ final class StandardTorrentListViewModelTests: TestCase {
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.refresh)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).torrentsUpdated)
     }
 
@@ -135,7 +135,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_addSelected_shouldEmitAddEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.addSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).add)
     }
 
@@ -164,7 +164,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_filterSelected_shouldEmitFilterEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.filterSelected(source: .view(UIView(), rect: .zero)))
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).filter)
     }
 
@@ -173,7 +173,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_itemSelected_shouldEmitDetailEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.itemSelected(index: 0))
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).detail)
         XCTAssertEqual(implementation.detailViewModelCallCount, 1)
         XCTAssertEqual(implementation.detailViewModelParamTorrent.map(\.value.name), ["Mock"])
@@ -185,7 +185,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_settingsSelected_shouldEmitSettingsEvent() throws {
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.settingsSelected)
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, .settings)
     }
 
@@ -201,8 +201,8 @@ final class StandardTorrentListViewModelTests: TestCase {
         viewModel.send(.refresh)
         let items = try viewModel.values.items.dropFirst().first().wait {
             self.viewModel.send(.search(query: "test tor"))
-        }.value()
-        let names = try items.map { try $0.name.first().wait().value() }
+        }.singleValue()
+        let names = try items.map { try $0.name.first().wait().singleValue() }
         XCTAssertEqual(names, ["test torrent", "TEST.TORRENT"])
     }
 
@@ -229,7 +229,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             self.viewModel.send(.resumeSelected(indices: [0, 1]))
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: pauseSelected
@@ -255,7 +255,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             self.viewModel.send(.pauseSelected(indices: [0, 1]))
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: removeSelected
@@ -311,7 +311,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             optionsAlert.actions.first { $0.title == "Keep Data" }?.handler?()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     func test_removeSelected_whenRemoveDataSelected_shouldCallImplementationRemoveAndRefresh() throws {
@@ -347,13 +347,13 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             optionsAlert.actions.first { $0.title == "Remove Data" }?.handler?()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: moreOptionsSelected
 
     private func getActivities(actions: @escaping () -> Void) throws -> [Activity] {
-        let event = try viewModel.eventPublisher.first().wait(executing: actions).value()
+        let event = try viewModel.eventPublisher.first().wait(executing: actions).singleValue()
         return try extract(case: type(of: event).activities, from: event).0
     }
 
@@ -444,7 +444,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             optionsAlert.actions.first { $0.title == "label1" }?.handler?()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: moreOptionsSelected - Verify Files
@@ -481,7 +481,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Verify Files" }?.handler()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: moreOptionsSelected - Move Download Folder
@@ -492,7 +492,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         XCTAssertCase(event, type(of: event).moveDownloadFolder)
     }
 
@@ -508,7 +508,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (path, _) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertEqual(path, "/downloads")
     }
@@ -525,7 +525,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (path, _) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         XCTAssertNil(path)
     }
@@ -537,7 +537,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         subject.send("/new")
         XCTAssertEqual(implementation.moveDownloadFolderCallCount, 1)
@@ -552,7 +552,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let event = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         let alert = try getAlert {
             subject.send("/new")
@@ -568,13 +568,13 @@ final class StandardTorrentListViewModelTests: TestCase {
         }
         let moveEvent = try viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Move Download Folder" }?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: type(of: moveEvent).moveDownloadFolder, from: moveEvent)
 
         let event = viewModel.eventPublisher.first().wait {
             subject.send("/new")
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: moreOptionsSelected - Update Trackers
@@ -610,7 +610,7 @@ final class StandardTorrentListViewModelTests: TestCase {
         let event = viewModel.eventPublisher.first().wait {
             activities.first { $0.title == "Update Trackers" }?.handler()
         }
-        XCTAssertFalse(event.hasValue())
+        XCTAssertTrue(event.values().isEmpty)
     }
 
     // MARK: - Values
@@ -618,14 +618,14 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: items
 
     func test_items_shouldEmitInitialValue() {
-        XCTAssertTrue(viewModel.values.items.first().wait().hasValue())
+        XCTAssertFalse(viewModel.values.items.first().wait().values().isEmpty)
     }
 
     func test_items_shouldRemoveDuplicates() {
         let items = viewModel.values.items.dropFirst().first().wait {
             self.viewModel.send(.refresh)
         }
-        XCTAssertFalse(items.hasValue())
+        XCTAssertTrue(items.values().isEmpty)
     }
 
     func test_items_shouldEmitNewValues() {
@@ -634,18 +634,18 @@ final class StandardTorrentListViewModelTests: TestCase {
         let items = viewModel.values.items.dropFirst().first().wait {
             self.viewModel.send(.refresh)
         }
-        XCTAssertTrue(items.hasValue())
+        XCTAssertFalse(items.values().isEmpty)
     }
 
     // MARK: hasActiveFilters
 
     func test_hasActiveFilters_withNoFilters_shouldBeFalse() throws {
-        XCTAssertFalse(try viewModel.values.hasActiveFilters.first().wait().value())
+        XCTAssertFalse(try viewModel.values.hasActiveFilters.first().wait().singleValue())
     }
 
     func test_hasActiveFilters_withFilters_shouldBeTrue() {
         preferences[.filterOptions] = FilterOptions(state: .downloading)
-        XCTAssertTrue(try viewModel.values.hasActiveFilters.first().wait(timeout: 1).value())
+        XCTAssertTrue(try viewModel.values.hasActiveFilters.first().wait(timeout: 1).singleValue())
     }
 
     // MARK: status
@@ -759,7 +759,7 @@ final class StandardTorrentListViewModelTests: TestCase {
             .first { $0.title == "Move Download Folder" }
         let event = try viewModel.eventPublisher.first().wait {
             action?.handler()
-        }.value()
+        }.singleValue()
         let (_, subject) = try extract(case: type(of: event).moveDownloadFolder, from: event)
         subject.send("/new")
         subject.send(completion: .finished)
