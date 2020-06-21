@@ -11,7 +11,7 @@ final class Session {
     }
 
     init() {
-        _setServer(Current.preferences.getSelectedServer())
+        _setServer(try? Current.preferences.getSelectedServer())
     }
 
     func setServer(_ server: Server) {
@@ -29,7 +29,7 @@ final class Session {
 
     private func setupServerObserver() {
         guard let server = server else {
-            serverObserver = Current.preferences.valueUpdatedPublisher(for: .servers).sink { [weak self] servers in
+            serverObserver = Current.preferences.updatePublisher(for: .servers).sink { [weak self] servers in
                 self?._setServer(servers.first)
             }
             return
@@ -39,7 +39,7 @@ final class Session {
             if let server = server {
                 self?._setServer(server)
             } else {
-                self?._setServer(Current.preferences.getSelectedServer())
+                self?._setServer(try? Current.preferences.getSelectedServer())
             }
         }
     }

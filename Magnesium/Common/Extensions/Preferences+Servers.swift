@@ -2,8 +2,8 @@ import Combine
 import Preferences
 
 extension Preferences {
-    private func updateSelectedServerID() {
-        guard let server = getSelectedServer() else {
+    private func updateSelectedServerID() throws {
+        guard let server = try getSelectedServer() else {
             removeValue(for: .selectedServerID)
             return
         }
@@ -12,7 +12,7 @@ extension Preferences {
     }
 
     func serverUpdatedPublisher(for server: Server) -> AnyPublisher<Server?, Never> {
-        preferencesChanged
+        changePublisher
             .filter { $0.isRelevant(to: .servers) }
             .map { change -> Server? in
                 switch change {
@@ -25,31 +25,31 @@ extension Preferences {
                     return nil
                 }
             }
-            .prepend(Deferred { Just(self.getServers().first { $0.id == server.id }) })
+            .prepend(Deferred { Just(try? self.getServers().first { $0.id == server.id }) })
             .removeDuplicates()
             .dropFirst()
             .eraseToAnyPublisher()
     }
 
-    func getSelectedServer() -> Server? {
-        let servers = getServers()
+    func getSelectedServer() throws -> Server? {
+        let servers = try getServers()
         guard let selectedServerID = self[.selectedServerID] else { return servers.first }
         return servers.first { $0.id == selectedServerID } ?? servers.first
     }
 
-    func getServers() -> [Server] {
+    func getServers() throws -> [Server] {
         var servers = self[.servers]
         for (index, server) in servers.enumerated() {
             var server = server
-            server.keychainData = Current.keychain.fetch(.server(server))
+            server.keychainData = try Current.keychain.data(for: .server(server))
             servers[index] = server
         }
 
         return servers
     }
 
-    func addOrUpdate(server: Server) {
-        var servers = getServers()
+    func addOrUpdate(server: Server) throws {
+        var servers = try getServers()
 
         if let index = servers.firstIndex(where: { $0.id == server.id }) {
             servers[index] = server
@@ -58,27 +58,27 @@ extension Preferences {
         }
 
         for server in servers {
-            Current.keychain.delete(.server(server))
+            try Current.keychain.removeData(for: .server(server))
 
             if let data = server.keychainData {
-                Current.keychain.update(.server(server), data: data)
+                try Current.keychain.set(data, for: .server(server))
             }
         }
 
         self[.servers] = servers
-        updateSelectedServerID()
+        try updateSelectedServerID()
     }
 
-    func remove(server: Server) {
-        var servers = getServers()
+    func remove(server: Server) throws {
+        var servers = try getServers()
         servers.removeAll { $0.id == server.id }
-        Current.keychain.delete(.server(server))
+        try Current.keychain.removeData(for: .server(server))
         self[.servers] = servers
-        updateSelectedServerID()
+        try updateSelectedServerID()
     }
 
-    func removeServers() {
-        Current.keychain.delete(.servers)
+    func removeServers() throws {
+        try Current.keychain.removeData(for: .servers)
         removeValue(for: .servers)
         removeValue(for: .selectedServerID)
     }

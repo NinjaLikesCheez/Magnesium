@@ -16,7 +16,7 @@ class SettingsViewModelTests: TestCase {
 
     func test_sections_whenServersChanged_shouldEmit() {
         let value = viewModel.values.sections.dropFirst().first().wait {
-            self.preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
+            try! self.preferences.addOrUpdate(server: Server(name: "", type: .deluge, data: Data(), keychainData: nil))
         }
         XCTAssertNotNil(value)
     }
@@ -38,8 +38,8 @@ class SettingsViewModelTests: TestCase {
     func test_changeServerSelected_shouldEmitAlert() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
-        preferences.addOrUpdate(server: server1)
-        preferences.addOrUpdate(server: server2)
+        try preferences.addOrUpdate(server: server1)
+        try preferences.addOrUpdate(server: server2)
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
@@ -51,8 +51,8 @@ class SettingsViewModelTests: TestCase {
     func test_changeServerSelected_whenServerSelected_shouldUpdateSession() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
-        preferences.addOrUpdate(server: server1)
-        preferences.addOrUpdate(server: server2)
+        try preferences.addOrUpdate(server: server1)
+        try preferences.addOrUpdate(server: server2)
         session.setServer(server1)
 
         let event = try viewModel.eventPublisher.first().wait {
@@ -67,8 +67,8 @@ class SettingsViewModelTests: TestCase {
     func test_serverSelected_shouldEmitEditServerEvent() throws {
         let server1 = Server(name: "Server 1", type: .deluge, data: Data(), keychainData: nil)
         let server2 = Server(name: "Server 2", type: .deluge, data: Data(), keychainData: nil)
-        preferences.addOrUpdate(server: server1)
-        preferences.addOrUpdate(server: server2)
+        try preferences.addOrUpdate(server: server1)
+        try preferences.addOrUpdate(server: server2)
 
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.serverSelected(index: 1))

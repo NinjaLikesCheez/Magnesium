@@ -160,6 +160,9 @@
 /* Failed to Verify Files */
 "error_verify_files" = "Failed to Verify Files";
 
+/* Failed to Delete Server */
+"error_delete_server" = "Failed to Delete Server";
+
 /* {size} ({percentage}) */
 "file_progress" = "%1$@ (%2$@)";
 

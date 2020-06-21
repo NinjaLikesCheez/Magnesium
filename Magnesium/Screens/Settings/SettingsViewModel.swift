@@ -18,9 +18,9 @@ final class SettingsViewModel: ViewModel {
         self.session = session
         values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
-        Current.preferences.valueUpdatedPublisher(for: .servers).asVoid()
+        Current.preferences.updatePublisher(for: .servers).asVoid()
             .merge(with: session.serverPublisher.asVoid())
-            .merge(with: Current.preferences.valueUpdatedPublisher(for: .autoRefreshInterval).asVoid())
+            .merge(with: Current.preferences.valuePublisher(for: .autoRefreshInterval).asVoid())
             .sink { [weak self] _ in self?.updateSections() }
             .store(in: &cancellables)
 
@@ -34,8 +34,8 @@ final class SettingsViewModel: ViewModel {
         case let .changeServerSelected(source):
             handleChangeServerSelected(from: source)
         case let .serverSelected(index):
-            let server = Current.preferences.getServers()[index]
-            eventSubject.send(.editServer(server))
+            guard let servers = try? Current.preferences.getServers() else { return }
+            eventSubject.send(.editServer(servers[index]))
         case .addServerSelected:
             eventSubject.send(.addServer)
         case .refreshIntervalSelected:
@@ -44,7 +44,7 @@ final class SettingsViewModel: ViewModel {
     }
 
     private func handleChangeServerSelected(from source: PopoverSource) {
-        let servers = Current.preferences.getServers()
+        let servers = (try? Current.preferences.getServers()) ?? []
         let serverActions = servers.map { server in
             AlertAction(title: server.name, style: .default) {
                 self.session.setServer(server)
@@ -54,7 +54,7 @@ final class SettingsViewModel: ViewModel {
     }
 
     private func updateSections() {
-        let servers = Current.preferences.getServers()
+        let servers = (try? Current.preferences.getServers()) ?? []
         var sections = [SettingsSection]()
 
         if servers.count > 1, let server = session.server {

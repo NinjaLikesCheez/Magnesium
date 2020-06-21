@@ -21,9 +21,9 @@ final class FilterViewModel: ViewModel {
             self?.labels = $0
         }.store(in: &cancellables)
 
-        Current.preferences.valueUpdatedPublisher(for: .sortOption)
+        Current.preferences.updatePublisher(for: .sortOption)
             .asVoid()
-            .merge(with: Current.preferences.valueUpdatedPublisher(for: .filterOptions).asVoid())
+            .merge(with: Current.preferences.updatePublisher(for: .filterOptions).asVoid())
             .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).asVoid())
             .sink { [weak self] _ in self?.updateSections() }
             .store(in: &cancellables)

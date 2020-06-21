@@ -215,6 +215,10 @@ enum L10n {
         NSLocalizedString("error_set_priority", comment: "Failed to Set Priority")
     }
 
+    static var deleteServerError: String {
+        NSLocalizedString("error_delete_server", comment: "Failed to Delete Server")
+    }
+
     // MARK: Servers
 
     static var deluge: String {

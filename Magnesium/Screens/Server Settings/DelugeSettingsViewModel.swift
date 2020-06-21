@@ -145,9 +145,9 @@ final class DelugeSettingsViewModel: ViewModel {
             server.name = name
             server.data = data
             server.keychainData = keychainData
-            Current.preferences.addOrUpdate(server: server)
+            try Current.preferences.addOrUpdate(server: server)
         } else {
-            Current.preferences.addOrUpdate(server: .init(
+            try Current.preferences.addOrUpdate(server: .init(
                 name: name,
                 type: .deluge,
                 data: data,
@@ -161,7 +161,13 @@ final class DelugeSettingsViewModel: ViewModel {
         guard let server = server else { return }
         eventSubject.send(.alert(.init(message: L10n.deleteServerConfirmation, style: .actionSheet(source), actions: [
             .init(title: L10n.deleteServer, style: .destructive) {
-                Current.preferences.remove(server: server)
+                do {
+                    try Current.preferences.remove(server: server)
+                } catch {
+                    self.showError(title: L10n.deleteServerError, message: error.localizedDescription)
+                    return
+                }
+
                 self.eventSubject.send(.complete)
             },
             .cancel,

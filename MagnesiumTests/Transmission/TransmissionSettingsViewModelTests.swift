@@ -170,7 +170,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[2].value.value = settings.username
         viewModel.values.inputs[3].value.value = keychain.password
         viewModel.send(.saveSelected)
-        let server = preferences.getServers()[0]
+        let server = try preferences.getServers()[0]
         XCTAssertEqual(server.name, "name")
         XCTAssertEqual(server.data, expectedData)
         XCTAssertEqual(server.keychainData, expectedKeychainData)
@@ -193,7 +193,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         viewModel.values.inputs[2].value.value = settings.username
         viewModel.values.inputs[3].value.value = keychain.password
         viewModel.send(.saveSelected)
-        let server = preferences.getServers()[0]
+        let server = try preferences.getServers()[0]
         XCTAssertEqual(server.name, "new name")
         XCTAssertEqual(server.data, expectedData)
         XCTAssertEqual(server.keychainData, expectedKeychainData)
@@ -251,18 +251,18 @@ class TransmissionSettingsViewModelTests: TestCase {
     }
 
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() throws {
-        preferences.addOrUpdate(server: server)
+        try preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
         let event = try viewModel.eventPublisher.first().wait {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         alert.actions.first { $0.title == "Delete Server" }?.handler?()
-        XCTAssertTrue(preferences.getServers().isEmpty)
+        XCTAssertTrue(try preferences.getServers().isEmpty)
     }
 
     func test_deleteSelected_whenDeleteServerSelected_shouldEmitCompleteEvent() throws {
-        preferences.addOrUpdate(server: server)
+        try preferences.addOrUpdate(server: server)
         let viewModel = editViewModel!
 
         let alertEvent = try viewModel.eventPublisher.first().wait {
@@ -274,6 +274,6 @@ class TransmissionSettingsViewModelTests: TestCase {
             alert.actions.first { $0.title == "Delete Server" }?.handler?()
         }.singleValue()
         XCTAssertCase(event, .complete)
-        XCTAssertTrue(preferences.getServers().isEmpty)
+        XCTAssertTrue(try preferences.getServers().isEmpty)
     }
 }

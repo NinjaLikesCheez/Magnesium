@@ -118,8 +118,7 @@
 		E96BDBF923FB78D800EFCA86 /* NoServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */; };
 		E96BDBFB23FB845A00EFCA86 /* NoServersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */; };
 		E96BDBFD23FB860E00EFCA86 /* NoServersCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */; };
-		E96E25A32425B9F2007DB2A0 /* KeychainKey+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */; };
-		E96E25A52425BC3D007DB2A0 /* KeychainGroupKey+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */; };
+		E96E25A32425B9F2007DB2A0 /* KeychainQuery+App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96E25A22425B9F2007DB2A0 /* KeychainQuery+App.swift */; };
 		E96E25A72425BCFC007DB2A0 /* Keychain in Frameworks */ = {isa = PBXBuildFile; productRef = E96E25A62425BCFC007DB2A0 /* Keychain */; };
 		E97042252400A05F00ACD170 /* ToolbarInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97042242400A05F00ACD170 /* ToolbarInfoView.swift */; };
 		E97233F723CFE3FA00038D30 /* ButtonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */; };
@@ -350,8 +349,7 @@
 		E96BDBF823FB78D800EFCA86 /* NoServersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewController.swift; sourceTree = "<group>"; };
 		E96BDBFA23FB845A00EFCA86 /* NoServersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewModel.swift; sourceTree = "<group>"; };
 		E96BDBFC23FB860E00EFCA86 /* NoServersCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersCoordinator.swift; sourceTree = "<group>"; };
-		E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainKey+App.swift"; sourceTree = "<group>"; };
-		E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainGroupKey+App.swift"; sourceTree = "<group>"; };
+		E96E25A22425B9F2007DB2A0 /* KeychainQuery+App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeychainQuery+App.swift"; sourceTree = "<group>"; };
 		E97042242400A05F00ACD170 /* ToolbarInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarInfoView.swift; sourceTree = "<group>"; };
 		E97233F623CFE3FA00038D30 /* ButtonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonTableViewCell.swift; sourceTree = "<group>"; };
 		E97233FB23CFF9C300038D30 /* AddServerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewController.swift; sourceTree = "<group>"; };
@@ -490,8 +488,7 @@
 				E9843B3423F39A9D005FBF7E /* AlertAction+App.swift */,
 				E9801EF623D37FC200181FFD /* Coordinator+Alert.swift */,
 				E9786AF523D38D5600E4157E /* Deluge+App.swift */,
-				E96E25A42425BC3D007DB2A0 /* KeychainGroupKey+App.swift */,
-				E96E25A22425B9F2007DB2A0 /* KeychainKey+App.swift */,
+				E96E25A22425B9F2007DB2A0 /* KeychainQuery+App.swift */,
 				E99B36F423F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift */,
 				E95BB40323CA404C002F0520 /* PreferenceKey+App.swift */,
 				E951873323C80FC00060636A /* Preferences+Servers.swift */,
@@ -1237,11 +1234,10 @@
 				E917B4BD23E764DA0090D490 /* AddTorrentFlow.swift in Sources */,
 				E99B36F523F0F3BB004F7B97 /* LPLinkMetadata+StandardTorrent.swift in Sources */,
 				E915C0412432FD87004816E5 /* TransmissionSession.swift in Sources */,
-				E96E25A52425BC3D007DB2A0 /* KeychainGroupKey+App.swift in Sources */,
 				E97750EA23D1686F00264638 /* SettingsSection.swift in Sources */,
 				E93201092496C044009F60C6 /* SettingsCoordinatorEvent.swift in Sources */,
 				E93200FD2496BEF4009F60C6 /* RefreshIntervalViewValues.swift in Sources */,
-				E96E25A32425B9F2007DB2A0 /* KeychainKey+App.swift in Sources */,
+				E96E25A32425B9F2007DB2A0 /* KeychainQuery+App.swift in Sources */,
 				E96A4EF72426AA4E00D00131 /* Prelude.swift in Sources */,
 				E97233FC23CFF9C300038D30 /* AddServerViewController.swift in Sources */,
 				E93200F32496BE63009F60C6 /* FilterViewValues.swift in Sources */,
