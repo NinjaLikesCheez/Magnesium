@@ -6,7 +6,7 @@ struct StandardTorrentListImplementation {
         let message: String
     }
 
-    var updated: AnyPublisher<([StandardTorrent], [StandardLabel]), Never>
+    var updatePublisher: AnyPublisher<([StandardTorrent], [StandardLabel]), Never>
     var refresh: () -> AnyPublisher<([StandardTorrent], [StandardLabel]), Error>
     var detailViewModel: (
         CurrentValueSubject<StandardTorrent, Never>,

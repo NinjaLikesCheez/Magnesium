@@ -83,7 +83,7 @@ class TorrentListItemTests: TestCase {
         }
     }
 
-    func test_state() {
+    func test_status() {
         let pairs: [(TorrentState, String)] = [
             (.downloading, "Downloading"),
             (.seeding, "Seeding"),
@@ -95,7 +95,7 @@ class TorrentListItemTests: TestCase {
 
         for (state, result) in pairs {
             subject.send(.mock(state: state))
-            XCTAssertEqual(item.state.first().wait(), result, String(describing: state))
+            XCTAssertEqual(item.status.first().wait(), result, String(describing: state))
         }
     }
 
@@ -117,9 +117,9 @@ class TorrentListItemTests: TestCase {
         }
     }
 
-    func test_progressString() {
+    func test_progressText() {
         subject.send(.mock(downloaded: 130_583_716, progress: 0.189_838, size: 687_865_856))
-        XCTAssertEqual(item.progressString.first().wait(), "124.5 MB / 656.0 MB (19%)")
+        XCTAssertEqual(item.progressText.first().wait(), "124.5 MB / 656.0 MB (19%)")
     }
 
     let ratioStates: [TorrentState] = [.seeding, .paused, .checking, .queued, .error]

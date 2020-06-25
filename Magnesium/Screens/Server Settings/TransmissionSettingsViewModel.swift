@@ -131,7 +131,7 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         let client = Current.transmission(url, username, password)
         client.request(.rpcVersion)
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:

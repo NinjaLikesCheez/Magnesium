@@ -6,7 +6,8 @@ import XCTest
 class TestCase: XCTestCase {
     override func setUp() {
         super.setUp()
-//        record = true
+//        SnapshotTesting.record = true
+        diffTool = "ksdiff"
         Current = .mock
     }
 }

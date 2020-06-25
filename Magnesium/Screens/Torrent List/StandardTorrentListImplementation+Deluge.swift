@@ -10,7 +10,7 @@ extension StandardTorrentListImplementation {
             .dropFirst()
             .eraseToAnyPublisher()
         return .init(
-            updated: updatePublisher,
+            updatePublisher: updatePublisher,
             refresh: { refresh(session: session) },
             detailViewModel: { detailViewModel(session: session, torrentSubject: $0, labelsSubject: $1) },
             addLink: { addLink(client: client, url: $0) },

@@ -110,6 +110,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
+        // TODO: this doesnt work in ios14
         selectedBackgroundView = editing ? UIImageView(image: UIImage(color: .systemGray5)) : nil
     }
 

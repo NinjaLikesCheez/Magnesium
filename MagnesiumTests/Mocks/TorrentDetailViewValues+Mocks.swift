@@ -14,10 +14,10 @@ extension TorrentDetailViewValues {
     ) -> Self {
         .init(
             hash: hash,
-            sections: Just(sections).eraseToAnyPublisher(),
-            isRefreshing: Just(isRefreshing).eraseToAnyPublisher(),
-            toolbarInfo: Just(toolbarInfo).eraseToAnyPublisher(),
-            editSection: Just(editSection).eraseToAnyPublisher(),
+            sections: Just(sections).ui(),
+            isRefreshing: Just(isRefreshing).ui(),
+            toolbarInfo: Just(toolbarInfo).ui(),
+            editSection: Just(editSection).ui(),
             contextMenu: contextMenu
         )
     }

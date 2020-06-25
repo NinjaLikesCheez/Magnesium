@@ -4,7 +4,6 @@ import Preferences
 import XCTest
 
 class AddServerCoordinatorTests: TestCase {
-    private let window = UIWindow()
     private var navigationController: UINavigationController!
     private var coordinator: AddServerCoordinator!
 
@@ -12,9 +11,6 @@ class AddServerCoordinatorTests: TestCase {
         super.setUp()
         coordinator = AddServerCoordinator()
         navigationController = UINavigationController(rootViewController: coordinator.presentable.viewController)
-        // the view controller needs to be in a key window to perform a presentation
-        window.rootViewController = navigationController
-        window.makeKeyAndVisible()
     }
 
     func test_presentable_shouldBeAddServerViewController() {

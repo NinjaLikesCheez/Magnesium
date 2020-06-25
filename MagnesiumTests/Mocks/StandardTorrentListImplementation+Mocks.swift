@@ -6,7 +6,7 @@ import XCTest
 extension StandardTorrentListImplementation {
     static func mock(_ impl: MockStandardTorrentListImplementation) -> StandardTorrentListImplementation {
         .init(
-            updated: impl.updatedSubject.eraseToAnyPublisher(),
+            updatePublisher: impl.updatedSubject.eraseToAnyPublisher(),
             refresh: impl.refresh,
             detailViewModel: impl.detailViewModel(torrentSubject:labelsSubject:),
             addLink: impl.addLink(url:),
@@ -29,8 +29,8 @@ final class MockStandardTorrentListImplementation {
     private(set) var refreshCallCount = 0
     var refreshResult = Just((
         [
-            StandardTorrent.mock(dateAdded: Date(), name: "Mock"),
-            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), name: "Mock 2"),
+            StandardTorrent.mock(dateAdded: Date(), hash: "A", name: "Mock"),
+            StandardTorrent.mock(dateAdded: Date(timeIntervalSinceNow: -1), hash: "B", name: "Mock 2"),
         ],
         [
             StandardLabel.mock(name: ""),

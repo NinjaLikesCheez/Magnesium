@@ -6,7 +6,7 @@ extension StandardTorrentListImplementation {
     static func transmission(_ session: TransmissionSession) -> Self {
         let client = session.client
         return .init(
-            updated: session.torrents.dropFirst().map { ($0, []) }.eraseToAnyPublisher(),
+            updatePublisher: session.torrents.dropFirst().map { ($0, []) }.eraseToAnyPublisher(),
             refresh: { refresh(session: session) },
             detailViewModel: { detailViewModel(session: session, torrentSubject: $0, labelsSubject: $1) },
             addLink: { addLink(client: client, url: $0) },

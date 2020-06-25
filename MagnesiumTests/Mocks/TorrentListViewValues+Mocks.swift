@@ -14,21 +14,23 @@ extension TorrentListViewValues {
         hasActiveFilters: Bool = false,
         editActionsEnabled: Bool = false,
         status: String = "",
-        detailViewModel: @escaping (Int) -> AnyTorrentDetailViewModel = { _ in .init(MockDetailViewModel()) },
-        contextMenu: @escaping (Int) -> Menu? = { _ in nil },
-        leadingSwipeActionsConfiguration: @escaping (Int, PopoverSource)
+        detailViewModel: @escaping (TorrentListItem) -> AnyTorrentDetailViewModel = { _ in
+            .init(MockDetailViewModel())
+        },
+        contextMenu: @escaping (TorrentListItem) -> Menu? = { _ in nil },
+        leadingSwipeActionsConfiguration: @escaping (TorrentListItem, PopoverSource)
             -> SwipeActionsConfiguration? = { _, _ in nil },
-        trailingSwipeActionsConfiguration: @escaping (Int, PopoverSource)
+        trailingSwipeActionsConfiguration: @escaping (TorrentListItem, PopoverSource)
             -> SwipeActionsConfiguration? = { _, _ in nil }
     ) -> Self {
         .init(
-            title: Just(title).eraseToAnyPublisher(),
-            items: Just(items).eraseToAnyPublisher(),
-            isLoading: Just(isLoading).eraseToAnyPublisher(),
-            isEditing: Just(isEditing).eraseToAnyPublisher(),
-            hasActiveFilters: Just(hasActiveFilters).eraseToAnyPublisher(),
-            editActionsEnabled: Just(editActionsEnabled).eraseToAnyPublisher(),
-            status: Just(status).eraseToAnyPublisher(),
+            title: Just(title).ui(),
+            items: Just(items).ui(),
+            isLoading: Just(isLoading).ui(),
+            isEditing: Just(isEditing).ui(),
+            hasActiveFilters: Just(hasActiveFilters).ui(),
+            editActionsEnabled: Just(editActionsEnabled).ui(),
+            status: Just(status).ui(),
             detailViewModel: detailViewModel,
             contextMenu: contextMenu,
             leadingSwipeActionsConfiguration: leadingSwipeActionsConfiguration,

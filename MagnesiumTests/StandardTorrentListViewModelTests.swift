@@ -664,18 +664,18 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: detailViewModel
 
     func test_detailViewModel_shouldReturnExpectedViewModel() {
-        XCTAssertNotNil(viewModel.values.detailViewModel(0))
+        XCTAssertNotNil(viewModel.values.detailViewModel(.mock(hash: "A")))
     }
 
     // MARK: contextMenu
 
     func test_contextMenu_whenNoLabels_shouldReturnExpectedMenu() {
-        implementation.refreshResult = Just(([.mock()], []))
+        implementation.refreshResult = Just(([.mock(hash: "A")], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
 
-        guard let menu = viewModel.values.contextMenu(0) else {
+        guard let menu = viewModel.values.contextMenu(.mock(hash: "A")) else {
             XCTFail("Expected menu")
             return
         }
@@ -684,7 +684,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_withActiveTorrent_shouldReturnExpectedMenu() {
-        guard let menu = viewModel.values.contextMenu(0) else {
+        guard let menu = viewModel.values.contextMenu(.mock(hash: "A")) else {
             XCTFail("Expected menu")
             return
         }
@@ -694,14 +694,14 @@ final class StandardTorrentListViewModelTests: TestCase {
 
     func test_contextMenu_withInactiveTorrent_shouldReturnExpectedMenu() {
         implementation.refreshResult = Just((
-            [.mock(state: .paused)],
+            [.mock(hash: "A", state: .paused)],
             [.mock(name: ""), .mock(name: "label1"), .mock(name: "label2")]
         ))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
 
-        guard let menu = viewModel.values.contextMenu(0) else {
+        guard let menu = viewModel.values.contextMenu(.mock(hash: "A")) else {
             XCTFail("Expected menu")
             return
         }
@@ -710,7 +710,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_pause_shouldPauseAndRefresh() {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
             .first { $0.title == "Pause" }
         action?.handler()
@@ -719,12 +719,12 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_resume_shouldResumeAndRefresh() {
-        implementation.refreshResult = Just(([.mock(name: "Mock", state: .paused)], []))
+        implementation.refreshResult = Just(([.mock(hash: "A", name: "Mock", state: .paused)], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
 
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
             .first { $0.title == "Resume" }
         action?.handler()
@@ -733,7 +733,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_setLabel_shouldSetLabelAndRefresh() throws {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.menu, from: $0) }
             .first?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
@@ -745,7 +745,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_verifyFiles_shouldVerifyFilesAndRefresh() {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
             .first { $0.title == "Verify Files" }
         action?.handler()
@@ -754,7 +754,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_moveDownloadFolder_shouldMoveDownloadFolderAndRefresh() throws {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
             .first { $0.title == "Move Download Folder" }
         let event = try viewModel.eventPublisher.first().wait {
@@ -769,7 +769,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_updateTrackers_shouldUpdateTrackersAndRefresh() {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
             .first { $0.title == "Update Trackers" }
         action?.handler()
@@ -778,7 +778,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_remove_keepData_shouldRemoveAndRefresh() {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.menu, from: $0) }
             .first { $0.title == "Remove" }?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
@@ -790,7 +790,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_contextMenu_remove_removeData_shouldRemoveAndRefresh() {
-        let action = viewModel.values.contextMenu(0)?.children
+        let action = viewModel.values.contextMenu(.mock(hash: "A"))?.children
             .compactMap { try? extract(case: MenuItem.menu, from: $0) }
             .first { $0.title == "Remove" }?.children
             .compactMap { try? extract(case: MenuItem.action, from: $0) }
@@ -804,26 +804,26 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: leadingSwipeActionsConfiguration
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsActive_shouldReturnedExpectedConfiguration() {
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "pause.fill")])
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
         XCTAssertEqual(config?.actions.map(\.style), [.normal])
     }
 
     func test_leadingSwipeActionsConfiguration_whenTorrentIsInactive_shouldReturnedExpectedConfiguration() {
-        implementation.refreshResult = Just(([.mock(state: .paused)], []))
+        implementation.refreshResult = Just(([.mock(hash: "A", state: .paused)], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
 
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         XCTAssertEqual(config?.actions.map(\.image), [UIImage(systemName: "play.fill")])
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [.systemBlue])
         XCTAssertEqual(config?.actions.map(\.style), [.normal])
     }
 
     func test_pauseSwipeAction_shouldCallImplementationPauseAndRefresh() {
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.pauseCallCount, 1)
         XCTAssertEqual(implementation.refreshCallCount, 2)
@@ -831,7 +831,7 @@ final class StandardTorrentListViewModelTests: TestCase {
 
     func test_pauseSwipeAction_whenFails_shouldEmitAlert() throws {
         implementation.pauseResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }
@@ -839,25 +839,25 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_resumeSwipeAction_shouldCallImplementationResumeAndRefresh() {
-        implementation.refreshResult = Just(([.mock(name: "Mock", state: .paused)], []))
+        implementation.refreshResult = Just(([.mock(hash: "A", name: "Mock", state: .paused)], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
 
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         config?.actions[0].handler()
         XCTAssertEqual(implementation.resumeCallCount, 1)
         XCTAssertEqual(implementation.refreshCallCount, 3)
     }
 
     func test_resumeSwipeAction_whenFails_shouldEmitAlert() throws {
-        implementation.refreshResult = Just(([.mock(name: "Mock", state: .paused)], []))
+        implementation.refreshResult = Just(([.mock(hash: "A", name: "Mock", state: .paused)], []))
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
         viewModel.send(.refresh)
         implementation.resumeResult = Fail(error: DelugeError.unauthenticated).eraseToAnyPublisher()
 
-        let config = viewModel.values.leadingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.leadingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }
@@ -867,7 +867,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     // MARK: trailingSwipeActionsConfiguration
 
     func test_trailingSwipeActionsConfiguration_shouldReturnExpectedConfiguration() {
-        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         let expected = [UIImage(systemName: "trash.fill"), UIImage(systemName: "ellipsis.circle.fill")]
         XCTAssertEqual(config?.actions.map(\.image), expected)
         XCTAssertEqual(config?.actions.map(\.backgroundColor), [nil, .systemGray])
@@ -875,7 +875,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_moreSwipeAction_shouldEmitActivities() throws {
-        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         let activities = try getActivities {
             config?.actions[1].handler()
         }
@@ -884,7 +884,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     }
 
     func test_removeSwipeAction_shouldCallImplementationRemoveAndRefresh() throws {
-        let config = viewModel.values.trailingSwipeActionsConfiguration(0, .view(UIView(), rect: .zero))
+        let config = viewModel.values.trailingSwipeActionsConfiguration(.mock(hash: "A"), .view(UIView(), rect: .zero))
         let alert = try getAlert {
             config?.actions[0].handler()
         }

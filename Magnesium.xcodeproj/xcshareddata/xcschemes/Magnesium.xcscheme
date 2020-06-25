@@ -69,22 +69,13 @@
       <Testables>
          <TestableReference
             skipped = "NO"
+            parallelizable = "YES"
             testExecutionOrdering = "random">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E9CC160823AD5CD400EA1B4C"
                BuildableName = "MagnesiumTests.xctest"
                BlueprintName = "MagnesiumTests"
-               ReferencedContainer = "container:Magnesium.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E920A31B2404BB7F00319D71"
-               BuildableName = "MagnesiumSnapshotTests.xctest"
-               BlueprintName = "MagnesiumSnapshotTests"
                ReferencedContainer = "container:Magnesium.xcodeproj">
             </BuildableReference>
          </TestableReference>

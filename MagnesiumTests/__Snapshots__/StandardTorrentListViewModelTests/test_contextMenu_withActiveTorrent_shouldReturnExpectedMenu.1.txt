@@ -33,7 +33,7 @@
               - state: State.off
               - title: "label2"
         ▿ image: Optional<UIImage>
-          - some: <UIImage symbol(system: tag) {23, 21} baseline=5,contentInsets={1, 2, 1, 2},alignmentRectInsets={-0.33333333333333215, 0, 1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+          - some: <UIImage symbol(system: tag) {22.666666666666668, 21} baseline=5,contentInsets={1, 1.6666666666666667, 1, 2},alignmentRectInsets={-0.33333333333333215, 0, 1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
         - options: 0 elements
         - title: "Set Label"
     ▿ MenuItem
@@ -57,7 +57,7 @@
         - attributes: 0 elements
         - handler: (Function)
         ▿ image: Optional<UIImage>
-          - some: <UIImage symbol(system: arrow.clockwise) {17.666666666666664, 20} baseline=3,contentInsets={1, 1.3333333333333333, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
+          - some: <UIImage symbol(system: arrow.clockwise) {18, 20} baseline=3,contentInsets={1, 1.6666666666666667, 1, 1.3333333333333321},alignmentRectInsets={0.66666666666666785, 0, -1, 0} config=<(null), traits=(UserInterfaceIdiom = Phone, DisplayScale = 3, DisplayGamut = P3, HorizontalSizeClass = Compact, VerticalSizeClass = Regular, UserInterfaceStyle = Light, UserInterfaceLayoutDirection = LTR, PreferredContentSizeCategory = L, AccessibilityContrast = Normal)>>
         - state: State.off
         - title: "Update Trackers"
     ▿ MenuItem

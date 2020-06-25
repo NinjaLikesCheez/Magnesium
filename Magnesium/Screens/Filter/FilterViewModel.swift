@@ -17,16 +17,15 @@ final class FilterViewModel: ViewModel {
     init(labels: AnyPublisher<[StandardLabel], Never>) {
         values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
-        labels.sink { [weak self] in
-            self?.labels = $0
-        }.store(in: &cancellables)
-
-        Current.preferences.updatePublisher(for: .sortOption)
+        let preferencePublisher = Current.preferences.updatePublisher(for: .sortOption)
             .asVoid()
             .merge(with: Current.preferences.updatePublisher(for: .filterOptions).asVoid())
-            .merge(with: labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) }).asVoid())
-            .sink { [weak self] _ in self?.updateSections() }
-            .store(in: &cancellables)
+        let labelsPublisher = labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) })
+
+        Publishers.CombineLatest(preferencePublisher, labelsPublisher).sink { [weak self] _, labels in
+            self?.labels = labels
+            self?.updateSections()
+        }.store(in: &cancellables)
 
         updateSections()
     }

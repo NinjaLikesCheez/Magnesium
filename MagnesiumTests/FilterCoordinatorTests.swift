@@ -4,17 +4,11 @@ import CommonModels
 import XCTest
 
 class FilterCoordinatorTests: TestCase {
-    private var window: UIWindow!
     private var coordinator: FilterCoordinator!
 
     override func setUp() {
         super.setUp()
-        window = UIWindow()
         coordinator = FilterCoordinator(labels: Just([]).eraseToAnyPublisher())
-
-        // the view controller needs to be in a key window to perform a presentation
-        window.rootViewController = coordinator.presentable.viewController
-        window.makeKeyAndVisible()
     }
 
     func test_presentable_shouldBeNavigationController_withFilterViewController() {
@@ -29,11 +23,5 @@ class FilterCoordinatorTests: TestCase {
             self.coordinator.send(.complete)
         }.singleValue()
         XCTAssertEqual(event, .complete)
-    }
-
-    func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.send(.alert(Alert(title: "", style: .alert)))
-        let viewController = coordinator.presentable.viewController
-        XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 }

@@ -5,17 +5,12 @@ import Preferences
 import XCTest
 
 class ServerSettingsCoordinatorTests: TestCase {
-    private var window: UIWindow!
     private var coordinator: ServerSettingsCoordinator!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        window = UIWindow()
         coordinator = ServerSettingsCoordinator(type: .transmission)
-        // the view controller needs to be in a key window to perform a presentation
-        window.rootViewController = coordinator.presentable.viewController
-        window.makeKeyAndVisible()
     }
 
     // MARK: presentable
@@ -51,11 +46,5 @@ class ServerSettingsCoordinatorTests: TestCase {
             self.coordinator.send(.complete)
         }.singleValue()
         XCTAssertCase(event, .complete)
-    }
-
-    func test_serverSettings_alertEvent_shouldPresentAlertController() {
-        coordinator.send(.alert(Alert(title: "", style: .alert)))
-        let viewController = coordinator.presentable.viewController.presentedViewController
-        XCTAssertType(viewController, UIAlertController.self)
     }
 }

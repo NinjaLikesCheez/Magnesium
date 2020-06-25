@@ -237,7 +237,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
         implementation.refresh()
             .eraseError()
             .append(refreshFiles())
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 self?.isRefreshingSubject.send(false)
                 guard case let .failure(error) = completion else { return }
@@ -279,7 +279,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func pause() {
         implementation.pause(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.pauseError, message: error.localizedDescription)
@@ -290,7 +290,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func resume() {
         implementation.resume(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.resumeError, message: error.localizedDescription)
@@ -301,7 +301,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func remove(removeData: Bool) {
         implementation.remove(torrentSubject.value, removeData)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:
@@ -316,7 +316,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func verify() {
         implementation.verify(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
@@ -327,7 +327,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func setLabel(_ label: StandardLabel) {
         implementation.setLabel(label, torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
@@ -338,7 +338,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func updateTrackers() {
         implementation.updateTrackers(torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
@@ -349,7 +349,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
     private func moveDownloadFolder(to path: String) {
         implementation.moveDownloadFolder(path, torrentSubject.value)
             .append(implementation.refresh().replaceError(with: ()).setFailureType(to: Error.self))
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
@@ -472,7 +472,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
                     .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             )
-            .receive(on: DispatchQueue.main)
+            .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.setPriorityError, message: error.localizedDescription)

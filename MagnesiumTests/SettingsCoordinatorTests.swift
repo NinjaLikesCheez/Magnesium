@@ -6,20 +6,14 @@ import Preferences
 import XCTest
 
 class SettingsCoordinatorTests: TestCase {
-    private var window: UIWindow!
     private var session: Session!
     private var coordinator: SettingsCoordinator!
     private var preferences: Preferences { Current.preferences }
 
     override func setUp() {
         super.setUp()
-        window = UIWindow()
         session = Session()
         coordinator = SettingsCoordinator(session: session)
-
-        // the view controller needs to be in a key window to perform a presentation
-        window.rootViewController = coordinator.presentable.viewController
-        window.makeKeyAndVisible()
     }
 
     func test_presentable_shouldBeNavigationController_withSettingsViewController() {
@@ -34,12 +28,6 @@ class SettingsCoordinatorTests: TestCase {
             self.coordinator.send(.complete)
         }.singleValue()
         XCTAssertEqual(event, .complete)
-    }
-
-    func test_settingsEvent_alert_shouldPresentAlertController() {
-        coordinator.send(.alert(Alert(title: "", style: .alert)))
-        let viewController = coordinator.presentable.viewController
-        XCTAssertType(viewController.presentedViewController, UIAlertController.self)
     }
 
     func test_settingsEvent_editServer_withTransmissionServer_shouldPushServerSettingsViewController() {
