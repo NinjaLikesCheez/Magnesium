@@ -37,7 +37,7 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
     )
 
     private lazy var selectAllBarButtonItem = UIBarButtonItem(
-        title: L10n.selectAll,
+        title: L10n.Action.selectAll,
         style: .plain,
         target: self,
         action: #selector(selectAllButtonTapped(_:))
@@ -335,7 +335,7 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         case .files:
             header.configure(
                 title: L10n.torrentInfoSectionFiles,
-                action: !isEditing ? L10n.edit : nil,
+                action: !isEditing ? L10n.Action.edit : nil,
                 actionHandler: { [weak self] in
                     self?.viewModel.send(.editSectionSelected(.files))
                 }

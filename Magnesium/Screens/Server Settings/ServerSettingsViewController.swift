@@ -129,7 +129,7 @@ where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsVi
                 fontWeight: .semibold,
                 alignment: .center
             )
-            cell.configure(text: L10n.delete, configuration: configuration)
+            cell.configure(text: L10n.Action.delete, configuration: configuration)
             return cell
         case .none:
             return .init()

@@ -393,7 +393,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
         }
 
         eventSubject.send(.alert(.init(
-            title: L10n.setPriority,
+            title: L10n.Action.setPriority,
             message: L10n.fileCount(files.count),
             style: .actionSheet(source),
             actions: [

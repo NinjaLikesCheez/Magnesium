@@ -63,7 +63,7 @@ final class DelugeSettingsViewModel: ViewModel {
 
         values = .init(
             title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
-            saveButtonTitle: server == nil ? L10n.add : L10n.save,
+            saveButtonTitle: server == nil ? L10n.Action.add : L10n.Action.save,
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
             isSaveButtonEnabled: isSaveButtonEnabledSubject.ui().eraseToAnyPublisher(),
@@ -160,7 +160,7 @@ final class DelugeSettingsViewModel: ViewModel {
     private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
         eventSubject.send(.alert(.init(message: L10n.deleteServerConfirmation, style: .actionSheet(source), actions: [
-            .init(title: L10n.deleteServer, style: .destructive) {
+            .init(title: L10n.Action.deleteServer, style: .destructive) {
                 do {
                     try Current.preferences.remove(server: server)
                 } catch {

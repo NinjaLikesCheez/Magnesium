@@ -48,7 +48,7 @@ final class TorrentDetailCoordinator: Coordinator {
 
     private func showMoveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>) {
         let alertController = UIAlertController(
-            title: L10n.moveDownloadFolder,
+            title: L10n.Action.moveDownloadFolder,
             message: nil,
             preferredStyle: .alert
         )
@@ -57,11 +57,11 @@ final class TorrentDetailCoordinator: Coordinator {
             textField.placeholder = "/downloads"
             textField.text = currentPath
         }
-        alertController.addAction(.init(title: L10n.save, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.Action.save, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.Action.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 }

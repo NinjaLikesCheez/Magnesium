@@ -225,6 +225,7 @@
 		E9E9F0F423807044007C6D2D /* TorrentDetailViewValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E9F0F323807044007C6D2D /* TorrentDetailViewValues.swift */; };
 		E9F24E0B23CE3B160089E45F /* DelugeSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */; };
 		E9F24E0F23CE4ECB0089E45F /* DelugeServerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */; };
+		E9F4378524A4391D007BC1DF /* L10n+Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9F4378424A4391D007BC1DF /* L10n+Action.swift */; };
 		E9F85AE3243156CA00AF13B3 /* CombineWaiting in Frameworks */ = {isa = PBXBuildFile; productRef = E9F85AE2243156CA00AF13B3 /* CombineWaiting */; };
 /* End PBXBuildFile section */
 
@@ -449,6 +450,7 @@
 		E9E9F0F323807044007C6D2D /* TorrentDetailViewValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailViewValues.swift; sourceTree = "<group>"; };
 		E9F24E0A23CE3B160089E45F /* DelugeSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeSettingsViewModel.swift; sourceTree = "<group>"; };
 		E9F24E0E23CE4ECB0089E45F /* DelugeServerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelugeServerSettings.swift; sourceTree = "<group>"; };
+		E9F4378424A4391D007BC1DF /* L10n+Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "L10n+Action.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -862,6 +864,7 @@
 				E96B0072237A43760091FA71 /* Info.plist */,
 				E999B0B723F62BFA000889FD /* L10n.swift */,
 				E9843B2B23F390F7005FBF7E /* Localization */,
+				E9F4378424A4391D007BC1DF /* L10n+Action.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1172,6 +1175,7 @@
 				E99B67FC24341E44002CF6A7 /* StandardTorrentListImplementation.swift in Sources */,
 				E9637856241334F80068E051 /* ServerType.swift in Sources */,
 				E95C4D9723E3D20B00202CAA /* FilterOptions.swift in Sources */,
+				E9F4378524A4391D007BC1DF /* L10n+Action.swift in Sources */,
 				E93201142496C135009F60C6 /* TorrentListCoordinatorEvent.swift in Sources */,
 				E9B7D5C523D15ECD0025FFA8 /* ServerSettingsCoordinator.swift in Sources */,
 				E99FC25A23D13C270019A992 /* AppCoordinator.swift in Sources */,

@@ -37,7 +37,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
 
     private lazy var addServerButton: UIButton = {
         let button = RoundedButton()
-        button.setTitle(L10n.addServer, for: .normal)
+        button.setTitle(L10n.Action.addServer, for: .normal)
         button.addTarget(self, action: #selector(addSeverButtonTapped(_:)), for: .touchUpInside)
         return button
     }()

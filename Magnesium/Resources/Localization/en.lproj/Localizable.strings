@@ -1,59 +1,59 @@
 /* Add */
-"action_add" = "Add";
+"action.add" = "Add";
 
 /* Add Server */
-"action_add_server" = "Add Server";
+"action.add-server" = "Add Server";
 
 /* Add Torrent */
-"action_add_torrent" = "Add Torrent";
+"action.add-torrent" = "Add Torrent";
 
 /* Cancel */
-"action_cancel" = "Cancel";
+"action.cancel" = "Cancel";
 
 /* Delete */
-"action_delete" = "Delete";
+"action.delete" = "Delete";
 
 /* Delete Server */
-"action_delete_server" = "Delete Server";
+"action.delete-server" = "Delete Server";
 
 /* Edit */
-"action_edit" = "Edit";
+"action.edit" = "Edit";
 
 /* Edit Server */
-"action_edit_server" = "Edit Server";
+"action.edit-server" = "Edit Server";
 
 /* Move Download Folder */
-"action_move_download_folder" = "Move Download Folder";
+"action.move-download-folder" = "Move Download Folder";
 
 /* OK */
-"action_ok" = "OK";
+"action.ok" = "OK";
 
 /* Pause */
-"action_pause" = "Pause";
+"action.pause" = "Pause";
 
 /* Remove */
-"action_remove" = "Remove";
+"action.remove" = "Remove";
 
 /* Resume */
-"action_resume" = "Resume";
+"action.resume" = "Resume";
 
 /* Save */
-"action_save" = "Save";
+"action.save" = "Save";
 
 /* Select All */
-"action_select_all" = "Select All";
+"action.select-all" = "Select All";
 
 /* Set Label */
-"action_set_label" = "Set Label";
+"action.set-label" = "Set Label";
 
 /* Set Priority */
-"action_set_priority" = "Set Priority";
+"action.set-priority" = "Set Priority";
 
 /* Update Trackers */
-"action_update_trackers" = "Update Trackers";
+"action.update-trackers" = "Update Trackers";
 
 /* Verify Files */
-"action_verify_files" = "Verify Files";
+"action.verify-files" = "Verify Files";
 
 /* Add Server */
 "add_server_screen_title" = "Add Server";

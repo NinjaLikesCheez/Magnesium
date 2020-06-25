@@ -11,7 +11,7 @@ struct Config {
     /// The directory containing the lproj directories.
     let localizations: String
     /// The localization patterns to match.
-    let patterns = ["NSLocalizedString\\(\\s*\"([\\w\\.]+)\""]
+    let patterns = ["NSLocalizedString\\(\\s*\"([\\w\\.\\-]+)\""]
     /// Any keys that should be ignored for linting.
     let ignoredKeys = [String]()
     /// The master language for localization.

@@ -69,7 +69,7 @@ final class TorrentListCoordinator: NSObject, Coordinator {
 
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
         let alert = Alert(
-            title: L10n.addTorrent,
+            title: L10n.Action.addTorrent,
             message: L10n.addTorrentMethodPrompt,
             style: .actionSheet(source),
             actions: [
@@ -96,11 +96,11 @@ final class TorrentListCoordinator: NSObject, Coordinator {
             textField.textContentType = .URL
             textField.placeholder = "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a"
         }
-        alertController.addAction(.init(title: L10n.add, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.Action.add, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.Action.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 
@@ -133,7 +133,7 @@ final class TorrentListCoordinator: NSObject, Coordinator {
 
     private func showMoveDownloadFolder(currentPath: String?, subject: PassthroughSubject<String, Never>) {
         let alertController = UIAlertController(
-            title: L10n.moveDownloadFolder,
+            title: L10n.Action.moveDownloadFolder,
             message: nil,
             preferredStyle: .alert
         )
@@ -142,11 +142,11 @@ final class TorrentListCoordinator: NSObject, Coordinator {
             textField.placeholder = "/downloads"
             textField.text = currentPath
         }
-        alertController.addAction(.init(title: L10n.save, style: .default) { _ in
+        alertController.addAction(.init(title: L10n.Action.save, style: .default) { _ in
             subject.send(alertController.textFields?.first?.text ?? "")
             subject.send(completion: .finished)
         })
-        alertController.addAction(.init(title: L10n.cancel, style: .cancel))
+        alertController.addAction(.init(title: L10n.Action.cancel, style: .cancel))
         viewController.present(alertController, animated: true, completion: nil)
     }
 }

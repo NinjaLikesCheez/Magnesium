@@ -38,7 +38,7 @@ where VM.ViewEvent == ServerErrorViewEvent {
 
     private lazy var editServerButton: UIButton = {
         let button = RoundedButton()
-        button.setTitle(L10n.editServer, for: .normal)
+        button.setTitle(L10n.Action.editServer, for: .normal)
         button.addTarget(self, action: #selector(editServerButtonTapped(_:)), for: .touchUpInside)
         return button
     }()

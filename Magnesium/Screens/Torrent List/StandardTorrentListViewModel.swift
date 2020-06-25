@@ -255,7 +255,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func presentRemoveOptions(for torrents: [StandardTorrent], from source: PopoverSource) {
         let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
         eventSubject.send(.alert(.init(
-            title: L10n.remove,
+            title: L10n.Action.remove,
             message: message,
             style: .actionSheet(source),
             actions: [
@@ -279,7 +279,7 @@ final class StandardTorrentListViewModel: ViewModel {
         }
 
         eventSubject.send(.alert(.init(
-            title: L10n.setLabel,
+            title: L10n.Action.setLabel,
             message: message,
             style: .actionSheet(source),
             actions: labelActions + [.cancel]
@@ -332,11 +332,11 @@ final class StandardTorrentListViewModel: ViewModel {
         var items = [MenuItem]()
 
         if torrent.isActive {
-            items.append(.action(.init(title: L10n.pause, image: UIImage(systemName: "pause")) { [weak self] in
+            items.append(.action(.init(title: L10n.Action.pause, image: UIImage(systemName: "pause")) { [weak self] in
                 self?.pause([torrent])
             }))
         } else {
-            items.append(.action(.init(title: L10n.resume, image: UIImage(systemName: "play")) { [weak self] in
+            items.append(.action(.init(title: L10n.Action.resume, image: UIImage(systemName: "play")) { [weak self] in
                 self?.resume([torrent])
             }))
         }
@@ -347,15 +347,23 @@ final class StandardTorrentListViewModel: ViewModel {
                     self?.setLabel(for: [torrent], label: label)
                 })
             }
-            items.append(.menu(.init(title: L10n.setLabel, image: UIImage(systemName: "tag"), children: children)))
+            items.append(.menu(.init(
+                title: L10n.Action.setLabel,
+                image: UIImage(systemName: "tag"),
+                children: children
+            )))
         }
 
-        items.append(.action(.init(title: L10n.verifyFiles, image: UIImage(systemName: "tray.full")) { [weak self] in
-            self?.verify([torrent])
-        }))
+        items.append(.action(.init(
+            title: L10n.Action.verifyFiles,
+            image: UIImage(systemName: "tray.full"),
+            handler: { [weak self] in
+                self?.verify([torrent])
+            }
+        )))
 
         items.append(.action(.init(
-            title: L10n.moveDownloadFolder,
+            title: L10n.Action.moveDownloadFolder,
             image: UIImage(systemName: "tray.and.arrow.down"),
             handler: { [weak self] in
                 guard let strongSelf = self else { return }
@@ -371,7 +379,7 @@ final class StandardTorrentListViewModel: ViewModel {
         )))
 
         items.append(.action(.init(
-            title: L10n.updateTrackers,
+            title: L10n.Action.updateTrackers,
             image: UIImage(systemName: "arrow.clockwise"),
             handler: { [weak self] in
                 self?.updateTrackers(for: [torrent])
@@ -379,7 +387,7 @@ final class StandardTorrentListViewModel: ViewModel {
         )))
 
         items.append(.menu(.init(
-            title: L10n.remove,
+            title: L10n.Action.remove,
             image: UIImage(systemName: "trash"),
             options: [.destructive],
             children: [

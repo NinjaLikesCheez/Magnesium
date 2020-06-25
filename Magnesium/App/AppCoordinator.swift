@@ -234,7 +234,7 @@ final class AppCoordinator: Coordinator {
             message: fileURL.lastPathComponent,
             style: .alert,
             actions: [
-                .init(title: L10n.addTorrent, style: .default) {
+                .init(title: L10n.Action.addTorrent, style: .default) {
                     self.addTorrentFlow.add(type: .file(fileURL))
                 },
                 .cancel,
@@ -250,7 +250,7 @@ final class AppCoordinator: Coordinator {
             message: magnetURL.absoluteString,
             style: .alert,
             actions: [
-                .init(title: L10n.addTorrent, style: .default) {
+                .init(title: L10n.Action.addTorrent, style: .default) {
                     self.addTorrentFlow.add(type: .magnet(magnetURL))
                 },
                 .cancel,
