@@ -182,6 +182,7 @@
 		E9B0375C243015EF002A88F1 /* SettingsViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B0375B243015EF002A88F1 /* SettingsViewControllerTests.swift */; };
 		E9B0375E243017F4002A88F1 /* AddServerViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B0375D243017F4002A88F1 /* AddServerViewControllerTests.swift */; };
 		E9B0376024301892002A88F1 /* ServerSettingsViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B0375F24301892002A88F1 /* ServerSettingsViewControllerTests.swift */; };
+		E9B05ED124A3AA4900BC86D8 /* StructReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B05ED024A3AA4900BC86D8 /* StructReference.swift */; };
 		E9B3457523C82992001F14BD /* ServerPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */; };
 		E9B40E8E23B3FCEB009E30AE /* TorrentDetailItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B40E8D23B3FCEB009E30AE /* TorrentDetailItem.swift */; };
 		E9B40E9023B3FD64009E30AE /* TorrentDetailSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9B40E8F23B3FD64009E30AE /* TorrentDetailSection.swift */; };
@@ -405,6 +406,7 @@
 		E9B0375B243015EF002A88F1 /* SettingsViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewControllerTests.swift; sourceTree = "<group>"; };
 		E9B0375D243017F4002A88F1 /* AddServerViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddServerViewControllerTests.swift; sourceTree = "<group>"; };
 		E9B0375F24301892002A88F1 /* ServerSettingsViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsViewControllerTests.swift; sourceTree = "<group>"; };
+		E9B05ED024A3AA4900BC86D8 /* StructReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructReference.swift; sourceTree = "<group>"; };
 		E9B3457423C82992001F14BD /* ServerPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerPreferencesTests.swift; sourceTree = "<group>"; };
 		E9B40E8D23B3FCEB009E30AE /* TorrentDetailItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailItem.swift; sourceTree = "<group>"; };
 		E9B40E8F23B3FD64009E30AE /* TorrentDetailSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentDetailSection.swift; sourceTree = "<group>"; };
@@ -790,6 +792,7 @@
 				E9C39ADF23CC27A800BB3556 /* TextInputItem.swift */,
 				E9A5D2462438197F002B7AC9 /* TorrentPriority.swift */,
 				E96B007E237A473E0091FA71 /* TorrentState.swift */,
+				E9B05ED024A3AA4900BC86D8 /* StructReference.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1049,7 +1052,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1130;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "James Hurst";
 				TargetAttributes = {
 					E96B0060237A43740091FA71 = {
@@ -1264,6 +1267,7 @@
 				E950506C24358C9500D7CE46 /* StandardTorrent+Deluge.swift in Sources */,
 				E91FD7CA23FCBD750059A21F /* ServerErrorViewModel.swift in Sources */,
 				E9637854241334DD0068E051 /* Server.swift in Sources */,
+				E9B05ED124A3AA4900BC86D8 /* StructReference.swift in Sources */,
 				E93200ED2496BE2A009F60C6 /* FilterCoordinatorEvent.swift in Sources */,
 				E91793A223E8FDC8000BEA89 /* StandardTorrentFile.swift in Sources */,
 				E928F00623AC340B006BD6BD /* TorrentDetailViewController.swift in Sources */,
@@ -1417,6 +1421,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1477,6 +1482,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

@@ -2,8 +2,8 @@ import Combine
 import UIKit
 import ViewModel
 
-// swiftlint:disable:next line_length
-final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewValues == RefreshIntervalViewValues {
+final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController
+where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewValues == RefreshIntervalViewValues {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
 

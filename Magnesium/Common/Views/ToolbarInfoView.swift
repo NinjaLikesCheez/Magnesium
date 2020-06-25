@@ -42,7 +42,7 @@ final class ToolbarInfoView: UIView {
         ])
     }
 
-    func configure(content: AnyPublisher<String, Never>) {
+    func configure(content: UIPublisher<String>) {
         cancellables.removeAll()
         content
             .asOptional()

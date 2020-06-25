@@ -2,8 +2,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-// swiftlint:disable:next line_length
-final class AddServerViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues {
+final class AddServerViewController<VM: ViewModel>: PresentableTableViewController
+where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues {
     private let viewModel: VM
 
     init(viewModel: VM) {

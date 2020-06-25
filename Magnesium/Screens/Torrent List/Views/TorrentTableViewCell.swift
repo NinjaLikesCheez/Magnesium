@@ -18,7 +18,7 @@ final class TorrentTableViewCell: UITableViewCell {
         return progressView
     }()
 
-    private lazy var stateLabel: UILabel = {
+    private lazy var statusLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = .preferredFont(forTextStyle: .subheadline)
@@ -85,14 +85,14 @@ final class TorrentTableViewCell: UITableViewCell {
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(progressView)
-        contentView.addSubview(stateLabel)
+        contentView.addSubview(statusLabel)
         contentView.addSubview(speedLabel)
         contentView.addSubview(progressLabel)
         contentView.addSubview(ratioOrETALabel)
     }
 
     private func setupLayoutConstraints() {
-        for view in [nameLabel, progressView, stateLabel, speedLabel, progressLabel, ratioOrETALabel] {
+        for view in [nameLabel, progressView, statusLabel, speedLabel, progressLabel, ratioOrETALabel] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
@@ -108,16 +108,16 @@ final class TorrentTableViewCell: UITableViewCell {
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
 
-            stateLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            stateLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
+            statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
-            speedLabel.leadingAnchor.constraint(greaterThanOrEqualTo: stateLabel.trailingAnchor, constant: 8),
+            speedLabel.leadingAnchor.constraint(greaterThanOrEqualTo: statusLabel.trailingAnchor, constant: 8),
             speedLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            speedLabel.topAnchor.constraint(equalTo: stateLabel.topAnchor),
-            speedLabel.bottomAnchor.constraint(equalTo: stateLabel.bottomAnchor),
+            speedLabel.topAnchor.constraint(equalTo: statusLabel.topAnchor),
+            speedLabel.bottomAnchor.constraint(equalTo: statusLabel.bottomAnchor),
 
             progressLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            progressLabel.topAnchor.constraint(equalTo: stateLabel.bottomAnchor, constant: 2),
+            progressLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 2),
             progressLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
 
             ratioOrETALabel.leadingAnchor.constraint(greaterThanOrEqualTo: progressLabel.trailingAnchor, constant: 8),
@@ -142,9 +142,9 @@ final class TorrentTableViewCell: UITableViewCell {
             .assign(to: \.progressTintColor, on: progressView)
             .store(in: &cancellables)
 
-        item.state
+        item.status
             .asOptional()
-            .assign(to: \.text, on: stateLabel)
+            .assign(to: \.text, on: statusLabel)
             .store(in: &cancellables)
 
         item.speed
@@ -152,7 +152,7 @@ final class TorrentTableViewCell: UITableViewCell {
             .assign(to: \.text, on: speedLabel)
             .store(in: &cancellables)
 
-        item.progressString
+        item.progressText
             .asOptional()
             .assign(to: \.text, on: progressLabel)
             .store(in: &cancellables)

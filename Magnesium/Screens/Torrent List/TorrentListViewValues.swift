@@ -4,15 +4,15 @@ import CommonModels
 struct TorrentListViewValues {
     var showAddButton: Bool = true
     var showFilterButton: Bool = true
-    var title: AnyPublisher<String, Never>
-    var items: AnyPublisher<[TorrentListItem], Never>
-    var isLoading: AnyPublisher<Bool, Never>
-    var isEditing: AnyPublisher<Bool, Never>
-    var hasActiveFilters: AnyPublisher<Bool, Never>
-    var editActionsEnabled: AnyPublisher<Bool, Never>
-    var status: AnyPublisher<String, Never>
-    var detailViewModel: (Int) -> AnyTorrentDetailViewModel?
-    var contextMenu: (Int) -> Menu?
-    var leadingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
-    var trailingSwipeActionsConfiguration: (Int, PopoverSource) -> SwipeActionsConfiguration?
+    var title: UIPublisher<String>
+    var items: UIPublisher<[TorrentListItem]>
+    var isLoading: UIPublisher<Bool>
+    var isEditing: UIPublisher<Bool>
+    var hasActiveFilters: UIPublisher<Bool>
+    var editActionsEnabled: UIPublisher<Bool>
+    var status: UIPublisher<String>
+    var detailViewModel: (TorrentListItem) -> AnyTorrentDetailViewModel?
+    var contextMenu: (TorrentListItem) -> Menu?
+    var leadingSwipeActionsConfiguration: (TorrentListItem, PopoverSource) -> SwipeActionsConfiguration?
+    var trailingSwipeActionsConfiguration: (TorrentListItem, PopoverSource) -> SwipeActionsConfiguration?
 }

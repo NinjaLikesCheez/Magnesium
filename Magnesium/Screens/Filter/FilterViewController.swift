@@ -2,8 +2,8 @@ import Combine
 import UIKit
 import ViewModel
 
-// swiftlint:disable:next line_length
-final class FilterViewController<VM: ViewModel>: UITableViewController where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
+final class FilterViewController<VM: ViewModel>: UITableViewController
+where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
     private let viewModel: VM
     private var dataSource: UITableViewDiffableDataSource<FilterSectionType, FilterItem>!
     private var cancellables = Set<AnyCancellable>()

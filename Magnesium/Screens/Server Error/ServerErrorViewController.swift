@@ -2,8 +2,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-// swiftlint:disable:next line_length
-final class ServerErrorViewController<VM: ViewModel>: PresentableViewController where VM.ViewEvent == ServerErrorViewEvent {
+final class ServerErrorViewController<VM: ViewModel>: PresentableViewController
+where VM.ViewEvent == ServerErrorViewEvent {
     private let viewModel: VM
 
     private lazy var stackView: UIStackView = {

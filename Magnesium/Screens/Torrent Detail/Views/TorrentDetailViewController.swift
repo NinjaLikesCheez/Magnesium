@@ -7,8 +7,9 @@ protocol TorrentDetailViewControllerIdentifiable {
     var torrentHash: String { get }
 }
 
-// swiftlint:disable:next line_length
-final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController, TorrentDetailViewControllerIdentifiable where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues {
+final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController,
+                                                        TorrentDetailViewControllerIdentifiable
+where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues {
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!

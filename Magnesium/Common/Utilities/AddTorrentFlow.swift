@@ -75,7 +75,7 @@ final class AddTorrentFlow {
             }
 
             request
-                .ui()
+                .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)
@@ -103,7 +103,7 @@ final class AddTorrentFlow {
             }
 
             request
-                .ui()
+                .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)

@@ -3,8 +3,8 @@ import Coordinator
 import UIKit
 import ViewModel
 
-// swiftlint:disable:next line_length
-final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsViewValues {
+final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
+where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsViewValues {
     private enum Section: Int {
         case settings
         case delete

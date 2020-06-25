@@ -2,13 +2,14 @@ import Combine
 import CommonModels
 import Coordinator
 import UIKit
+import UniformTypeIdentifiers
 
 final class TorrentListCoordinator: NSObject, Coordinator {
     private let viewModel: AnyTorrentListViewModel
     private let session: Session
     private let viewController: TorrentListViewController<AnyTorrentListViewModel>
     private let eventSubject = PassthroughSubject<TorrentListCoordinatorEvent, Never>()
-    private var previewCoordinatorMap = [Int: TorrentDetailCoordinator]()
+    private var previewCoordinatorMap = [TorrentListItem: TorrentDetailCoordinator]()
     private lazy var addTorrentFlow = AddTorrentFlow(viewController: viewController, session: session)
     let viewModelEventPublisher: AnyPublisher<TorrentListViewModelEvent, Never>
     var cancellables = Set<AnyCancellable>()
@@ -158,24 +159,24 @@ extension TorrentListCoordinator: UIDocumentPickerDelegate {
 }
 
 extension TorrentListCoordinator: TorrentListViewDelegate {
-    func previewForItem(at index: Int) -> UIViewController? {
-        guard let viewModel = viewModel.values.detailViewModel(index) else { return nil }
+    func preview(for item: TorrentListItem) -> UIViewController? {
+        guard let viewModel = viewModel.values.detailViewModel(item) else { return nil }
         let coordinator = TorrentDetailCoordinator(viewModel: viewModel)
         addChildCoordinator(coordinator) { _, _ in }
-        previewCoordinatorMap[index] = coordinator
+        previewCoordinatorMap[item] = coordinator
         return coordinator.presentable.viewController
     }
 
-    func commitPreviewForItem(at index: Int) {
-        guard let coordinator = previewCoordinatorMap[index] else { return }
-        previewCoordinatorMap.removeValue(forKey: index)
+    func commitPreview(for item: TorrentListItem) {
+        guard let coordinator = previewCoordinatorMap[item] else { return }
+        previewCoordinatorMap.removeValue(forKey: item)
         eventSubject.send(.commitDetail(coordinator: coordinator))
         removeChildCoordinator(coordinator)
     }
 
-    func didDismissPreviewForItem(at index: Int) {
+    func willDismissPreview(for item: TorrentListItem) {
         DispatchQueue.main.async { [weak self] in
-            self?.previewCoordinatorMap.removeValue(forKey: index)
+            self?.previewCoordinatorMap.removeValue(forKey: item)
         }
     }
 }

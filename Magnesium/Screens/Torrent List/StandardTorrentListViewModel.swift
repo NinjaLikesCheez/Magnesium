@@ -35,54 +35,48 @@ final class StandardTorrentListViewModel: ViewModel {
                 isEditing ? L10n.selectedCount(count) : server.name
             }
             .ui()
-            .eraseToAnyPublisher()
 
         let items = torrentMapper.valuesPublisher
             .map { $0.map { TorrentListItem(torrentSubject: $0) } }
             .ui()
-            .eraseToAnyPublisher()
 
         let hasActiveFilters = Current.preferences.valuePublisher(for: .filterOptions)
             .map { $0 != FilterOptions() }
             .ui()
-            .eraseToAnyPublisher()
 
         let totalDownloadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
             .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
-            .eraseToAnyPublisher()
 
         let totalUploadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
             .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
-            .eraseToAnyPublisher()
 
         let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
             .map { "\($0) \($1)" }
             .ui()
-            .eraseToAnyPublisher()
 
         _values = .init(
             title: title,
             items: items,
-            isLoading: isLoadingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
-            isEditing: isEditingSubject.removeDuplicates().ui().eraseToAnyPublisher(),
+            isLoading: isLoadingSubject.removeDuplicates().ui(),
+            isEditing: isEditingSubject.removeDuplicates().ui(),
             hasActiveFilters: hasActiveFilters,
-            editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui().eraseToAnyPublisher(),
+            editActionsEnabled: multiSelectCountSubject.map { $0 > 0 }.ui(),
             status: status,
             detailViewModel: { [weak self] in
-                self?.detailViewModelForItem(at: $0)
+                self?.detailViewModel(for: $0)
             },
             contextMenu: { [weak self] in
-                self?.contextMenuForItem(at: $0)
+                self?.contextMenu(for: $0)
             },
             leadingSwipeActionsConfiguration: { [weak self] in
-                self?.leadingSwipeActionsConfigurationForItem(at: $0, source: $1)
+                self?.leadingSwipeActionsConfiguration(for: $0, source: $1)
             },
             trailingSwipeActionsConfiguration: { [weak self] in
-                self?.trailingSwipeActionsConfigurationForItem(at: $0, source: $1)
+                self?.trailingSwipeActionsConfiguration(for: $0, source: $1)
             }
         )
 
@@ -172,7 +166,7 @@ final class StandardTorrentListViewModel: ViewModel {
     // internal for testing
     func addLink(_ url: String) {
         implementation.addLink(url)
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] in
                 if case let .failure(error) = $0 {
                     self?.showError(title: error.title, message: error.message)
@@ -184,7 +178,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func pause(_ torrents: [StandardTorrent]) {
         implementation.pause(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.pauseError, message: error.localizedDescription)
@@ -195,7 +189,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func resume(_ torrents: [StandardTorrent]) {
         implementation.resume(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.resumeError, message: error.localizedDescription)
@@ -206,7 +200,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func remove(_ torrents: [StandardTorrent], removeData: Bool) {
         implementation.remove(torrents, removeData)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.removeError, message: error.localizedDescription)
@@ -217,7 +211,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func setLabel(for torrents: [StandardTorrent], label: StandardLabel) {
         implementation.setLabel(label, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
@@ -228,7 +222,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func verify(_ torrents: [StandardTorrent]) {
         implementation.verify(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
@@ -239,7 +233,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func updateTrackers(for torrents: [StandardTorrent]) {
         implementation.updateTrackers(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
@@ -250,7 +244,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func moveDownloadFolder(for torrents: [StandardTorrent], to path: String) {
         implementation.moveDownloadFolder(path, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
@@ -327,12 +321,14 @@ final class StandardTorrentListViewModel: ViewModel {
 
     // MARK: View Functions
 
-    private func detailViewModelForItem(at index: Int) -> AnyTorrentDetailViewModel? {
-        implementation.detailViewModel(torrentMapper.values[index], labelsSubject)
+    private func detailViewModel(for item: TorrentListItem) -> AnyTorrentDetailViewModel? {
+        guard let subject = torrentMapper.map[item.hash] else { return nil }
+        return implementation.detailViewModel(subject, labelsSubject)
     }
 
-    private func contextMenuForItem(at index: Int) -> Menu? {
-        let torrent = torrentMapper.values[index].value
+    private func contextMenu(for item: TorrentListItem) -> Menu? {
+        guard let torrent = torrentMapper.map[item.hash]?.value else { return nil }
+
         var items = [MenuItem]()
 
         if torrent.isActive {
@@ -408,11 +404,12 @@ final class StandardTorrentListViewModel: ViewModel {
         return Menu(children: items)
     }
 
-    private func leadingSwipeActionsConfigurationForItem(
-        at index: Int,
+    private func leadingSwipeActionsConfiguration(
+        for item: TorrentListItem,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrentMapper.values[index].value
+        guard let torrent = torrentMapper.map[item.hash]?.value else { return nil }
+
         if torrent.isActive {
             return SwipeActionsConfiguration(actions: [
                 SwipeAction(
@@ -438,11 +435,12 @@ final class StandardTorrentListViewModel: ViewModel {
         }
     }
 
-    private func trailingSwipeActionsConfigurationForItem(
-        at index: Int,
+    private func trailingSwipeActionsConfiguration(
+        for item: TorrentListItem,
         source: PopoverSource
     ) -> SwipeActionsConfiguration? {
-        let torrent = torrentMapper.values[index].value
+        guard let torrent = torrentMapper.map[item.hash]?.value else { return nil }
+
         return SwipeActionsConfiguration(actions: [
             SwipeAction(
                 image: UIImage(systemName: "trash.fill"),
@@ -482,7 +480,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func refresh() -> AnyPublisher<Void, Error> {
         performRefresh()
             .eraseError()
-            .ui()
+            .receive(on: DispatchQueue.main)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.refreshError, message: error.localizedDescription)

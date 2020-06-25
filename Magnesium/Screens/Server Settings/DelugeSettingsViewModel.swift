@@ -118,7 +118,7 @@ final class DelugeSettingsViewModel: ViewModel {
         isLoadingSubject.send(true)
         let client = Current.deluge(url, password)
         client.request(.authenticate)
-            .ui()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:

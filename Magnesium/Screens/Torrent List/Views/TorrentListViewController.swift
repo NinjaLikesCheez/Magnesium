@@ -5,13 +5,13 @@ import UIKit
 import ViewModel
 
 protocol TorrentListViewDelegate: AnyObject {
-    func previewForItem(at index: Int) -> UIViewController?
-    func commitPreviewForItem(at index: Int)
-    func didDismissPreviewForItem(at index: Int)
+    func preview(for item: TorrentListItem) -> UIViewController?
+    func commitPreview(for item: TorrentListItem)
+    func willDismissPreview(for item: TorrentListItem)
 }
 
-// swiftlint:disable:next line_length
-final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValues {
+final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating
+where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValues {
     private enum Section {
         case main
     }
@@ -83,42 +83,34 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         action: #selector(moreButtonTapped(_:))
     )
 
-    private lazy var searchController: UISearchController = {
-        let searchController = UISearchController()
-        searchController.searchBar.autocapitalizationType = .none
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        return searchController
-    }()
+    private lazy var searchController = with(UISearchController()) {
+        $0.searchResultsUpdater = self
+        $0.searchBar.autocapitalizationType = .none
+        $0.obscuresBackgroundDuringPresentation = false
+    }
 
-    private lazy var activityView: UIActivityIndicatorView = {
-        let view = UIActivityIndicatorView(style: .medium)
-        view.hidesWhenStopped = true
-        return view
-    }()
+    private lazy var activityView = with(UIActivityIndicatorView(style: .medium)) {
+        $0.hidesWhenStopped = true
+        $0.startAnimating()
+    }
 
-    private lazy var emptyStateView: UIView = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
+    private lazy var emptyStateView: UIView = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = .init(descriptor: descriptor, size: 0)
-        label.text = "No Torrents"
-        label.textColor = .placeholderText
-        return label
-    }()
+        $0.font = .init(descriptor: descriptor, size: 0)
+        $0.text = "No Torrents" // TODO: localize
+        $0.textColor = .placeholderText
+        $0.isHidden = true
+    }
 
-    private lazy var statusView: ToolbarInfoView = {
-        let view = ToolbarInfoView()
-        view.configure(content: viewModel.values.status)
-        return view
-    }()
+    private lazy var statusView = ToolbarInfoView()
 
     // MARK: Initialization
 
     init(viewModel: VM) {
         self.viewModel = viewModel
-        super.init(style: .plain)
+        super.init(nibName: nil, bundle: nil)
         viewModel.values.title.sink { [weak self] in self?.title = $0 }.store(in: &cancellables)
         navigationItem.searchController = searchController
         configureNormalBarButtonItems()
@@ -134,22 +126,67 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureTableView()
+        configureView()
+        configureDataSource()
+        bindViewModel()
+    }
 
-        activityView.startAnimating()
-        tableView.addSubview(activityView)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setToolbarHidden(false, animated: animated)
+    }
 
-        emptyStateView.isHidden = true
-        tableView.addSubview(emptyStateView)
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let center = CGPoint(
+            x: tableView.bounds.width * 0.5,
+            y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
+        )
+        activityView.sizeToFit()
+        activityView.center = center
+        emptyStateView.sizeToFit()
+        emptyStateView.center = center
+    }
 
+    // MARK: Configuration
+
+    private func configureView() {
         refreshControl = .init()
         refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
 
+        tableView.rowHeight = TorrentTableViewCell.estimatedHeight
+        tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
+        tableView.allowsMultipleSelectionDuringEditing = true
+        tableView.separatorStyle = .none
+        tableView.addSubview(activityView)
+        tableView.addSubview(emptyStateView)
+    }
+
+    private func configureDataSource() {
+        tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
+
+        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
+            guard let cell = tableView.dequeueReusableCell(
+                withIdentifier: "torrent",
+                for: indexPath
+            ) as? TorrentTableViewCell else {
+                return nil
+            }
+
+            cell.configure(with: item)
+            return cell
+        }
+
+        dataSource.defaultRowAnimation = .fade
+        tableView.dataSource = dataSource
+    }
+
+    private func bindViewModel() {
         if viewModel.values.showFilterButton {
             viewModel.values.hasActiveFilters.sink { [weak self] in
                 self?.filterBarButtonItem.image = UIImage(systemName: $0
-                    ? "line.horizontal.3.decrease.circle.fill"
-                    : "line.horizontal.3.decrease.circle")
+                                                            ? "line.horizontal.3.decrease.circle.fill"
+                                                            : "line.horizontal.3.decrease.circle")
             }.store(in: &cancellables)
         }
 
@@ -198,48 +235,6 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
                 .store(in: &cancellables)
         }
     }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setToolbarHidden(false, animated: animated)
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let center = CGPoint(
-            x: tableView.bounds.width * 0.5,
-            y: tableView.bounds.height * 0.5 - tableView.adjustedContentInset.top
-        )
-        activityView.sizeToFit()
-        activityView.center = center
-        emptyStateView.sizeToFit()
-        emptyStateView.center = center
-    }
-
-    private func configureTableView() {
-        tableView.rowHeight = TorrentTableViewCell.estimatedHeight
-        tableView.estimatedRowHeight = TorrentTableViewCell.estimatedHeight
-        tableView.allowsMultipleSelectionDuringEditing = true
-        tableView.separatorStyle = .none
-        tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
-
-        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: "torrent",
-                for: indexPath
-            ) as? TorrentTableViewCell else {
-                return nil
-            }
-
-            cell.configure(with: item)
-            return cell
-        }
-
-        dataSource.defaultRowAnimation = .fade
-        tableView.dataSource = dataSource
-    }
-
-    // MARK: Methods
 
     private func update(with items: [TorrentListItem]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, TorrentListItem>()
@@ -397,13 +392,14 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         contextMenuConfigurationForRowAt indexPath: IndexPath,
         point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        .init(
-            identifier: indexPath as NSCopying,
+        guard let item = dataSource.itemIdentifier(for: indexPath) else { return nil }
+        return .init(
+            identifier: StructReference(item),
             previewProvider: { [weak self] in
-                self?.delegate?.previewForItem(at: indexPath.row)
+                self?.delegate?.preview(for: item)
             },
             actionProvider: { [weak self] _ in
-                self?.viewModel.values.contextMenu(indexPath.row)?.createUIMenu()
+                self?.viewModel.values.contextMenu(item)?.createUIMenu()
             }
         )
     }
@@ -413,10 +409,16 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionCommitAnimating
     ) {
-        guard let indexPath = configuration.identifier as? IndexPath else { return }
-        animator.addAnimations {
-            self.delegate?.commitPreviewForItem(at: indexPath.row)
+        guard let ref = configuration.identifier as? StructReference<TorrentListItem>,
+              let indexPath = dataSource.indexPath(for: ref.rawValue)
+        else {
+            return
         }
+
+        animator.addAnimations {
+            self.delegate?.commitPreview(for: ref.rawValue)
+        }
+
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
     }
 
@@ -424,8 +426,8 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         _ tableView: UITableView,
         previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
-        guard let indexPath = configuration.identifier as? IndexPath else { return nil }
-        delegate?.didDismissPreviewForItem(at: indexPath.row)
+        guard let ref = configuration.identifier as? StructReference<TorrentListItem> else { return nil }
+        delegate?.willDismissPreview(for: ref.rawValue)
         return nil
     }
 
@@ -433,22 +435,28 @@ final class TorrentListViewController<VM: ViewModel>: PresentableTableViewContro
         _ tableView: UITableView,
         leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
-        return viewModel.values.leadingSwipeActionsConfiguration(
-            indexPath.row,
-            PopoverSource.view(cell, rect: cell.bounds)
-        )?.createUISwipeActionsConfiguration()
+        guard let item = dataSource.itemIdentifier(for: indexPath),
+              let cell = tableView.cellForRow(at: indexPath)
+        else {
+            return nil
+        }
+
+        return viewModel.values.leadingSwipeActionsConfiguration(item, .view(cell, rect: cell.bounds))?
+            .createUISwipeActionsConfiguration()
     }
 
     override func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
-        return viewModel.values.trailingSwipeActionsConfiguration(
-            indexPath.row,
-            PopoverSource.view(cell, rect: cell.bounds)
-        )?.createUISwipeActionsConfiguration()
+        guard let item = dataSource.itemIdentifier(for: indexPath),
+              let cell = tableView.cellForRow(at: indexPath)
+        else {
+            return nil
+        }
+
+        return viewModel.values.trailingSwipeActionsConfiguration(item, .view(cell, rect: cell.bounds))?
+            .createUISwipeActionsConfiguration()
     }
 
     override func tableView(
