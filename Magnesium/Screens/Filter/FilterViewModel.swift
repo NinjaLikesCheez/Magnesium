@@ -17,9 +17,9 @@ final class FilterViewModel: ViewModel {
     init(labels: AnyPublisher<[StandardLabel], Never>) {
         values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
 
-        let preferencePublisher = Current.preferences.updatePublisher(for: .sortOption)
+        let preferencePublisher = Current.preferences.valuePublisher(for: .sortOption)
             .asVoid()
-            .merge(with: Current.preferences.updatePublisher(for: .filterOptions).asVoid())
+            .merge(with: Current.preferences.valuePublisher(for: .filterOptions).asVoid())
         let labelsPublisher = labels.removeDuplicates(by: { $0.map(\.name) == $1.map(\.name) })
 
         Publishers.CombineLatest(preferencePublisher, labelsPublisher).sink { [weak self] _, labels in
@@ -57,8 +57,8 @@ final class FilterViewModel: ViewModel {
         }
 
         eventSubject.send(.alert(.init(
-            title: L10n.sortByAlertTitle,
-            message: L10n.sortByAlertMessage,
+            title: L10n.Screen.Filter.sortBy,
+            message: L10n.Screen.Filter.sortByHint,
             style: .actionSheet(source),
             actions: sortActions + [.cancel]
         )))
@@ -69,7 +69,7 @@ final class FilterViewModel: ViewModel {
         let labels: [StandardLabel?] = [nil] + self.labels
         let labelActions = labels.map { label in
             AlertAction(
-                title: label.map(\.displayName) ?? L10n.allFilter,
+                title: label.map(\.displayName) ?? L10n.Screen.Filter.filteredAll,
                 style: .default,
                 handler: {
                     filterOptions.label = label?.name
@@ -79,8 +79,8 @@ final class FilterViewModel: ViewModel {
         }
 
         eventSubject.send(.alert(.init(
-            title: L10n.filterLabelAlertTitle,
-            message: L10n.filterLabelAlertMessage,
+            title: L10n.Screen.Filter.filterByLabel,
+            message: L10n.Screen.Filter.filterByLabelHint,
             style: .actionSheet(source),
             actions: labelActions + [.cancel]
         )))
@@ -90,15 +90,15 @@ final class FilterViewModel: ViewModel {
         var filterOptions = Current.preferences[.filterOptions]
         let states: [TorrentState?] = [nil] + TorrentState.allCases
         let filterActions = states.map { state in
-            AlertAction(title: state?.localizedString ?? L10n.allFilter, style: .default) {
+            AlertAction(title: state?.localizedString ?? L10n.Screen.Filter.filteredAll, style: .default) {
                 filterOptions.state = state
                 Current.preferences[.filterOptions] = filterOptions
             }
         }
 
         eventSubject.send(.alert(.init(
-            title: L10n.filterStateAlertTitle,
-            message: L10n.filterStateAlertMessage,
+            title: L10n.Screen.Filter.filterByState,
+            message: L10n.Screen.Filter.filterByStateHint,
             style: .actionSheet(source),
             actions: filterActions + [.cancel]
         )))
@@ -114,14 +114,14 @@ final class FilterViewModel: ViewModel {
         ]))
 
         var filtersSection = FilterSection(type: .filters, items: [
-            .state(filterOptions.state?.localizedString ?? L10n.allFilter),
+            .state(filterOptions.state?.localizedString ?? L10n.Screen.Filter.filteredAll),
         ])
 
         if !labels.isEmpty {
             let labelName = filterOptions.label.map {
-                $0.isEmpty ? L10n.noneLabel : $0
+                $0.isEmpty ? L10n.Label.none : $0
             }
-            filtersSection.items.append(.label(labelName ?? L10n.allFilter))
+            filtersSection.items.append(.label(labelName ?? L10n.Screen.Filter.filteredAll))
         }
 
         sections.append(filtersSection)

@@ -91,7 +91,7 @@ class DelugeSettingsViewModelTests: TestCase {
             viewModel.send(.saveSelected)
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.title, "Unable to Add Server")
+        XCTAssertEqual(alert.title, "Invalid URL")
         XCTAssertEqual(
             alert.message,
             "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."

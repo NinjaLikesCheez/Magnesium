@@ -77,5 +77,9 @@ extension L10n {
         static var selectAll: String {
             NSLocalizedString("action.select-all", comment: "Select All")
         }
+
+        static var sort: String {
+            NSLocalizedString("action.sort", comment: "Sort")
+        }
     }
 }

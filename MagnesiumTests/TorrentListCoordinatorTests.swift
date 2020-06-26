@@ -67,56 +67,57 @@ class TorrentListCoordinatorTests: TestCase {
 
     // MARK: - TorrentListViewDelegate
 
-    // TODO:
-//    func test_previewForItem_shouldAddDetailChildCoordinator() {
-//        let viewController = coordinator.previewForItem(at: 0)
-//        XCTAssertNotNil(viewController)
-//        XCTAssertEqual(coordinator.childCoordinators.count, 1)
-//        let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
-//        XCTAssertType(childCoordinator, TorrentDetailCoordinator.self)
-//    }
-//
-//    func test_commitPreviews_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
-//        XCTAssertNotNil(coordinator.previewForItem(at: 0))
-//        let childCoordinator = coordinator.childCoordinators.values.first?.base as? TorrentDetailCoordinator
-//
-//        let event = try coordinator.eventPublisher.first().wait {
-//            self.coordinator.commitPreviewForItem(at: 0)
-//        }.singleValue()
-//        let committedCoordinator = try extract(case: type(of: event).commitDetail, from: event)
-//        XCTAssertTrue(childCoordinator === committedCoordinator)
-//    }
-//
-//    func test_commitPreviewForItem_shouldRemoveChildCoordinator() {
-//        XCTAssertNotNil(coordinator.previewForItem(at: 0))
-//        XCTAssertEqual(coordinator.childCoordinators.count, 1)
-//        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
-//        coordinator.commitPreviewForItem(at: 0)
-//        XCTAssertTrue(coordinator.childCoordinators.isEmpty)
-//        XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
-//    }
-//
-//    func test_cleanupPreviewForItem_shouldRemovePreviewCoordinatorFromCache() {
-//        XCTAssertNotNil(coordinator.previewForItem(at: 0))
-//        XCTAssertEqual(coordinator.childCoordinators.count, 1)
-//        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
-//        // remove the child coordinator so the only reference should be the preview cache
-//        coordinator.childCoordinators.removeAll()
-//        XCTAssertFalse(isKnownUniquelyReferenced(&childCoordinator))
-//        coordinator.didDismissPreviewForItem(at: 0)
-//        let expectation = self.expectation(description: "")
-//        DispatchQueue.main.async {
-//            XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
-//            expectation.fulfill()
-//        }
-//        waitForExpectations(timeout: 1)
-//    }
+    func test_preview_shouldAddDetailChildCoordinator() {
+        let viewController = coordinator.preview(for: .mock(hash: "A"))
+        XCTAssertNotNil(viewController)
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        let childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
+        XCTAssertType(childCoordinator, TorrentDetailCoordinator.self)
+    }
+
+    func test_commitPreview_shouldEmitCommitDetailEvent_withSameCoordinator() throws {
+        XCTAssertNotNil(coordinator.preview(for: .mock(hash: "A")))
+        let childCoordinator = coordinator.childCoordinators.values.first?.base as? TorrentDetailCoordinator
+
+        let event = try coordinator.eventPublisher.first().wait {
+            self.coordinator.commitPreview(for: .mock(hash: "A"))
+        }.singleValue()
+        let committedCoordinator = try extract(case: type(of: event).commitDetail, from: event)
+        XCTAssertTrue(childCoordinator === committedCoordinator)
+    }
+
+    func test_commitPreview_shouldRemoveChildCoordinator() {
+        XCTAssertNotNil(coordinator.preview(for: .mock(hash: "A")))
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
+        coordinator.commitPreview(for: .mock(hash: "A"))
+        XCTAssertTrue(coordinator.childCoordinators.isEmpty)
+        XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
+    }
+
+    func test_willDismissPreview_shouldRemovePreviewCoordinatorFromCache() {
+        XCTAssertNotNil(coordinator.preview(for: .mock(hash: "A")))
+        XCTAssertEqual(coordinator.childCoordinators.count, 1)
+        var childCoordinator = coordinator.childCoordinators.values.first!.base as AnyObject
+        // remove the child coordinator so the only reference should be the preview cache
+        coordinator.childCoordinators.removeAll()
+        XCTAssertFalse(isKnownUniquelyReferenced(&childCoordinator))
+        coordinator.willDismissPreview(for: .mock(hash: "A"))
+        let expectation = self.expectation(description: "")
+        DispatchQueue.main.async {
+            XCTAssertTrue(isKnownUniquelyReferenced(&childCoordinator))
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 1)
+    }
 }
 
 // MARK: - Mocks
 
 private final class MockViewModel: ViewModel {
-    let values = TorrentListViewValues.mock()
+    let values = TorrentListViewValues.mock(
+        detailViewModel: { _ in AnyViewModel(MockDetailViewModel()) }
+    )
     let eventSubject = PassthroughSubject<TorrentListViewModelEvent, Never>()
     var eventPublisher: AnyPublisher<TorrentListViewModelEvent, Never> { eventSubject.eraseToAnyPublisher() }
     func send(_ event: TorrentListViewEvent) {}

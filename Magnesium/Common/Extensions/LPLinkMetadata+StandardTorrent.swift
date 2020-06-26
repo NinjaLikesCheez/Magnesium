@@ -3,7 +3,7 @@ import LinkPresentation
 extension LPLinkMetadata {
     convenience init(torrents: [StandardTorrent]) {
         self.init()
-        title = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
+        title = torrents.count == 1 ? torrents[0].name : L10n.Torrent.count(torrents.count)
 
         let firstCharacter = torrents.count == 1 ? (torrents[0].name.first.map { String($0) } ?? "") as NSString : nil
         let iconProvider = NSItemProvider()

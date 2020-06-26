@@ -22,7 +22,7 @@ where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewValues == RefreshInterval
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = L10n.refreshIntervalScreenTitle
+        title = L10n.Screen.RefreshInterval.title
     }
 
     @available(*, unavailable)

@@ -67,9 +67,9 @@ final class SettingsViewModel: ViewModel {
         let refreshInterval = Current.preferences[.autoRefreshInterval]
         let localizedRefresh: String
         if refreshInterval <= 0 {
-            localizedRefresh = L10n.refreshIntervalNever
+            localizedRefresh = L10n.Screen.RefreshInterval.never
         } else {
-            localizedRefresh = L10n.refreshIntervalSeconds(Int(refreshInterval))
+            localizedRefresh = L10n.Screen.RefreshInterval.seconds(Int(refreshInterval))
         }
         sections.append(.init(type: .general, items: [.refreshInterval(current: localizedRefresh)]))
 

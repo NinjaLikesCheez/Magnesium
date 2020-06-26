@@ -11,7 +11,7 @@ where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = L10n.settingsScreenTitle
+        title = L10n.Screen.Settings.title
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.leftBarButtonItem = .init(
             barButtonSystemItem: .done,
@@ -32,7 +32,7 @@ where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
                 if cell == nil {
                     cell = .init(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = L10n.settingsOptionCurrentServer
+                cell.textLabel?.text = L10n.Screen.Settings.currentServer
                 cell.detailTextLabel?.text = name
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -43,7 +43,7 @@ where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
                 return cell
             case .addServer:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "text", for: indexPath)
-                cell.textLabel?.text = L10n.settingsOptionAddServer
+                cell.textLabel?.text = L10n.Action.addServer
                 cell.accessoryType = .disclosureIndicator
                 return cell
             case let .refreshInterval(current: current):
@@ -51,7 +51,7 @@ where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
                 if cell == nil {
                     cell = .init(style: .value1, reuseIdentifier: "detail")
                 }
-                cell.textLabel?.text = L10n.settingsOptionRefreshInterval
+                cell.textLabel?.text = L10n.Screen.RefreshInterval.title
                 cell.detailTextLabel?.text = current
                 cell.accessoryType = .disclosureIndicator
                 return cell
@@ -109,9 +109,9 @@ private extension SettingsViewController {
             case .changeServer:
                 return nil
             case .servers:
-                return L10n.settingsSectionServers
+                return L10n.Screen.Settings.serversSection
             case .general:
-                return L10n.settingsSectionGeneral
+                return L10n.Screen.Settings.generalSection
             }
         }
     }

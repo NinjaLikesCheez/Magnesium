@@ -30,7 +30,9 @@ class DelugeTorrentListImplementationTests: TestCase {
     }
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {
-        assertSnapshot(matching: try implementation.addLink("^").wait().error(), as: .dump)
+        let error = try implementation.addLink("^").wait().error()
+        XCTAssertEqual(error.title, "Invalid URL")
+        XCTAssertEqual(error.message, "That URL doesn't appear to be valid.")
     }
 
     func test_addLink_withMagnetLink_shouldAddMagnetURL() {

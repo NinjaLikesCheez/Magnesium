@@ -58,7 +58,7 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = L10n.torrentInfoScreenTitle
+        title = L10n.Screen.TorrentInfo.title
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = moreBarButtonItem
     }
@@ -329,12 +329,12 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         case .header:
             break
         case .info:
-            header.configure(title: L10n.torrentInfoSectionInfo)
+            header.configure(title: L10n.Screen.TorrentInfo.informationSection)
         case .trackers:
-            header.configure(title: L10n.torrentInfoSectionTrackers)
+            header.configure(title: L10n.Screen.TorrentInfo.trackersSection)
         case .files:
             header.configure(
-                title: L10n.torrentInfoSectionFiles,
+                title: L10n.Screen.TorrentInfo.filesSection,
                 action: !isEditing ? L10n.Action.edit : nil,
                 actionHandler: { [weak self] in
                     self?.viewModel.send(.editSectionSelected(.files))

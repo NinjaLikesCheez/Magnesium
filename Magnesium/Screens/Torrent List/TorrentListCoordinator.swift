@@ -70,13 +70,13 @@ final class TorrentListCoordinator: NSObject, Coordinator {
     private func showAdd(from source: PopoverSource, linkSubject: PassthroughSubject<String, Never>) {
         let alert = Alert(
             title: L10n.Action.addTorrent,
-            message: L10n.addTorrentMethodPrompt,
+            message: L10n.AddTorrent.addMethodPrompt,
             style: .actionSheet(source),
             actions: [
-                .init(title: L10n.addTorrentMethodLink, style: .default) {
+                .init(title: L10n.AddTorrent.addLink, style: .default) {
                     self.showAddLink(subject: linkSubject)
                 },
-                .init(title: L10n.addTorrentMethodFile, style: .default) {
+                .init(title: L10n.AddTorrent.addFile, style: .default) {
                     self.showAddFile()
                 },
                 .cancel,
@@ -88,8 +88,8 @@ final class TorrentListCoordinator: NSObject, Coordinator {
     // internal for testing
     func showAddLink(subject: PassthroughSubject<String, Never>) {
         let alertController = UIAlertController(
-            title: L10n.addTorrentLinkAlertTitle,
-            message: L10n.addTorrentLinkAlertMessage,
+            title: L10n.AddTorrent.enterURL,
+            message: L10n.AddTorrent.addLinkHint,
             preferredStyle: .alert
         )
         alertController.addTextField { textField in

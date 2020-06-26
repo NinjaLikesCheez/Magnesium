@@ -38,8 +38,8 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
         let nameInput = TextInputItem(
-            name: L10n.serverSettingsOptionName,
-            placeholder: L10n.transmission,
+            name: L10n.Screen.EditServer.serverName,
+            placeholder: L10n.Server.transmission,
             value: nameSubject,
             isEnabled: nameEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.default.withReturnKeyType(.next)
@@ -47,7 +47,7 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         let serverEnabled = CurrentValueSubject<Bool, Never>(true)
         let serverInput = TextInputItem(
-            name: L10n.serverSettingsOptionServer,
+            name: L10n.Screen.EditServer.serverURL,
             placeholder: "https://example.com",
             value: serverSubject,
             isEnabled: serverEnabled.ui().eraseToAnyPublisher(),
@@ -56,8 +56,8 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         let usernameEnabled = CurrentValueSubject<Bool, Never>(true)
         let usernameInput = TextInputItem(
-            name: L10n.serverSettingsOptionUsername,
-            placeholder: L10n.serverSettingsOptionUsernameHintOptional,
+            name: L10n.Screen.EditServer.username,
+            placeholder: L10n.Screen.EditServer.optionalUsernamePlaceholder,
             value: usernameSubject,
             isEnabled: usernameEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.username.withReturnKeyType(.next)
@@ -65,15 +65,15 @@ final class TransmissionSettingsViewModel: ViewModel {
 
         let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
         let passwordInput = TextInputItem(
-            name: L10n.serverSettingsOptionPassword,
-            placeholder: L10n.serverSettingsOptionPasswordHintOptional,
+            name: L10n.Screen.EditServer.password,
+            placeholder: L10n.Screen.EditServer.optionalPasswordPlaceholder,
             value: passwordSubject,
             isEnabled: passwordEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
         values = .init(
-            title: server == nil ? L10n.addServerScreenTitle : L10n.editServerScreenTitle,
+            title: server == nil ? L10n.Screen.AddServer.title : L10n.Screen.EditServer.title,
             saveButtonTitle: server == nil ? L10n.Action.add : L10n.Action.save,
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
@@ -112,24 +112,24 @@ final class TransmissionSettingsViewModel: ViewModel {
 
     private func handleSaveSelected() {
         guard isSaveButtonEnabledSubject.value,
-            let name = nameSubject.value,
-            let urlString = serverSubject.value
+              let name = nameSubject.value,
+              let urlString = serverSubject.value
         else {
             return
         }
 
         let username = usernameSubject.value
         let password = passwordSubject.value
-        let errorTitle = server == nil ? L10n.addServerError : L10n.saveServerError
 
         guard let url = URL(string: urlString), ["http", "https"].contains(url.scheme), url.host != nil else {
-            showError(title: errorTitle, message: L10n.serverURLValidationErrorDescription)
+            showError(title: L10n.Error.invalidURL, message: L10n.Screen.AddServer.invalidServerURL)
             return
         }
 
         isLoadingSubject.send(true)
 
         let client = Current.transmission(url, username, password)
+        let errorTitle = server == nil ? L10n.Error.failedToAddServer : L10n.Error.failedToSaveServer
         client.request(.rpcVersion)
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
@@ -176,31 +176,35 @@ final class TransmissionSettingsViewModel: ViewModel {
 
     private func handleDeleteSelected(source: PopoverSource) {
         guard let server = server else { return }
-        eventSubject.send(.alert(.init(message: L10n.deleteServerConfirmation, style: .actionSheet(source), actions: [
-            .init(title: L10n.Action.deleteServer, style: .destructive) {
-                do {
-                    try Current.preferences.remove(server: server)
-                } catch {
-                    self.showError(title: L10n.deleteServerError, message: error.localizedDescription)
-                    return
-                }
+        eventSubject.send(.alert(.init(
+            message: L10n.Screen.EditServer.deleteServerConfirmation,
+            style: .actionSheet(source),
+            actions: [
+                .init(title: L10n.Action.deleteServer, style: .destructive) {
+                    do {
+                        try Current.preferences.remove(server: server)
+                    } catch {
+                        self.showError(title: L10n.Error.failedToDeleteServer, message: error.localizedDescription)
+                        return
+                    }
 
-                self.eventSubject.send(.complete)
-            },
-            .cancel,
-        ])))
+                    self.eventSubject.send(.complete)
+                },
+                .cancel,
+            ]
+        )))
     }
 
     private func showError(_ error: TransmissionError) {
         let message: String
         switch error {
         case .unauthenticated:
-            message = L10n.unauthenticatedErrorDescription
+            message = L10n.Error.unauthenticatedVerifyCredentials
         default:
             message = error.localizedDescription
         }
 
-        showError(title: L10n.authenticationError, message: message)
+        showError(title: L10n.Error.authenticationFailed, message: message)
     }
 
     private func showError(title: String, message: String?) {

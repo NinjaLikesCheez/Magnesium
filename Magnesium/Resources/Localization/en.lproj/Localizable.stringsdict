@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>torrent_count</key>
+	<key>torrent.count</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
 		<string>%#@torrents@</string>
@@ -20,7 +20,7 @@
 			<string>%d Torrents</string>
 		</dict>
 	</dict>
-	<key>file_count</key>
+	<key>file.count</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
 		<string>%#@files@</string>

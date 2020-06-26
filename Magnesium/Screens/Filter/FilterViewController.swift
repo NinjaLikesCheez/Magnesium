@@ -11,7 +11,7 @@ where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        navigationItem.title = L10n.filterScreenTitle
+        navigationItem.title = L10n.Screen.Filter.title
         navigationItem.leftBarButtonItem = .init(
             barButtonSystemItem: .done,
             target: self,
@@ -33,17 +33,17 @@ where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
             switch item {
             case let .sort(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = L10n.filterOptionSort
+                cell.textLabel?.text = L10n.Action.sort
                 cell.detailTextLabel?.text = value
                 return cell
             case let .state(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = L10n.filterOptionState
+                cell.textLabel?.text = L10n.Screen.Filter.state
                 cell.detailTextLabel?.text = value
                 return cell
             case let .label(value):
                 let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-                cell.textLabel?.text = L10n.filterOptionLabel
+                cell.textLabel?.text = L10n.Screen.Filter.label
                 cell.detailTextLabel?.text = value
                 return cell
             }

@@ -14,9 +14,7 @@ extension TorrentListViewValues {
         hasActiveFilters: Bool = false,
         editActionsEnabled: Bool = false,
         status: String = "",
-        detailViewModel: @escaping (TorrentListItem) -> AnyTorrentDetailViewModel = { _ in
-            .init(MockDetailViewModel())
-        },
+        detailViewModel: @escaping (TorrentListItem) -> AnyTorrentDetailViewModel? = { _ in nil },
         contextMenu: @escaping (TorrentListItem) -> Menu? = { _ in nil },
         leadingSwipeActionsConfiguration: @escaping (TorrentListItem, PopoverSource)
             -> SwipeActionsConfiguration? = { _, _ in nil },
@@ -37,10 +35,4 @@ extension TorrentListViewValues {
             trailingSwipeActionsConfiguration: trailingSwipeActionsConfiguration
         )
     }
-}
-
-private final class MockDetailViewModel: ViewModel {
-    let values = TorrentDetailViewValues.mock()
-    let eventPublisher: AnyPublisher<TorrentDetailViewModelEvent, Never> = Empty().eraseToAnyPublisher()
-    func send(_ event: TorrentDetailViewEvent) {}
 }

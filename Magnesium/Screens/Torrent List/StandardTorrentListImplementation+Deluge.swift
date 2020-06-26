@@ -47,8 +47,8 @@ extension StandardTorrentListImplementation {
     ) -> AnyPublisher<Void, AddLinkError> {
         guard let url = URL(string: url) else {
             return Fail(error: .init(
-                title: L10n.torrentLinkValidationError,
-                message: L10n.torrentLinkValidationErrorDescription
+                title: L10n.Error.invalidURL,
+                message: L10n.Error.invalidURLMessage
             )).eraseToAnyPublisher()
         }
 
@@ -62,7 +62,7 @@ extension StandardTorrentListImplementation {
 
         return publisher
             .mapError { error in
-                .init(title: L10n.addTorrentError, message: error.localizedDescription)
+                .init(title: L10n.Error.failedToAddTorrent, message: error.localizedDescription)
             }
             .eraseToAnyPublisher()
     }

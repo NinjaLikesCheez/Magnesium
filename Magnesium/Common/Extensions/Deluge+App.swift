@@ -66,14 +66,14 @@ extension DelugeError: LocalizedError {
         case let .request(error):
             return error.localizedDescription
         case .unauthenticated:
-            return L10n.unauthenticatedErrorDescription
+            return L10n.Error.unauthenticatedVerifyCredentials
         case .unexpectedResponse:
-            return L10n.unexpectedResponseErrorDescription
+            return L10n.Error.unexpectedServerResponse
         case let .serverError(message):
             if let message = message {
-                return L10n.serverMessageErrorDescription(message)
+                return L10n.Error.serverErrorWithMessage(message)
             } else {
-                return L10n.serverErrorDescription
+                return L10n.Error.serverError
             }
         }
     }

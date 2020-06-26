@@ -32,7 +32,7 @@ final class StandardTorrentListViewModel: ViewModel {
         let title = isEditingSubject
             .combineLatest(multiSelectCountSubject)
             .map { isEditing, count in
-                isEditing ? L10n.selectedCount(count) : server.name
+                isEditing ? L10n.Common.selectedCount(count) : server.name
             }
             .ui()
 
@@ -46,16 +46,16 @@ final class StandardTorrentListViewModel: ViewModel {
 
         let totalDownloadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
-            .map { L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
+            .map { L10n.Torrent.downloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
 
         let totalUploadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
-            .map { L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
+            .map { L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
             .ui()
 
         let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
-            .map { "\($0) \($1)" }
+            .map { "\($0) \($1)" } // TODO: localize?
             .ui()
 
         _values = .init(
@@ -179,7 +179,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.pauseError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToPause, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -190,7 +190,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.resumeError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToResume, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -201,7 +201,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.removeError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToRemove, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -212,7 +212,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToSetLabel, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -223,7 +223,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToVerifyFiles, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -234,8 +234,8 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(title: L10n.Error.failedToUpdateTrackers, message: error.localizedDescription)
+            }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
 
@@ -245,22 +245,22 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToMoveDownloadFolder, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
 
     private func presentRemoveOptions(for torrents: [StandardTorrent], from source: PopoverSource) {
-        let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
+        let message = torrents.count == 1 ? torrents[0].name : L10n.Torrent.count(torrents.count)
         eventSubject.send(.alert(.init(
             title: L10n.Action.remove,
             message: message,
             style: .actionSheet(source),
             actions: [
-                .init(title: L10n.removeTorrentOptionKeepData, style: .default) {
+                .init(title: L10n.Torrent.removeKeepData, style: .default) {
                     self.remove(torrents, removeData: false)
                 },
-                .init(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+                .init(title: L10n.Torrent.removeRemoveData, style: .destructive) {
                     self.remove(torrents, removeData: true)
                 },
                 .cancel,
@@ -269,7 +269,7 @@ final class StandardTorrentListViewModel: ViewModel {
     }
 
     private func presentLabelSelection(for torrents: [StandardTorrent], from source: PopoverSource) {
-        let message = torrents.count == 1 ? torrents[0].name : L10n.torrentCount(torrents.count)
+        let message = torrents.count == 1 ? torrents[0].name : L10n.Torrent.count(torrents.count)
         let labelActions = labelsSubject.value.map { label in
             AlertAction(title: label.displayName, style: .default) {
                 self.setLabel(for: torrents, label: label)
@@ -390,14 +390,14 @@ final class StandardTorrentListViewModel: ViewModel {
             options: [.destructive],
             children: [
                 .action(.init(
-                    title: L10n.removeTorrentOptionKeepData,
+                    title: L10n.Torrent.removeKeepData,
                     image: UIImage(systemName: "trash"),
                     handler: { [weak self] in
                         self?.remove([torrent], removeData: false)
                     }
                 )),
                 .action(.init(
-                    title: L10n.removeTorrentOptionRemoveData,
+                    title: L10n.Torrent.removeRemoveData,
                     image: UIImage(systemName: "trash"),
                     attributes: [.destructive],
                     handler: { [weak self] in
@@ -489,7 +489,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .onMainThread()
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToRefresh, message: error.localizedDescription)
             })
             .eraseToAnyPublisher()
     }

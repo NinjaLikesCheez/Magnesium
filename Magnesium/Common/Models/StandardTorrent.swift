@@ -34,18 +34,18 @@ extension StandardTorrent {
 
     var localizedSpeed: String {
         if state == .downloading {
-            let download = L10n.torrentDownloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
-            let upload = L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
-            return "\(download) \(upload)"
+            let download = L10n.Torrent.downloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
+            let upload = L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
+            return "\(download) \(upload)" // TODO: localize?
         } else if state == .seeding {
-            return L10n.torrentUploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
+            return L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
         } else {
             return ""
         }
     }
 
     var localizedProgress: String {
-        L10n.torrentProgress(
+        L10n.Torrent.progress(
             downloaded: Formatters.bytes.string(fromByteCount: downloaded),
             size: Formatters.bytes.string(fromByteCount: size),
             progress: Formatters.percentage.string(for: progress) ?? ""
@@ -65,7 +65,7 @@ extension StandardTorrent {
         if state == .downloading {
             return formattedETA
         } else {
-            return L10n.torrentRatio(formattedRatio())
+            return L10n.Torrent.ratio(formattedRatio())
         }
     }
 }

@@ -230,7 +230,7 @@ final class AppCoordinator: Coordinator {
     func add(fileURL: URL) {
         guard let server = session.server else { return }
         let alert = Alert(
-            title: L10n.addTorrentToServerPrompt(serverName: server.name),
+            title: L10n.AddTorrent.addToServer(serverName: server.name),
             message: fileURL.lastPathComponent,
             style: .alert,
             actions: [
@@ -246,7 +246,7 @@ final class AppCoordinator: Coordinator {
     func add(magnetURL: URL) {
         guard let server = session.server else { return }
         let alert = Alert(
-            title: L10n.addTorrentToServerPrompt(serverName: server.name),
+            title: L10n.AddTorrent.addToServer(serverName: server.name),
             message: magnetURL.absoluteString,
             style: .alert,
             actions: [

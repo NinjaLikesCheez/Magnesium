@@ -107,61 +107,61 @@ final class StandardTorrentDetailViewModel: ViewModel {
         ]))
         sections.append(.init(type: .info, items: [
             .info(.init(
-                name: L10n.torrentInfoSize,
+                name: L10n.Screen.TorrentInfo.size,
                 value: torrentSubject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoDownloadSpeed,
+                name: L10n.Screen.TorrentInfo.downloadSpeed,
                 value: torrentSubject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoUploadSpeed,
+                name: L10n.Screen.TorrentInfo.uploadSpeed,
                 value: torrentSubject
                     .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoDownloaded,
+                name: L10n.Screen.TorrentInfo.downloaded,
                 value: torrentSubject
                     .map { Formatters.bytes.string(fromByteCount: $0.downloaded) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoUploaded,
+                name: L10n.Screen.TorrentInfo.uploaded,
                 value: torrentSubject
                     .map { Formatters.bytes.string(fromByteCount: $0.uploaded) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoETA,
+                name: L10n.Screen.TorrentInfo.eta,
                 value: torrentSubject.map(\.formattedETA).ui().eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoRatio,
+                name: L10n.Screen.TorrentInfo.ratio,
                 value: torrentSubject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoPeers,
+                name: L10n.Screen.TorrentInfo.peers,
                 value: torrentSubject
-                    .map { L10n.torrentPeers(peers: $0.peers, totalPeers: $0.totalPeers) }
+                    .map { L10n.Torrent.peers(peers: $0.peers, totalPeers: $0.totalPeers) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoSeed,
+                name: L10n.Screen.TorrentInfo.seeds,
                 value: torrentSubject
-                    .map { L10n.torrentPeers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
+                    .map { L10n.Torrent.peers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
-                name: L10n.torrentInfoDownloadFolder,
+                name: L10n.Screen.TorrentInfo.downloadFolder,
                 value: torrentSubject.map { ($0.downloadPath as NSString).lastPathComponent }
                     .ui()
                     .eraseToAnyPublisher(),
@@ -241,7 +241,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .handleEvents(receiveCompletion: { [weak self] completion in
                 self?.isRefreshingSubject.send(false)
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.refreshError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToRefresh, message: error.localizedDescription)
             })
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
             .store(in: &cancellables)
@@ -282,7 +282,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.pauseError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToPause, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -293,7 +293,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.resumeError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToResume, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -307,7 +307,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
                 case .finished:
                     self?.eventSubject.send(.complete)
                 case let .failure(error):
-                    self?.showError(title: L10n.removeError, message: error.localizedDescription)
+                    self?.showError(title: L10n.Error.failedToRemove, message: error.localizedDescription)
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellables)
@@ -319,8 +319,8 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.verifyFilesError, message: error.localizedDescription)
-                }, receiveValue: { _ in })
+                self?.showError(title: L10n.Error.failedToVerifyFiles, message: error.localizedDescription)
+            }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
 
@@ -330,7 +330,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.setLabelError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToSetLabel, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -341,7 +341,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.updateTrackersError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToUpdateTrackers, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
@@ -352,17 +352,17 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.moveDownloadFolderError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToMoveDownloadFolder, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
 
     private func presentRemoveOptions(from source: PopoverSource) {
         eventSubject.send(.alert(.init(style: .actionSheet(source), actions: [
-            .init(title: L10n.removeTorrentOptionKeepData, style: .default) {
+            .init(title: L10n.Torrent.removeKeepData, style: .default) {
                 self.remove(removeData: false)
             },
-            .init(title: L10n.removeTorrentOptionRemoveData, style: .destructive) {
+            .init(title: L10n.Torrent.removeRemoveData, style: .destructive) {
                 self.remove(removeData: true)
             },
             .cancel,
@@ -394,19 +394,19 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
         eventSubject.send(.alert(.init(
             title: L10n.Action.setPriority,
-            message: L10n.fileCount(files.count),
+            message: L10n.File.count(files.count),
             style: .actionSheet(source),
             actions: [
-                .init(title: L10n.disabledPriority, style: .default) { [weak self] in
+                .init(title: L10n.Priority.disabled, style: .default) { [weak self] in
                     self?.setPriority(.disabled, for: files)
                 },
-                .init(title: L10n.lowPriority, style: .default) { [weak self] in
+                .init(title: L10n.Priority.low, style: .default) { [weak self] in
                     self?.setPriority(.low, for: files)
                 },
-                .init(title: L10n.normalPriority, style: .default) { [weak self] in
+                .init(title: L10n.Priority.normal, style: .default) { [weak self] in
                     self?.setPriority(.normal, for: files)
                 },
-                .init(title: L10n.highPriority, style: .default) { [weak self] in
+                .init(title: L10n.Priority.high, style: .default) { [weak self] in
                     self?.setPriority(.high, for: files)
                 },
                 .cancel,
@@ -429,28 +429,28 @@ final class StandardTorrentDetailViewModel: ViewModel {
 
             return Menu(children: [
                 .action(.init(
-                    title: L10n.disabledPriority,
+                    title: L10n.Priority.disabled,
                     state: file.value.priority == .disabled ? .on : .off,
                     handler: { [weak self] in
                         self?.setPriority(.disabled, for: [file.value])
                     }
                 )),
                 .action(.init(
-                    title: L10n.lowPriority,
+                    title: L10n.Priority.low,
                     state: file.value.priority == .low ? .on : .off,
                     handler: { [weak self] in
                         self?.setPriority(.low, for: [file.value])
                     }
                 )),
                 .action(.init(
-                    title: L10n.normalPriority,
+                    title: L10n.Priority.normal,
                     state: file.value.priority == .normal ? .on : .off,
                     handler: { [weak self] in
                         self?.setPriority(.normal, for: [file.value])
                     }
                 )),
                 .action(.init(
-                    title: L10n.highPriority,
+                    title: L10n.Priority.high,
                     state: file.value.priority == .high ? .on : .off,
                     handler: { [weak self] in
                         self?.setPriority(.high, for: [file.value])
@@ -475,7 +475,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .onMainThread()
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
-                self?.showError(title: L10n.setPriorityError, message: error.localizedDescription)
+                self?.showError(title: L10n.Error.failedToSetPriority, message: error.localizedDescription)
             }, receiveValue: { _ in })
             .store(in: &cancellables)
     }

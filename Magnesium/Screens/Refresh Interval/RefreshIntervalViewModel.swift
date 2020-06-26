@@ -6,11 +6,11 @@ final class RefreshIntervalViewModel: ViewModel {
     let values: RefreshIntervalViewValues
 
     private let options: [(Int, String)] = [
-        (0, L10n.refreshIntervalNever),
-        (2, L10n.refreshIntervalSeconds(2)),
-        (5, L10n.refreshIntervalSeconds(5)),
-        (10, L10n.refreshIntervalSeconds(10)),
-        (30, L10n.refreshIntervalSeconds(30)),
+        (0, L10n.Screen.RefreshInterval.never),
+        (2, L10n.Screen.RefreshInterval.seconds(2)),
+        (5, L10n.Screen.RefreshInterval.seconds(5)),
+        (10, L10n.Screen.RefreshInterval.seconds(10)),
+        (30, L10n.Screen.RefreshInterval.seconds(30)),
     ]
 
     init() {

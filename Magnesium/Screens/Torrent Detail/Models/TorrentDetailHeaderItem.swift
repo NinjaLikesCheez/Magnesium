@@ -18,7 +18,7 @@ struct TorrentDetailHeaderItem: Identifiable {
         progressColor = torrentSubject.map(\.state.displayColor).ui().eraseToAnyPublisher()
         status = torrentSubject
             .map {
-                L10n.torrentStatusAndProgress(
+                L10n.Torrent.torrentStatusWithPercentage(
                     status: $0.state.localizedString,
                     progress: Formatters.percentage(precision: 2).string(for: $0.progress) ?? ""
                 )

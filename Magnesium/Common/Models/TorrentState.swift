@@ -18,17 +18,17 @@ extension TorrentState {
     var localizedString: String {
         switch self {
         case .downloading:
-            return L10n.downloadingState
+            return L10n.Torrent.downloadingState
         case .seeding:
-            return L10n.seedingState
+            return L10n.Torrent.seedingState
         case .paused:
-            return L10n.pausedState
+            return L10n.Torrent.pausedState
         case .queued:
-            return L10n.queuedState
+            return L10n.Torrent.queuedState
         case .checking:
-            return L10n.checkingState
+            return L10n.Torrent.checkingState
         case .error:
-            return L10n.errorState
+            return L10n.Torrent.errorState
         }
     }
 

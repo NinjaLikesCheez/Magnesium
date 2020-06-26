@@ -49,18 +49,18 @@ extension TransmissionError: LocalizedError {
         case let .request(error):
             return error.localizedDescription
         case let .statusCode(statusCode):
-            return L10n.unexpectedStatusCodeErrorDescription(statusCode)
+            return L10n.Error.unexpectedStatusCode(statusCode)
         case .noSessionID:
-            return L10n.noSessionIDErrorDescription
+            return L10n.Error.noSessionID
         case .unauthenticated:
-            return L10n.unauthenticatedErrorDescription
+            return L10n.Error.unauthenticatedVerifyCredentials
         case .unexpectedResponse:
-            return L10n.unexpectedResponseErrorDescription
+            return L10n.Error.unexpectedServerResponse
         case let .serverError(result):
             if let result = result {
-                return L10n.serverMessageErrorDescription(result)
+                return L10n.Error.serverErrorWithMessage(result)
             } else {
-                return L10n.serverErrorDescription
+                return L10n.Error.serverError
             }
         }
     }

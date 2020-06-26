@@ -19,7 +19,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
         label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = L10n.noServersTitle
+        label.text = L10n.Screen.NoServers.header
         label.textAlignment = .center
         return label
     }()
@@ -29,7 +29,7 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
         label.adjustsFontForContentSizeCategory = true
         label.font = .preferredFont(forTextStyle: .body)
         label.textColor = UIColor.secondaryLabel
-        label.text = L10n.noServersBody
+        label.text = L10n.Screen.NoServers.message
         label.numberOfLines = 0
         label.textAlignment = .center
         return label

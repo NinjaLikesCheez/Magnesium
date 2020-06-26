@@ -88,13 +88,13 @@ extension SortOption.Property {
     var localizedString: String {
         switch self {
         case .dateAdded:
-            return L10n.sortPropertyDateAdded
+            return L10n.Sort.dateAdded
         case .name:
-            return L10n.sortPropertyName
+            return L10n.Sort.name
         case .downloadSpeed:
-            return L10n.sortPropertyDownloadSpeed
+            return L10n.Sort.downloadSpeed
         case .uploadSpeed:
-            return L10n.sortPropertyUploadSpeed
+            return L10n.Sort.uploadSpeed
         }
     }
 }

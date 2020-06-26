@@ -7,6 +7,6 @@ extension StandardLabel: Equatable {}
 
 extension StandardLabel {
     var displayName: String {
-        name.isEmpty ? L10n.noneLabel : name
+        name.isEmpty ? L10n.Label.none : name
     }
 }

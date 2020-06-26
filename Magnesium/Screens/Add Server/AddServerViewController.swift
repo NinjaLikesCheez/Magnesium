@@ -9,7 +9,7 @@ where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues {
     init(viewModel: VM) {
         self.viewModel = viewModel
         super.init(style: .insetGrouped)
-        title = L10n.addServerScreenTitle
+        title = L10n.Screen.AddServer.title
     }
 
     @available(*, unavailable)

@@ -97,7 +97,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
         let alert = try getAlert {
             self.viewModel.send(.refresh)
         }
-        XCTAssertEqual(alert.title, "Update Failed")
+        XCTAssertEqual(alert.title, "Failed to Refresh")
     }
 
     func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {

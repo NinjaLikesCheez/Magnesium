@@ -20,7 +20,7 @@ where VM.ViewEvent == ServerErrorViewEvent {
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
         label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = L10n.serverErrorTitle
+        label.text = L10n.Screen.ServerError.header
         label.textAlignment = .center
         return label
     }()
@@ -30,7 +30,7 @@ where VM.ViewEvent == ServerErrorViewEvent {
         label.adjustsFontForContentSizeCategory = true
         label.font = .preferredFont(forTextStyle: .body)
         label.textColor = UIColor.secondaryLabel
-        label.text = L10n.serverErrorBody
+        label.text = L10n.Screen.ServerError.message
         label.numberOfLines = 0
         label.textAlignment = .center
         return label

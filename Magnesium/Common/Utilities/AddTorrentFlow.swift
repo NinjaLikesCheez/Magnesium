@@ -27,7 +27,7 @@ final class AddTorrentFlow {
     // swiftlint:disable:next cyclomatic_complexity
     func add(type: URLType) {
         guard let server = session.server else {
-            showError(title: L10n.unableToAddTorrentError, message: L10n.noServersErrorDescription)
+            showError(title: L10n.Error.unableToAddTorrent, message: L10n.Error.noServersMessage)
             return
         }
 
@@ -54,7 +54,7 @@ final class AddTorrentFlow {
                     try? decoder.decode(DelugeKeychainData.self, from: $0)
                 })
             else {
-                showError(title: L10n.unableToAddTorrentError, message: L10n.corruptServerSettingsErrorDescription)
+                showError(title: L10n.Error.unableToAddTorrent, message: L10n.Error.corruptServerSettingsMessage)
                 return
             }
 
@@ -78,7 +78,7 @@ final class AddTorrentFlow {
                 .onMainThread()
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
-                    self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)
+                    self?.showError(title: L10n.Error.unableToAddTorrent, message: error.localizedDescription)
                 }, receiveValue: { _ in })
                 .store(in: &cancellables)
         case .transmission:
@@ -88,7 +88,7 @@ final class AddTorrentFlow {
                     try? decoder.decode(TransmissionKeychainData.self, from: $0)
                 })
             else {
-                showError(title: L10n.unableToAddTorrentError, message: L10n.corruptServerSettingsErrorDescription)
+                showError(title: L10n.Error.unableToAddTorrent, message: L10n.Error.corruptServerSettingsMessage)
                 return
             }
 
@@ -106,7 +106,7 @@ final class AddTorrentFlow {
                 .onMainThread()
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
-                    self?.showError(title: L10n.failedToAddTorrentError, message: error.localizedDescription)
+                    self?.showError(title: L10n.Error.unableToAddTorrent, message: error.localizedDescription)
                 }, receiveValue: { _ in })
                 .store(in: &cancellables)
         }
