@@ -48,7 +48,7 @@ class TorrentDetailViewControllerTests: TestCase {
                 ]),
             ],
             editSection: .files,
-            toolbarInfo: L10n.selectedCount(1)
+            toolbarInfo: L10n.Common.selectedCount(1)
         )
         let viewModel = StaticViewModel(values: values, viewEvent: TorrentDetailViewEvent.self)
         let viewController = TorrentDetailViewController(viewModel: viewModel)

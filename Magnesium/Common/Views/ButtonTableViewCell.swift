@@ -20,12 +20,10 @@ final class ButtonTableViewCell: UITableViewCell {
         }
     }
 
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.textAlignment = .center
-        return label
-    }()
+    private lazy var titleLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.textAlignment = .center
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

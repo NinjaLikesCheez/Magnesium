@@ -3,21 +3,17 @@ import UIKit
 final class TorrentDetailSectionHeaderView: UITableViewHeaderFooterView {
     private var actionHandler: (() -> Void)?
 
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
+    private lazy var titleLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = UIFont(descriptor: descriptor, size: 0)
-        return label
-    }()
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+    }
 
-    private lazy var actionButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.titleLabel?.font = .preferredFont(forTextStyle: .callout)
-        button.addTarget(self, action: #selector(actionButtonTapped(_:)), for: .touchUpInside)
-        return button
-    }()
+    private lazy var actionButton = with(UIButton(type: .system)) {
+        $0.titleLabel?.font = .preferredFont(forTextStyle: .callout)
+        $0.addTarget(self, action: #selector(actionButtonTapped(_:)), for: .touchUpInside)
+    }
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)

@@ -94,7 +94,7 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
         $0.startAnimating()
     }
 
-    private lazy var emptyStateView: UIView = with(UILabel()) {
+    private lazy var emptyStateView = with(UILabel()) {
         $0.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
@@ -229,6 +229,8 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
             self?.update(with: items)
         }.store(in: &cancellables)
 
+        statusView.configure(content: viewModel.values.status)
+
         for button in [pauseBarButtonItem, resumeBarButtonItem, removeBarButtonItem, moreBarButtonItem] {
             viewModel.values.editActionsEnabled
                 .assign(to: \.isEnabled, on: button)
@@ -245,8 +247,6 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
             self.dataSource.apply(snapshot, animatingDifferences: true)
         }
     }
-
-    // MARK: Editing
 
     private func configureNormalState() {
         setEditing(false, animated: true)

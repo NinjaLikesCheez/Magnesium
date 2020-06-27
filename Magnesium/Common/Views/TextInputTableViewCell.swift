@@ -5,21 +5,17 @@ final class TextInputTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
     private var valueSubject: CurrentValueSubject<String?, Never>?
 
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .caption1)
-        return label
-    }()
+    private lazy var nameLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .caption1)
+    }
 
-    private lazy var textField: UITextField = {
-        let textField = UITextField()
-        textField.adjustsFontForContentSizeCategory = true
-        textField.font = .preferredFont(forTextStyle: .body)
-        textField.addTarget(self, action: #selector(textFieldTextChanged(_:)), for: .editingChanged)
-        textField.delegate = self
-        return textField
-    }()
+    private lazy var textField = with(UITextField()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .body)
+        $0.addTarget(self, action: #selector(textFieldTextChanged(_:)), for: .editingChanged)
+        $0.delegate = self
+    }
 
     var proceedToNextInput: (() -> Void)?
 

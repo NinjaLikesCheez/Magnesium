@@ -4,53 +4,43 @@ import UIKit
 final class TorrentDetailInfoTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var verticalStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 5
-        return stackView
-    }()
+    private lazy var verticalStackView = with(UIStackView(
+        arrangedSubviews: [horizontalStackView, expandedValueLabel]
+    )) {
+        $0.axis = .vertical
+        $0.spacing = 5
+    }
 
-    private lazy var horizontalStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        return stackView
-    }()
+    private lazy var horizontalStackView = with(UIStackView(
+        arrangedSubviews: [nameLabel, valueLabel, expandImageView]
+    )) {
+        $0.axis = .horizontal
+        $0.spacing = 8
+    }
 
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .secondaryLabel
-        return label
-    }()
+    private lazy var nameLabel = with(UILabel()) {
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .secondaryLabel
+    }
 
-    private lazy var valueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        return label
-    }()
+    private lazy var valueLabel = with(UILabel()) {
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+    }
 
-    private lazy var expandedValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.numberOfLines = 0
-        return label
-    }()
+    private lazy var expandedValueLabel = with(UILabel()) {
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.numberOfLines = 0
+    }
 
-    private lazy var expandImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.tintColor = .secondaryLabel
-        imageView.image = UIImage(systemName: "chevron.down")
-        imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .subheadline)
-        return imageView
-    }()
+    private lazy var expandImageView = with(UIImageView()) {
+        $0.tintColor = .secondaryLabel
+        $0.image = UIImage(systemName: "chevron.down")
+        $0.preferredSymbolConfiguration = UIImage.SymbolConfiguration(textStyle: .subheadline)
+    }
 
-    private lazy var separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        return view
-    }()
+    private lazy var separatorView = with(UIView()) {
+        $0.backgroundColor = .separator
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -74,11 +64,6 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        horizontalStackView.addArrangedSubview(nameLabel)
-        horizontalStackView.addArrangedSubview(valueLabel)
-        horizontalStackView.addArrangedSubview(expandImageView)
-        verticalStackView.addArrangedSubview(horizontalStackView)
-        verticalStackView.addArrangedSubview(expandedValueLabel)
         contentView.addSubview(verticalStackView)
         contentView.addSubview(separatorView)
     }

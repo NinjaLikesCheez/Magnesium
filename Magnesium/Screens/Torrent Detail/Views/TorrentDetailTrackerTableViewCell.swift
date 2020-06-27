@@ -1,19 +1,15 @@
 import UIKit
 
 final class TorrentDetailTrackerTableViewCell: UITableViewCell {
-    private lazy var trackerLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.numberOfLines = 0
-        return label
-    }()
+    private lazy var trackerLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.numberOfLines = 0
+    }
 
-    private lazy var separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        return view
-    }()
+    private lazy var separatorView = with(UIView()) {
+        $0.backgroundColor = .separator
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

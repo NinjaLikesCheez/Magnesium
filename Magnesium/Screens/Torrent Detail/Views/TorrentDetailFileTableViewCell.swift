@@ -4,42 +4,32 @@ import UIKit
 final class TorrentDetailFileTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var topStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [nameLabel, priorityImageViewContainer])
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        return stackView
-    }()
+    private lazy var topStackView = with(UIStackView(arrangedSubviews: [nameLabel, priorityImageViewContainer])) {
+        $0.axis = .horizontal
+        $0.spacing = 8
+    }
 
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.numberOfLines = 0
-        return label
-    }()
+    private lazy var nameLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.numberOfLines = 0
+    }
 
     private lazy var priorityImageViewContainer = UIView()
 
-    private lazy var priorityImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.preferredSymbolConfiguration = .init(textStyle: .subheadline)
-        return imageView
-    }()
+    private lazy var priorityImageView = with(UIImageView()) {
+        $0.preferredSymbolConfiguration = .init(textStyle: .subheadline)
+    }
 
-    private lazy var infoLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .secondaryLabel
-        return label
-    }()
+    private lazy var infoLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .secondaryLabel
+    }
 
-    private lazy var separatorView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        return view
-    }()
+    private lazy var separatorView = with(UIView()) {
+        $0.backgroundColor = .separator
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -106,12 +96,6 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
             separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1 / traitCollection.displayScale),
         ])
-    }
-
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
-        // TODO: this doesnt work in ios14
-        selectedBackgroundView = editing ? UIImageView(image: UIImage(color: .systemGray5)) : nil
     }
 
     func configure(with item: TorrentDetailFileItem, isLastRow: Bool) {

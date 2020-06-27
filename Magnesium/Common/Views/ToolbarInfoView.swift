@@ -4,13 +4,11 @@ import UIKit
 final class ToolbarInfoView: UIView {
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var contentLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .footnote)
-        label.textColor = .secondaryLabel
-        return label
-    }()
+    private lazy var contentLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .footnote)
+        $0.textColor = .secondaryLabel
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)

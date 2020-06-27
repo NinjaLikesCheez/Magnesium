@@ -4,51 +4,39 @@ import UIKit
 final class TorrentTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
 
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .callout)
-        label.numberOfLines = 2
-        return label
-    }()
+    private lazy var nameLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .callout)
+        $0.numberOfLines = 2
+    }
 
-    private lazy var progressView: UIProgressView = {
-        let progressView = UIProgressView(progressViewStyle: .bar)
-        progressView.trackTintColor = .systemGray5
-        return progressView
-    }()
+    private lazy var progressView = with(UIProgressView(progressViewStyle: .bar)) {
+        $0.trackTintColor = .systemGray5
+    }
 
-    private lazy var statusLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .systemGray
-        return label
-    }()
+    private lazy var statusLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .systemGray
+    }
 
-    private lazy var speedLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .systemGray
-        return label
-    }()
+    private lazy var speedLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .systemGray
+    }
 
-    private lazy var progressLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .systemGray
-        return label
-    }()
+    private lazy var progressLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .systemGray
+    }
 
-    private lazy var ratioOrETALabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .subheadline)
-        label.textColor = .systemGray
-        return label
-    }()
+    private lazy var ratioOrETALabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .systemGray
+    }
 
     static var estimatedHeight: CGFloat {
         8

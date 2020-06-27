@@ -13,81 +13,62 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     private var buttonHeightConstraint: NSLayoutConstraint?
     weak var delegate: TorrentDetailHeaderTableViewCellDelegate?
 
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
+    private lazy var nameLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = UIFont(descriptor: descriptor, size: 0)
-        label.numberOfLines = 0
-        return label
-    }()
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+        $0.numberOfLines = 0
+    }
 
-    private lazy var labelLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
+    private lazy var labelLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
         let base = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
         let descriptor = base.withSymbolicTraits([.traitItalic]) ?? base
-        label.font = UIFont(descriptor: descriptor, size: 0)
-        label.numberOfLines = 0
-        label.textColor = UIColor.secondaryLabel
-        return label
-    }()
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.secondaryLabel
+    }
 
-    private lazy var topLabelsStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        return stackView
-    }()
+    private lazy var topLabelsStackView = with(UIStackView(arrangedSubviews: [nameLabel, labelLabel])) {
+        $0.axis = .vertical
+        $0.spacing = 4
+    }
 
-    private lazy var progressView: UIProgressView = {
-        let progressView = UIProgressView(progressViewStyle: .bar)
-        progressView.trackTintColor = .systemGray5
-        return progressView
-    }()
+    private lazy var progressView = with(UIProgressView(progressViewStyle: .bar)) {
+        $0.trackTintColor = .systemGray5
+    }
 
-    private lazy var statusLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .callout)
-        label.textColor = .systemGray
-        return label
-    }()
+    private lazy var statusLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .callout)
+        $0.textColor = .systemGray
+    }
 
-    private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 12
-        stackView.distribution = .fillEqually
-        return stackView
-    }()
+    private lazy var buttonStackView = with(UIStackView(arrangedSubviews: [pauseButton, removeButton])) {
+        $0.axis = .horizontal
+        $0.spacing = 12
+        $0.distribution = .fillEqually
+    }
 
-    private lazy var pauseButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.tintColor = .systemBlue
-        button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
-        button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
-        return button
-    }()
+    private lazy var pauseButton = with(UIButton(type: .custom)) {
+        $0.tintColor = .systemBlue
+        $0.setPreferredSymbolConfiguration(.init(textStyle: .body), forImageIn: .normal)
+        $0.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+        $0.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
+    }
 
-    private lazy var removeButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.tintColor = .systemRed
+    private lazy var removeButton = with(UIButton(type: .custom)) {
+        $0.tintColor = .systemRed
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
-        button.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
-        button.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
-        button.addTarget(self, action: #selector(removeButtonTapped(_:)), for: .touchUpInside)
-        return button
-    }()
+        $0.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
+        $0.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+        $0.addTarget(self, action: #selector(removeButtonTapped(_:)), for: .touchUpInside)
+    }
 
     private var isActive = true {
         didSet {
-            let configuration = UIImage.SymbolConfiguration(textStyle: .body)
-            pauseButton.setImage(UIImage(
-                systemName: isActive ? "pause.fill" : "play.fill",
-                withConfiguration: configuration
-            ), for: .normal)
+            pauseButton.setImage(UIImage(systemName: isActive ? "pause.fill" : "play.fill"), for: .normal)
         }
     }
 
@@ -151,13 +132,9 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     }
 
     private func setupViews() {
-        topLabelsStackView.addArrangedSubview(nameLabel)
-        topLabelsStackView.addArrangedSubview(labelLabel)
         contentView.addSubview(topLabelsStackView)
         contentView.addSubview(progressView)
         contentView.addSubview(statusLabel)
-        buttonStackView.addArrangedSubview(pauseButton)
-        buttonStackView.addArrangedSubview(removeButton)
         contentView.addSubview(buttonStackView)
     }
 
@@ -180,7 +157,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: topLabelsStackView.bottomAnchor, constant: 8)
-                .withPriority(.defaultHigh),
+            .withPriority(.defaultHigh),
 
             statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

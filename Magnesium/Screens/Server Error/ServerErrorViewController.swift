@@ -6,49 +6,41 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController
 where VM.ViewEvent == ServerErrorViewEvent {
     private let viewModel: VM
 
-    private lazy var stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 20
-        stackView.alignment = .center
-        return stackView
-    }()
-
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
-            .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = L10n.Screen.ServerError.header
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var bodyLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .body)
-        label.textColor = UIColor.secondaryLabel
-        label.text = L10n.Screen.ServerError.message
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        return label
-    }()
-
-    private lazy var editServerButton: UIButton = {
-        let button = RoundedButton()
-        button.setTitle(L10n.Action.editServer, for: .normal)
-        button.addTarget(self, action: #selector(editServerButtonTapped(_:)), for: .touchUpInside)
-        return button
-    }()
-
     private lazy var settingsBarButtonItem = UIBarButtonItem(
         image: UIImage(systemName: "gear"),
         style: .plain,
         target: self,
         action: #selector(settingsButtonTapped(_:))
     )
+
+    private lazy var stackView = with(UIStackView(arrangedSubviews: [titleLabel, bodyLabel, editServerButton])) {
+        $0.axis = .vertical
+        $0.spacing = 20
+        $0.alignment = .center
+    }
+
+    private lazy var titleLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
+            .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+        $0.text = L10n.Screen.ServerError.header
+        $0.textAlignment = .center
+    }
+
+    private lazy var bodyLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .body)
+        $0.textColor = UIColor.secondaryLabel
+        $0.text = L10n.Screen.ServerError.message
+        $0.numberOfLines = 0
+        $0.textAlignment = .center
+    }
+
+    private lazy var editServerButton = with(RoundedButton()) {
+        $0.setTitle(L10n.Action.editServer, for: .normal)
+        $0.addTarget(self, action: #selector(editServerButtonTapped(_:)), for: .touchUpInside)
+    }
 
     init(viewModel: VM) {
         self.viewModel = viewModel
@@ -70,9 +62,6 @@ where VM.ViewEvent == ServerErrorViewEvent {
 
     private func setupViews() {
         view.backgroundColor = .systemBackground
-        stackView.addArrangedSubview(titleLabel)
-        stackView.addArrangedSubview(bodyLabel)
-        stackView.addArrangedSubview(editServerButton)
         view.addSubview(stackView)
     }
 

@@ -43,11 +43,7 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         action: #selector(selectAllButtonTapped(_:))
     )
 
-    private lazy var toolbarInfoView: ToolbarInfoView = {
-        let view = ToolbarInfoView()
-        view.configure(content: viewModel.values.toolbarInfo)
-        return view
-    }()
+    private lazy var toolbarInfoView = ToolbarInfoView()
 
     var torrentHash: String {
         viewModel.values.hash
@@ -72,28 +68,9 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureTableView()
-
-        refreshControl = .init()
-        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
-
-        viewModel.values.isRefreshing.sink { [weak self] isLoading in
-            if !isLoading {
-                self?.refreshControl?.endRefreshing()
-            }
-        }.store(in: &cancellables)
-
-        viewModel.values.sections.sink { [weak self] sections in
-            self?.update(with: sections)
-        }.store(in: &cancellables)
-
-        viewModel.values.editSection.sink { [weak self] section in
-            if let section = section {
-                self?.configureEditingState(for: section)
-            } else {
-                self?.configureNormalState()
-            }
-        }.store(in: &cancellables)
+        configureView()
+        configureDataSource()
+        bindViewModel()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -106,22 +83,27 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         viewModel.send(.disappeared)
     }
 
-    private func configureTableView() {
+    // MARK: Configuration
+
+    private func configureView() {
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.separatorStyle = .none
         tableView.contentInset.top = 20
         tableView.allowsMultipleSelectionDuringEditing = true
-        tableView.register(TorrentDetailHeaderTableViewCell.self, forCellReuseIdentifier: "header")
-        tableView.register(TorrentDetailInfoTableViewCell.self, forCellReuseIdentifier: "info")
-        tableView.register(TorrentDetailTrackerTableViewCell.self, forCellReuseIdentifier: "tracker")
-        tableView.register(TorrentDetailFileTableViewCell.self, forCellReuseIdentifier: "file")
-        tableView.register(TorrentDetailSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: "header")
         tableView.tableHeaderView = {
             var frame = CGRect.zero
             frame.size.height = .leastNormalMagnitude
             return .init(frame: frame)
         }()
         tableView.tableFooterView = .init()
+    }
+
+    private func configureDataSource() {
+        tableView.register(TorrentDetailHeaderTableViewCell.self, forCellReuseIdentifier: "header")
+        tableView.register(TorrentDetailInfoTableViewCell.self, forCellReuseIdentifier: "info")
+        tableView.register(TorrentDetailTrackerTableViewCell.self, forCellReuseIdentifier: "tracker")
+        tableView.register(TorrentDetailFileTableViewCell.self, forCellReuseIdentifier: "file")
+        tableView.register(TorrentDetailSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: "header")
 
         dataSource = .init(tableView: tableView) { [weak self] tableView, indexPath, item in
             switch item {
@@ -183,7 +165,30 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         tableView.dataSource = dataSource
     }
 
-    // MARK: Methods
+    private func bindViewModel() {
+        refreshControl = .init()
+        refreshControl?.addTarget(self, action: #selector(refreshControlTriggered(_:)), for: .valueChanged)
+
+        viewModel.values.isRefreshing.sink { [weak self] isLoading in
+            if !isLoading {
+                self?.refreshControl?.endRefreshing()
+            }
+        }.store(in: &cancellables)
+
+        viewModel.values.sections.sink { [weak self] sections in
+            self?.update(with: sections)
+        }.store(in: &cancellables)
+
+        viewModel.values.editSection.sink { [weak self] section in
+            if let section = section {
+                self?.configureEditingState(for: section)
+            } else {
+                self?.configureNormalState()
+            }
+        }.store(in: &cancellables)
+
+        toolbarInfoView.configure(content: viewModel.values.toolbarInfo)
+    }
 
     private func update(with sections: [TorrentDetailSection]) {
         let animated = !isFirstSnapshot
@@ -200,47 +205,6 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
             self.dataSource.apply(snapshot, animatingDifferences: animated)
         }
     }
-
-    // MARK: Actions
-
-    @objc
-    private func refreshControlTriggered(_ sender: UIRefreshControl) {
-        viewModel.send(.refresh)
-    }
-
-    @objc
-    private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.send(.moreOptionsSelected(source: .barButton(sender)))
-    }
-
-    @objc
-    private func doneButtonTapped(_ sender: UIBarButtonItem) {
-        viewModel.send(.doneEditingSelected)
-    }
-
-    @objc
-    private func filePriorityButtonTapped(_ sender: UIBarButtonItem) {
-        guard let indexPaths = tableView.indexPathsForSelectedRows else { return }
-        viewModel.send(.setFilePrioritySelected(indexPaths: indexPaths, source: .barButton(sender)))
-    }
-
-    @objc
-    private func selectAllButtonTapped(_ sender: UIBarButtonItem) {
-        guard let editSection = dataSource.editSection,
-            let sectionIndex = dataSource.snapshot().indexOfSection(editSection)
-        else {
-            return
-        }
-
-        for row in 0 ..< tableView.numberOfRows(inSection: sectionIndex) {
-            let indexPath = IndexPath(row: row, section: sectionIndex)
-            _ = tableView.delegate?.tableView?(tableView, willSelectRowAt: indexPath)
-            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-            tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
-        }
-    }
-
-    // MARK: Editing
 
     private func configureNormalState() {
         guard isEditing else {
@@ -301,6 +265,45 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
         }
     }
 
+    // MARK: Actions
+
+    @objc
+    private func refreshControlTriggered(_ sender: UIRefreshControl) {
+        viewModel.send(.refresh)
+    }
+
+    @objc
+    private func moreButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.send(.moreOptionsSelected(source: .barButton(sender)))
+    }
+
+    @objc
+    private func doneButtonTapped(_ sender: UIBarButtonItem) {
+        viewModel.send(.doneEditingSelected)
+    }
+
+    @objc
+    private func filePriorityButtonTapped(_ sender: UIBarButtonItem) {
+        guard let indexPaths = tableView.indexPathsForSelectedRows else { return }
+        viewModel.send(.setFilePrioritySelected(indexPaths: indexPaths, source: .barButton(sender)))
+    }
+
+    @objc
+    private func selectAllButtonTapped(_ sender: UIBarButtonItem) {
+        guard let editSection = dataSource.editSection,
+              let sectionIndex = dataSource.snapshot().indexOfSection(editSection)
+        else {
+            return
+        }
+
+        for row in 0 ..< tableView.numberOfRows(inSection: sectionIndex) {
+            let indexPath = IndexPath(row: row, section: sectionIndex)
+            _ = tableView.delegate?.tableView?(tableView, willSelectRowAt: indexPath)
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+            tableView.delegate?.tableView?(tableView, didSelectRowAt: indexPath)
+        }
+    }
+
     // MARK: UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -309,8 +312,8 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard shouldShowHeader(forSection: section),
-            let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header")
-            as? TorrentDetailSectionHeaderView
+              let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header")
+                as? TorrentDetailSectionHeaderView
         else {
             return nil
         }
@@ -353,9 +356,9 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if case let .info(item) = dataSource.itemIdentifier(for: indexPath),
-            !expandedInfoIDs.contains(item.id),
-            item.expandedValue != nil,
-            let cell = tableView.cellForRow(at: indexPath) as? TorrentDetailInfoTableViewCell
+           !expandedInfoIDs.contains(item.id),
+           item.expandedValue != nil,
+           let cell = tableView.cellForRow(at: indexPath) as? TorrentDetailInfoTableViewCell
         // swiftformat:disable:next braces
         {
             expandedInfoIDs.insert(item.id)

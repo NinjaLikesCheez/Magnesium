@@ -5,42 +5,34 @@ import ViewModel
 final class NoServersViewController<VM: ViewModel>: PresentableViewController where VM.ViewEvent == NoServersViewEvent {
     private let viewModel: VM
 
-    private lazy var stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 20
-        stackView.alignment = .center
-        return stackView
-    }()
+    private lazy var stackView = with(UIStackView(arrangedSubviews: [titleLabel, bodyLabel, addServerButton])) {
+       $0.axis = .vertical
+       $0.spacing = 20
+       $0.alignment = .center
+    }
 
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
+    private lazy var titleLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
-        label.font = UIFont(descriptor: descriptor, size: 0)
-        label.text = L10n.Screen.NoServers.header
-        label.textAlignment = .center
-        return label
-    }()
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+        $0.text = L10n.Screen.NoServers.header
+        $0.textAlignment = .center
+    }
 
-    private lazy var bodyLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = .preferredFont(forTextStyle: .body)
-        label.textColor = UIColor.secondaryLabel
-        label.text = L10n.Screen.NoServers.message
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        return label
-    }()
+    private lazy var bodyLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        $0.font = .preferredFont(forTextStyle: .body)
+        $0.textColor = UIColor.secondaryLabel
+        $0.text = L10n.Screen.NoServers.message
+        $0.numberOfLines = 0
+        $0.textAlignment = .center
+    }
 
-    private lazy var addServerButton: UIButton = {
-        let button = RoundedButton()
-        button.setTitle(L10n.Action.addServer, for: .normal)
-        button.addTarget(self, action: #selector(addSeverButtonTapped(_:)), for: .touchUpInside)
-        return button
-    }()
+    private lazy var addServerButton = with(RoundedButton()) {
+        $0.setTitle(L10n.Action.addServer, for: .normal)
+        $0.addTarget(self, action: #selector(addSeverButtonTapped(_:)), for: .touchUpInside)
+    }
 
     private lazy var settingsBarButtonItem = UIBarButtonItem(
         image: UIImage(systemName: "gear"),
@@ -69,9 +61,6 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
 
     private func setupViews() {
         view.backgroundColor = .systemBackground
-        stackView.addArrangedSubview(titleLabel)
-        stackView.addArrangedSubview(bodyLabel)
-        stackView.addArrangedSubview(addServerButton)
         view.addSubview(stackView)
     }
 
