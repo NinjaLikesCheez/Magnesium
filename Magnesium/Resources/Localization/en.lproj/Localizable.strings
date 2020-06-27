@@ -188,6 +188,9 @@
 /* password */
 "screen.edit-server.password" = "password";
 
+/* password */
+"screen.edit-server.password-placeholder" = "password";
+
 /* name */
 "screen.edit-server.server-name" = "name";
 

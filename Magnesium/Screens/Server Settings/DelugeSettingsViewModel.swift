@@ -55,7 +55,7 @@ final class DelugeSettingsViewModel: ViewModel {
         let passwordEnabled = CurrentValueSubject<Bool, Never>(true)
         let passwordInput = TextInputItem(
             name: L10n.Screen.EditServer.password,
-            placeholder: L10n.Screen.EditServer.optionalPasswordPlaceholder,
+            placeholder: L10n.Screen.EditServer.passwordPlaceholder,
             value: passwordSubject,
             isEnabled: passwordEnabled.ui().eraseToAnyPublisher(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)

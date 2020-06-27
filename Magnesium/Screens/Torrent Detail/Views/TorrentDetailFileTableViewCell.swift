@@ -98,6 +98,16 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         ])
     }
 
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        if #available(iOS 14, *) {
+            // nothing
+        } else {
+            // selected colour is the same as the background colour in iOS 13
+            selectedBackgroundView = editing ? UIImageView(image: UIImage(color: .systemGray4)) : nil
+        }
+    }
+
     func configure(with item: TorrentDetailFileItem, isLastRow: Bool) {
         item.name
             .asOptional()

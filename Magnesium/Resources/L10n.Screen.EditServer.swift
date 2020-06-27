@@ -18,6 +18,13 @@ extension L10n.Screen {
             NSLocalizedString("screen.edit-server.password", comment: "password")
         }
 
+        static var passwordPlaceholder: String {
+            NSLocalizedString(
+                "screen.edit-server.password-placeholder",
+                comment: "password"
+            )
+        }
+
         static var optionalPasswordPlaceholder: String {
             NSLocalizedString(
                 "screen.edit-server.optional-password-placeholder",

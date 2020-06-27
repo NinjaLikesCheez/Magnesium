@@ -17,7 +17,7 @@ extension Server {
                 type: .transmission,
                 data: try! JSONEncoder().encode(TransmissionServerSettings(
                     url: URL(string: "http://mock.mock")!,
-                    username: "mockusername"
+                    username: "mockuser"
                 )),
                 keychainData: try! JSONEncoder().encode(TransmissionKeychainData(password: "mockpassword"))
             )
