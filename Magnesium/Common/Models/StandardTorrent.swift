@@ -36,7 +36,7 @@ extension StandardTorrent {
         if state == .downloading {
             let download = L10n.Torrent.downloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
             let upload = L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
-            return "\(download) \(upload)" // TODO: localize?
+            return "\(download) \(upload)"
         } else if state == .seeding {
             return L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
         } else {

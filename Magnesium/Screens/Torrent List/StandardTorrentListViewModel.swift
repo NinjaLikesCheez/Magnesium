@@ -55,7 +55,7 @@ final class StandardTorrentListViewModel: ViewModel {
             .ui()
 
         let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
-            .map { "\($0) \($1)" } // TODO: localize?
+            .map { "\($0) \($1)" }
             .ui()
 
         _values = .init(

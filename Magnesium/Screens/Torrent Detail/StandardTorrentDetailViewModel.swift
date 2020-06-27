@@ -72,7 +72,7 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .map { editSection, count -> String in
                 switch editSection {
                 case .files:
-                    return L10n.selectedCount(count)
+                    return L10n.Common.selectedCount(count)
                 default:
                     return ""
                 }

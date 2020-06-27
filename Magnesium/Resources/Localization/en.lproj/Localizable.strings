@@ -299,6 +299,9 @@
 /* Uploaded */
 "screen.torrent-info.uploaded" = "Uploaded";
 
+/* No Torrents */
+"screen.torrent-list.no-torrents" = "No Torrents";
+
 /* No Servers */
 "screens.no-servers.header" = "No Servers";
 

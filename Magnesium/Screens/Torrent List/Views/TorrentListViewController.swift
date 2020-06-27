@@ -99,7 +99,7 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
         let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title2)
             .addingAttributes([.traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]])
         $0.font = .init(descriptor: descriptor, size: 0)
-        $0.text = "No Torrents" // TODO: localize
+        $0.text = L10n.Screen.TorrentList.noTorrents
         $0.textColor = .placeholderText
         $0.isHidden = true
     }
