@@ -24,11 +24,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let window = UIWindow(windowScene: windowScene)
             self.window = window
             coordinator = AppCoordinator(window: window)
+            handleURLContexts(connectionOptions.urlContexts)
         }
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let url = URLContexts.first?.url else { return }
+        handleURLContexts(URLContexts)
+    }
+
+    private func handleURLContexts(_ contexts: Set<UIOpenURLContext>) {
+        guard let url = contexts.first?.url else { return }
         if url.scheme == "file", url.pathExtension == "torrent" {
             coordinator?.add(fileURL: url)
         } else if url.scheme == "magnet" {
