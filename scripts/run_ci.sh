@@ -20,5 +20,6 @@ tools/mint bootstrap --verbose
 tools/mint run swiftlint --strict
 
 xcrun xcodebuild -version
+xcrun xcodebuild -resolvePackageDependencies
 xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -scheme Magnesium test \
   | tools/mint run xcbeautify
