@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ex
-export FASTLANE_SKIP_UPDATE_CHECK=1
+source scripts/config.sh
 
 if [ -n "$(git ls-files --others --modified --exclude-standard)" ]; then
   printf "\e[1;31mError: Unclean git environment.\e[0m\n"
@@ -19,5 +19,6 @@ tools/mint bootstrap --verbose
 
 tools/mint run swiftlint --strict
 
-bundle install
-bundle exec fastlane run_ci
+xcrun xcodebuild -version
+xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -scheme Magnesium test \
+  | tools/mint run xcbeautify

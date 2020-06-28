@@ -1,6 +1,6 @@
 included:
-  - Magnesium
-  - MagnesiumTests
+  - Sources/Magnesium
+  - Tests/MagnesiumTests
 
 file_name:
   excluded:

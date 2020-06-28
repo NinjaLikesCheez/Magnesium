@@ -1,0 +1,62 @@
+name: Magnesium
+options:
+  bundleIdPrefix: ca.jameshurst
+  deploymentTarget:
+    iOS: "13.0"
+packages:
+  Components:
+    path: Sources/Components
+  Deluge:
+    url: https://github.com/jameshurst/Deluge-Swift.git
+    from: 1.0.0
+  Transmission:
+    url: https://github.com/jameshurst/Transmission-Swift.git
+    from: 1.0.0
+  CombineWaiting:
+    url: https://github.com/jameshurst/CombineWaiting.git
+    from: 0.1.0
+  SnapshotTesting:
+    url: https://github.com/pointfreeco/swift-snapshot-testing.git
+    from: 1.8.1
+targets:
+  Magnesium:
+    type: application
+    sources: Sources/Magnesium
+    platform: iOS
+    dependencies:
+      - package: Components
+        product: Coordinator
+      - package: Components
+        product: Preferences
+      - package: Components
+        product: Keychain
+      - package: Components
+        product: ViewModel
+      - package: Components
+        product: Extensions
+      - package: Components
+        product: CommonModels
+      - package: Deluge
+      - package: Transmission
+    preBuildScripts:
+      - name: Swiftlint
+        script: tools/mint run swiftlint lint
+    scheme:
+      testTargets:
+        - MagnesiumTests
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.heimdall
+      DEVELOPMENT_TEAM: 3RLT5NMM8V
+  MagnesiumTests:
+    type: bundle.unit-test
+    sources:
+      - path: Tests/MagnesiumTests
+        excludes:
+          - "**/__Snapshots__"
+    platform: iOS
+    dependencies:
+      - target: Magnesium
+      - package: Components
+        product: TestExtensions
+      - package: CombineWaiting
+      - package: SnapshotTesting
