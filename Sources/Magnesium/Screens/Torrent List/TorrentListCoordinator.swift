@@ -186,8 +186,8 @@ private extension TorrentListCoordinator {
         case .deluge:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(DelugeServerSettings.self, from: server.data),
-                let keychainData = server.keychainData,
-                let keychain = try? decoder.decode(DelugeKeychainData.self, from: keychainData)
+                  let keychainData = server.keychainData,
+                  let keychain = try? decoder.decode(DelugeKeychainData.self, from: keychainData)
             else {
                 return nil
             }
@@ -200,8 +200,8 @@ private extension TorrentListCoordinator {
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
-                let keychainData = server.keychainData,
-                let keychain = try? decoder.decode(TransmissionKeychainData.self, from: keychainData)
+                  let keychainData = server.keychainData,
+                  let keychain = try? decoder.decode(TransmissionKeychainData.self, from: keychainData)
             else {
                 return nil
             }

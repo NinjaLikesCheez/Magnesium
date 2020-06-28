@@ -20,22 +20,22 @@ extension StandardTorrent {
 
     init?(_ torrent: Torrent) {
         guard let dateAdded = torrent.dateAdded,
-            let downloaded = torrent.downloaded,
-            let downloadPath = torrent.downloadPath,
-            let downloadRate = torrent.downloadRate,
-            let eta = torrent.eta,
-            let label = torrent.label,
-            let peers = torrent.peers,
-            let progress = torrent.progress,
-            let seeds = torrent.seeds,
-            let size = torrent.size,
-            let state = torrent.state.map(Self.state),
-            let totalPeers = torrent.totalPeers,
-            let totalSeeds = torrent.totalSeeds,
-            let trackers = torrent.trackers?.map(\.url),
-            let uploaded = torrent.uploaded,
-            let uploadRate = torrent.uploadRate,
-            let name = torrent.name
+              let downloaded = torrent.downloaded,
+              let downloadPath = torrent.downloadPath,
+              let downloadRate = torrent.downloadRate,
+              let eta = torrent.eta,
+              let label = torrent.label,
+              let peers = torrent.peers,
+              let progress = torrent.progress,
+              let seeds = torrent.seeds,
+              let size = torrent.size,
+              let state = torrent.state.map(Self.state),
+              let totalPeers = torrent.totalPeers,
+              let totalSeeds = torrent.totalSeeds,
+              let trackers = torrent.trackers?.map(\.url),
+              let uploaded = torrent.uploaded,
+              let uploadRate = torrent.uploadRate,
+              let name = torrent.name
         else {
             return nil
         }

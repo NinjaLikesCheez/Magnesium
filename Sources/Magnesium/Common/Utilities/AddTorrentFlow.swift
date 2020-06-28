@@ -50,9 +50,9 @@ final class AddTorrentFlow {
         case .deluge:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(DelugeServerSettings.self, from: server.data),
-                let keychain = server.keychainData.flatMap({
+                  let keychain = server.keychainData.flatMap({
                     try? decoder.decode(DelugeKeychainData.self, from: $0)
-                })
+                  })
             else {
                 showError(title: L10n.Error.unableToAddTorrent, message: L10n.Error.corruptServerSettingsMessage)
                 return
@@ -84,9 +84,9 @@ final class AddTorrentFlow {
         case .transmission:
             let decoder = JSONDecoder()
             guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),
-                let keychain = server.keychainData.flatMap({
+                  let keychain = server.keychainData.flatMap({
                     try? decoder.decode(TransmissionKeychainData.self, from: $0)
-                })
+                  })
             else {
                 showError(title: L10n.Error.unableToAddTorrent, message: L10n.Error.corruptServerSettingsMessage)
                 return

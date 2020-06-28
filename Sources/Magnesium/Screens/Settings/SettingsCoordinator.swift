@@ -75,7 +75,7 @@ final class SettingsCoordinator: Coordinator {
 
     private func popToPreviousViewController(_ viewController: UIViewController?) {
         guard let viewController = viewController,
-            let index = navigationController.viewControllers.firstIndex(of: viewController), index > 0
+              let index = navigationController.viewControllers.firstIndex(of: viewController), index > 0
         else {
             return
         }

@@ -24,22 +24,22 @@ extension StandardTorrent {
 
     init?(_ torrent: Torrent) {
         guard let bytesUnchecked = torrent.bytesUnchecked,
-            let bytesValid = torrent.bytesValid,
-            let dateAdded = torrent.dateAdded,
-            let downloadPath = torrent.downloadPath,
-            let downloadRate = torrent.downloadRate,
-            let eta = torrent.eta,
-            let hash = torrent.hash,
-            let name = torrent.name,
-            let peers = torrent.peers,
-            let progress = torrent.progress,
-            let seeds = torrent.seeds,
-            let size = torrent.size,
-            let state = torrent.status.map(Self.state),
-            let totalPeers = torrent.totalPeers,
-            let trackers = torrent.trackers?.map(\.host),
-            let uploaded = torrent.uploaded,
-            let uploadRate = torrent.uploadRate
+              let bytesValid = torrent.bytesValid,
+              let dateAdded = torrent.dateAdded,
+              let downloadPath = torrent.downloadPath,
+              let downloadRate = torrent.downloadRate,
+              let eta = torrent.eta,
+              let hash = torrent.hash,
+              let name = torrent.name,
+              let peers = torrent.peers,
+              let progress = torrent.progress,
+              let seeds = torrent.seeds,
+              let size = torrent.size,
+              let state = torrent.status.map(Self.state),
+              let totalPeers = torrent.totalPeers,
+              let trackers = torrent.trackers?.map(\.host),
+              let uploaded = torrent.uploaded,
+              let uploadRate = torrent.uploadRate
         else {
             return nil
         }
