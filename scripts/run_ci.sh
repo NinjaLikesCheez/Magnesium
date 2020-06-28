@@ -8,7 +8,7 @@ if [ -n "$(git ls-files --others --modified --exclude-standard)" ]; then
   exit -1
 fi
 
-tools/mint bootstrap --verbose
+scripts/bootstrap.sh
 
 # Xcode 12 has nicer formatter than swiftformat
 # scripts/format.sh
