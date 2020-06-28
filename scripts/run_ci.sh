@@ -21,5 +21,5 @@ tools/mint run swiftlint --strict
 
 xcrun xcodebuild -version
 xcrun xcodebuild -resolvePackageDependencies
-xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -scheme Magnesium test \
+xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -scheme Magnesium clean build test \
   | tools/mint run xcbeautify
