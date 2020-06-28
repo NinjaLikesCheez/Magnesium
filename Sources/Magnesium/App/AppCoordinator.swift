@@ -265,7 +265,7 @@ final class AppCoordinator: Coordinator {
         for coordinator in coordinators {
             let viewController = coordinator.presentable.viewController
             guard let identifiable = viewController as? TorrentDetailViewControllerIdentifiable,
-                !hashes.contains(identifiable.torrentHash)
+                  !hashes.contains(identifiable.torrentHash)
             else {
                 continue
             }
@@ -283,7 +283,7 @@ extension AppCoordinator: UISplitViewControllerDelegate {
         onto primaryViewController: UIViewController
     ) -> Bool {
         if let navigationController = secondaryViewController as? UINavigationController,
-            !(navigationController.viewControllers.first is TorrentDetailViewControllerIdentifiable) {
+           !(navigationController.viewControllers.first is TorrentDetailViewControllerIdentifiable) {
             return true
         }
 
