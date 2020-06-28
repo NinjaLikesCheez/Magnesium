@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -exo pipefail
 source scripts/config.sh
 
 if [ -n "$(git ls-files --others --modified --exclude-standard)" ]; then
