@@ -2,7 +2,6 @@ import Combine
 import CommonModels
 import Coordinator
 import UIKit
-import UniformTypeIdentifiers
 
 final class TorrentListCoordinator: NSObject, Coordinator {
     private let viewModel: AnyTorrentListViewModel
