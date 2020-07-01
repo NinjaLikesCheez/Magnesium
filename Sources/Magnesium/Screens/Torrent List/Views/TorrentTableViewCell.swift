@@ -3,11 +3,20 @@ import UIKit
 
 final class TorrentTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
+    private var labelLabelTopConstraint: NSLayoutConstraint?
 
     private lazy var nameLabel = with(UILabel()) {
         $0.adjustsFontForContentSizeCategory = true
         $0.font = .preferredFont(forTextStyle: .callout)
         $0.numberOfLines = 2
+    }
+
+    private lazy var labelLabel = with(UILabel()) {
+        $0.adjustsFontForContentSizeCategory = true
+        let base = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .subheadline)
+        let descriptor = base.withSymbolicTraits([.traitItalic]) ?? base
+        $0.font = UIFont(descriptor: descriptor, size: 0)
+        $0.textColor = .systemGray
     }
 
     private lazy var progressView = with(UIProgressView(progressViewStyle: .bar)) {
@@ -72,6 +81,7 @@ final class TorrentTableViewCell: UITableViewCell {
 
     private func setupViews() {
         contentView.addSubview(nameLabel)
+        contentView.addSubview(labelLabel)
         contentView.addSubview(progressView)
         contentView.addSubview(statusLabel)
         contentView.addSubview(speedLabel)
@@ -80,21 +90,27 @@ final class TorrentTableViewCell: UITableViewCell {
     }
 
     private func setupLayoutConstraints() {
-        for view in [nameLabel, progressView, statusLabel, speedLabel, progressLabel, ratioOrETALabel] {
+        for view in [nameLabel, labelLabel, progressView, statusLabel, speedLabel, progressLabel, ratioOrETALabel] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
         speedLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
         ratioOrETALabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
+        labelLabelTopConstraint = labelLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 2)
+
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
 
+            labelLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            labelLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            labelLabelTopConstraint!,
+
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            progressView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 8),
+            progressView.topAnchor.constraint(equalTo: labelLabel.bottomAnchor, constant: 8),
 
             statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
@@ -119,6 +135,18 @@ final class TorrentTableViewCell: UITableViewCell {
         item.name
             .asOptional()
             .assign(to: \.text, on: nameLabel)
+            .store(in: &cancellables)
+
+        item.label
+            .asOptional()
+            .assign(to: \.text, on: labelLabel)
+            .store(in: &cancellables)
+
+        item.label
+            .map(\.isEmpty)
+            .sink { [weak self] isEmpty in
+                self?.labelLabelTopConstraint?.constant = isEmpty ? 0 : 2
+            }
             .store(in: &cancellables)
 
         item.progress

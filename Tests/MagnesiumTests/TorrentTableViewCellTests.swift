@@ -27,6 +27,11 @@ class TorrentTableViewCellTests: TestCase {
         let traits = UITraitCollection(preferredContentSizeCategory: .extraExtraExtraLarge)
         assertSnapshot(matching: SizingView(cell), as: .image(traits: traits))
     }
+
+    func test_label() {
+        let cell = TorrentTableViewCell.mock(torrent: .mock(label: "label", name: "Name"))
+        assertSnapshot(matching: SizingView(cell), as: .image)
+    }
 }
 
 private extension TorrentTableViewCell {
