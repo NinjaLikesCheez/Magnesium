@@ -45,7 +45,6 @@ targets:
       testTargets:
         - MagnesiumTests
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.heimdall
       DEVELOPMENT_TEAM: 3RLT5NMM8V
   MagnesiumTests:
     type: bundle.unit-test
