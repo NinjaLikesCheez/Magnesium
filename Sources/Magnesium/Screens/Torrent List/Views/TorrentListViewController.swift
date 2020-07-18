@@ -165,7 +165,7 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
     private func configureDataSource() {
         tableView.register(TorrentTableViewCell.self, forCellReuseIdentifier: "torrent")
 
-        dataSource = .init(tableView: tableView) { tableView, indexPath, item in
+        dataSource = .init(tableView: tableView) { [weak self] tableView, indexPath, item in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: "torrent",
                 for: indexPath
@@ -173,6 +173,7 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
                 return nil
             }
 
+            cell.delegate = self
             cell.configure(with: item)
             return cell
         }
@@ -482,5 +483,12 @@ private extension TorrentListViewController {
         override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
             true
         }
+    }
+}
+
+extension TorrentListViewController: TorrentTableViewCellDelegate {
+    func cellDidResize(_ cell: TorrentTableViewCell) {
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
 }

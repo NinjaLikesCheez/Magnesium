@@ -12,6 +12,6 @@ final class StructReference<Value>: RawRepresentable, NSCopying {
     }
 
     func copy(with zone: NSZone? = nil) -> Any {
-        StructReference(rawValue)
+        self // This only works as self in iOS 14b2
     }
 }

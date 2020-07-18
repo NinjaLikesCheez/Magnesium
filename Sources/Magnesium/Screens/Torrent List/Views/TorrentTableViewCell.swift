@@ -1,9 +1,14 @@
 import Combine
 import UIKit
 
+protocol TorrentTableViewCellDelegate: AnyObject {
+    func cellDidResize(_ cell: TorrentTableViewCell)
+}
+
 final class TorrentTableViewCell: UITableViewCell {
     private var cancellables = Set<AnyCancellable>()
     private var labelLabelTopConstraint: NSLayoutConstraint?
+    weak var delegate: TorrentTableViewCellDelegate?
 
     private lazy var nameLabel = with(UILabel()) {
         $0.adjustsFontForContentSizeCategory = true
@@ -94,6 +99,7 @@ final class TorrentTableViewCell: UITableViewCell {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
+        labelLabel.setContentCompressionResistancePriority(.defaultHigh - 1, for: .vertical)
         speedLabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
         ratioOrETALabel.setContentCompressionResistancePriority(.defaultHigh + 1, for: .horizontal)
 
@@ -146,6 +152,17 @@ final class TorrentTableViewCell: UITableViewCell {
             .map(\.isEmpty)
             .sink { [weak self] isEmpty in
                 self?.labelLabelTopConstraint?.constant = isEmpty ? 0 : 2
+            }
+            .store(in: &cancellables)
+
+        item.label
+            .map(\.isEmpty)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] _ in
+                guard let strongSelf = self else { return }
+                strongSelf.updateConstraintsIfNeeded()
+                strongSelf.delegate?.cellDidResize(strongSelf)
             }
             .store(in: &cancellables)
 
