@@ -1,7 +1,7 @@
 ▿ Menu
   ▿ children: 5 elements
     ▿ MenuItem
-      ▿ action: MenuAction
+      ▿ action: Action
         - attributes: 0 elements
         - handler: (Function)
         ▿ image: Optional<UIImage>
@@ -9,7 +9,7 @@
         - state: State.off
         - title: "Pause"
     ▿ MenuItem
-      ▿ action: MenuAction
+      ▿ action: Action
         - attributes: 0 elements
         - handler: (Function)
         ▿ image: Optional<UIImage>
@@ -17,7 +17,7 @@
         - state: State.off
         - title: "Verify Files"
     ▿ MenuItem
-      ▿ action: MenuAction
+      ▿ action: Action
         - attributes: 0 elements
         - handler: (Function)
         ▿ image: Optional<UIImage>
@@ -25,7 +25,7 @@
         - state: State.off
         - title: "Move Download Folder"
     ▿ MenuItem
-      ▿ action: MenuAction
+      ▿ action: Action
         - attributes: 0 elements
         - handler: (Function)
         ▿ image: Optional<UIImage>
@@ -36,7 +36,7 @@
       ▿ menu: Menu
         ▿ children: 2 elements
           ▿ MenuItem
-            ▿ action: MenuAction
+            ▿ action: Action
               - attributes: 0 elements
               - handler: (Function)
               ▿ image: Optional<UIImage>
@@ -44,7 +44,7 @@
               - state: State.off
               - title: "Keep Data"
           ▿ MenuItem
-            ▿ action: MenuAction
+            ▿ action: Action
               ▿ attributes: 1 element
                 - Attribute.destructive
               - handler: (Function)
