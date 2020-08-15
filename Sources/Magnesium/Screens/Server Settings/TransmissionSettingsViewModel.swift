@@ -131,7 +131,7 @@ final class TransmissionSettingsViewModel: ViewModel {
         let client = Current.transmission(url, username, password)
         let errorTitle = server == nil ? L10n.Error.failedToAddServer : L10n.Error.failedToSaveServer
         client.request(.rpcVersion)
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
                 case .finished:

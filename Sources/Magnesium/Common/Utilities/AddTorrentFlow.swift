@@ -75,7 +75,7 @@ final class AddTorrentFlow {
             }
 
             request
-                .onMainThread()
+                .receive(on: UIScheduler.shared)
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.Error.unableToAddTorrent, message: error.localizedDescription)
@@ -103,7 +103,7 @@ final class AddTorrentFlow {
             }
 
             request
-                .onMainThread()
+                .receive(on: UIScheduler.shared)
                 .sink(receiveCompletion: { [weak self] completion in
                     guard case let .failure(error) = completion else { return }
                     self?.showError(title: L10n.Error.unableToAddTorrent, message: error.localizedDescription)

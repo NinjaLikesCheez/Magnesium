@@ -164,7 +164,7 @@ final class StandardTorrentListViewModel: ViewModel {
     // internal for testing
     func addLink(_ url: String) {
         implementation.addLink(url)
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] in
                 if case let .failure(error) = $0 {
                     self?.showError(title: error.title, message: error.message)
@@ -176,7 +176,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func pause(_ torrents: [StandardTorrent]) {
         implementation.pause(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToPause, message: error.localizedDescription)
@@ -187,7 +187,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func resume(_ torrents: [StandardTorrent]) {
         implementation.resume(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToResume, message: error.localizedDescription)
@@ -198,7 +198,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func remove(_ torrents: [StandardTorrent], removeData: Bool) {
         implementation.remove(torrents, removeData)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToRemove, message: error.localizedDescription)
@@ -209,7 +209,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func setLabel(for torrents: [StandardTorrent], label: StandardLabel) {
         implementation.setLabel(label, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToSetLabel, message: error.localizedDescription)
@@ -220,7 +220,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func verify(_ torrents: [StandardTorrent]) {
         implementation.verify(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToVerifyFiles, message: error.localizedDescription)
@@ -231,7 +231,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func updateTrackers(for torrents: [StandardTorrent]) {
         implementation.updateTrackers(torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToUpdateTrackers, message: error.localizedDescription)
@@ -242,7 +242,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func moveDownloadFolder(for torrents: [StandardTorrent], to path: String) {
         implementation.moveDownloadFolder(path, torrents)
             .append(implementation.refresh().asVoid().replaceError(with: ()).setFailureType(to: Error.self))
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .sink(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToMoveDownloadFolder, message: error.localizedDescription)
@@ -486,7 +486,7 @@ final class StandardTorrentListViewModel: ViewModel {
     private func refresh() -> AnyPublisher<Void, Error> {
         performRefresh()
             .eraseError()
-            .onMainThread()
+            .receive(on: UIScheduler.shared)
             .handleEvents(receiveCompletion: { [weak self] completion in
                 guard case let .failure(error) = completion else { return }
                 self?.showError(title: L10n.Error.failedToRefresh, message: error.localizedDescription)
