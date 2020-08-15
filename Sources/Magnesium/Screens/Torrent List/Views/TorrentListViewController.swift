@@ -488,7 +488,9 @@ private extension TorrentListViewController {
 
 extension TorrentListViewController: TorrentTableViewCellDelegate {
     func cellDidResize(_ cell: TorrentTableViewCell) {
-        tableView.beginUpdates()
-        tableView.endUpdates()
+        DispatchQueue.main.async {
+            self.tableView.beginUpdates()
+            self.tableView.endUpdates()
+        }
     }
 }
