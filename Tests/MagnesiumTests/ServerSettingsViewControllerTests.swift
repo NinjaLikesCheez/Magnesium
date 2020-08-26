@@ -8,7 +8,7 @@ class ServerSettingsViewControllerTests: TestCase {
     func test_loading() {
         var values = ServerSettingsViewValues.editServer
         values.isLoading = Just(true).eraseToAnyPublisher()
-        let viewModel = StaticViewModel(values: values, viewEvent: ServerSettingsViewEvent.self)
+        let viewModel = StaticViewModel(event: ServerSettingsViewEvent.self, values: values)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)

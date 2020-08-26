@@ -32,7 +32,7 @@ class TorrentDetailViewControllerTests: TestCase {
                 ]),
             ]
         )
-        let viewModel = StaticViewModel(values: values, viewEvent: TorrentDetailViewEvent.self)
+        let viewModel = StaticViewModel(event: TorrentDetailViewEvent.self, values: values)
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         viewController.loadViewIfNeeded()
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -50,7 +50,7 @@ class TorrentDetailViewControllerTests: TestCase {
             editSection: .files,
             toolbarInfo: L10n.Common.selectedCount(1)
         )
-        let viewModel = StaticViewModel(values: values, viewEvent: TorrentDetailViewEvent.self)
+        let viewModel = StaticViewModel(event: TorrentDetailViewEvent.self, values: values)
         let viewController = TorrentDetailViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         viewController.loadViewIfNeeded()

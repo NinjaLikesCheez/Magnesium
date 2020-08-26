@@ -13,7 +13,7 @@ class SettingsViewControllerTests: TestCase {
                 .init(type: .general, items: [.refreshInterval(current: "2 seconds")]),
             ]).eraseToAnyPublisher()
         )
-        let viewModel = StaticViewModel(values: values, viewEvent: SettingsViewEvent.self)
+        let viewModel = StaticViewModel(event: SettingsViewEvent.self, values: values)
         let viewController = SettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
