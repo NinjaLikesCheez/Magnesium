@@ -987,7 +987,7 @@
 		E4DA19C4D49EB0AE480D0E4B /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				E9B733465049ACDC195A883E /* Dependencies */,
+				E9B733465049ACDC195A883E /* Environment */,
 				33B026DA918553EAE78420DE /* Extensions */,
 				9C7B844D6E57995A2CABAC74 /* Models */,
 				A2BB1C151A2CA1C524F535F1 /* Utilities */,
@@ -996,14 +996,14 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		E9B733465049ACDC195A883E /* Dependencies */ = {
+		E9B733465049ACDC195A883E /* Environment */ = {
 			isa = PBXGroup;
 			children = (
 				F898EE111A0694D05E86A684 /* Defaults.swift */,
 				5B5735F724BA3DCAC185094D /* Environment.swift */,
 				2B0D09300CA93B93724E800E /* FileSystem.swift */,
 			);
-			path = Dependencies;
+			path = Environment;
 			sourceTree = "<group>";
 		};
 		EDE660FCAD604233F6057DB8 /* Torrent List */ = {
