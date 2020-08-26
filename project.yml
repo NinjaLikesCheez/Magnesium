@@ -17,7 +17,7 @@ packages:
     from: 0.1.0
   SnapshotTesting:
     url: https://github.com/pointfreeco/swift-snapshot-testing.git
-    from: 1.8.1
+    from: 1.8.2
 targets:
   Magnesium:
     type: application
