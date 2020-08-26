@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -exo pipefail
 source scripts/config.sh
 
 find Tests -type d -name __Snapshots__  | xargs rm -rf
