@@ -5,7 +5,7 @@ import ViewModel
 import XCTest
 
 class TorrentListViewControllerTests: TestCase {
-    func test_emptyState() {
+    func test_snapshot_whenEmpty() {
         let values = TorrentListViewValues.mock(title: "Server")
         let viewModel = StaticViewModel(event: TorrentListViewEvent.self, values: values)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -13,7 +13,7 @@ class TorrentListViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_loadingState() {
+    func test_snapshot_whenLoading() {
         let values = TorrentListViewValues.mock(title: "Server", isLoading: true)
         let viewModel = StaticViewModel(event: TorrentListViewEvent.self, values: values)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -21,7 +21,7 @@ class TorrentListViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_items() {
+    func test_snapshot_withTorrents() {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "Server",
@@ -35,7 +35,7 @@ class TorrentListViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .wait(for: 0.1, on: .image))
     }
 
-    func test_activeFilters() {
+    func test_snapshot_withActiveFilters() {
         let values = TorrentListViewValues.mock(title: "Server", hasActiveFilters: true)
         let viewModel = StaticViewModel(event: TorrentListViewEvent.self, values: values)
         let viewController = TorrentListViewController(viewModel: viewModel)
@@ -43,7 +43,7 @@ class TorrentListViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_editing() {
+    func test_snapshot_whenEditing() {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "0 Selected",
@@ -57,7 +57,7 @@ class TorrentListViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .wait(for: 0.1, on: .image))
     }
 
-    func test_editing_withSelection() {
+    func test_snapshot_whenEditing_withSelection() {
         let torrents = [StandardTorrent.visualMock]
         let values = TorrentListViewValues.mock(
             title: "1 Selected",

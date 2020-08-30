@@ -360,7 +360,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
 
     // MARK: setFilePrioritySelected
 
-    func test_setFilePrioritySelected_shouldEmitAlert() throws {
+    func test_setFilePrioritySelected_shouldEmitExpectedAlert() throws {
         _ = viewModel.values.sections.first().wait()
         let alert = try getAlert {
             self.viewModel.send(.setFilePrioritySelected(

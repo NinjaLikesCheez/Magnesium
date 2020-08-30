@@ -27,7 +27,7 @@ class AddTorrentFlowTests: TestCase {
 
     // MARK: Deluge
 
-    func test_add_withDeluge_andFileURL_shouldPerformRequest() {
+    func test_add_withDeluge_andFileURL_shouldPerformAddTorrentFileRequest() {
         delugeClient.results.append((
             "core.add_torrent_file",
             Just("").setFailureType(to: DelugeError.self).eraseToAnyPublisher()
@@ -38,7 +38,7 @@ class AddTorrentFlowTests: TestCase {
         assertSnapshot(matching: delugeClient.requests, as: .requests)
     }
 
-    func test_add_withDeluge_andMagnetURL_shouldPerformRequest() {
+    func test_add_withDeluge_andMagnetURL_shouldPerformAddMagnetRequest() {
         delugeClient.results.append((
             "core.add_torrent_magnet",
             Just("").setFailureType(to: DelugeError.self).eraseToAnyPublisher()
@@ -51,7 +51,7 @@ class AddTorrentFlowTests: TestCase {
 
     // MARK: Transmission
 
-    func test_add_withTransmission_andFileURL_shouldPerformRequest() {
+    func test_add_withTransmission_andFileURL_shouldPerformAddRequest() {
         session.setServer(.mock(.transmission))
 
         let url = URL(fileURLWithPath: "file.torrent")

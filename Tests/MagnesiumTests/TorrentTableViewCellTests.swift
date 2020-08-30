@@ -3,19 +3,19 @@ import SnapshotTesting
 import XCTest
 
 class TorrentTableViewCellTests: TestCase {
-    func test_longName() {
+    func test_snapshot_withLongName() {
         let cell = TorrentTableViewCell.mock(torrent: .mock(name: .snapshotLong))
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_states() {
+    func test_snapshot_states() {
         for state in TorrentState.allCases {
             let cell = TorrentTableViewCell.mock(torrent: .mock(name: "Name", progress: 1, state: state))
             assertSnapshot(matching: SizingView(cell), as: .image, named: String(describing: state))
         }
     }
 
-    func test_contentCompression() {
+    func test_snapshot_contentCompression() {
         let cell = TorrentTableViewCell.mock(torrent: .mock(
             downloaded: 100_000_000_000,
             downloadRate: 100_000_000_000,
@@ -28,7 +28,7 @@ class TorrentTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image(traits: traits))
     }
 
-    func test_label() {
+    func test_snapshot_withLabel() {
         let cell = TorrentTableViewCell.mock(torrent: .mock(label: "label", name: "Name"))
         assertSnapshot(matching: SizingView(cell), as: .image)
     }

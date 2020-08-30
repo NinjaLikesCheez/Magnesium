@@ -14,12 +14,12 @@ class TransmissionTorrentDetailImplementationTests: TestCase {
         implementation = .transmission(session: .init(client: client))
     }
 
-    func test_refresh_shouldGetTorrents() {
+    func test_refresh_shouldPerformTorrentsRequest() {
         _ = implementation.refresh().wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_refreshFiles_shouldGetTorrentFiles() throws {
+    func test_refreshFiles_shouldPerformTorrentFilesRequest() throws {
         let files: [TransmissionTorrentFile] = [
             .mock(index: 0, name: "f0", size: 1),
             .mock(index: 0, name: "f1", size: 1),
@@ -32,42 +32,42 @@ class TransmissionTorrentDetailImplementationTests: TestCase {
         XCTAssertEqual(results, files.map(\.standard))
     }
 
-    func test_pause_shouldStop() {
+    func test_pause_shouldPerformStopRequest() {
         _ = implementation.pause(.mock(hash: "B")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_resume_shouldStart() {
+    func test_resume_shouldPerformStartRequest() {
         _ = implementation.resume(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withKeepData_shouldRemove() {
+    func test_remove_withKeepData_shouldPerformRemoveRequest() {
         _ = implementation.remove(.mock(hash: "A"), false).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withRemoveData_shouldRemove() {
+    func test_remove_withRemoveData_shouldPerformRemoveRequest() {
         _ = implementation.remove(.mock(hash: "A"), true).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_verify_shouldVerify() {
+    func test_verify_shouldPerformVerifyRequest() {
         _ = implementation.verify(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_updateTrackers_shouldReannounce() {
+    func test_updateTrackers_shouldPerformReannounceRequest() {
         _ = implementation.updateTrackers(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_moveDownloadFolder_shouldSetLocation() {
+    func test_moveDownloadFolder_shouldPerformSetLocationRequest() {
         _ = implementation.moveDownloadFolder("/new", .mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_setPriority_should_setOptions_withPriority() {
+    func test_setPriority_shouldPerformSetOptionsRequest() {
         _ = implementation.setPriority(
             .mock(hash: "A"),
             [],

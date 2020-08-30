@@ -119,7 +119,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         XCTAssertEqual(values, [true, false])
     }
 
-    func test_saveSelected_shouldRequestRPCVersion() {
+    func test_saveSelected_shouldPerformRPCVersionRequest() {
         let viewModel = addViewModel!
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "http://example.com"

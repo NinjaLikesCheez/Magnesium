@@ -4,7 +4,7 @@ import SnapshotTesting
 import XCTest
 
 class FilterViewControllerTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let viewModel = FilterViewModel(labels: Just([.mock(), .mock(name: "label")]).eraseToAnyPublisher())
         let viewController = FilterViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)

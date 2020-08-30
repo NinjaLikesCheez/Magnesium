@@ -3,7 +3,7 @@ import SnapshotTesting
 import XCTest
 
 class ServerErrorViewControllerTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let viewController = ServerErrorViewController(viewModel: ServerErrorViewModel())
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)

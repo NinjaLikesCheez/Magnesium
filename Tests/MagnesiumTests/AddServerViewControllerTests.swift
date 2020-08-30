@@ -4,7 +4,7 @@ import ViewModel
 import XCTest
 
 class AddServerViewControllerTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let values = AddServerViewValues(types: [
             "Deluge",
             "Transmission",

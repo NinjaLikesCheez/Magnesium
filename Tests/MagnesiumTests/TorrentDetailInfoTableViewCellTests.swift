@@ -4,7 +4,7 @@ import SnapshotTesting
 import XCTest
 
 class TorrentDetailInfoTableViewCellTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name",
             value: "Value",
@@ -15,7 +15,7 @@ class TorrentDetailInfoTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_view_whenLastRow() {
+    func test_snapshot_whenLastRow() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name",
             value: "Value",
@@ -26,7 +26,7 @@ class TorrentDetailInfoTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_view_whenExpanded() {
+    func test_snapshot_whenExpanded() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name",
             value: "Value",
@@ -37,7 +37,7 @@ class TorrentDetailInfoTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_longValues() {
+    func test_snapshot_withLongValues() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name", // name should never be long
             value: .snapshotLong,
@@ -48,7 +48,7 @@ class TorrentDetailInfoTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_longValues_whenExpanded() {
+    func test_snapshot_withLongValues_whenExpanded() {
         let cell = TorrentDetailInfoTableViewCell.mock(
             name: "Name", // name should never be long
             value: .snapshotLong,

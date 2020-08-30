@@ -111,7 +111,7 @@ class DelugeSettingsViewModelTests: TestCase {
         XCTAssertEqual(values, [true, false])
     }
 
-    func test_saveSelected_shouldAuthenticate() {
+    func test_saveSelected_shouldPerformAuthenticationRequest() {
         let viewModel = addViewModel!
         viewModel.values.inputs[0].value.value = "name"
         viewModel.values.inputs[1].value.value = "http://example.com"

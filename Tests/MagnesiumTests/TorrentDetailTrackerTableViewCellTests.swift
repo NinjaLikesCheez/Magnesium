@@ -3,7 +3,7 @@ import SnapshotTesting
 import XCTest
 
 class TorrentDetailTrackerTableViewCellTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let cell = TorrentDetailTrackerTableViewCell.mock(
             tracker: "http://tracker.example.com:9000/announce",
             isLastRow: false
@@ -11,7 +11,7 @@ class TorrentDetailTrackerTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_view_whenLastRow() {
+    func test_snapshot_whenLastRow() {
         let cell = TorrentDetailTrackerTableViewCell.mock(
             tracker: "http://tracker.example.com:9000/announce",
             isLastRow: true
@@ -19,7 +19,7 @@ class TorrentDetailTrackerTableViewCellTests: TestCase {
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_longTracker() {
+    func test_snapshot_withLongTrackerURL() {
         let cell = TorrentDetailTrackerTableViewCell.mock(tracker: .snapshotLong, isLastRow: false)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }

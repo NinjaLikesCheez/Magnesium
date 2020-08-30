@@ -5,7 +5,7 @@ import ViewModel
 import XCTest
 
 class TorrentDetailViewControllerTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let torrent = StandardTorrent.mock(label: "label", name: "Name")
         let values = TorrentDetailViewValues.mock(
             sections: [
@@ -39,7 +39,7 @@ class TorrentDetailViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .wait(for: 0.1, on: .image))
     }
 
-    func test_editSection_files() {
+    func test_snapshot_whenEditingFilesSection() {
         let values = TorrentDetailViewValues.mock(
             sections: [
                 .init(type: .files, items: [

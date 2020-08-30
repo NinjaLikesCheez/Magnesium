@@ -3,22 +3,22 @@ import SnapshotTesting
 import XCTest
 
 class TorrentDetailFileTableViewCellTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let cell = TorrentDetailFileTableViewCell.mock(file: .mock(), isLastRow: false)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_view_whenLastRow() {
+    func test_snapshot_whenLastRow() {
         let cell = TorrentDetailFileTableViewCell.mock(file: .mock(), isLastRow: true)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_longName() {
+    func test_snapshot_withLongName() {
         let cell = TorrentDetailFileTableViewCell.mock(file: .mock(name: .snapshotLong), isLastRow: false)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_priorities() {
+    func test_snapshot_priorities() {
         for priority in TorrentPriority.allCases {
             let cell = TorrentDetailFileTableViewCell.mock(file: .mock(priority: priority), isLastRow: false)
             assertSnapshot(matching: SizingView(cell), as: .image, named: String(describing: priority))

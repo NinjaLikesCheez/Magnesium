@@ -16,7 +16,7 @@ class TransmissionTorrentListImplementationTests: TestCase {
         implementation = .transmission(.init(client: client))
     }
 
-    func test_refresh_shouldGetTorrents() {
+    func test_refresh_shouldPerformTorrentsRequest() {
         _ = implementation.refresh().wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
@@ -35,17 +35,17 @@ class TransmissionTorrentListImplementationTests: TestCase {
         XCTAssertEqual(error.message, "That URL doesn't appear to be valid.")
     }
 
-    func test_addLink_withMagnetLink_shouldAddURL() {
+    func test_addLink_withMagnetLink_shouldPerformAddRequest() {
         _ = implementation.addLink("magnet:?").wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_addLink_withRegularLink_shouldAddMagnetURL() {
+    func test_addLink_withRegularLink_shouldPerformAddRequest() {
         _ = implementation.addLink("http://example.com").wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_addLink_whenFails_shouldReturnError() throws {
+    func test_addLink_whenFails_shouldReturnExpectedError() throws {
         client.results.append((
             "torrent-add",
             Fail(error: .unauthenticated).eraseToAnyPublisher()
@@ -53,37 +53,37 @@ class TransmissionTorrentListImplementationTests: TestCase {
         assertSnapshot(matching: try implementation.addLink("http://example.com").wait().error(), as: .dump)
     }
 
-    func test_pause_shouldStop() {
+    func test_pause_shouldPerformStopRequest() {
         _ = implementation.pause([.mock(hash: "A"), .mock(hash: "B")]).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_resume_shouldStart() {
+    func test_resume_shouldPerformStartRequest() {
         _ = implementation.resume([.mock(hash: "A"), .mock(hash: "B")]).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withKeepData_shouldRemove() {
+    func test_remove_withKeepData_shouldPerformRemoveRequest() {
         _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], false).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withRemoveData_shouldRemove() {
+    func test_remove_withRemoveData_shouldPerformRemoveRequest() {
         _ = implementation.remove([.mock(hash: "A"), .mock(hash: "B")], true).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_verify_shouldVerify() {
+    func test_verify_shouldPerformVerifyRequest() {
         _ = implementation.verify([.mock(hash: "A"), .mock(hash: "B")])
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_updateTrackers_shouldReannounce() {
+    func test_updateTrackers_shouldPerformReannounceRequest() {
         _ = implementation.updateTrackers([.mock(hash: "A"), .mock(hash: "B")]).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_moveDownloadFolder_shouldSetLocation() {
+    func test_moveDownloadFolder_shouldPerformSetLocationRequest() {
         _ = implementation.moveDownloadFolder("/new", [.mock(hash: "A"), .mock(hash: "B")]).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }

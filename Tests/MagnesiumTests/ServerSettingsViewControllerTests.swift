@@ -5,7 +5,7 @@ import ViewModel
 import XCTest
 
 class ServerSettingsViewControllerTests: TestCase {
-    func test_loading() {
+    func test_snapshot_whenLoading() {
         var values = ServerSettingsViewValues.editServer
         values.isLoading = Just(true).eraseToAnyPublisher()
         let viewModel = StaticViewModel(event: ServerSettingsViewEvent.self, values: values)
@@ -14,28 +14,28 @@ class ServerSettingsViewControllerTests: TestCase {
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_addServer_withDeluge() {
+    func test_snapshot_whenAddingDelugeServer() {
         let viewModel = DelugeSettingsViewModel()
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_editServer_withDeluge() {
+    func test_snapshot_whenEditingDelugeServer() {
         let viewModel = DelugeSettingsViewModel(server: .mock(.deluge))
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_addServer_withTransmission() {
+    func test_snapshot_whenAddingTransmissionServer() {
         let viewModel = TransmissionSettingsViewModel()
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         assertSnapshot(matching: navigationController, as: .image)
     }
 
-    func test_editServer_withTransmission() {
+    func test_snapshot_whenEditingTransmissionServer() {
         let viewModel = TransmissionSettingsViewModel(server: .mock(.transmission))
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)

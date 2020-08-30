@@ -14,7 +14,7 @@ class DelugeTorrentDetailImplementationTests: TestCase {
         implementation = .deluge(session: .init(client: client))
     }
 
-    func test_refresh_shouldUpdateUI() {
+    func test_refresh_shouldPerformUpdateUIRequest() {
         _ = implementation.refresh().wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
@@ -32,47 +32,47 @@ class DelugeTorrentDetailImplementationTests: TestCase {
         XCTAssertEqual(files, [.mock(index: 0, name: "f0"), .mock(index: 1, name: "f1")])
     }
 
-    func test_pause_shouldPause() {
+    func test_pause_shouldPerformPauseRequest() {
         _ = implementation.pause(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_resume_shouldResume() {
+    func test_resume_shouldPerformResumeRequest() {
         _ = implementation.resume(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withKeepData_shouldRemove() {
+    func test_remove_withKeepData_shouldPerformRemoveRequest() {
         _ = implementation.remove(.mock(hash: "A"), false).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_remove_withRemoveData_shouldRemove() {
+    func test_remove_withRemoveData_shouldPerformRemoveRequest() {
         _ = implementation.remove(.mock(hash: "A"), true).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_verify_shouldRecheck() {
+    func test_verify_shouldPerformRecheckRequest() {
         _ = implementation.verify(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_setLabel_shouldSetLabels() {
+    func test_setLabel_shouldPerformSetLabelsRequest() {
         _ = implementation.setLabel(.mock(name: "label"), .mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_updateTrackers_shouldReannounce() {
+    func test_updateTrackers_shouldPerformReannounceRequest() {
         _ = implementation.updateTrackers(.mock(hash: "A")).wait()
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_moveDownloadFolder_shouldMoveStorage() {
+    func test_moveDownloadFolder_shouldPerformMoveStorageRequest() {
         _ = implementation.moveDownloadFolder("/new", .mock(hash: "A"))
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_setPriority_should_setOptions_withPriority() {
+    func test_setPriority_shouldPerformSetOptionsRequest() {
         _ = implementation.setPriority(
             .mock(hash: "A"),
             [.mock(index: 0), .mock(index: 1), .mock(index: 2), .mock(index: 3), .mock(index: 4)],

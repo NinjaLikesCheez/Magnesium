@@ -5,7 +5,7 @@ import ViewModel
 import XCTest
 
 class SettingsViewControllerTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let values = SettingsViewValues(
             sections: Just([
                 .init(type: .changeServer, items: [.changeServer("Server 1")]),

@@ -3,12 +3,12 @@ import SnapshotTesting
 import XCTest
 
 class TorrentDetailSectionHeaderViewTests: TestCase {
-    func test_view() {
+    func test_snapshot() {
         let cell = TorrentDetailSectionHeaderView.mock(title: "Title")
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
 
-    func test_longName() {
+    func test_snapshot_withLongName() {
         let cell = TorrentDetailSectionHeaderView.mock(title: .snapshotLong)
         assertSnapshot(matching: SizingView(cell), as: .image)
     }
