@@ -40,12 +40,13 @@ class DelugeTorrentListImplementationTests: TestCase {
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_addLink_withMagnetLink_whenFails_shouldReturnExpectedError() throws {
+    func test_addLink_withMagnetLink_whenFails_shouldReturnError() throws {
         client.results.append((
             method: "core.add_torrent_magnet",
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        assertSnapshot(matching: try implementation.addLink("magnet:?").wait().error(), as: .dump)
+        let error = try implementation.addLink("magnet:?").wait().error()
+        XCTAssertEqual(error.title, L10n.Error.failedToAddTorrent)
     }
 
     func test_addLink_withRegularLink_shouldPerformAddURLRequest() {
@@ -53,12 +54,13 @@ class DelugeTorrentListImplementationTests: TestCase {
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_addLink_withRegularLink_whenFails_shouldReturnExpectedError() throws {
+    func test_addLink_withRegularLink_whenFails_shouldReturnError() throws {
         client.results.append((
             method: "core.add_torrent_url",
             result: Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        assertSnapshot(matching: try implementation.addLink("http://example.com").wait().error(), as: .dump)
+        let error = try implementation.addLink("http://example.com").wait().error()
+        XCTAssertEqual(error.title, L10n.Error.failedToAddTorrent)
     }
 
     func test_pause_shouldPerformPauseRequest() {

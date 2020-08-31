@@ -45,12 +45,13 @@ class TransmissionTorrentListImplementationTests: TestCase {
         assertSnapshot(matching: client.requests, as: .requests)
     }
 
-    func test_addLink_whenFails_shouldReturnExpectedError() throws {
+    func test_addLink_whenFails_shouldReturnError() throws {
         client.results.append((
             "torrent-add",
             Fail(error: .unauthenticated).eraseToAnyPublisher()
         ))
-        assertSnapshot(matching: try implementation.addLink("http://example.com").wait().error(), as: .dump)
+        let error = try implementation.addLink("http://example.com").wait().error()
+        XCTAssertEqual(error.title, L10n.Error.failedToAddTorrent)
     }
 
     func test_pause_shouldPerformStopRequest() {

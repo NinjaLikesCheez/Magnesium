@@ -368,7 +368,14 @@ final class StandardTorrentDetailViewModelTests: TestCase {
                 source: .view(.init(), rect: .zero)
             ))
         }
-        assertSnapshot(matching: alert, as: .dump)
+        XCTAssertEqual(alert.title, L10n.Action.setPriority)
+        XCTAssertEqual(alert.actions.map(\.title), [
+            L10n.Priority.disabled,
+            L10n.Priority.low,
+            L10n.Priority.normal,
+            L10n.Priority.high,
+            L10n.Action.cancel,
+        ])
     }
 
     // MARK: - Values
