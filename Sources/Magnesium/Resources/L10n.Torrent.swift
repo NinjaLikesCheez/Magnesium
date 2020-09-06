@@ -12,6 +12,11 @@ extension L10n {
             return .localizedStringWithFormat(format, uploadSpeed)
         }
 
+        static func downloadUploadSpeed(downloadSpeed: String, uploadSpeed: String) -> String {
+            let format = NSLocalizedString("torrent.download-upload-speed", comment: "↓ {bytes}/s ↑ {bytes}/s")
+            return .localizedStringWithFormat(format, downloadSpeed, uploadSpeed)
+        }
+
         static func progress(downloaded: String, size: String, progress: String) -> String {
             let format = NSLocalizedString("torrent.progress", comment: "{downloaded} / {size} ({percentage})")
             return .localizedStringWithFormat(format, downloaded, size, progress)
@@ -67,6 +72,10 @@ extension L10n {
         static func count(_ count: Int) -> String {
             let format = NSLocalizedString("torrent.count", comment: "{number} Torrents")
             return .localizedStringWithFormat(format, count)
+        }
+
+        static func networkSpeed(_ speed: String) -> String {
+            NSLocalizedString("torrent.network-speed", comment: "{bytes}/s")
         }
     }
 }

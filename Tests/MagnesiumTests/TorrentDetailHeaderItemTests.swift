@@ -37,8 +37,8 @@ class TorrentDetailHeaderItemTests: TestCase {
     }
 
     func test_progress() {
-        torrent.send(.mock(progress: 0.189_838))
-        XCTAssertEqual(item.progress.first().wait(), 0.189_838)
+        torrent.send(.mock(progress: 0.189))
+        XCTAssertEqual(item.progress.first().wait(), 0.189)
     }
 
     func test_progressColor() {
@@ -59,17 +59,23 @@ class TorrentDetailHeaderItemTests: TestCase {
 
     func test_status() {
         let pairs: [(TorrentState, String)] = [
-            (.downloading, "Downloading"),
-            (.seeding, "Seeding"),
-            (.paused, "Paused"),
-            (.checking, "Checking"),
-            (.queued, "Queued"),
-            (.error, "Error"),
+            (.downloading, L10n.Torrent.downloadingState),
+            (.seeding, L10n.Torrent.seedingState),
+            (.paused, L10n.Torrent.pausedState),
+            (.checking, L10n.Torrent.checkingState),
+            (.queued, L10n.Torrent.queuedState),
+            (.error, L10n.Torrent.errorState),
         ]
 
         for (state, result) in pairs {
             torrent.send(.mock(state: state))
-            XCTAssertEqual(item.status.first().wait(), "\(result) (0.00%)")
+            XCTAssertEqual(
+                item.status.first().wait(),
+                L10n.Torrent.torrentStatusWithPercentage(
+                    status: result,
+                    progress: Formatters.percentage(precision: 2).string(for: torrent.value.progress) ?? ""
+                )
+            )
         }
     }
 }

@@ -113,14 +113,14 @@ final class StandardTorrentDetailViewModel: ViewModel {
             .info(.init(
                 name: L10n.Screen.TorrentInfo.downloadSpeed,
                 value: torrentSubject
-                    .map { "\(Formatters.bytes.string(fromByteCount: $0.downloadRate))/s" }
+                    .map { L10n.Torrent.networkSpeed(Formatters.bytes.string(fromByteCount: $0.downloadRate)) }
                     .ui()
                     .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.uploadSpeed,
                 value: torrentSubject
-                    .map { "\(Formatters.bytes.string(fromByteCount: $0.uploadRate))/s" }
+                    .map { L10n.Torrent.networkSpeed(Formatters.bytes.string(fromByteCount: $0.uploadRate)) }
                     .ui()
                     .eraseToAnyPublisher()
             )),

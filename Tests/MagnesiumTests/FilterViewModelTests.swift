@@ -21,8 +21,8 @@ class FilterViewModelTests: TestCase {
         labelsSubject.send([])
         let sections = try viewModel.values.sections.first().wait().singleValue()
         let expected = [
-            FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
-            FilterSection(type: .filters, items: [.state("All")]),
+            FilterSection(type: .sort, items: [.sort(L10n.Sort.descending(property: L10n.Sort.dateAdded))]),
+            FilterSection(type: .filters, items: [.state(L10n.Screen.Filter.filteredAll)]),
         ]
         XCTAssertEqual(sections, expected)
     }
@@ -30,8 +30,11 @@ class FilterViewModelTests: TestCase {
     func test_sections_withLabels_shouldEmitExpectedValues() throws {
         let sections = try viewModel.values.sections.first().wait().singleValue()
         let expected = [
-            FilterSection(type: .sort, items: [.sort("↓ Date Added")]),
-            FilterSection(type: .filters, items: [.state("All"), .label("All")]),
+            FilterSection(type: .sort, items: [.sort(L10n.Sort.descending(property: L10n.Sort.dateAdded))]),
+            FilterSection(type: .filters, items: [
+                .state(L10n.Screen.Filter.filteredAll),
+                .label(L10n.Screen.Filter.filteredAll),
+            ]),
         ]
         XCTAssertEqual(sections, expected)
     }
@@ -40,14 +43,14 @@ class FilterViewModelTests: TestCase {
         let sections = try viewModel.values.sections.dropFirst().first().wait {
             self.preferences[.sortOption] = SortOption(property: .name)
         }.singleValue()
-        XCTAssertEqual(sections[0].items, [.sort("↑ Name")])
+        XCTAssertEqual(sections[0].items, [.sort(L10n.Sort.ascending(property: L10n.Sort.name))])
     }
 
     func test_sections_whenFilterOptionsChanged_shouldEmit() throws {
         let sections = try viewModel.values.sections.dropFirst().first().wait {
             self.preferences[.filterOptions] = FilterOptions(state: .downloading)
         }.singleValue()
-        XCTAssertEqual(sections[1].items[0], .state("Downloading"))
+        XCTAssertEqual(sections[1].items[0], .state(L10n.Torrent.downloadingState))
     }
 
     func test_sections_whenLabelsUpdated_shouldEmit() {
@@ -73,12 +76,17 @@ class FilterViewModelTests: TestCase {
     }
 
     func test_sortSelected_shouldEmitAlert() throws {
-        let expected = ["Date Added", "Name", "Download Speed", "Upload Speed", "Cancel"]
         let event = try viewModel.eventPublisher.first().wait {
             self.viewModel.send(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.actions.map(\.title), expected)
+        XCTAssertEqual(alert.actions.map(\.title), [
+            L10n.Sort.dateAdded,
+            L10n.Sort.name,
+            L10n.Sort.downloadSpeed,
+            L10n.Sort.uploadSpeed,
+            L10n.Action.cancel,
+        ])
     }
 
     func test_sortSelected__whenExistingOptionSelected_shouldInvert() throws {
@@ -97,7 +105,7 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.sortSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        alert.actions.first { $0.title == "Name" }?.handler?()
+        alert.actions.first { $0.title == L10n.Sort.name }?.handler?()
         let newOption = preferences[.sortOption]
         XCTAssertEqual(newOption, SortOption(property: .name))
     }
@@ -107,8 +115,16 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        let expected = ["All", "Downloading", "Seeding", "Paused", "Checking", "Queued", "Error", "Cancel"]
-        XCTAssertEqual(alert.actions.map(\.title), expected)
+        XCTAssertEqual(alert.actions.map(\.title), [
+            L10n.Screen.Filter.filteredAll,
+            L10n.Torrent.downloadingState,
+            L10n.Torrent.seedingState,
+            L10n.Torrent.pausedState,
+            L10n.Torrent.checkingState,
+            L10n.Torrent.queuedState,
+            L10n.Torrent.errorState,
+            L10n.Action.cancel,
+        ])
     }
 
     func test_stateSelected_withNewOption_shouldSetNewOption() throws {
@@ -116,7 +132,7 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.stateSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        alert.actions.first { $0.title == "Downloading" }?.handler?()
+        alert.actions.first { $0.title == L10n.Torrent.downloadingState }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions(state: .downloading))
     }
@@ -126,7 +142,12 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.actions.map(\.title), ["All", "None", "test", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), [
+            L10n.Screen.Filter.filteredAll,
+            L10n.Label.none,
+            "test",
+            L10n.Action.cancel,
+        ])
     }
 
     func test_labelSelected_whenAllSelected_shouldRemoveLabelFilter() throws {
@@ -134,7 +155,7 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        alert.actions.first { $0.title == "All" }?.handler?()
+        alert.actions.first { $0.title == L10n.Screen.Filter.filteredAll }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions())
     }
@@ -144,7 +165,7 @@ class FilterViewModelTests: TestCase {
             self.viewModel.send(.labelSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        alert.actions.first { $0.title == "None" }?.handler?()
+        alert.actions.first { $0.title == L10n.Label.none }?.handler?()
         let newOption = preferences[.filterOptions]
         XCTAssertEqual(newOption, FilterOptions(label: ""))
     }

@@ -31,8 +31,8 @@ class TransmissionTorrentListImplementationTests: TestCase {
 
     func test_addLink_withInvalidURL_shouldReturnError() throws {
         let error = try implementation.addLink("^").wait().error()
-        XCTAssertEqual(error.title, "Invalid URL")
-        XCTAssertEqual(error.message, "That URL doesn't appear to be valid.")
+        XCTAssertEqual(error.title, L10n.Error.invalidURL)
+        XCTAssertEqual(error.message, L10n.Error.invalidURLMessage)
     }
 
     func test_addLink_withMagnetLink_shouldPerformAddRequest() {

@@ -31,7 +31,12 @@ class TransmissionSettingsViewModelTests: TestCase {
     }
 
     func test_inputs() {
-        XCTAssertEqual(addViewModel.values.inputs.map(\.name), ["name", "server", "username", "password"])
+        XCTAssertEqual(addViewModel.values.inputs.map(\.name), [
+            L10n.Screen.EditServer.serverName,
+            L10n.Screen.EditServer.serverURL,
+            L10n.Screen.EditServer.username,
+            L10n.Screen.EditServer.password,
+        ])
     }
 
     func test_name_withServer_shouldUseExisting() {
@@ -51,19 +56,19 @@ class TransmissionSettingsViewModelTests: TestCase {
     }
 
     func test_title_withoutServer() {
-        XCTAssertEqual(addViewModel.values.title, "Add Server")
+        XCTAssertEqual(addViewModel.values.title, L10n.Screen.AddServer.title)
     }
 
     func test_title_withServer() {
-        XCTAssertEqual(editViewModel.values.title, "Edit Server")
+        XCTAssertEqual(editViewModel.values.title, L10n.Screen.EditServer.title)
     }
 
     func test_saveButtonTitle_withoutServer() {
-        XCTAssertEqual(addViewModel.values.saveButtonTitle, "Add")
+        XCTAssertEqual(addViewModel.values.saveButtonTitle, L10n.Action.add)
     }
 
     func test_saveButtonTitle_withServer() {
-        XCTAssertEqual(editViewModel.values.saveButtonTitle, "Save")
+        XCTAssertEqual(editViewModel.values.saveButtonTitle, L10n.Action.save)
     }
 
     func test_canDelete_withoutServer() {
@@ -100,12 +105,9 @@ class TransmissionSettingsViewModelTests: TestCase {
             viewModel.send(.saveSelected)
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.title, "Invalid URL")
-        XCTAssertEqual(
-            alert.message,
-            "The server URL is invalid. Ensure the URL begins with \"http://\" or \"https://\"."
-        )
-        XCTAssertEqual(alert.actions.map(\.title), ["OK"])
+        XCTAssertEqual(alert.title, L10n.Error.invalidURL)
+        XCTAssertEqual(alert.message, L10n.Screen.AddServer.invalidServerURL)
+        XCTAssertEqual(alert.actions.map(\.title), [L10n.Action.ok])
     }
 
     func test_saveSelected_shouldChangeIsLoading() {
@@ -141,8 +143,8 @@ class TransmissionSettingsViewModelTests: TestCase {
             viewModel.send(.saveSelected)
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.title, "Authentication Failed")
-        XCTAssertEqual(alert.message, "Unable to authenticate. Verify that your credentials are correct.")
+        XCTAssertEqual(alert.title, L10n.Error.authenticationFailed)
+        XCTAssertEqual(alert.message, L10n.Error.unauthenticatedVerifyCredentials)
     }
 
     func test_saveSelected_withoutData_shouldDoNothing() {
@@ -244,10 +246,10 @@ class TransmissionSettingsViewModelTests: TestCase {
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
         XCTAssertNil(alert.title)
-        XCTAssertEqual(alert.message, "Are you sure you want to delete this server?")
-        XCTAssertEqual(alert.actions[0].title, "Delete Server")
+        XCTAssertEqual(alert.message, L10n.Screen.EditServer.deleteServerConfirmation)
+        XCTAssertEqual(alert.actions[0].title, L10n.Action.deleteServer)
         XCTAssertEqual(alert.actions[0].style, AlertAction.Style.destructive)
-        XCTAssertEqual(alert.actions[1].title, "Cancel")
+        XCTAssertEqual(alert.actions[1].title, L10n.Action.cancel)
     }
 
     func test_deleteSelected_whenDeleteServerSelected_shouldRemoveServer() throws {
@@ -257,7 +259,7 @@ class TransmissionSettingsViewModelTests: TestCase {
             viewModel.send(.deleteSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        alert.actions.first { $0.title == "Delete Server" }?.handler?()
+        alert.actions.first { $0.title == L10n.Action.deleteServer }?.handler?()
         XCTAssertTrue(try preferences.getServers().isEmpty)
     }
 
@@ -271,7 +273,7 @@ class TransmissionSettingsViewModelTests: TestCase {
         let alert = try extract(case: type(of: alertEvent).alert, from: alertEvent)
 
         let event = try viewModel.eventPublisher.first().wait {
-            alert.actions.first { $0.title == "Delete Server" }?.handler?()
+            alert.actions.first { $0.title == L10n.Action.deleteServer }?.handler?()
         }.singleValue()
         XCTAssertCase(event, .complete)
         XCTAssertTrue(try preferences.getServers().isEmpty)

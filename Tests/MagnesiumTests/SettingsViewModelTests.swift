@@ -45,7 +45,7 @@ class SettingsViewModelTests: TestCase {
             self.viewModel.send(.changeServerSelected(source: .view(UIView(), rect: .zero)))
         }.singleValue()
         let alert = try extract(case: type(of: event).alert, from: event)
-        XCTAssertEqual(alert.actions.map(\.title), ["Server 1", "Server 2", "Cancel"])
+        XCTAssertEqual(alert.actions.map(\.title), ["Server 1", "Server 2", L10n.Action.cancel])
     }
 
     func test_changeServerSelected_whenServerSelected_shouldUpdateSession() throws {

@@ -17,5 +17,15 @@ extension L10n {
         static var uploadSpeed: String {
             NSLocalizedString("sort.upload-speed", comment: "Upload Speed")
         }
+
+        static func ascending(property: String) -> String {
+            let format = NSLocalizedString("sort.direction-ascending", comment: "↑ {property}")
+            return .localizedStringWithFormat(format, property)
+        }
+
+        static func descending(property: String) -> String {
+            let format = NSLocalizedString("sort.direction-descending", comment: "↓ {property}")
+            return .localizedStringWithFormat(format, property)
+        }
     }
 }

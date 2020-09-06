@@ -47,18 +47,18 @@ class AppCoordinatorTests: TestCase {
         session.setServer(.mock(.transmission))
         coordinator.add(fileURL: URL(fileURLWithPath: "/file.torrent", isDirectory: false))
         let alertController = splitViewController.presentedViewController as! UIAlertController
-        XCTAssertEqual(alertController.title, "Add to MockServer")
+        XCTAssertEqual(alertController.title, L10n.AddTorrent.addToServer(serverName: "MockServer"))
         XCTAssertEqual(alertController.message, "file.torrent")
-        XCTAssertEqual(alertController.actions.map(\.title), ["Add Torrent", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), [L10n.Action.addTorrent, L10n.Action.cancel])
     }
 
     func test_addMagnetURL_shouldPresentAlertController() {
         session.setServer(.mock(.transmission))
         coordinator.add(magnetURL: URL(string: "magnet:?")!)
         let alertController = splitViewController.presentedViewController as! UIAlertController
-        XCTAssertEqual(alertController.title, "Add to MockServer")
+        XCTAssertEqual(alertController.title, L10n.AddTorrent.addToServer(serverName: "MockServer"))
         XCTAssertEqual(alertController.message, "magnet:?")
-        XCTAssertEqual(alertController.actions.map(\.title), ["Add Torrent", "Cancel"])
+        XCTAssertEqual(alertController.actions.map(\.title), [L10n.Action.addTorrent, L10n.Action.cancel])
     }
 
     // MARK: - ServerErrorCoordinatorEvent

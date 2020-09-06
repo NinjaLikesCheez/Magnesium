@@ -39,8 +39,10 @@ targets:
       - package: Deluge
       - package: Transmission
     preBuildScripts:
-      - name: Swiftlint
+      - name: SwiftLint
         script: tools/mint run swiftlint lint
+      - name: Localization Lint
+        script: scripts/LocalizationLint.swift
     scheme:
       testTargets:
         - MagnesiumTests

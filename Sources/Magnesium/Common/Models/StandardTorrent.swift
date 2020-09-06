@@ -34,9 +34,9 @@ extension StandardTorrent {
 
     var localizedSpeed: String {
         if state == .downloading {
-            let download = L10n.Torrent.downloadSpeed(Formatters.bytes.string(fromByteCount: downloadRate))
-            let upload = L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
-            return "\(download) \(upload)"
+            let download = Formatters.bytes.string(fromByteCount: downloadRate)
+            let upload = Formatters.bytes.string(fromByteCount: uploadRate)
+            return L10n.Torrent.downloadUploadSpeed(downloadSpeed: download, uploadSpeed: upload)
         } else if state == .seeding {
             return L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
         } else {
@@ -53,11 +53,11 @@ extension StandardTorrent {
     }
 
     var formattedETA: String {
-        eta > 0 ? Formatters.eta.string(from: eta) ?? "" : "∞"
+        eta > 0 ? Formatters.eta.string(from: eta) ?? "" : L10n.Common.infinity
     }
 
     func formattedRatio(precision: Int = 1) -> String {
-        guard !ratio.isInfinite, !ratio.isNaN else { return "∞" }
+        guard !ratio.isInfinite, !ratio.isNaN else { return L10n.Common.infinity }
         return Formatters.number(precision: precision).string(for: ratio) ?? ""
     }
 

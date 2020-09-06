@@ -77,6 +77,9 @@
 /* Enter a URL */
 "add-torrent.enter-url" = "Enter a URL";
 
+/* ∞ */
+"common.infinity" = "∞";
+
 /* Authentication Failed */
 "error.authentication-failed" = "Authentication Failed";
 
@@ -323,6 +326,12 @@
 /* Date Added */
 "sort.date-added" = "Date Added";
 
+/* ↑ {property} */
+"sort.direction-ascending" = "↑ %@";
+
+/* ↓ {property} */
+"sort.direction-descending" = "↓ %@";
+
 /* Download Speed */
 "sort.download-speed" = "Download Speed";
 
@@ -338,11 +347,17 @@
 /* ↓ {bytes}/s */
 "torrent.download-speed" = "↓ %@/s";
 
+/* ↓ {bytes}/s ↑ {bytes}/s */
+"torrent.download-upload-speed" = "↓ %1$@/s ↑ %2$@/s";
+
 /* Downloading */
 "torrent.downloading-state" = "Downloading";
 
 /* Error */
 "torrent.error-state" = "Error";
+
+/* {bytes}/s */
+"torrent.network-speed" = "%@/s";
 
 /* Paused */
 "torrent.paused-state" = "Paused";

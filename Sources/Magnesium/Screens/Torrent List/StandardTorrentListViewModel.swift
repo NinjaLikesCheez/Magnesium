@@ -46,16 +46,16 @@ final class StandardTorrentListViewModel: ViewModel {
 
         let totalDownloadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.downloadRate } }
-            .map { L10n.Torrent.downloadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
+            .map { Formatters.bytes.string(fromByteCount: $0) }
             .ui()
 
         let totalUploadSpeed = torrentMapper.allValuesPublisher
             .map { $0.reduce(0) { $0 + $1.value.uploadRate } }
-            .map { L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: $0)) }
+            .map { Formatters.bytes.string(fromByteCount: $0) }
             .ui()
 
         let status = Publishers.CombineLatest(totalDownloadSpeed, totalUploadSpeed)
-            .map { "\($0) \($1)" }
+            .map { L10n.Torrent.downloadUploadSpeed(downloadSpeed: $0, uploadSpeed: $1) }
             .ui()
 
         _values = .init(

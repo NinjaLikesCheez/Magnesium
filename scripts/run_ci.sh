@@ -12,6 +12,11 @@ scripts/bootstrap.sh
 
 tools/mint run swiftlint --strict
 
+if [ -n "$(scripts/LocalizationLint.swift)" ]; then
+  printf "\e[1;31mError: Found localization issues.\e[0m\n"
+  exit -1
+fi
+
 xcrun xcodebuild -version
 xcrun xcodebuild -resolvePackageDependencies
 xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -scheme Magnesium clean build test \

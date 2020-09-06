@@ -11,7 +11,7 @@ class AddServerViewModelTests: TestCase {
     }
 
     func test_types() {
-        XCTAssertEqual(viewModel.values.types, ["Deluge", "Transmission"])
+        XCTAssertEqual(viewModel.values.types, [L10n.Server.deluge, L10n.Server.transmission])
     }
 
     func test_typeSelected_withDeluge_shouldEmitDelugeAddServerType() throws {

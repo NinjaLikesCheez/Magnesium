@@ -19,8 +19,8 @@ struct Config {
 }
 
 let config = Config(
-    sources: "Magnesium",
-    localizations: "Magnesium/Resources/Localization"
+    sources: "Sources/Magnesium",
+    localizations: "Sources/Magnesium/Resources/Localization"
 )
 
 // MARK: - Script

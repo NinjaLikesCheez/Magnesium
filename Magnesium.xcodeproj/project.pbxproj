@@ -1045,7 +1045,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5766926C6F7224C633FEE0A8 /* Build configuration list for PBXNativeTarget "Magnesium" */;
 			buildPhases = (
-				695BC06E1B09CA2E69787507 /* Swiftlint */,
+				24B35DB07DC5A5AD078E7620 /* SwiftLint */,
+				DAF6FEF69BF09A78912AF417 /* Localization Lint */,
 				A6BCF23BE16FE4958E717456 /* Sources */,
 				357298692CA6251BD512F3A2 /* Resources */,
 				224108AF3274CEBDD5BDE4DE /* Frameworks */,
@@ -1153,7 +1154,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		695BC06E1B09CA2E69787507 /* Swiftlint */ = {
+		24B35DB07DC5A5AD078E7620 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1162,7 +1163,7 @@
 			);
 			inputPaths = (
 			);
-			name = Swiftlint;
+			name = SwiftLint;
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -1170,6 +1171,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "tools/mint run swiftlint lint";
+		};
+		DAF6FEF69BF09A78912AF417 /* Localization Lint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Localization Lint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = scripts/LocalizationLint.swift;
 		};
 /* End PBXShellScriptBuildPhase section */
 

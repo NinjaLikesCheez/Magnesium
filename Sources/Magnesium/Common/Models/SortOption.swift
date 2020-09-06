@@ -72,15 +72,12 @@ extension SortOption.Direction: Equatable {}
 
 extension SortOption {
     var localizedString: String {
-        let directionString: String
         switch direction {
         case .ascending:
-            directionString = "↑"
+            return L10n.Sort.ascending(property: property.localizedString)
         case .descending:
-            directionString = "↓"
+            return L10n.Sort.descending(property: property.localizedString)
         }
-
-        return "\(directionString) \(property.localizedString)"
     }
 }
 

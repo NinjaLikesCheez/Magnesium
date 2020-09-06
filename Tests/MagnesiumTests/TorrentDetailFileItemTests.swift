@@ -30,6 +30,12 @@ class TorrentDetailFileItemTests: TestCase {
     }
 
     func test_info() {
-        XCTAssertEqual(item.info.first().wait(), "95.4 MB (19%)")
+        XCTAssertEqual(
+            item.info.first().wait(),
+            L10n.File.progress(
+                size: Formatters.bytes.string(fromByteCount: fileSubject.value.size),
+                progress: Formatters.percentage.string(for: fileSubject.value.progress) ?? ""
+            )
+        )
     }
 }
