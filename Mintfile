@@ -1,3 +1,4 @@
-realm/SwiftLint@0.40.0
-thii/xcbeautify@0.8.0
-yonaskolb/xcodegen@2.17.0
+nicklockwood/SwiftFormat@0.47.2
+realm/SwiftLint@0.40.3
+thii/xcbeautify@0.8.1
+yonaskolb/xcodegen@2.18.0

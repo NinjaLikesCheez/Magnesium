@@ -1,6 +1,9 @@
 # fileHeader
 --header strip
 
+# use xcode indentation
+--xcodeindentation enabled
+
 # numberFormatting
 --decimalgrouping 3,5
 --fractiongrouping enabled
@@ -16,4 +19,4 @@
 --disable specifiers
 
 # version
---swiftversion 5.2
+--swiftversion 5.3
