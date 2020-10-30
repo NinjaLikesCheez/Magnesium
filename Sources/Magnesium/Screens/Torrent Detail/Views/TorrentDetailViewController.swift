@@ -8,8 +8,9 @@ protocol TorrentDetailViewControllerIdentifiable {
 }
 
 final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewController,
-                                                        TorrentDetailViewControllerIdentifiable
-where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues {
+    TorrentDetailViewControllerIdentifiable
+    where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailViewValues
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
@@ -312,8 +313,9 @@ where VM.ViewEvent == TorrentDetailViewEvent, VM.ViewValues == TorrentDetailView
 
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard shouldShowHeader(forSection: section),
-              let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header")
-                as? TorrentDetailSectionHeaderView
+              let header = tableView.dequeueReusableHeaderFooterView(
+                  withIdentifier: "header"
+              ) as? TorrentDetailSectionHeaderView
         else {
             return nil
         }

@@ -3,7 +3,8 @@ import UIKit
 import ViewModel
 
 final class SettingsViewController<VM: ViewModel>: UITableViewController
-where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues {
+    where VM.ViewEvent == SettingsViewEvent, VM.ViewValues == SettingsViewValues
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!

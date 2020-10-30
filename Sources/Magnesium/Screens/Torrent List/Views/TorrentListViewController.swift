@@ -11,7 +11,8 @@ protocol TorrentListViewDelegate: AnyObject {
 }
 
 final class TorrentListViewController<VM: ViewModel>: PresentableTableViewController, UISearchResultsUpdating
-where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValues {
+    where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValues
+{ // swiftlint:disable:this opening_brace
     private enum Section {
         case main
     }
@@ -186,8 +187,8 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
         if viewModel.values.showFilterButton {
             viewModel.values.hasActiveFilters.sink { [weak self] in
                 self?.filterBarButtonItem.image = UIImage(systemName: $0
-                                                            ? "line.horizontal.3.decrease.circle.fill"
-                                                            : "line.horizontal.3.decrease.circle")
+                    ? "line.horizontal.3.decrease.circle.fill"
+                    : "line.horizontal.3.decrease.circle")
             }.store(in: &cancellables)
         }
 
@@ -345,25 +346,25 @@ where VM.ViewEvent == TorrentListViewEvent, VM.ViewValues == TorrentListViewValu
 
     @objc
     private func resumeButtonTapped(_ sender: UIBarButtonItem) {
-        guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
+        guard let indices = tableView.indexPathsForSelectedRows?.map(\.row) else { return }
         viewModel.send(.resumeSelected(indices: indices))
     }
 
     @objc
     private func pauseButtonTapped(_ sender: UIBarButtonItem) {
-        guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
+        guard let indices = tableView.indexPathsForSelectedRows?.map(\.row) else { return }
         viewModel.send(.pauseSelected(indices: indices))
     }
 
     @objc
     private func removeButtonTapped(_ sender: UIBarButtonItem) {
-        guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
+        guard let indices = tableView.indexPathsForSelectedRows?.map(\.row) else { return }
         viewModel.send(.removeSelected(indices: indices, source: .barButton(sender)))
     }
 
     @objc
     private func moreButtonTapped(_ sender: UIBarButtonItem) {
-        guard let indices = tableView.indexPathsForSelectedRows?.map({ $0.row }) else { return }
+        guard let indices = tableView.indexPathsForSelectedRows?.map(\.row) else { return }
         viewModel.send(.moreOptionsSelected(indices: indices, source: .barButton(sender)))
     }
 

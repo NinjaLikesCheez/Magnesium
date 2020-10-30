@@ -157,7 +157,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             progressView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             progressView.topAnchor.constraint(equalTo: topLabelsStackView.bottomAnchor, constant: 8)
-            .withPriority(.defaultHigh),
+                .withPriority(.defaultHigh),
 
             statusLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

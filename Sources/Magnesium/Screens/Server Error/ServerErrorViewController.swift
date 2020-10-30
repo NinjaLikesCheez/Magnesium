@@ -3,7 +3,8 @@ import UIKit
 import ViewModel
 
 final class ServerErrorViewController<VM: ViewModel>: PresentableViewController
-where VM.ViewEvent == ServerErrorViewEvent {
+    where VM.ViewEvent == ServerErrorViewEvent
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
 
     private lazy var settingsBarButtonItem = UIBarButtonItem(

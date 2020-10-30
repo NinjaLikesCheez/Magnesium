@@ -581,10 +581,10 @@ final class StandardTorrentDetailViewModelTests: TestCase {
 
     func test_contextMenu_action_whenPriorityIsCurrent_shouldBeInOnState() throws {
         let pairs: [(String, TorrentPriority)] = [
-        (L10n.Priority.disabled, .disabled),
-        (L10n.Priority.low, .low),
-        (L10n.Priority.normal, .normal),
-        (L10n.Priority.high, .high),
+            (L10n.Priority.disabled, .disabled),
+            (L10n.Priority.low, .low),
+            (L10n.Priority.normal, .normal),
+            (L10n.Priority.high, .high),
         ]
 
         for (title, priority) in pairs {

@@ -3,7 +3,8 @@ import UIKit
 import ViewModel
 
 final class FilterViewController<VM: ViewModel>: UITableViewController
-where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues {
+    where VM.ViewEvent == FilterViewEvent, VM.ViewValues == FilterViewValues
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
     private var dataSource: UITableViewDiffableDataSource<FilterSectionType, FilterItem>!
     private var cancellables = Set<AnyCancellable>()

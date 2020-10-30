@@ -6,9 +6,9 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     private let viewModel: VM
 
     private lazy var stackView = with(UIStackView(arrangedSubviews: [titleLabel, bodyLabel, addServerButton])) {
-       $0.axis = .vertical
-       $0.spacing = 20
-       $0.alignment = .center
+        $0.axis = .vertical
+        $0.spacing = 20
+        $0.alignment = .center
     }
 
     private lazy var titleLabel = with(UILabel()) {

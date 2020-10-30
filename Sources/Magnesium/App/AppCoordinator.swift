@@ -283,7 +283,8 @@ extension AppCoordinator: UISplitViewControllerDelegate {
         onto primaryViewController: UIViewController
     ) -> Bool {
         if let navigationController = secondaryViewController as? UINavigationController,
-           !(navigationController.viewControllers.first is TorrentDetailViewControllerIdentifiable) {
+           !(navigationController.viewControllers.first is TorrentDetailViewControllerIdentifiable)
+        { // swiftlint:disable:this opening_brace
             return true
         }
 

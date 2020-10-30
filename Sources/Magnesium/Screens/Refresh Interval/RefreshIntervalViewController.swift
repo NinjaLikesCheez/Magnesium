@@ -3,7 +3,8 @@ import UIKit
 import ViewModel
 
 final class RefreshIntervalViewController<VM: ViewModel>: UITableViewController
-where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewValues == RefreshIntervalViewValues {
+    where VM.ViewEvent == RefreshIntervalViewEvent, VM.ViewValues == RefreshIntervalViewValues
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
     private var cancellables = Set<AnyCancellable>()
 

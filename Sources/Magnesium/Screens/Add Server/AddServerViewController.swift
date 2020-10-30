@@ -3,7 +3,8 @@ import UIKit
 import ViewModel
 
 final class AddServerViewController<VM: ViewModel>: PresentableTableViewController
-where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues {
+    where VM.ViewEvent == AddServerViewEvent, VM.ViewValues == AddServerViewValues
+{ // swiftlint:disable:this opening_brace
     private let viewModel: VM
 
     init(viewModel: VM) {

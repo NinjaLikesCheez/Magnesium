@@ -4,7 +4,8 @@ import UIKit
 import ViewModel
 
 final class ServerSettingsViewController<VM: ViewModel>: PresentableTableViewController
-where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsViewValues {
+    where VM.ViewEvent == ServerSettingsViewEvent, VM.ViewValues == ServerSettingsViewValues
+{ // swiftlint:disable:this opening_brace
     private enum Section: Int {
         case settings
         case delete
