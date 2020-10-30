@@ -75,7 +75,8 @@ extension L10n {
         }
 
         static func networkSpeed(_ speed: String) -> String {
-            NSLocalizedString("torrent.network-speed", comment: "{bytes}/s")
+            let format = NSLocalizedString("torrent.network-speed", comment: "{bytes}/s")
+            return .localizedStringWithFormat(format, speed)
         }
     }
 }
