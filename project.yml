@@ -46,6 +46,7 @@ targets:
     scheme:
       testTargets:
         - MagnesiumTests
+      gatherCoverageData: true
     settings:
       DEVELOPMENT_TEAM: 3RLT5NMM8V
   MagnesiumTests:
