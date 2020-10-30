@@ -12,36 +12,36 @@ class TorrentDetailHeaderItemTests: TestCase {
         item = TorrentDetailHeaderItem(torrentSubject: torrent)
     }
 
-    func test_name() {
+    func test_name() throws {
         torrent.send(.mock(name: "name"))
-        XCTAssertEqual(item.name.first().wait(), "name")
+        XCTAssertEqual(try item.name.first().wait().singleValue(), "name")
     }
 
-    func test_label() {
+    func test_label() throws {
         torrent.send(.mock(label: "label"))
-        XCTAssertEqual(item.label.first().wait(), "label")
+        XCTAssertEqual(try item.label.first().wait().singleValue(), "label")
     }
 
     func test_isActive_withActiveStates_shouldBeTrue() throws {
         for state in [TorrentState.downloading, .seeding] {
             torrent.send(.mock(state: state))
-            XCTAssertTrue(item.isActive.first().wait())
+            XCTAssertTrue(try item.isActive.first().wait().singleValue())
         }
     }
 
-    func test_isActive_withInactiveState_shouldBeFalse() {
+    func test_isActive_withInactiveState_shouldBeFalse() throws {
         for state in [TorrentState.paused, .checking, .queued, .error] {
             torrent.send(.mock(state: state))
-            XCTAssertFalse(item.isActive.first().wait())
+            XCTAssertFalse(try item.isActive.first().wait().singleValue())
         }
     }
 
-    func test_progress() {
+    func test_progress() throws {
         torrent.send(.mock(progress: 0.189))
-        XCTAssertEqual(item.progress.first().wait(), 0.189)
+        XCTAssertEqual(try item.progress.first().wait().singleValue(), 0.189)
     }
 
-    func test_progressColor() {
+    func test_progressColor() throws {
         let pairs: [(TorrentState, UIColor)] = [
             (.downloading, TorrentState.downloading.displayColor),
             (.seeding, TorrentState.seeding.displayColor),
@@ -53,11 +53,11 @@ class TorrentDetailHeaderItemTests: TestCase {
 
         for (state, result) in pairs {
             torrent.send(.mock(state: state))
-            XCTAssertEqual(item.progressColor.first().wait(), result, String(describing: state))
+            XCTAssertEqual(try item.progressColor.first().wait().singleValue(), result, String(describing: state))
         }
     }
 
-    func test_status() {
+    func test_status() throws {
         let pairs: [(TorrentState, String)] = [
             (.downloading, L10n.Torrent.downloadingState),
             (.seeding, L10n.Torrent.seedingState),
@@ -70,7 +70,7 @@ class TorrentDetailHeaderItemTests: TestCase {
         for (state, result) in pairs {
             torrent.send(.mock(state: state))
             XCTAssertEqual(
-                item.status.first().wait(),
+                try item.status.first().wait().singleValue(),
                 L10n.Torrent.torrentStatusWithPercentage(
                     status: result,
                     progress: Formatters.percentage(precision: 2).string(for: torrent.value.progress) ?? ""

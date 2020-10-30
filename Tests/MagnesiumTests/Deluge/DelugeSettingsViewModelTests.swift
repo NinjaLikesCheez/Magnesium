@@ -108,7 +108,7 @@ class DelugeSettingsViewModelTests: TestCase {
 
         let values = viewModel.values.isLoading.dropFirst().wait {
             viewModel.send(.saveSelected)
-        }
+        }.values()
         XCTAssertEqual(values, [true, false])
     }
 

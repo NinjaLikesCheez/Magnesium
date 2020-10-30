@@ -1099,7 +1099,7 @@
 		7451830A229A93074C05F758 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					02B1F42366609E3533897ADB = {
 						DevelopmentTeam = 3RLT5NMM8V;
@@ -1701,7 +1701,7 @@
 			repositoryURL = "https://github.com/jameshurst/CombineWaiting.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
+				minimumVersion = 0.2.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

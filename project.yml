@@ -14,7 +14,7 @@ packages:
     from: 1.0.0
   CombineWaiting:
     url: https://github.com/jameshurst/CombineWaiting.git
-    from: 0.1.0
+    from: 0.2.0
   SnapshotTesting:
     url: https://github.com/pointfreeco/swift-snapshot-testing.git
     from: 1.8.2

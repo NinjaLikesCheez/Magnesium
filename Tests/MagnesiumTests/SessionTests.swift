@@ -12,8 +12,9 @@ class SessionTests: TestCase {
         session = Session()
     }
 
-    func test_serverPublisher_shouldHaveInitialValue() {
-        XCTAssertEqual(session.serverPublisher.first().wait(), .none)
+    func test_serverPublisher_shouldHaveInitialValue() throws {
+        let server = try session.serverPublisher.first().wait().singleValue()
+        XCTAssertNil(server)
     }
 
     func test_serverPublisher_whenFirstServerAdded_shouldEmit() throws {

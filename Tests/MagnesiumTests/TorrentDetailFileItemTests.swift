@@ -25,13 +25,13 @@ class TorrentDetailFileItemTests: TestCase {
         XCTAssertNotEqual(TorrentDetailFileItem(fileSubject: CurrentValueSubject(file)).id, item.id)
     }
 
-    func test_name() {
-        XCTAssertEqual(item.name.first().wait(), "file.rar")
+    func test_name() throws {
+        XCTAssertEqual(try item.name.first().wait().singleValue(), "file.rar")
     }
 
-    func test_info() {
+    func test_info() throws {
         XCTAssertEqual(
-            item.info.first().wait(),
+            try item.info.first().wait().singleValue(),
             L10n.File.progress(
                 size: Formatters.bytes.string(fromByteCount: fileSubject.value.size),
                 progress: Formatters.percentage.string(for: fileSubject.value.progress) ?? ""

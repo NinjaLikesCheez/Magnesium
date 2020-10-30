@@ -103,7 +103,7 @@ final class StandardTorrentDetailViewModelTests: TestCase {
     func test_refresh_isRefreshing_shouldEmitTrueThenFalse() {
         let values = viewModel.values.isRefreshing.dropFirst().wait {
             self.viewModel.send(.refresh)
-        }
+        }.values()
         XCTAssertEqual(values, [true, false])
     }
 

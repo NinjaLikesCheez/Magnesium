@@ -57,17 +57,17 @@ class TorrentListItemTests: TestCase {
         )
     }
 
-    func test_name() {
+    func test_name() throws {
         subject.send(.mock(name: "name"))
-        XCTAssertEqual(item.name.first().wait(), "name")
+        XCTAssertEqual(try item.name.first().wait().singleValue(), "name")
     }
 
-    func test_progress() {
+    func test_progress() throws {
         subject.send(.mock(progress: 0.189))
-        XCTAssertEqual(item.progress.first().wait(), 0.189)
+        XCTAssertEqual(try item.progress.first().wait().singleValue(), 0.189)
     }
 
-    func test_progressColor() {
+    func test_progressColor() throws {
         let pairs: [(TorrentState, UIColor)] = [
             (.downloading, TorrentState.downloading.displayColor),
             (.seeding, TorrentState.seeding.displayColor),
@@ -79,11 +79,11 @@ class TorrentListItemTests: TestCase {
 
         for (state, result) in pairs {
             subject.send(.mock(state: state))
-            XCTAssertEqual(item.progressColor.first().wait(), result, String(describing: state))
+            XCTAssertEqual(try item.progressColor.first().wait().singleValue(), result, String(describing: state))
         }
     }
 
-    func test_status() {
+    func test_status() throws {
         let pairs: [(TorrentState, String)] = [
             (.downloading, L10n.Torrent.downloadingState),
             (.seeding, L10n.Torrent.seedingState),
@@ -95,14 +95,14 @@ class TorrentListItemTests: TestCase {
 
         for (state, result) in pairs {
             subject.send(.mock(state: state))
-            XCTAssertEqual(item.status.first().wait(), result, String(describing: state))
+            XCTAssertEqual(try item.status.first().wait().singleValue(), result, String(describing: state))
         }
     }
 
-    func test_speed_whenDownloading_shouldContainDownloadAndUploadRate() {
+    func test_speed_whenDownloading_shouldContainDownloadAndUploadRate() throws {
         subject.send(StandardTorrent.mock(downloadRate: 1_540_527, uploadRate: 465_158))
         XCTAssertEqual(
-            item.speed.first().wait(),
+            try item.speed.first().wait().singleValue(),
             L10n.Torrent.downloadUploadSpeed(
                 downloadSpeed: Formatters.bytes.string(fromByteCount: 1_540_527),
                 uploadSpeed: Formatters.bytes.string(fromByteCount: 465_158)
@@ -110,10 +110,10 @@ class TorrentListItemTests: TestCase {
         )
     }
 
-    func test_speed_whenSeeding_shouldContainOnlyUploadRate() {
+    func test_speed_whenSeeding_shouldContainOnlyUploadRate() throws {
         subject.send(StandardTorrent.mock(downloadRate: 1_540_527, state: .seeding, uploadRate: 465_158))
         XCTAssertEqual(
-            item.speed.first().wait(),
+            try item.speed.first().wait().singleValue(),
             L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: 465_158))
         )
     }
@@ -126,10 +126,10 @@ class TorrentListItemTests: TestCase {
         }
     }
 
-    func test_progressText() {
+    func test_progressText() throws {
         subject.send(.mock(downloaded: 130_583_716, progress: 0.189, size: 687_865_856))
         XCTAssertEqual(
-            item.progressText.first().wait(),
+            try item.progressText.first().wait().singleValue(),
             L10n.Torrent.progress(
                 downloaded: Formatters.bytes.string(fromByteCount: 130_583_716),
                 size: Formatters.bytes.string(fromByteCount: 687_865_856),
@@ -144,34 +144,34 @@ class TorrentListItemTests: TestCase {
         for state in ratioStates {
             subject.send(.mock(downloaded: 10_000, state: state, uploaded: 4254))
             XCTAssertEqual(
-                item.ratioOrETA.first().wait(),
+                try item.ratioOrETA.first().wait().singleValue(),
                 L10n.Torrent.ratio(Formatters.number(precision: 1).string(for: 4254 / 10_000.0) ?? "")
             )
         }
     }
 
-    func test_ratio_whenInfinite_shouldFormatProperly() {
+    func test_ratio_whenInfinite_shouldFormatProperly() throws {
         for state in ratioStates {
             subject.send(.mock(state: state, uploaded: 1))
             XCTAssertTrue(subject.value.ratio.isInfinite)
-            XCTAssertEqual(item.ratioOrETA.first().wait(), L10n.Torrent.ratio(L10n.Common.infinity))
+            XCTAssertEqual(try item.ratioOrETA.first().wait().singleValue(), L10n.Torrent.ratio(L10n.Common.infinity))
         }
     }
 
-    func test_ratio_whenNaN_shouldFormatProperly() {
+    func test_ratio_whenNaN_shouldFormatProperly() throws {
         for state in ratioStates {
             subject.send(.mock(state: state))
             XCTAssertTrue(subject.value.ratio.isNaN)
-            XCTAssertEqual(item.ratioOrETA.first().wait(), L10n.Torrent.ratio(L10n.Common.infinity))
+            XCTAssertEqual(try item.ratioOrETA.first().wait().singleValue(), L10n.Torrent.ratio(L10n.Common.infinity))
         }
     }
 
-    func test_eta() {
+    func test_eta() throws {
         subject.send(StandardTorrent.mock(eta: 361))
-        XCTAssertEqual(item.ratioOrETA.first().wait(), Formatters.eta.string(from: 361) ?? "")
+        XCTAssertEqual(try item.ratioOrETA.first().wait().singleValue(), Formatters.eta.string(from: 361) ?? "")
     }
 
-    func test_eta_whenZero_shouldFormatProperly() {
-        XCTAssertEqual(item.ratioOrETA.first().wait(), L10n.Common.infinity)
+    func test_eta_whenZero_shouldFormatProperly() throws {
+        XCTAssertEqual(try item.ratioOrETA.first().wait().singleValue(), L10n.Common.infinity)
     }
 }

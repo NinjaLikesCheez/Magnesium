@@ -25,25 +25,29 @@ final class StandardTorrentListViewModelTests: TestCase {
 
     // MARK: - Title
 
-    func test_title_shouldBeExpectedTitle() {
-        XCTAssertEqual(viewModel.values.title.first().wait(), "MockServer")
+    func test_title_shouldBeExpectedTitle() throws {
+        let title = try viewModel.values.title.first().wait().singleValue()
+        XCTAssertEqual(title, "MockServer")
     }
 
-    func test_title_whenEditing_shouldBeSelectionCount() {
+    func test_title_whenEditing_shouldBeSelectionCount() throws {
         viewModel.send(.editSelected)
-        XCTAssertEqual(viewModel.values.title.first().wait(), L10n.Common.selectedCount(0))
+        let title = try viewModel.values.title.first().wait().singleValue()
+        XCTAssertEqual(title, L10n.Common.selectedCount(0))
     }
 
-    func test_title_whenEditingSelectionChanged_shouldUpdate() {
+    func test_title_whenEditingSelectionChanged_shouldUpdate() throws {
         viewModel.send(.editSelected)
         viewModel.send(.multiSelectUpdated(indices: [0, 1]))
-        XCTAssertEqual(viewModel.values.title.first().wait(), L10n.Common.selectedCount(2))
+        let title = try viewModel.values.title.first().wait().singleValue()
+        XCTAssertEqual(title, L10n.Common.selectedCount(2))
     }
 
-    func test_title_whenEditingEnded_shouldBeDefault() {
+    func test_title_whenEditingEnded_shouldBeDefault() throws {
         viewModel.send(.editSelected)
         viewModel.send(.doneEditingSelected)
-        XCTAssertEqual(viewModel.values.title.first().wait(), "MockServer")
+        let title = try viewModel.values.title.first().wait().singleValue()
+        XCTAssertEqual(title, "MockServer")
     }
 
     // MARK: - Auto Refresh
@@ -101,7 +105,7 @@ final class StandardTorrentListViewModelTests: TestCase {
     func test_refresh_isLoading_shouldEmitTrueThenFalse() {
         let values = viewModel.values.isLoading.dropFirst().wait {
             self.viewModel.send(.refresh)
-        }
+        }.values()
         XCTAssertEqual(values, [true, false])
     }
 
@@ -110,7 +114,7 @@ final class StandardTorrentListViewModelTests: TestCase {
 
         let values = viewModel.values.isLoading.dropFirst().wait {
             self.viewModel.send(.refresh)
-        }
+        }.values()
         XCTAssertEqual(values, [true, false])
     }
 
@@ -667,7 +671,7 @@ final class StandardTorrentListViewModelTests: TestCase {
 
     // MARK: status
 
-    func test_status_shouldBeTotalSpeeds() {
+    func test_status_shouldBeTotalSpeeds() throws {
         implementation.refreshResult = Just(([
             .mock(downloadRate: 100_000, label: "label1", uploadRate: 200_000),
             .mock(downloadRate: 200_000, label: "label2", uploadRate: 400_000),
@@ -675,8 +679,9 @@ final class StandardTorrentListViewModelTests: TestCase {
         ], [])).setFailureType(to: Error.self).eraseToAnyPublisher()
         viewModel.send(.refresh)
         preferences[.filterOptions] = FilterOptions(label: "label2")
+        let status = try viewModel.values.status.first().wait().singleValue()
         XCTAssertEqual(
-            viewModel.values.status.first().wait(),
+            status,
             L10n.Torrent.downloadUploadSpeed(
                 downloadSpeed: Formatters.bytes.string(fromByteCount: 700_000),
                 uploadSpeed: Formatters.bytes.string(fromByteCount: 1_400_000)
