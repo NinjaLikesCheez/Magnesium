@@ -5,7 +5,7 @@ struct TextInputItem {
     var name: String
     var placeholder: String
     var value: CurrentValueSubject<String?, Never>
-    var isEnabled: AnyPublisher<Bool, Never> = Just(true).eraseToAnyPublisher()
+    var isEnabled: UIPublisher<Bool> = .init(value: false)
     var configuration: Configuration
 }
 

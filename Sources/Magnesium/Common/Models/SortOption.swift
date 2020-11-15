@@ -1,4 +1,4 @@
-struct SortOption {
+struct SortOption: Equatable, Codable {
     var property: Property
     var direction: Direction
 
@@ -21,11 +21,8 @@ extension SortOption {
     }
 }
 
-extension SortOption: Codable {}
-extension SortOption: Equatable {}
-
 extension SortOption {
-    enum Property: String {
+    enum Property: String, Equatable, Codable, CaseIterable {
         case dateAdded
         case name
         case downloadSpeed
@@ -44,12 +41,8 @@ extension SortOption.Property {
     }
 }
 
-extension SortOption.Property: CaseIterable {}
-extension SortOption.Property: Codable {}
-extension SortOption.Property: Equatable {}
-
 extension SortOption {
-    enum Direction: String {
+    enum Direction: String, Equatable, Codable, CaseIterable {
         case ascending
         case descending
     }
@@ -65,10 +58,6 @@ extension SortOption.Direction {
         }
     }
 }
-
-extension SortOption.Direction: CaseIterable {}
-extension SortOption.Direction: Codable {}
-extension SortOption.Direction: Equatable {}
 
 extension SortOption {
     var localizedString: String {

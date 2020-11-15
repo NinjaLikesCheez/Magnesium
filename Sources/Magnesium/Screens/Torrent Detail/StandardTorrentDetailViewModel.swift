@@ -108,64 +108,56 @@ final class StandardTorrentDetailViewModel: ViewModel {
         sections.append(.init(type: .info, items: [
             .info(.init(
                 name: L10n.Screen.TorrentInfo.size,
-                value: torrentSubject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui().eraseToAnyPublisher()
+                value: torrentSubject.map { Formatters.bytes.string(fromByteCount: $0.size) }.ui()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.downloadSpeed,
                 value: torrentSubject
                     .map { L10n.Torrent.networkSpeed(Formatters.bytes.string(fromByteCount: $0.downloadRate)) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.uploadSpeed,
                 value: torrentSubject
                     .map { L10n.Torrent.networkSpeed(Formatters.bytes.string(fromByteCount: $0.uploadRate)) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.downloaded,
                 value: torrentSubject
                     .map { Formatters.bytes.string(fromByteCount: $0.downloaded) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.uploaded,
                 value: torrentSubject
                     .map { Formatters.bytes.string(fromByteCount: $0.uploaded) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.eta,
-                value: torrentSubject.map(\.formattedETA).ui().eraseToAnyPublisher()
+                value: torrentSubject.map(\.formattedETA).ui()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.ratio,
-                value: torrentSubject.map { $0.formattedRatio(precision: 3) }.ui().eraseToAnyPublisher()
+                value: torrentSubject.map { $0.formattedRatio(precision: 3) }.ui()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.peers,
                 value: torrentSubject
                     .map { L10n.Torrent.peers(peers: $0.peers, totalPeers: $0.totalPeers) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.seeds,
                 value: torrentSubject
                     .map { L10n.Torrent.peers(peers: $0.seeds, totalPeers: $0.totalSeeds) }
                     .ui()
-                    .eraseToAnyPublisher()
             )),
             .info(.init(
                 name: L10n.Screen.TorrentInfo.downloadFolder,
-                value: torrentSubject.map { ($0.downloadPath as NSString).lastPathComponent }
-                    .ui()
-                    .eraseToAnyPublisher(),
-                expandedValue: torrentSubject.map(\.downloadPath).ui().eraseToAnyPublisher()
+                value: torrentSubject.map { ($0.downloadPath as NSString).lastPathComponent }.ui(),
+                expandedValue: torrentSubject.map(\.downloadPath).ui()
             )),
         ]))
 

@@ -1,16 +1,16 @@
 import Combine
 import UIKit
 
-struct TorrentDetailFileItem: Identifiable {
+struct TorrentDetailFileItem: Equatable, Hashable {
     let id: Int
-    var name: AnyPublisher<String, Never>
-    var info: AnyPublisher<String, Never>
-    var priorityImage: AnyPublisher<UIImage?, Never>
+    var name: UIPublisher<String>
+    var info: UIPublisher<String>
+    var priorityImage: UIPublisher<UIImage?>
 
     init(fileSubject: CurrentValueSubject<StandardTorrentFile, Never>) {
         id = fileSubject.value.index
-        name = fileSubject.map(\.name).ui().eraseToAnyPublisher()
-        info = fileSubject.map(\.localizedProgress).ui().eraseToAnyPublisher()
+        name = fileSubject.map(\.name).ui()
+        info = fileSubject.map(\.localizedProgress).ui()
         priorityImage = fileSubject.map { file -> UIImage? in
             switch file.priority {
             case .disabled:
@@ -28,6 +28,6 @@ struct TorrentDetailFileItem: Identifiable {
                     .withTintColor(.systemGreen)
                     .withRenderingMode(.alwaysOriginal)
             }
-        }.ui().eraseToAnyPublisher()
+        }.ui()
     }
 }

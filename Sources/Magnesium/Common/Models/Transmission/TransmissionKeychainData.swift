@@ -1,6 +1,3 @@
-struct TransmissionKeychainData {
+struct TransmissionKeychainData: Equatable, Codable {
     var password: String?
 }
-
-extension TransmissionKeychainData: Codable {}
-extension TransmissionKeychainData: Equatable {}

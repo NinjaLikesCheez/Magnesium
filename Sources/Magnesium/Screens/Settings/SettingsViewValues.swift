@@ -1,5 +1,5 @@
 import Combine
 
 struct SettingsViewValues {
-    var sections: AnyPublisher<[SettingsSection], Never>
+    var sections: UIPublisher<[SettingsSection]>
 }

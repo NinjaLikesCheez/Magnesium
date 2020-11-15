@@ -7,6 +7,6 @@ struct RefreshIntervalViewValues {
 extension RefreshIntervalViewValues {
     struct OptionItem {
         var title: String
-        var isSelected: AnyPublisher<Bool, Never>
+        var isSelected: UIPublisher<Bool>
     }
 }

@@ -15,7 +15,7 @@ final class FilterViewModel: ViewModel {
     }
 
     init(labels: AnyPublisher<[StandardLabel], Never>) {
-        values = .init(sections: sectionsSubject.ui().eraseToAnyPublisher())
+        values = .init(sections: sectionsSubject.ui())
 
         let preferencePublisher = Current.preferences.valuePublisher(for: .sortOption)
             .asVoid()

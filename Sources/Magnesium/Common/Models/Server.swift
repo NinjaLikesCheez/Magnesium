@@ -1,9 +1,7 @@
 import Foundation
 
-struct Server: Identifiable {
-    // swiftlint:disable:next type_name
-    typealias ID = String
-    private(set) var id: ID = UUID().uuidString
+struct Server: Equatable {
+    private(set) var id: String = UUID().uuidString
     var name: String
     var type: ServerType
     var data: Data
@@ -25,5 +23,3 @@ extension Server: Codable {
         case data
     }
 }
-
-extension Server: Equatable {}

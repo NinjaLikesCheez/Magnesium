@@ -4,7 +4,7 @@ struct ServerSettingsViewValues {
     var title: String
     var saveButtonTitle: String
     var canDelete: Bool
-    var isLoading: AnyPublisher<Bool, Never>
-    var isSaveButtonEnabled: AnyPublisher<Bool, Never>
+    var isLoading: UIPublisher<Bool>
+    var isSaveButtonEnabled: UIPublisher<Bool>
     var inputs: [TextInputItem]
 }

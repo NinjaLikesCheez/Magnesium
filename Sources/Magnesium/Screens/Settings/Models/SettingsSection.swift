@@ -1,7 +1,4 @@
-struct SettingsSection {
+struct SettingsSection: Equatable, Hashable {
     let type: SettingsSectionType
     let items: [SettingsItem]
 }
-
-extension SettingsSection: Equatable {}
-extension SettingsSection: Hashable {}

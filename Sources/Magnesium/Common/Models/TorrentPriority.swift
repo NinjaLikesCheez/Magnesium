@@ -1,10 +1,6 @@
-enum TorrentPriority {
+enum TorrentPriority: Equatable, Hashable, CaseIterable {
     case disabled
     case low
     case normal
     case high
 }
-
-extension TorrentPriority: Equatable {}
-extension TorrentPriority: Hashable {}
-extension TorrentPriority: CaseIterable {}

@@ -1,6 +1,6 @@
 import Foundation
 
-struct StandardTorrent {
+struct StandardTorrent: Equatable {
     var dateAdded: Date
     var downloaded: Int64
     var downloadPath: String
@@ -20,8 +20,6 @@ struct StandardTorrent {
     var uploaded: Int64
     var uploadRate: Int64
 }
-
-extension StandardTorrent: Equatable {}
 
 extension StandardTorrent {
     var ratio: Double {

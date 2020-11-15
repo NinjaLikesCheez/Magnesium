@@ -1,7 +1,4 @@
-struct FilterOptions {
+struct FilterOptions: Equatable, Codable {
     var state: TorrentState?
     var label: String?
 }
-
-extension FilterOptions: Codable {}
-extension FilterOptions: Equatable {}

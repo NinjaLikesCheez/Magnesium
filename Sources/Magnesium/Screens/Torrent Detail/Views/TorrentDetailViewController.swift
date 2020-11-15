@@ -15,7 +15,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     private var cancellables = Set<AnyCancellable>()
     private var dataSource: DataSource!
     private var isFirstSnapshot = true
-    private var expandedInfoIDs = Set<TorrentDetailInfoItem.ID>()
+    private var expandedInfoIDs = Set<String>()
 
     private lazy var doneBarButtonItem = UIBarButtonItem(
         barButtonSystemItem: .done,

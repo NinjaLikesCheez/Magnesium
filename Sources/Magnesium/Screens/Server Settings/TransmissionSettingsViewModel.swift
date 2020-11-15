@@ -41,7 +41,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.Screen.EditServer.serverName,
             placeholder: L10n.Server.transmission,
             value: nameSubject,
-            isEnabled: nameEnabled.ui().eraseToAnyPublisher(),
+            isEnabled: nameEnabled.ui(),
             configuration: TextInputItem.Configuration.default.withReturnKeyType(.next)
         )
 
@@ -50,7 +50,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.Screen.EditServer.serverURL,
             placeholder: "https://example.com",
             value: serverSubject,
-            isEnabled: serverEnabled.ui().eraseToAnyPublisher(),
+            isEnabled: serverEnabled.ui(),
             configuration: TextInputItem.Configuration.url.withReturnKeyType(.next)
         )
 
@@ -59,7 +59,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.Screen.EditServer.username,
             placeholder: L10n.Screen.EditServer.optionalUsernamePlaceholder,
             value: usernameSubject,
-            isEnabled: usernameEnabled.ui().eraseToAnyPublisher(),
+            isEnabled: usernameEnabled.ui(),
             configuration: TextInputItem.Configuration.username.withReturnKeyType(.next)
         )
 
@@ -68,7 +68,7 @@ final class TransmissionSettingsViewModel: ViewModel {
             name: L10n.Screen.EditServer.password,
             placeholder: L10n.Screen.EditServer.optionalPasswordPlaceholder,
             value: passwordSubject,
-            isEnabled: passwordEnabled.ui().eraseToAnyPublisher(),
+            isEnabled: passwordEnabled.ui(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
@@ -76,8 +76,8 @@ final class TransmissionSettingsViewModel: ViewModel {
             title: server == nil ? L10n.Screen.AddServer.title : L10n.Screen.EditServer.title,
             saveButtonTitle: server == nil ? L10n.Action.add : L10n.Action.save,
             canDelete: server != nil,
-            isLoading: isLoadingSubject.ui().eraseToAnyPublisher(),
-            isSaveButtonEnabled: isSaveButtonEnabledSubject.ui().eraseToAnyPublisher(),
+            isLoading: isLoadingSubject.ui(),
+            isSaveButtonEnabled: isSaveButtonEnabledSubject.ui(),
             inputs: [nameInput, serverInput, usernameInput, passwordInput]
         )
 

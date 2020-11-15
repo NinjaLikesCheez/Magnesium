@@ -1,9 +1,9 @@
 import Combine
 
-struct TorrentDetailInfoItem: Identifiable {
+struct TorrentDetailInfoItem: Equatable, Hashable {
     var name: String
-    var value: AnyPublisher<String, Never>
-    var expandedValue: AnyPublisher<String, Never>?
+    var value: UIPublisher<String>
+    var expandedValue: UIPublisher<String>?
 
     var id: String {
         name

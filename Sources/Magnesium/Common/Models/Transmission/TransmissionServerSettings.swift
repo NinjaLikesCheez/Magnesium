@@ -1,9 +1,6 @@
 import Foundation
 
-struct TransmissionServerSettings {
+struct TransmissionServerSettings: Equatable, Codable {
     var url: URL
     var username: String?
 }
-
-extension TransmissionServerSettings: Codable {}
-extension TransmissionServerSettings: Equatable {}

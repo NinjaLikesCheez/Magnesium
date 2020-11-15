@@ -1,7 +1,7 @@
 import Combine
 import UIKit
 
-struct TorrentListItem {
+struct TorrentListItem: Equatable, Hashable {
     let hash: String
     var name: UIPublisher<String>
     var label: UIPublisher<String>
@@ -24,23 +24,5 @@ extension TorrentListItem {
         speed = torrentSubject.map(\.localizedSpeed).ui()
         progressText = torrentSubject.map(\.localizedProgress).ui()
         ratioOrETA = torrentSubject.map(\.localizedRatioOrETA).ui()
-    }
-}
-
-extension TorrentListItem: Equatable {
-    static func == (lhs: TorrentListItem, rhs: TorrentListItem) -> Bool {
-        lhs.hash == rhs.hash
-    }
-}
-
-extension TorrentListItem: Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(hash)
-    }
-}
-
-extension TorrentListItem: Identifiable {
-    var id: String {
-        hash
     }
 }

@@ -1,4 +1,4 @@
-enum ServerType: String {
+enum ServerType: String, Codable {
     case deluge
     case transmission
 }
@@ -13,5 +13,3 @@ extension ServerType {
         }
     }
 }
-
-extension ServerType: Codable {}

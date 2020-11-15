@@ -1,7 +1,4 @@
-struct FilterSection {
+struct FilterSection: Equatable, Hashable {
     let type: FilterSectionType
     var items: [FilterItem]
 }
-
-extension FilterSection: Equatable {}
-extension FilterSection: Hashable {}

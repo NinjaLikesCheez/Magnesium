@@ -1,6 +1,4 @@
-struct TorrentDetailSection {
+struct TorrentDetailSection: Equatable {
     let type: TorrentDetailSectionType
     let items: [TorrentDetailItem]
 }
-
-extension TorrentDetailSection: Equatable {}

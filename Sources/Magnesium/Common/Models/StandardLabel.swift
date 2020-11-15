@@ -1,9 +1,7 @@
-struct StandardLabel {
+struct StandardLabel: Equatable {
     var name: String
     var count: Int
 }
-
-extension StandardLabel: Equatable {}
 
 extension StandardLabel {
     var displayName: String {

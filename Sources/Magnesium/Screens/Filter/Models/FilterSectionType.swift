@@ -1,7 +1,4 @@
-enum FilterSectionType {
+enum FilterSectionType: Equatable, Hashable {
     case sort
     case filters
 }
-
-extension FilterSectionType: Equatable {}
-extension FilterSectionType: Hashable {}

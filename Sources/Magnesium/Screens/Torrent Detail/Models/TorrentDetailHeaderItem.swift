@@ -1,21 +1,21 @@
 import Combine
 import UIKit
 
-struct TorrentDetailHeaderItem: Identifiable {
+struct TorrentDetailHeaderItem: Equatable, Hashable {
     let id: String
-    var name: AnyPublisher<String, Never>
-    var isActive: AnyPublisher<Bool, Never>
-    var progress: AnyPublisher<Float, Never>
-    var progressColor: AnyPublisher<UIColor, Never>
-    var status: AnyPublisher<String, Never>
-    var label: AnyPublisher<String, Never>
+    var name: UIPublisher<String>
+    var isActive: UIPublisher<Bool>
+    var progress: UIPublisher<Float>
+    var progressColor: UIPublisher<UIColor>
+    var status: UIPublisher<String>
+    var label: UIPublisher<String>
 
     init(torrentSubject: CurrentValueSubject<StandardTorrent, Never>) {
         id = torrentSubject.value.hash
-        name = torrentSubject.map(\.name).ui().eraseToAnyPublisher()
-        isActive = torrentSubject.map(\.isActive).ui().eraseToAnyPublisher()
-        progress = torrentSubject.map(\.progress).ui().eraseToAnyPublisher()
-        progressColor = torrentSubject.map(\.state.displayColor).ui().eraseToAnyPublisher()
+        name = torrentSubject.map(\.name).ui()
+        isActive = torrentSubject.map(\.isActive).ui()
+        progress = torrentSubject.map(\.progress).ui()
+        progressColor = torrentSubject.map(\.state.displayColor).ui()
         status = torrentSubject
             .map {
                 L10n.Torrent.torrentStatusWithPercentage(
@@ -24,7 +24,6 @@ struct TorrentDetailHeaderItem: Identifiable {
                 )
             }
             .ui()
-            .eraseToAnyPublisher()
-        label = torrentSubject.map(\.label).ui().eraseToAnyPublisher()
+        label = torrentSubject.map(\.label).ui()
     }
 }

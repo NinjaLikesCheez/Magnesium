@@ -9,7 +9,7 @@ extension PreferenceKey {
         .init("servers", defaultValue: [])
     }
 
-    static var selectedServerID: PreferenceKey<Server.ID?> {
+    static var selectedServerID: PreferenceKey<String?> {
         .init("selectedServerID", defaultValue: nil)
     }
 

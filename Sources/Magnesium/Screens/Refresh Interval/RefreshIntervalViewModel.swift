@@ -18,7 +18,7 @@ final class RefreshIntervalViewModel: ViewModel {
         values = .init(options: options.map { option in
             .init(
                 title: option.1,
-                isSelected: publisher.map { Int($0) == option.0 }.ui().eraseToAnyPublisher()
+                isSelected: publisher.map { Int($0) == option.0 }.ui()
             )
         })
     }
