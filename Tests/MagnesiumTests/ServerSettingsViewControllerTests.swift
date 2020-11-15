@@ -7,7 +7,7 @@ import XCTest
 class ServerSettingsViewControllerTests: TestCase {
     func test_snapshot_whenLoading() {
         var values = ServerSettingsViewValues.editServer
-        values.isLoading = Just(true).eraseToAnyPublisher()
+        values.isLoading = .init(true)
         let viewModel = StaticViewModel(event: ServerSettingsViewEvent.self, values: values)
         let viewController = ServerSettingsViewController(viewModel: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -49,8 +49,8 @@ private extension ServerSettingsViewValues {
             title: "Edit Server",
             saveButtonTitle: "Save",
             canDelete: true,
-            isLoading: Just(false).eraseToAnyPublisher(),
-            isSaveButtonEnabled: Just(true).eraseToAnyPublisher(),
+            isLoading: .init(false),
+            isSaveButtonEnabled: .init(true),
             inputs: [
                 .init(
                     name: "server",

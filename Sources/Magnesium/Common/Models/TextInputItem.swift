@@ -5,7 +5,7 @@ struct TextInputItem {
     var name: String
     var placeholder: String
     var value: CurrentValueSubject<String?, Never>
-    var isEnabled: UIPublisher<Bool> = .init(value: false)
+    var isEnabled: UIPublisher<Bool> = .init(false)
     var configuration: Configuration
 }
 

@@ -7,8 +7,8 @@ import XCTest
 class RefreshIntervalViewControllerTests: TestCase {
     func test_snapshot() {
         let values = RefreshIntervalViewValues(options: [
-            .init(title: "2 seconds", isSelected: Just(true).eraseToAnyPublisher()),
-            .init(title: "5 seconds", isSelected: Just(false).eraseToAnyPublisher()),
+            .init(title: "2 seconds", isSelected: .init(true)),
+            .init(title: "5 seconds", isSelected: .init(false)),
         ])
         let viewModel = StaticViewModel(event: RefreshIntervalViewEvent.self, values: values)
         let viewController = RefreshIntervalViewController(viewModel: viewModel)

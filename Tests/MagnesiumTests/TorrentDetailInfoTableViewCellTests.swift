@@ -73,8 +73,8 @@ private extension TorrentDetailInfoTableViewCell {
         cell.configure(
             with: .init(
                 name: name,
-                value: Just(value).eraseToAnyPublisher(),
-                expandedValue: Just(expandedValue).eraseToAnyPublisher()
+                value: .init(value),
+                expandedValue: .init(expandedValue)
             ),
             isExpanded: isExpanded,
             isLastRow: isLastRow

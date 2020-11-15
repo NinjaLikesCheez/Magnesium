@@ -12,51 +12,6 @@ class TorrentListItemTests: TestCase {
         item = TorrentListItem(torrentSubject: subject)
     }
 
-    func test_identity_shouldBeEqualToHash() {
-        let torrent1 = StandardTorrent.mock(hash: "A")
-        var torrent2 = StandardTorrent.mock(hash: "A")
-        XCTAssertEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).id,
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).id
-        )
-
-        torrent2.hash = "B"
-        XCTAssertNotEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).id,
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).id
-        )
-    }
-
-    func test_equality_shouldBeDerivedFromID() {
-        let torrent1 = StandardTorrent.mock(hash: "A")
-        var torrent2 = StandardTorrent.mock(hash: "A")
-        XCTAssertEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)),
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2))
-        )
-
-        torrent2.hash = "B"
-        XCTAssertNotEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)),
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2))
-        )
-    }
-
-    func test_hashValue_shouldBeDerivedFromID() {
-        let torrent1 = StandardTorrent.mock(hash: "A")
-        var torrent2 = StandardTorrent.mock(hash: "A")
-        XCTAssertEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).hashValue,
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).hashValue
-        )
-
-        torrent2.hash = "B"
-        XCTAssertNotEqual(
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent1)).hashValue,
-            TorrentListItem(torrentSubject: CurrentValueSubject(torrent2)).hashValue
-        )
-    }
-
     func test_name() throws {
         subject.send(.mock(name: "name"))
         XCTAssertEqual(try item.name.first().wait().singleValue(), "name")

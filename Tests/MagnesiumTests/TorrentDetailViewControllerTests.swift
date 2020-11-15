@@ -13,13 +13,13 @@ class TorrentDetailViewControllerTests: TestCase {
                 .init(type: .info, items: [
                     .info(.init(
                         name: "Name",
-                        value: Just("Value").eraseToAnyPublisher(),
-                        expandedValue: Just("Expanded").eraseToAnyPublisher()
+                        value: .init("Value"),
+                        expandedValue: .init("Expanded")
                     )),
                     .info(.init(
                         name: "Another Name",
-                        value: Just("Value").eraseToAnyPublisher(),
-                        expandedValue: Just("Expanded").eraseToAnyPublisher()
+                        value: .init("Value"),
+                        expandedValue: .init("Expanded")
                     )),
                 ]),
                 .init(type: .trackers, items: [
