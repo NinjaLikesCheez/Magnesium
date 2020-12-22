@@ -13,7 +13,7 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -21,18 +21,12 @@ final class TorrentDetailTrackerTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setup() {
-        selectionStyle = .none
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
+        selectionStyle = .none
+
         contentView.addSubview(trackerLabel)
         contentView.addSubview(separatorView)
-    }
 
-    private func setupLayoutConstraints() {
         trackerLabel.translatesAutoresizingMaskIntoConstraints = false
         separatorView.translatesAutoresizingMaskIntoConstraints = false
 

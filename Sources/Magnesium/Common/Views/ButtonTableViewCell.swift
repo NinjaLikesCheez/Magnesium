@@ -48,14 +48,11 @@ final class ButtonTableViewCell: UITableViewCell {
 
     private func setup() {
         setupViews()
-        setupLayoutConstraints()
     }
 
     private func setupViews() {
         contentView.addSubview(titleLabel)
-    }
 
-    private func setupLayoutConstraints() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         heightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0).withPriority(.required - 1)

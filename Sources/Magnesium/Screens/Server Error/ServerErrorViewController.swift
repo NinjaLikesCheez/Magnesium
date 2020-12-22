@@ -58,15 +58,12 @@ final class ServerErrorViewController<VM: ViewModel>: PresentableViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        setupLayoutConstraints()
     }
 
     private func setupViews() {
         view.backgroundColor = .systemBackground
         view.addSubview(stackView)
-    }
 
-    private func setupLayoutConstraints() {
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([

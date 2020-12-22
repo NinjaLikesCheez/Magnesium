@@ -12,7 +12,7 @@ final class ToolbarInfoView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -20,16 +20,9 @@ final class ToolbarInfoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setup() {
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
         addSubview(contentLabel)
-    }
 
-    private func setupLayoutConstraints() {
         contentLabel.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([

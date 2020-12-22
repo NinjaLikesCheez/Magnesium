@@ -66,7 +66,7 @@ final class TorrentTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -79,11 +79,6 @@ final class TorrentTableViewCell: UITableViewCell {
         cancellables.removeAll()
     }
 
-    private func setup() {
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(labelLabel)
@@ -92,9 +87,7 @@ final class TorrentTableViewCell: UITableViewCell {
         contentView.addSubview(speedLabel)
         contentView.addSubview(progressLabel)
         contentView.addSubview(ratioOrETALabel)
-    }
 
-    private func setupLayoutConstraints() {
         for view in [nameLabel, labelLabel, progressView, statusLabel, speedLabel, progressLabel, ratioOrETALabel] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }

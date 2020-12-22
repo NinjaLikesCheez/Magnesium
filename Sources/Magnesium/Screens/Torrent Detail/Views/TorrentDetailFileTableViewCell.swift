@@ -33,7 +33,7 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -46,20 +46,13 @@ final class TorrentDetailFileTableViewCell: UITableViewCell {
         cancellables.removeAll()
     }
 
-    private func setup() {
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
         priorityImageViewContainer.addSubview(priorityImageView)
 
         contentView.addSubview(topStackView)
         contentView.addSubview(infoLabel)
         contentView.addSubview(separatorView)
-    }
 
-    private func setupLayoutConstraints() {
         // priorityImageViewContainer
 
         priorityImageView.translatesAutoresizingMaskIntoConstraints = false

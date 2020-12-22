@@ -17,7 +17,7 @@ final class TorrentDetailSectionHeaderView: UITableViewHeaderFooterView {
 
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -25,17 +25,10 @@ final class TorrentDetailSectionHeaderView: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setup() {
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(actionButton)
-    }
 
-    private func setupLayoutConstraints() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         actionButton.translatesAutoresizingMaskIntoConstraints = false
 

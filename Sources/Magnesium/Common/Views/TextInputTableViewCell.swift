@@ -42,15 +42,12 @@ final class TextInputTableViewCell: UITableViewCell {
     private func setup() {
         selectionStyle = .none
         setupViews()
-        setupLayoutConstraints()
     }
 
     private func setupViews() {
         contentView.addSubview(nameLabel)
         contentView.addSubview(textField)
-    }
 
-    private func setupLayoutConstraints() {
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         textField.translatesAutoresizingMaskIntoConstraints = false
 

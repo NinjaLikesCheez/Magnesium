@@ -44,7 +44,7 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -57,18 +57,12 @@ final class TorrentDetailInfoTableViewCell: UITableViewCell {
         cancellables.removeAll()
     }
 
-    private func setup() {
-        selectionStyle = .none
-        setupViews()
-        setupLayoutConstraints()
-    }
-
     private func setupViews() {
+        selectionStyle = .none
+
         contentView.addSubview(verticalStackView)
         contentView.addSubview(separatorView)
-    }
 
-    private func setupLayoutConstraints() {
         verticalStackView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.translatesAutoresizingMaskIntoConstraints = false
 

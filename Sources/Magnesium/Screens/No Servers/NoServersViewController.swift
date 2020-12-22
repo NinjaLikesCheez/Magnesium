@@ -56,15 +56,12 @@ final class NoServersViewController<VM: ViewModel>: PresentableViewController wh
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        setupLayoutConstraints()
     }
 
     private func setupViews() {
         view.backgroundColor = .systemBackground
         view.addSubview(stackView)
-    }
 
-    private func setupLayoutConstraints() {
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([

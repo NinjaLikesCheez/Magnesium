@@ -74,7 +74,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setup()
+        setupViews()
     }
 
     @available(*, unavailable)
@@ -123,22 +123,14 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         cancellables.removeAll()
     }
 
-    private func setup() {
-        selectionStyle = .none
-        UIView.performWithoutAnimation {
-            setupViews()
-            setupLayoutConstraints()
-        }
-    }
-
     private func setupViews() {
+        selectionStyle = .none
+
         contentView.addSubview(topLabelsStackView)
         contentView.addSubview(progressView)
         contentView.addSubview(statusLabel)
         contentView.addSubview(buttonStackView)
-    }
 
-    private func setupLayoutConstraints() {
         for view in [topLabelsStackView, progressView, statusLabel, buttonStackView] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
