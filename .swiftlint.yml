@@ -48,6 +48,7 @@ analyzer_rules:
 disabled_rules:
   - file_length
   - function_body_length
+  - inclusive_language
   - type_body_length
 
 opt_in_rules:

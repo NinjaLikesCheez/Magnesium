@@ -24,7 +24,6 @@ if [ -n "$(scripts/LocalizationLint.swift)" ]; then
 fi
 
 xcrun xcodebuild -version
-xcrun xcodebuild -derivedDataPath build -scheme Magnesium -resolvePackageDependencies
 xcrun xcodebuild "${XCODEBUILD_ARGS[@]}" -derivedDataPath build -scheme Magnesium clean build test \
   | tools/mint run xcbeautify
 
