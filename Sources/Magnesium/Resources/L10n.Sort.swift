@@ -18,6 +18,10 @@ extension L10n {
             NSLocalizedString("sort.upload-speed", comment: "Upload Speed")
         }
 
+        static var progress: String {
+            NSLocalizedString("sort.progress", comment: "Progress")
+        }
+
         static func ascending(property: String) -> String {
             let format = NSLocalizedString("sort.direction-ascending", comment: "↑ {property}")
             return .localizedStringWithFormat(format, property)

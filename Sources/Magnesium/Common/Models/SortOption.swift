@@ -27,6 +27,7 @@ extension SortOption {
         case name
         case downloadSpeed
         case uploadSpeed
+        case progress
     }
 }
 
@@ -35,7 +36,7 @@ extension SortOption.Property {
         switch self {
         case .name:
             return .ascending
-        case .dateAdded, .downloadSpeed, .uploadSpeed:
+        case .dateAdded, .downloadSpeed, .uploadSpeed, .progress:
             return .descending
         }
     }
@@ -81,6 +82,8 @@ extension SortOption.Property {
             return L10n.Sort.downloadSpeed
         case .uploadSpeed:
             return L10n.Sort.uploadSpeed
+        case .progress:
+            return L10n.Sort.progress
         }
     }
 }

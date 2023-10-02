@@ -79,6 +79,12 @@ final class TorrentMapper: ValueMapper<String, StandardTorrent> {
                     ? .orderedSame
                     : $0.uploadRate < $1.uploadRate ? .orderedAscending : .orderedDescending
             }
+        case .progress:
+            compare = {
+                $0.progress == $1.progress
+                ? .orderedSame
+                : $0.progress < $1.progress ? .orderedAscending : .orderedDescending
+            }
         }
 
         return torrents.sorted { subject1, subject2 -> Bool in

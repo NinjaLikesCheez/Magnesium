@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -280,7 +280,7 @@
 		11F397B5288EE7BCF6850216 /* NoServersViewModelEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersViewModelEvent.swift; sourceTree = "<group>"; };
 		12EBD5F522B120266A9D4476 /* StructReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructReference.swift; sourceTree = "<group>"; };
 		133C123F6195CC44E6BFE1F5 /* ToolbarInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarInfoView.swift; sourceTree = "<group>"; };
-		13DDF854F04D9B09302A89C8 /* Magnesium.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13DDF854F04D9B09302A89C8 /* Magnesium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Magnesium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15239AACBAE838E809C39EEC /* NoServersCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoServersCoordinatorTests.swift; sourceTree = "<group>"; };
 		15CE343D940EFB07125805FE /* TorrentMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TorrentMapperTests.swift; sourceTree = "<group>"; };
 		1606F4B4A8FDE5118AF4DBA9 /* StandardTorrentDetailImplementation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardTorrentDetailImplementation.swift; sourceTree = "<group>"; };
@@ -1045,7 +1045,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5766926C6F7224C633FEE0A8 /* Build configuration list for PBXNativeTarget "Magnesium" */;
 			buildPhases = (
-				24B35DB07DC5A5AD078E7620 /* SwiftLint */,
 				DAF6FEF69BF09A78912AF417 /* Localization Lint */,
 				A6BCF23BE16FE4958E717456 /* Sources */,
 				357298692CA6251BD512F3A2 /* Resources */,
@@ -1100,11 +1099,6 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1200;
-				TargetAttributes = {
-					02B1F42366609E3533897ADB = {
-						DevelopmentTeam = 3RLT5NMM8V;
-					};
-				};
 			};
 			buildConfigurationList = 035FAA594E5B02EE4B99C7EE /* Build configuration list for PBXProject "Magnesium" */;
 			compatibilityVersion = "Xcode 10.0";
@@ -1154,24 +1148,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		24B35DB07DC5A5AD078E7620 /* SwiftLint */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = SwiftLint;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "tools/mint run swiftlint lint";
-		};
 		DAF6FEF69BF09A78912AF417 /* Localization Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1188,7 +1164,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = scripts/LocalizationLint.swift;
+			shellScript = "scripts/LocalizationLint.swift\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1581,13 +1557,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 3RLT5NMM8V;
+				DEVELOPMENT_TEAM = M2QJQZX6EU;
 				INFOPLIST_FILE = Sources/Magnesium/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ca.jameshurst.Magnesium;
+				PRODUCT_BUNDLE_IDENTIFIER = "ca.jameshurst.Magnesium-ninja";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1615,13 +1591,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 3RLT5NMM8V;
+				DEVELOPMENT_TEAM = M2QJQZX6EU;
 				INFOPLIST_FILE = Sources/Magnesium/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = ca.jameshurst.Magnesium;
+				PRODUCT_BUNDLE_IDENTIFIER = "ca.jameshurst.Magnesium-ninja";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

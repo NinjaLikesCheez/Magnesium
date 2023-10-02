@@ -341,6 +341,9 @@
 /* Upload Speed */
 "sort.upload-speed" = "Upload Speed";
 
+/* Progress */
+"sort.progress" = "Progress";
+
 /* Checking */
 "torrent.checking-state" = "Checking";
 
