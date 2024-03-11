@@ -191,7 +191,7 @@ private extension TorrentListCoordinator {
             else {
                 return nil
             }
-            let client = Current.deluge(settings.url, keychain.password)
+					let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
             let viewModel = StandardTorrentListViewModel(
                 implementation: .deluge(.init(client: client)),
                 server: server

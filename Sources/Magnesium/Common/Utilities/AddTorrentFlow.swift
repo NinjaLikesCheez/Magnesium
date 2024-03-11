@@ -58,7 +58,7 @@ final class AddTorrentFlow {
                 return
             }
 
-            let client = Current.deluge(settings.url, keychain.password)
+            let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
             let request: AnyPublisher<Void, Error>
 
             switch type {

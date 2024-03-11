@@ -206,6 +206,12 @@
 /* username */
 "screen.edit-server.username" = "username";
 
+/* basic authentication username */
+"screen.edit-server.basic-auth-username" = "basic authentication username";
+
+/* basic authentication password */
+"screen.edit-server.basic-auth-password" = "basic authentication password";
+
 /* Filter by Label */
 "screen.filter.filter-by-label" = "Filter by Label";
 

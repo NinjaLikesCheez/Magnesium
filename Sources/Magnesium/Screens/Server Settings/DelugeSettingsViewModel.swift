@@ -12,6 +12,11 @@ final class DelugeSettingsViewModel: ViewModel {
     private let nameSubject: CurrentValueSubject<String?, Never>
     private let serverSubject: CurrentValueSubject<String?, Never>
     private let passwordSubject: CurrentValueSubject<String?, Never>
+
+    // HTTP Basic Authentication
+    private let basicAuthenticationUsernameSubject: CurrentValueSubject<String?, Never>
+    private let basicAuthenticationPasswordSubject: CurrentValueSubject<String?, Never>
+
     private var cancellables = Set<AnyCancellable>()
     let values: ServerSettingsViewValues
 
@@ -33,6 +38,8 @@ final class DelugeSettingsViewModel: ViewModel {
         nameSubject = .init(server?.name)
         serverSubject = .init(settings?.url.absoluteString)
         passwordSubject = .init(keychain?.password)
+        basicAuthenticationUsernameSubject = .init(keychain?.basicAuthentication?.username)
+        basicAuthenticationPasswordSubject = .init(keychain?.basicAuthentication?.password)
 
         let nameEnabled = CurrentValueSubject<Bool, Never>(true)
         let nameInput = TextInputItem(
@@ -58,6 +65,24 @@ final class DelugeSettingsViewModel: ViewModel {
             placeholder: L10n.Screen.EditServer.passwordPlaceholder,
             value: passwordSubject,
             isEnabled: passwordEnabled.ui(),
+            configuration: TextInputItem.Configuration.password.withReturnKeyType(.next)
+        )
+
+        let basicAuthenticationUsernameEnabled = CurrentValueSubject<Bool, Never>(true)
+        let basicAuthenticationUsernameInput = TextInputItem(
+            name: L10n.Screen.EditServer.basicAuthenticationUsername,
+            placeholder: L10n.Screen.EditServer.basicAuthenticationUsername,
+            value: basicAuthenticationUsernameSubject,
+            isEnabled: basicAuthenticationUsernameEnabled.ui(),
+            configuration: TextInputItem.Configuration.username.withReturnKeyType(.next)
+        )
+
+        let basicAuthenticationPasswordEnabled = CurrentValueSubject<Bool, Never>(true)
+        let basicAuthenticationPasswordInput = TextInputItem(
+            name: L10n.Screen.EditServer.basicAuthenticationPassword,
+            placeholder: L10n.Screen.EditServer.passwordPlaceholder,
+            value: basicAuthenticationPasswordSubject,
+            isEnabled: basicAuthenticationPasswordEnabled.ui(),
             configuration: TextInputItem.Configuration.password.withReturnKeyType(.send)
         )
 
@@ -67,7 +92,13 @@ final class DelugeSettingsViewModel: ViewModel {
             canDelete: server != nil,
             isLoading: isLoadingSubject.ui(),
             isSaveButtonEnabled: isSaveButtonEnabledSubject.ui(),
-            inputs: [nameInput, serverInput, passwordInput]
+            inputs: [
+                nameInput,
+                serverInput,
+                passwordInput,
+                basicAuthenticationUsernameInput,
+                basicAuthenticationPasswordInput,
+            ]
         )
 
         nameSubject
@@ -115,7 +146,16 @@ final class DelugeSettingsViewModel: ViewModel {
 
         isLoadingSubject.send(true)
 
-        let client = Current.deluge(url, password)
+        var basicAuthentication: BasicAuthentication?
+
+        if
+            let basicUsername = basicAuthenticationUsernameSubject.value,
+            let basicPassword = basicAuthenticationPasswordSubject.value
+        {
+            basicAuthentication = .init(username: basicUsername, password: basicPassword)
+        }
+
+        let client = Current.deluge(url, password, basicAuthentication)
         let errorTitle = server == nil ? L10n.Error.failedToAddServer : L10n.Error.failedToSaveServer
         client.request(.authenticate)
             .receive(on: UIScheduler.shared)
@@ -124,7 +164,7 @@ final class DelugeSettingsViewModel: ViewModel {
                 case .finished:
                     do {
                         let settings = DelugeServerSettings(url: url)
-                        let keychain = DelugeKeychainData(password: password)
+                        let keychain = DelugeKeychainData(password: password, basicAuthentication: basicAuthentication)
                         try self?.saveServer(name: name, settings: settings, keychain: keychain)
                     } catch {
                         self?.showError(title: errorTitle, message: error.localizedDescription)
