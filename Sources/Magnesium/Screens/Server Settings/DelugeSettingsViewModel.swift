@@ -146,7 +146,7 @@ final class DelugeSettingsViewModel: ViewModel {
 
         isLoadingSubject.send(true)
 
-        var basicAuthentication: BasicAuthentication?
+        var basicAuthentication: Deluge.BasicAuthentication?
 
         if
             let basicUsername = basicAuthenticationUsernameSubject.value,

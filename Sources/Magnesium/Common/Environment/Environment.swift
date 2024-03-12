@@ -5,7 +5,7 @@ import Preferences
 import Transmission
 
 struct Environment {
-    var deluge: (URL, String, BasicAuthentication?) -> DelugeClient
+    var deluge: (URL, String, Deluge.BasicAuthentication?) -> DelugeClient
     var transmission: (URL, String?, String?) -> TransmissionClient
     var preferences: Preferences
     var keychain: Keychain
