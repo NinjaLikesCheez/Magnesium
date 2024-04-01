@@ -26,6 +26,9 @@
 /* Move Download Folder */
 "action.move-download-folder" = "Move Download Folder";
 
+/* Copy Download Folder Path */
+"action.copy-download-folder-path" = "Copy Download Folder Path";
+
 /* OK */
 "action.ok" = "OK";
 
@@ -97,6 +100,9 @@
 
 /* Failed to Move Download Folder */
 "error.failed-to-move-download-folder" = "Failed to Move Download Folder";
+
+/* Failed to Get Download Folder */
+"error.failed-to-get-download-folder" = "Failed to Get Download Folder";
 
 /* Failed to Pause */
 "error.failed-to-pause" = "Failed to Pause";

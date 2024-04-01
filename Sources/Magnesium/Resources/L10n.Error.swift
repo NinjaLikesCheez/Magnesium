@@ -6,6 +6,10 @@ extension L10n {
             NSLocalizedString("error.failed-to-pause", comment: "Failed to Pause")
         }
 
+        static var failedToGetDownloadFolder: String {
+            NSLocalizedString("error.failed-to-get-download-folder", comment: "Failed to Get Download Folder")
+        }
+
         static var failedToResume: String {
             NSLocalizedString("error.failed-to-resume", comment: "Failed to Resume")
         }

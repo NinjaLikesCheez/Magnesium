@@ -81,5 +81,9 @@ extension L10n {
         static var sort: String {
             NSLocalizedString("action.sort", comment: "Sort")
         }
+
+        static var copyDownloadPaths: String {
+            NSLocalizedString("action.copy-download-folder-paths", comment: "Copy Download Folder Path")
+        }
     }
 }

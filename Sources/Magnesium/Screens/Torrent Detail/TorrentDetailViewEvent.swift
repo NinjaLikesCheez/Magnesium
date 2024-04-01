@@ -9,6 +9,7 @@ enum TorrentDetailViewEvent {
     case pauseSelected
     case resumeSelected
     case removeSelected(source: PopoverSource)
+    case copyDownloadFolderPathSelected
     case editSectionSelected(TorrentDetailSectionType)
     case doneEditingSelected
     case multiSelectUpdated(indexPaths: [IndexPath])

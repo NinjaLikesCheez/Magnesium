@@ -4,6 +4,7 @@ import UIKit
 protocol TorrentDetailHeaderTableViewCellDelegate: AnyObject {
     func headerDidSelectPause(_ header: TorrentDetailHeaderTableViewCell)
     func headerDidSelectResume(_ header: TorrentDetailHeaderTableViewCell)
+    func headerDidSelectCopyFilePath(_ header: TorrentDetailHeaderTableViewCell)
     func headerDidSelectRemove(_ header: TorrentDetailHeaderTableViewCell, sender: UIView)
     func headerDidResize(_ header: TorrentDetailHeaderTableViewCell)
 }
@@ -45,25 +46,36 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         $0.textColor = .systemGray
     }
 
-    private lazy var buttonStackView = with(UIStackView(arrangedSubviews: [pauseButton, removeButton])) {
+    private lazy var buttonsStackView = with(UIStackView(arrangedSubviews: [controlButtonStackView, copyPathButton])) {
+        $0.axis = .vertical
+        $0.spacing = 12
+        $0.distribution = .fillEqually
+    }
+
+    private lazy var controlButtonStackView = with(UIStackView(arrangedSubviews: [pauseButton, removeButton])) {
         $0.axis = .horizontal
         $0.spacing = 12
         $0.distribution = .fillEqually
     }
 
-    private lazy var pauseButton = with(UIButton(type: .custom)) {
-        $0.tintColor = .systemBlue
+    private lazy var pauseButton = with(UIButton(type: .system)) {
         $0.setPreferredSymbolConfiguration(.init(textStyle: .body), forImageIn: .normal)
-        $0.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         $0.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
     }
 
-    private lazy var removeButton = with(UIButton(type: .custom)) {
+    private lazy var removeButton = with(UIButton(type: .system)) {
         $0.tintColor = .systemRed
         let configuration = UIImage.SymbolConfiguration(textStyle: .body)
         $0.setImage(UIImage(systemName: "trash.fill", withConfiguration: configuration), for: .normal)
-        $0.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         $0.addTarget(self, action: #selector(removeButtonTapped(_:)), for: .touchUpInside)
+    }
+
+    private lazy var copyPathButton = with(UIButton(type: .system)) {
+        $0.tintColor = .systemBlue
+        let configuration = UIImage.SymbolConfiguration(textStyle: .body)
+        $0.setImage(UIImage(systemName: "doc.on.doc", withConfiguration: configuration), for: .normal)
+        $0.setTitle("Copy File Path", for: .normal)
+        $0.addTarget(self, action: #selector(copyPathButtonTapped(_:)), for: .touchUpInside)
     }
 
     private var isActive = true {
@@ -98,6 +110,12 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             mask.path = UIBezierPath(roundedRect: removeButton.bounds, cornerRadius: 8).cgPath
             return mask
         }()
+        copyPathButton.layoutIfNeeded()
+        copyPathButton.layer.mask = {
+            let mask = CAShapeLayer()
+            mask.path = UIBezierPath(roundedRect: copyPathButton.bounds, cornerRadius: 8).cgPath
+            return mask
+        }()
     }
 
     override func updateConstraints() {
@@ -115,6 +133,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             pauseButton.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
             removeButton.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
+            copyPathButton.setBackgroundImage(UIImage(color: .tertiarySystemFill), for: .normal)
         }
     }
 
@@ -129,9 +148,9 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         contentView.addSubview(topLabelsStackView)
         contentView.addSubview(progressView)
         contentView.addSubview(statusLabel)
-        contentView.addSubview(buttonStackView)
+        contentView.addSubview(buttonsStackView)
 
-        for view in [topLabelsStackView, progressView, statusLabel, buttonStackView] {
+        for view in [topLabelsStackView, progressView, statusLabel, buttonsStackView] {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
 
@@ -139,7 +158,7 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
         labelLabel.setContentCompressionResistancePriority(.defaultHigh - 1, for: .vertical)
         statusLabel.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
 
-        buttonHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 0)
+        buttonHeightConstraint = controlButtonStackView.heightAnchor.constraint(equalToConstant: 0)
 
         NSLayoutConstraint.activate([
             topLabelsStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
@@ -155,10 +174,10 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
             statusLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             statusLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 8),
 
-            buttonStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            buttonStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            buttonStackView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
-            buttonStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
+            buttonsStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            buttonsStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            buttonsStackView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
+            buttonsStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             buttonHeightConstraint!,
         ])
     }
@@ -221,5 +240,10 @@ final class TorrentDetailHeaderTableViewCell: UITableViewCell {
     @objc
     private func removeButtonTapped(_ sender: UIButton) {
         delegate?.headerDidSelectRemove(self, sender: sender)
+    }
+
+    @objc
+    private func copyPathButtonTapped(_ sender: UIButton) {
+        delegate?.headerDidSelectCopyFilePath(self)
     }
 }

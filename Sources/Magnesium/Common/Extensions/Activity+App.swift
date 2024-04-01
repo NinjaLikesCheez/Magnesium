@@ -37,4 +37,13 @@ extension Activity {
             handler: handler
         )
     }
+
+    static func copyDownloadPaths(handler: @escaping () -> Void) -> Activity {
+        .init(
+            title: L10n.Action.copyDownloadPaths,
+            image: UIImage(systemName: "doc.on.doc"),
+            type: "ca.jameshurt.Magnesium.copy-download-path",
+            handler: handler
+        )
+    }
 }

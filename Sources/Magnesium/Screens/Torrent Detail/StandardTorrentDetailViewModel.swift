@@ -195,6 +195,8 @@ final class StandardTorrentDetailViewModel: ViewModel {
             pause()
         case .resumeSelected:
             resume()
+        case .copyDownloadFolderPathSelected:
+            copyDownloadFolderPath()
         case let .removeSelected(source):
             presentRemoveOptions(from: source)
         case let .editSectionSelected(section):
@@ -265,7 +267,25 @@ final class StandardTorrentDetailViewModel: ViewModel {
             self.updateTrackers()
         })
 
+        activities.append(.copyDownloadPaths {
+            self.copyDownloadFolderPath()
+        })
+
         eventSubject.send(.activities(activities, torrent: torrent, source: source))
+    }
+
+    private func copyDownloadFolderPath() {
+        let downloadPath = torrentSubject.value.downloadPath
+
+        implementation.paths(torrentSubject.value)
+            .receive(on: UIScheduler.shared)
+            .sink(receiveCompletion: { [weak self] completion in
+                guard case let .failure(error) = completion else { return }
+                self?.showError(title: L10n.Error.failedToPause, message: error.localizedDescription)
+            }, receiveValue: { paths in
+                UIPasteboard.general.string = downloadPath + "/" + paths[0]
+            })
+            .store(in: &cancellables)
     }
 
     private func pause() {

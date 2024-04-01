@@ -87,6 +87,7 @@ final class TorrentDetailViewController<VM: ViewModel>: PresentableTableViewCont
     // MARK: Configuration
 
     private func configureView() {
+        tableView.delaysContentTouches = false // allow content touches for buttons in the table view cell
         tableView.cellLayoutMarginsFollowReadableWidth = true
         tableView.separatorStyle = .none
         tableView.contentInset.top = 20
@@ -438,6 +439,10 @@ extension TorrentDetailViewController: TorrentDetailHeaderTableViewCellDelegate 
     func headerDidResize(_ header: TorrentDetailHeaderTableViewCell) {
         tableView.beginUpdates()
         tableView.endUpdates()
+    }
+
+    func headerDidSelectCopyFilePath(_ header: TorrentDetailHeaderTableViewCell) {
+        viewModel.send(.copyDownloadFolderPathSelected)
     }
 }
 
