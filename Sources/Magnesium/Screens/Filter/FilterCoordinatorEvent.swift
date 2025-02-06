@@ -1,3 +1,0 @@
-enum FilterCoordinatorEvent {
-    case complete
-}

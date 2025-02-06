@@ -1,64 +1,38 @@
 name: Magnesium
 options:
-  bundleIdPrefix: ca.jameshurst
-  deploymentTarget:
-    iOS: "13.0"
+  minimumXcodeGenVersion: 2.42.0
+configFiles:
+  Debug: config/Debug.xcconfig
+  Release: config/Release.xcconfig
 packages:
-  Components:
-    path: Sources/Components
   Deluge:
-    url: https://github.com/jameshurst/Deluge-Swift.git
-    from: 1.0.0
-  Transmission:
-    url: https://github.com/jameshurst/Transmission-Swift.git
-    from: 1.0.0
-  CombineWaiting:
-    url: https://github.com/jameshurst/CombineWaiting.git
-    from: 0.2.0
-  SnapshotTesting:
-    url: https://github.com/pointfreeco/swift-snapshot-testing.git
-    from: 1.8.2
+    path: ../Deluge-Swift
+    # url: https://github.com/jameshurst/Deluge-Swift
+    # branch: connected
+  QBittorrent:
+    # path: ../QBittorrent-Swift
+    url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
+    branch: main
+  Logging:
+    url: https://github.com/apple/swift-log
+    from: 1.6.2
 targets:
   Magnesium:
     type: application
-    sources: Sources/Magnesium
-    platform: iOS
-    dependencies:
-      - package: Components
-        product: Coordinator
-      - package: Components
-        product: Preferences
-      - package: Components
-        product: Keychain
-      - package: Components
-        product: ViewModel
-      - package: Components
-        product: Extensions
-      - package: Components
-        product: CommonModels
-      - package: Deluge
-      - package: Transmission
-    preBuildScripts:
-      - name: SwiftLint
-        script: tools/mint run swiftlint lint
-      - name: Localization Lint
-        script: scripts/LocalizationLint.swift
-    scheme:
-      testTargets:
-        - MagnesiumTests
-      gatherCoverageData: true
-    settings:
-      DEVELOPMENT_TEAM: 3RLT5NMM8V
-  MagnesiumTests:
-    type: bundle.unit-test
+    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    deploymentTarget:
+      iOS: 18.0
+      tvOS: 18.0
+      macOS: 15.0
+      visionOS: 2.0
     sources:
-      - path: Tests/MagnesiumTests
-        excludes:
-          - "**/__Snapshots__"
-    platform: iOS
+      - Magnesium
+    info:
+      path: Sources/Magnesium/Resources/Info.plist
+    configFiles:
+      Debug: config/Magnesium-Debug.xcconfig
+      Release: config/Magnesium-Release.xcconfig
     dependencies:
-      - target: Magnesium
-      - package: Components
-        product: TestExtensions
-      - package: CombineWaiting
-      - package: SnapshotTesting
+      - package: Deluge
+      - package: QBittorrent
+      - package: Logging

@@ -1,9 +1,0 @@
-[
-  {
-    "args" : [
-      "A",
-      "label"
-    ],
-    "method" : "label.set_torrent"
-  }
-]
