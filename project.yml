@@ -10,9 +10,9 @@ packages:
     # url: https://github.com/jameshurst/Deluge-Swift
     # branch: connected
   QBittorrent:
-    # path: ../QBittorrent-Swift
-    url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
-    branch: main
+    path: ../QBittorrent-Swift
+    # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
+    # branch: main
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
@@ -27,8 +27,15 @@ targets:
       visionOS: 2.0
     sources:
       - Magnesium
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.Magnesium
     info:
       path: Sources/Magnesium/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Magnesium
+        CFBundleIdentifier: ca.jameshurst.Magnesium
+        UILaunchScreen:
+          UIColorName: White
     configFiles:
       Debug: config/Magnesium-Debug.xcconfig
       Release: config/Magnesium-Release.xcconfig

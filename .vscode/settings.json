@@ -2,5 +2,6 @@
 	"[swift]": {
 		"editor.defaultFormatter": "sweetpad.sweetpad",
 		"editor.formatOnSave": true
-	}
+	},
+	"sweetpad.xcodegen.autogenerate": true
 }
