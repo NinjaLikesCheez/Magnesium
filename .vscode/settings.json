@@ -3,5 +3,9 @@
 		"editor.defaultFormatter": "sweetpad.sweetpad",
 		"editor.formatOnSave": true
 	},
-	"sweetpad.xcodegen.autogenerate": true
+	"sweetpad.xcodegen.autogenerate": true,
+	"cSpell.words": [
+		"Borderless",
+		"checkmark"
+	]
 }
