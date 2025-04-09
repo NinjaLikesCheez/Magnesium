@@ -1,11 +1,13 @@
 import Foundation
 
 struct TorrentMapper {
-	static func map(_ torrents: [StandardTorrent], query: String) -> [StandardTorrent] {
-		let sortOption = Current.preferences[.sortOption]
-		let filterOptions = Current.preferences[.filterOptions]
-
-		return Self.sort(
+	static func map(
+		_ torrents: [StandardTorrent],
+		query: String,
+		sortOption: SortOption,
+		filterOptions: FilterOptions
+	) -> [StandardTorrent] {
+		Self.sort(
 			Self.filter(torrents, using: filterOptions, query: query),
 			using: sortOption
 		)
@@ -14,15 +16,15 @@ struct TorrentMapper {
 	static func filter(_ values: [StandardTorrent], using filter: FilterOptions, query: String) -> [StandardTorrent] {
 		var filtered = values
 
-		if let state = filter.state {
+		if !filter.states.isEmpty {
 			filtered = filtered.filter { value in
-				value.state == state
+				filter.states.contains(value.state)
 			}
 		}
 
-		if let label = filter.label {
+		if !filter.labels.isEmpty {
 			filtered = filtered.filter { value in
-				value.label == label
+				filter.labels.contains(value.label)
 			}
 		}
 

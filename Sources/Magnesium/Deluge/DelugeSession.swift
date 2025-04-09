@@ -12,8 +12,6 @@ struct DelugeSession {
 		let torrents = torrentsAndLabels.torrents.compactMap(StandardTorrent.init)
 		let labels = torrentsAndLabels.labels.map(StandardLabel.init)
 
-		print("labels: \(labels), torrents: \(torrentsAndLabels.labels)")
-
 		return (torrents, labels)
 	}
 }

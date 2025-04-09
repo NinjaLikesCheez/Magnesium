@@ -10,7 +10,7 @@ struct AppEnvironment {
 	var deluge: (URL, String, BasicAuthentication?) -> Deluge
 	// var transmission: (URL, String?, String?) -> TransmissionClient
 	var qbittorrent: (URL, String, String, BasicAuthentication?) -> QBittorrent
-	var preferences: Preferences
+	var preferences: AppPreferences
 	var keychain: Keychain
 	var locale: Locale
 	var calendar: Calendar
@@ -23,7 +23,7 @@ extension AppEnvironment {
 		deluge: Deluge.init,
 		// transmission: Transmission.init,
 		qbittorrent: QBittorrent.init,
-		preferences: UserDefaultsPreferences(),
+		preferences: AppPreferences(UserDefaultsPreferences()),
 		keychain: SystemKeychain(),
 		locale: .autoupdatingCurrent,
 		calendar: .autoupdatingCurrent

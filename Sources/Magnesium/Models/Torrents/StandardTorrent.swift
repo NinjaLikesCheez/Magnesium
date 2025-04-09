@@ -1,6 +1,6 @@
 import Foundation
 
-struct StandardTorrent: Decodable, Equatable, Identifiable {
+struct StandardTorrent: Decodable, Hashable, Equatable, Identifiable {
 	var id: String { hash }
 
 	var dateAdded: Date

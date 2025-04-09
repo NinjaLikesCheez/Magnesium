@@ -1,4 +1,4 @@
 struct FilterOptions: Equatable, Codable {
-	var state: TorrentState?
-	var label: String?
+	var states: Set<TorrentState> = []
+	var labels: Set<String> = []
 }

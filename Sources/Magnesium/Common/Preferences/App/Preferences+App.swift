@@ -1,8 +1,10 @@
 import Foundation
+import Observation
+
 
 extension PreferenceKey {
 	static var autoRefreshInterval: PreferenceKey<TimeInterval> {
-		.init("autoRefreshInterval", defaultValue: 2)  // TODO: Migrate this to a 'defaults' thing like old Magnesium
+		.init("autoRefreshInterval", defaultValue: 2)
 	}
 
 	static var servers: PreferenceKey<[Server]> {

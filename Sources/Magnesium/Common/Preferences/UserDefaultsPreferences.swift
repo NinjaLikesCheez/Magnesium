@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 /// A preferences implementation that uses `UserDefaults`.
-public final class UserDefaultsPreferences: Preferences {
+public class UserDefaultsPreferences: Preferences {
     private let userDefaults: UserDefaults
     private let changeSubject = PassthroughSubject<PreferenceChange, Never>()
 

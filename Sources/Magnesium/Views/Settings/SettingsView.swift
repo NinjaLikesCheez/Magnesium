@@ -3,10 +3,11 @@ import SwiftUI
 public struct SettingsView: View {
 	@Environment(Session.self) private var session: Session
 	@Environment(\.dismiss) private var dismiss
+	@Environment(AppPreferences.self) private var preferences: AppPreferences
 
 	@State private var servers: [Server] = []
 
-	@State private var selectedRefreshInterval: TimeInterval = Current.preferences[.autoRefreshInterval]
+	@State private var selectedRefreshInterval: TimeInterval = Current.preferences.autoRefreshInterval
 
 	public var body: some View {
 		NavigationStack {
@@ -37,6 +38,7 @@ public struct SettingsView: View {
 		Section("Servers") {
 			ForEach(servers) { server in
 				NavigationLink {
+					// TODO: When saving this, we don't dismiss properly because in the onboarding we don't use a dismiss action but rather remove the view on a successful save... fix that plz
 					switch server.type {
 					case .deluge:
 						DelugeServerSettingsView(server)
@@ -71,7 +73,8 @@ public struct SettingsView: View {
 				Text("5 minutes").tag(300.0)
 			}
 			.onChange(of: selectedRefreshInterval) { oldValue, newValue in
-				Current.preferences[.autoRefreshInterval] = newValue
+				preferences.autoRefreshInterval = newValue
+//				Current.preferences[.autoRefreshInterval] = newValue
 			}
 		}
 	}

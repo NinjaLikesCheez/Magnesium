@@ -12,6 +12,7 @@ struct MagnesiumApp: App {
 			} else {
 				TorrentListView()
 					.environment(session)
+					.environment(Current.preferences)
 			}
 		}
 	}

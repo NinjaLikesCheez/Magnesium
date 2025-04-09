@@ -19,29 +19,29 @@ final class Session {
 
 	private func _setServer(_ server: Server?) {
 		self.server = server
-		setupServerObserver()
+//		setupServerObserver()
 		if let server = server {
-			Current.preferences[.selectedServerID] = server.id
+			Current.preferences.selectedServerID = server.id
 			actionImplementation = Session.actionImplementation(server: server)
 		}
 	}
 
-	private func setupServerObserver() {
-		guard let server = server else {
-			serverObserver = Current.preferences.updatePublisher(for: .servers).sink { [weak self] servers in
-				self?._setServer(servers.first)
-			}
-			return
-		}
-
-		serverObserver = Current.preferences.serverUpdatedPublisher(for: server).sink { [weak self] server in
-			if let server = server {
-				self?._setServer(server)
-			} else {
-				self?._setServer(try? Current.preferences.getSelectedServer())
-			}
-		}
-	}
+//	private func setupServerObserver() {
+//		guard let server = server else {
+//			serverObserver = Current.preferences.updatePublisher(for: .servers).sink { [weak self] servers in
+//				self?._setServer(servers.first)
+//			}
+//			return
+//		}
+//
+//		serverObserver = Current.preferences.serverUpdatedPublisher(for: server).sink { [weak self] server in
+//			if let server = server {
+//				self?._setServer(server)
+//			} else {
+//				self?._setServer(try? Current.preferences.getSelectedServer())
+//			}
+//		}
+//	}
 }
 
 extension Session {
@@ -49,14 +49,20 @@ extension Session {
 		switch server.type {
 		case .deluge:
 			let decoder = JSONDecoder()
-			guard let settings = try? decoder.decode(DelugeServerSettings.self, from: server.data),
-				let keychainData = server.keychainData,
-				let keychain = try? decoder.decode(DelugeKeychainData.self, from: keychainData)
-			else {
-				fatalError("Failed to decode Deluge settings")
+			do {
+				guard let keychainData = server.keychainData else {
+					fatalError("Failed to fetch keychain data for server: \(server)")
+				}
+
+				let settings = try decoder.decode(DelugeServerSettings.self, from: server.data)
+				let keychain = try decoder.decode(DelugeKeychainData.self, from: keychainData)
+
+				let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
+				return .deluge(.init(client: client))
+			} catch {
+				fatalError("Failed to decode Deluge settings: \(error.localizedDescription)")
 			}
-			let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
-			return .deluge(.init(client: client))
+
 		// case .transmission:
 		// 	let decoder = JSONDecoder()
 		// 	guard let settings = try? decoder.decode(TransmissionServerSettings.self, from: server.data),

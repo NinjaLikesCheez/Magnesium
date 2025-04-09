@@ -65,3 +65,4 @@ DerivedData/
 ### SweetPad
 buildServer.json
 Magnesium.xcodeproj
+.build

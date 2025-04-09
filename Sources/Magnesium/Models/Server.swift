@@ -1,7 +1,7 @@
 import Foundation
 
 struct Server: Equatable {
-	private(set) var id: String = UUID().uuidString
+	var id: String { name }
 	var name: String
 	var type: ServerType
 	var data: Data
@@ -17,7 +17,6 @@ struct Server: Equatable {
 
 extension Server: Codable {
 	enum CodingKeys: CodingKey {
-		case id
 		case name
 		case type
 		case data
