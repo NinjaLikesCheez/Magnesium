@@ -5,6 +5,7 @@ public struct TorrentListView: View {
 
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
+	@Environment(\.editMode) private var editMode
 
 	@State private var _allTorrents: [StandardTorrent] = []
 	private var torrents: [StandardTorrent] {
@@ -19,26 +20,12 @@ public struct TorrentListView: View {
 	@State private var labels: [StandardLabel] = []
 
 	@State private var searchQuery: String = ""
-	@State private var showingSettings = false
-	@State private var showingFilter = false
-	@State private var showingAddOptions = false
+	@State private var showingSettingsView = false
+	@State private var showingFilterView = false
 
 	// TODO: this error handling needs a _lot_ of UX love...
 	@State private var error: String?
 	@State private var selections: Set<String> = []
-	@State private var editMode: EditMode = .inactive
-	@State private var isConfirmingDelete = false
-
-	private var totalUploadSpeed: String {
-		Formatters.bytes.string(fromByteCount: torrents.reduce(into: 0) { $0 += $1.uploadRate })
-	}
-
-	private var totalDownloadSpeed: String {
-		Formatters.bytes.string(fromByteCount: torrents.reduce(into: 0) { $0 += $1.downloadRate })
-	}
-
-	private let timer = Timer.publish(every: Current.preferences.autoRefreshInterval, on: .main, in: .common)
-		.autoconnect()
 
 	private var selectedTorrents: [StandardTorrent] { torrents.filter { selections.contains($0.id) } }
 
@@ -49,6 +36,9 @@ public struct TorrentListView: View {
 				refresh()
 			} content: {
 				torrentList
+			}
+			.refreshable {
+				refresh()
 			}
 			.overlay {
 				if let error {
@@ -79,129 +69,45 @@ public struct TorrentListView: View {
 				}.opacity(0)
 			}
 		}
-		.environment(\.editMode, $editMode)
 		.searchable(text: $searchQuery)
 		.navigationTitle(session.server.name)
 		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button {
-					showingSettings = true
-				} label: {
-					Image(systemName: "gear")
-				}
-			}
+			settingsToolbarItem
+			selectToolbarItem
 
-			ToolbarItem(placement: .topBarTrailing) {
-				Button(editMode.isEditing ? "Done" : "Select") {
-					editMode = editMode.isEditing ? .inactive : .active
-				}
-				.disabled(torrents.isEmpty)
-			}
-
-			ToolbarItem(placement: .bottomBar) {
-				if editMode.isEditing {
-					editingBarItems
-				} else {
-					bottomBarItems
-				}
+			if editMode?.wrappedValue.isEditing ?? false {
+				TorrentListEditingToolbar()
+			} else {
+				TorrentListStatusToolbar(
+					showingFilterView: $showingFilterView,
+					torrents: torrents
+				)
 			}
 		}
-		.sheet(isPresented: $showingSettings) {
+		.sheet(isPresented: $showingSettingsView) {
 			SettingsView()
 		}
-		.sheet(isPresented: $showingFilter) {
+		.sheet(isPresented: $showingFilterView) {
 			TorrentFilterSettingsView(labels: labels)
 				.presentationDetents([.height(400), .medium, .large])
 		}
 	}
 
-	var editingBarItems: some View {
-		HStack {
+	@ToolbarContentBuilder
+	var settingsToolbarItem: some ToolbarContent {
+		ToolbarItem(placement: .topBarLeading) {
 			Button {
-				Task {
-					// TODO: error handle
-					try await session.actionImplementation.resume(selectedTorrents)
-				}
+				showingSettingsView = true
 			} label: {
-				Image(systemName: "play.circle")
-			}
-
-			Spacer()
-
-			Button {
-				Task {
-					// TODO: error handle
-					try await session.actionImplementation.pause(selectedTorrents)
-				}
-			} label: {
-				Image(systemName: "pause.circle")
-			}
-
-			Spacer()
-
-			Button {
-				isConfirmingDelete = true
-			} label: {
-				Image(systemName: "trash.circle")
-			}
-			.confirmationDialog("Remove", isPresented: $isConfirmingDelete) {
-				Button("Keep Data") {
-					Task {
-						// TODO: error handle
-						try await session.actionImplementation.remove(selectedTorrents, false)
-					}
-				}
-
-				Button("Remove Data", role: .destructive) {
-					Task {
-						// TODO: error handle
-						try await session.actionImplementation.remove(selectedTorrents, true)
-					}
-				}
-			}
-
-			Spacer()
-
-			Button {
-				// TODO: this
-			} label: {
-				Image(systemName: "ellipsis.circle")
+				Image(systemName: "gear")
 			}
 		}
 	}
 
-	var bottomBarItems: some View {
-		HStack {
-			Button {
-				showingFilter = true
-			} label: {
-				Image(systemName: "line.3.horizontal.decrease.circle")
-			}
-
-			Spacer()
-
-			Text(
-				"↓ \(totalDownloadSpeed) ↑ \(totalUploadSpeed)"
-			)
-			.font(.caption)
-			.foregroundStyle(.secondary)
-
-			Spacer()
-
-			Menu {
-				Button {
-					// TODO: Implement file picker
-				} label: {
-					Text("Add File")
-				}
-				Button {
-					// TODO: Implement link input
-				} label: {
-					Text("Add Link")
-				}
-			} label: {
-				Image(systemName: "plus")
-			}
+	@ToolbarContentBuilder
+	var selectToolbarItem: some ToolbarContent {
+		ToolbarItem(placement: .topBarTrailing) {
+			EditButton()
 		}
 	}
 
@@ -209,10 +115,8 @@ public struct TorrentListView: View {
 		Task {
 			do {
 				let (torrents, labels) = try await session.actionImplementation.refresh()
-
 				error = nil
-//				self._allTorrents = torrents
-				// TODO: this won't be instantly updated if a filter changes....
+
 				self._allTorrents = torrents
 				self.labels = labels
 			} catch {
