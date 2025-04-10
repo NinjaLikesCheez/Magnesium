@@ -70,6 +70,18 @@ public final class AppPreferences {
 		}
 	}
 
+	var automaticallyLookForMagnetLinks: Bool {
+		get {
+			access(keyPath: \.automaticallyLookForMagnetLinks)
+			return preferences[.automaticallyLookForMagnetLinks]
+		}
+		set {
+			withMutation(keyPath: \.automaticallyLookForMagnetLinks) {
+				preferences[.automaticallyLookForMagnetLinks] = newValue
+			}
+		}
+	}
+
 	@ObservationIgnored
 	private var preferences: Preferences
 
@@ -86,10 +98,6 @@ extension AppPreferences {
 }
 
 extension AppPreferences {
-//	private func keypath<T>(for identifier: PreferenceKey<T>) -> PartialKeyPath<AppPreferences> {
-//		
-//	}
-
 	private func updateSelectedServerID() throws {
 		guard let server = try getSelectedServer() else {
 			preferences.removeValue(for: .selectedServerID)

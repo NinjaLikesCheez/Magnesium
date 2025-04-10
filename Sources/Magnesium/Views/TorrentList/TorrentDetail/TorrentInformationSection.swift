@@ -19,8 +19,9 @@ struct TorrentInformationSection: View {
 			.init(label: "Uploaded", value: Formatters.bytes.string(fromByteCount: torrent.uploaded)),
 			.init(label: "ETA", value: torrent.formattedETA),
 			.init(label: "Ratio", value: torrent.formattedRatio()),
-			.init(label: "Seeds", value: "\(torrent.seeds)"),
 			.init(label: "Peers", value: "\(torrent.peers)"),
+			.init(label: "Seeds", value: "\(torrent.seeds)"),
+			.init(label: "Download Folder", value: torrent.downloadPath)
 		]
 	}
 

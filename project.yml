@@ -6,13 +6,13 @@ configFiles:
   Release: config/Release.xcconfig
 packages:
   Deluge:
-    # path: ../Deluge-Swift
-    url: https://github.com/jameshurst/Deluge-Swift
-    branch: connected
+    path: ../Deluge-Swift
+    # url: https://github.com/jameshurst/Deluge-Swift
+    # branch: connected
   QBittorrent:
-    # path: ../QBittorrent-Swift
-    url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
-    branch: main
+    path: ../QBittorrent-Swift
+    # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
+    # branch: main
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
@@ -36,6 +36,8 @@ targets:
         CFBundleIdentifier: ca.jameshurst.Magnesium
         UILaunchScreen:
           UIColorName: White
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
     configFiles:
       Debug: config/Magnesium-Debug.xcconfig
       Release: config/Magnesium-Release.xcconfig

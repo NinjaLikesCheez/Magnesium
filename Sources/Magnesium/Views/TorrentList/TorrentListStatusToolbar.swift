@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct TorrentListStatusToolbar: ToolbarContent {
-	@Binding var showingFilterView: Bool
+	@Environment(Session.self) private var session
+
 	@State var torrents: [StandardTorrent]
+	@Binding var sheetDestination: SheetDestination?
+	@Binding var showAddTorrentConfirmation: Bool
 
 	private var totalUploadSpeed: String {
 		Formatters.bytes.string(fromByteCount: torrents.reduce(into: 0) { $0 += $1.uploadRate })
@@ -28,7 +31,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	var items: some View {
 		HStack {
 			Button {
-				showingFilterView = true
+				sheetDestination = .filter
 			} label: {
 				Image(systemName: "line.3.horizontal.decrease.circle")
 			}
@@ -41,16 +44,18 @@ struct TorrentListStatusToolbar: ToolbarContent {
 
 			Spacer()
 
-			Menu {
-				Button {
-					// TODO: Implement file picker
-				} label: {
-					Text("Add File")
+			Button {
+				guard
+					Current.preferences.automaticallyLookForMagnetLinks,
+						let string = UIPasteboard.general.string,
+						let _ = URL(string: string)
+				else {
+					showAddTorrentConfirmation = true
+					return
 				}
-				Button {
-					// TODO: Implement link input
-				} label: {
-					Text("Add Link")
+
+				Task {
+					try await session.actionImplementation.addLink(string)
 				}
 			} label: {
 				Image(systemName: "plus")

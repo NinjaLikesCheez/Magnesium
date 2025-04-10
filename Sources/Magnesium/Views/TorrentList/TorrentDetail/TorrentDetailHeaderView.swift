@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentActionImplementation.self) var implementation
+	@Environment(\.dismiss) private var dismiss
 	var torrent: StandardTorrent
 
 	@State private var showingRemoveConfirmation = false
@@ -78,6 +79,7 @@ struct TorrentDetailHeaderView: View {
 				Task {
 					do {
 						try await implementation.remove([torrent], false)
+						dismiss()
 					} catch {
 						print("Error: Failed to remove torrent: \(error)")
 					}
@@ -87,6 +89,7 @@ struct TorrentDetailHeaderView: View {
 				Task {
 					do {
 						try await implementation.remove([torrent], true)
+						dismiss()
 					} catch {
 						print("Error: Failed to remove torrent and data")
 					}

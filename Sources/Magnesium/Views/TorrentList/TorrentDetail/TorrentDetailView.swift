@@ -17,5 +17,7 @@ struct TorrentDetailView: View {
 			}
 		}
 		.buttonStyle(BorderlessButtonStyle())
+		.navigationTitle("Info")
+		.navigationBarTitleDisplayMode(.inline)
 	}
 }

@@ -51,7 +51,7 @@ extension TorrentActionImplementation {
 			if url.scheme == "magnet" {
 				try await client.request(.add(magnetURL: url))
 			} else {
-				try await client.request(.add(url: url))
+				try await client.request(.add(fileURL: url))
 			}
 		} catch {
 			throw .init(

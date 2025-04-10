@@ -22,4 +22,8 @@ extension PreferenceKey {
 	static var filterOptions: PreferenceKey<FilterOptions> {
 		.init("filterOptions", defaultValue: FilterOptions())
 	}
+
+	static var automaticallyLookForMagnetLinks: PreferenceKey<Bool> {
+		.init("automaticallyLookForMagnetLinks", defaultValue: false)
+	}
 }
