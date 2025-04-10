@@ -1,5 +1,6 @@
 import Deluge
 
+typealias DelugeTorrentFile = TorrentFile
 typealias DelugeTorrentItem = TorrentItem
 
 struct DelugeSession {
@@ -13,6 +14,35 @@ struct DelugeSession {
 		let labels = torrentsAndLabels.labels.map(StandardLabel.init)
 
 		return (torrents, labels)
+	}
+}
+
+extension DelugeTorrentFile {
+	var standard: StandardTorrentFile {
+		.init(
+			index: index,
+			name: name,
+			size: size,
+			progress: progress,
+			priority: priority.standard
+		)
+	}
+}
+
+extension Priority {
+	var standard: TorrentPriority {
+		switch self {
+		case .disabled:
+			.disabled
+		case .low:
+			.low
+		case .normal:
+			.normal
+		case .high:
+			.high
+		default:
+			.normal
+		}
 	}
 }
 

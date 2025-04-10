@@ -9,6 +9,7 @@ class TorrentActionImplementation {
 
 	// var updatePublisher: AnyPublisher<([StandardTorrent], [StandardLabel]), Never>
 	var refresh: () async throws -> ([StandardTorrent], [StandardLabel])
+	var refreshFiles: (StandardTorrent) async throws -> [StandardTorrentFile]
 	// var detailViewModel:
 	// 	(
 	// 		CurrentValueSubject<StandardTorrent, Never>,
@@ -26,6 +27,7 @@ class TorrentActionImplementation {
 
 	required init(
 		refresh: @escaping () async throws -> ([StandardTorrent], [StandardLabel]),
+		refreshFiles: @escaping (StandardTorrent) async throws -> [StandardTorrentFile],
 		addLink: @escaping (String) async throws(AddLinkError) -> Void,
 		paths: @escaping (StandardTorrent) async throws -> [String],
 		pause: @escaping ([StandardTorrent]) async throws -> Void,
@@ -37,6 +39,7 @@ class TorrentActionImplementation {
 		moveDownloadFolder: @escaping (String, [StandardTorrent]) async throws -> Void
 	) {
 		self.refresh = refresh
+		self.refreshFiles = refreshFiles
 		self.addLink = addLink
 		self.paths = paths
 		self.pause = pause

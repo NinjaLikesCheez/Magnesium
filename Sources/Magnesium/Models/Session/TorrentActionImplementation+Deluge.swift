@@ -6,6 +6,7 @@ extension TorrentActionImplementation {
 		let client = session.client
 		return .init(
 			refresh: { try await refresh(session: session) },
+			refreshFiles: { try await refreshFiles(client: client, torrent: $0) },
 			// detailViewModel: { detailViewModel(session: session, torrentSubject: $0, labelsSubject: $1) },
 			addLink: { url async throws(AddLinkError) in try await addLink(client: client, url: url) },
 			paths: { try await paths(client: client, torrent: $0) },
@@ -21,6 +22,21 @@ extension TorrentActionImplementation {
 
 	private static func refresh(session: DelugeSession) async throws -> ([StandardTorrent], [StandardLabel]) {
 		try await session.refresh()
+	}
+
+	private static func torrentFiles(in items: [DelugeTorrentItem]) -> [StandardTorrentFile] {
+		items.reduce(into: [StandardTorrentFile]()) { result, item in
+			switch item {
+			case let .file(file):
+				result.append(file.standard)
+			case let .directory(_, items):
+				result.append(contentsOf: torrentFiles(in: items))
+			}
+		}
+	}
+
+	private static func refreshFiles(client: Deluge, torrent: StandardTorrent) async throws -> [StandardTorrentFile] {
+		torrentFiles(in: try await client.request(.torrentItems(hash: torrent.hash)))
 	}
 
 	// private static func detailViewModel(

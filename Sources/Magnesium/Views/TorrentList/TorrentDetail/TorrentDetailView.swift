@@ -9,12 +9,12 @@ struct TorrentDetailView: View {
 			Section {
 				TorrentDetailHeaderView(torrent: torrent)
 			}
-			Section {
-				TorrentInformationSection(torrent: torrent)
-			} header: {
-				Text("Information")
-					.font(.headline)
-			}
+
+			TorrentInformationSection(torrent: torrent)
+
+			TorrentTrackerSection(torrent: torrent)
+
+			TorrentFilesSection(torrent: torrent)
 		}
 		.buttonStyle(BorderlessButtonStyle())
 		.navigationTitle("Info")

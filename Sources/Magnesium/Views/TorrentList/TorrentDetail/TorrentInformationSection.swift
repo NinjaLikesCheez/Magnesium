@@ -26,13 +26,18 @@ struct TorrentInformationSection: View {
 	}
 
 	var body: some View {
-		ForEach(items) { item in
-			HStack {
-				Text(item.label)
-					.foregroundStyle(.secondary)
-				Spacer()
-				Text(item.value)
+		Section {
+			ForEach(items) { item in
+				HStack {
+					Text(item.label)
+						.foregroundStyle(.secondary)
+					Spacer()
+					Text(item.value)
+				}
 			}
+		} header: {
+			Text("Information")
+				.font(.headline)
 		}
 	}
 }
