@@ -21,6 +21,8 @@ public struct SettingsView: View {
 				serverSection
 
 				generalSection
+
+				resetSection
 			}
 			.navigationTitle("Settings")
 			.toolbar {
@@ -96,6 +98,17 @@ public struct SettingsView: View {
 				}
 			} label: {
 				Text("Change system prompt behaviour")
+			}
+		}
+	}
+
+	var resetSection: some View {
+		Section("Reset") {
+			Button(role: .destructive) {
+				preferences.reset()
+				session.reset()
+			} label: {
+				Text("Reset")
 			}
 		}
 	}

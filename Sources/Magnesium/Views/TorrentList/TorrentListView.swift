@@ -84,6 +84,7 @@ public struct TorrentListView: View {
 			settingsToolbarItem
 			selectToolbarItem
 
+			// TODO: this doesn't correctly respond to changes, fix general architecture
 			if editMode?.wrappedValue.isEditing ?? false {
 				TorrentListEditingToolbar(
 					selectedTorrents: selectedTorrents,

@@ -4,6 +4,7 @@ import Logging
 @main
 struct MagnesiumApp: App {
 	@State private var session = Session()
+	@State private var preferences = Current.preferences
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -21,10 +22,11 @@ struct MagnesiumApp: App {
 				if session.server == nil {
 					OnboardingView()
 						.environment(session)
+						.environment(preferences)
 				} else {
 					TorrentListView()
 						.environment(session)
-						.environment(Current.preferences)
+						.environment(preferences)
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 enum ServerType: String, Identifiable, CaseIterable, Codable {
-	case deluge
+	case deluge = "Deluge"
 	// case transmission
-	case qbittorrent
+	case qbittorrent = "QBittorrent"
 
 	var id: Self { self }
 }

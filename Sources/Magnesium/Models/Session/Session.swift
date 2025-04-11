@@ -17,6 +17,10 @@ final class Session {
 		_setServer(server)
 	}
 
+	func reset() {
+		server = nil
+	}
+
 	private func _setServer(_ server: Server?) {
 		self.server = server
 //		setupServerObserver()

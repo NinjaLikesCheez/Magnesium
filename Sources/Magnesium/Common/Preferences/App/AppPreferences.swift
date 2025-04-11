@@ -160,4 +160,9 @@ extension AppPreferences {
 		removeValue(for: .selectedServerID)
 		servers = []
 		selectedServerID = nil
-	}}
+	}
+
+	func reset() {
+		preferences.reset()
+	}
+}

@@ -13,6 +13,10 @@ struct ServerSettingsItem {
 }
 
 struct ServerSettingsView: View {
+	@Environment(AppPreferences.self) private var preferences: AppPreferences
+	@Environment(\.dismiss) private var dismiss
+	@Environment(Session.self) private var session
+
 	@Binding var name: String
 	@Binding var address: String
 	var username: Binding<String>?
@@ -39,7 +43,6 @@ struct ServerSettingsView: View {
 				basicAuthenticationSection(basicAuthentication)
 			}
 		}
-		.navigationTitle("\(name) Settings")
 		.toolbar {
 			saveButton
 		}
@@ -104,7 +107,9 @@ struct ServerSettingsView: View {
 				errorMessage = nil
 				do {
 					let server = try await makeServer()
-					try Current.preferences.addOrUpdate(server: server)
+					try preferences.addOrUpdate(server: server)
+					session.setServer(server)
+					// TODO: move session into preferences?
 				} catch let error as ServerSettingsItem.Error {
 					switch error {
 					case .invalidState(let message):
@@ -116,6 +121,7 @@ struct ServerSettingsView: View {
 					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
 				}
 				isSaving = false
+				dismiss()
 			}
 		} label: {
 			if isSaving {

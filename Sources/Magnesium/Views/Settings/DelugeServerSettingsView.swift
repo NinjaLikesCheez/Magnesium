@@ -2,47 +2,42 @@ import Deluge
 import SwiftUI
 
 struct DelugeServerSettingsView: View {
-	@State private var name: String
-	@State private var address: String
-	@State private var password: String
-	@State private var basicAuthentication: ServerBasicAuthentication
-
+	@State private var settings: DelugeSettings
 	@State private var server: Server?
+	private var editingExistingServer = false
 
 	init(_ server: Server? = nil) {
 		if let server {
-			name = server.name
-
-			let settings = try? JSONDecoder().decode(DelugeServerSettings.self, from: server.data)
+			let serverSettings = try? JSONDecoder().decode(DelugeServerSettings.self, from: server.data)
 			let keychain = server.keychainData.flatMap { try? JSONDecoder().decode(DelugeKeychainData.self, from: $0) }
 
-			address = settings?.url.absoluteString ?? ""
-			password = keychain?.password ?? ""
-			basicAuthentication = keychain?.basicAuthentication?.toServerBasicAuthentication() ?? ServerBasicAuthentication()
+			settings = .init(
+				name: server.name,
+				address: serverSettings?.url.absoluteString ?? "",
+				password: keychain?.password ?? "",
+				basicAuthentication: keychain?.basicAuthentication?.toServerBasicAuthentication() ?? ServerBasicAuthentication()
+			)
 		} else {
-			name = ""
-			address = ""
-			password = ""
-			basicAuthentication = ServerBasicAuthentication()
+			settings = .init()
 		}
 	}
 
 	var body: some View {
 		ServerSettingsView(
-			name: $name,
-			address: $address,
-			password: $password,
-			basicAuthentication: $basicAuthentication,
+			name: $settings.name,
+			address: $settings.address,
+			password: $settings.password,
+			basicAuthentication: $settings.basicAuthentication,
 			makeServer: { () async throws(ServerSettingsItem.Error) in
-				guard let url = URL(string: address) else {
+				guard let url = URL(string: settings.address) else {
 					throw .invalidState(message: "Invalid URL, ensure you add http(s)://")
 				}
 
-				let client = Current.deluge(url, password, basicAuthentication.toAPIClient())
+				let client = Current.deluge(url, settings.password, settings.basicAuthentication.toAPIClient())
 				let authenticated: Bool
 
 				do throws(Deluge.Error) {
-					authenticated = try await client.request(.authenticate(password))
+					authenticated = try await client.request(.authenticate(settings.password))
 					if !authenticated {
 						throw Deluge.Error.response(.unauthenticated)
 					}
@@ -50,10 +45,10 @@ struct DelugeServerSettingsView: View {
 					throw .unableToAuthenticate
 				}
 
-				let settings = DelugeServerSettings(url: url)
+				let serverSettings = DelugeServerSettings(url: url)
 				let keychain = DelugeKeychainData(
-					password: password,
-					basicAuthentication: basicAuthentication.toAPIClient()
+					password: settings.password,
+					basicAuthentication: settings.basicAuthentication.toAPIClient()
 				)
 
 				let encoder = JSONEncoder()
@@ -61,24 +56,25 @@ struct DelugeServerSettingsView: View {
 				let keychainData: Data
 
 				do {
-					data = try encoder.encode(settings)
+					data = try encoder.encode(serverSettings)
 					keychainData = try encoder.encode(keychain)
 				} catch {
 					throw .invalidState(message: error.localizedDescription)
 				}
 
 				return .init(
-					name: name,
+					name: settings.name,
 					type: .deluge,
 					data: data,
 					keychainData: keychainData
 				)
 			},
 			saveServerButtonEnabled: { basicAuthenticationEnabled in
-				!name.isEmpty && !address.isEmpty && URL(string: address) != nil && !password.isEmpty
+				!settings.name.isEmpty && !settings.address.isEmpty && URL(string: settings.address) != nil && !settings.password.isEmpty
 					&& (!basicAuthenticationEnabled
-						|| !basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
+							|| !settings.basicAuthentication.username.isEmpty && !settings.basicAuthentication.password.isEmpty)
 			}
 		)
+		.navigationTitle("Deluge Settings")
 	}
 }

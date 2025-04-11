@@ -92,8 +92,11 @@ struct QBittorrentServerSettingsView: View {
 						|| !basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
 			}
 		)
+		.navigationTitle("QBittorrent Settings")
 	}
 }
+
+// TODO: this doesn't dismiss correctly in the onboarding flow
 
 struct AddServerView: View {
 	var body: some View {

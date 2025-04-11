@@ -28,12 +28,12 @@ targets:
     sources:
       - Sources/Magnesium
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.Magnesium
+      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.Magnesium2
     info:
       path: Sources/Magnesium/Resources/Info.plist
       properties:
         CFBundleDisplayName: Magnesium
-        CFBundleIdentifier: ca.jameshurst.Magnesium
+        CFBundleIdentifier: ca.jameshurst.Magnesium2
         UILaunchScreen:
           UIColorName: White
         NSAppTransportSecurity:
