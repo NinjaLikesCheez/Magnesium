@@ -14,7 +14,7 @@ struct OnboardingView: View {
 			NavigationStack {
 				switch type {
 				case .deluge:
-					DelugeServerSettingsView()
+					AddDelugeServerView()
 				case .qbittorrent:
 					QBittorrentServerSettingsView()
 				}
@@ -48,10 +48,10 @@ struct OnboardingView: View {
 			} label: {
 				Text(type.rawValue)
 					.fontWeight(.bold)
+					.frame(maxWidth: .infinity)
 					.padding()
 			}
 			.foregroundStyle(.white)
-			.frame(maxWidth: .infinity)
 			.background(Color.accentColor)
 			.cornerRadius(10)
 			.padding(.horizontal)
