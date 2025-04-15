@@ -9,5 +9,9 @@ extension L10n {
         static var transmission: String {
             NSLocalizedString("server.transmission", comment: "Transmission")
         }
+
+        static var qbittorrent: String {
+            NSLocalizedString("server.qbittorrent", comment: "qBittorrent")
+        }
     }
 }

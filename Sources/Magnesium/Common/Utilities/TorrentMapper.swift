@@ -1,115 +1,108 @@
-import Combine
 import Foundation
-import Preferences
 
-final class TorrentMapper: ValueMapper<String, StandardTorrent> {
-    init(querySubject: CurrentValueSubject<String?, Never>) {
-        let sortOptionPublisher = Current.preferences.valuePublisher(for: .sortOption)
-        let filterOptionsPublisher = Current.preferences.valuePublisher(for: .filterOptions)
-        let filter = Publishers.CombineLatest3(sortOptionPublisher, filterOptionsPublisher, querySubject)
-            .map { sort, filter, query -> FilterFunction in
-                // swiftformat:disable:next redundantReturn
-                return { subjects in
-                    var filtered = subjects
+struct TorrentMapper {
+	static func map(
+		_ torrents: [StandardTorrent],
+		query: String,
+		sortOption: SortOption,
+		filterOptions: FilterOptions
+	) -> [StandardTorrent] {
+		Self.sort(
+			Self.filter(torrents, using: filterOptions, query: query),
+			using: sortOption
+		)
+	}
 
-                    if let state = filter.state {
-                        filtered = filtered.filter { subject in
-                            subject.value.state == state
-                        }
-                    }
+	static func filter(_ values: [StandardTorrent], using filter: FilterOptions, query: String) -> [StandardTorrent] {
+		var filtered = values
 
-                    if let label = filter.label {
-                        filtered = filtered.filter { subject in
-                            subject.value.label == label
-                        }
-                    }
+		if !filter.states.isEmpty {
+			filtered = filtered.filter { value in
+				filter.states.contains(value.state)
+			}
+		}
 
-                    if let query = query {
-                        let trimmed = (query as NSString).trimmingCharacters(in: CharacterSet.whitespaces)
-                        if !trimmed.isEmpty {
-                            filtered = filtered.filter { subject in
-                                Self.search(needle: trimmed, haystack: subject.value.name)
-                            }
-                        }
-                    }
+		if !filter.labels.isEmpty {
+			filtered = filtered.filter { value in
+				filter.labels.contains(value.label)
+			}
+		}
 
-                    return Self.sort(filtered, using: sort)
-                }
-            }
-            .eraseToAnyPublisher()
-        super.init(filter: filter)
-    }
+		if !query.isEmpty {
+			let trimmed = (query as NSString).trimmingCharacters(in: CharacterSet.whitespaces)
+			if !trimmed.isEmpty {
+				filtered = filtered.filter { value in
+					Self.search(needle: trimmed, haystack: value.name)
+				}
+			}
+		}
 
-    @available(*, unavailable)
-    override func update(with new: [(String, StandardTorrent)]) {
-        fatalError("Unimplemented")
-    }
+		return filtered
+	}
 
-    func update(with torrents: [StandardTorrent]) {
-        super.update(with: torrents.map { ($0.hash, $0) })
-    }
+	private static func search(needle: String, haystack: String) -> Bool {
+		let delimiters = CharacterSet([" ", ".", "-", "_"])
+		let normalizedNeedle = needle.lowercased().components(separatedBy: delimiters).joined(separator: " ")
+		let normalizedHaystack = haystack.lowercased().components(separatedBy: delimiters).joined(separator: " ")
+		return normalizedHaystack.contains(normalizedNeedle)
+	}
 
-    private static func search(needle: String, haystack: String) -> Bool {
-        let delimiters = CharacterSet([" ", ".", "-", "_"])
-        let normalizedNeedle = needle.lowercased().components(separatedBy: delimiters).joined(separator: " ")
-        let normalizedHaystack = haystack.lowercased().components(separatedBy: delimiters).joined(separator: " ")
-        return normalizedHaystack.contains(normalizedNeedle)
-    }
+	static func sort(_ values: [StandardTorrent]) {
 
-    // swiftlint:disable:next cyclomatic_complexity
-    private static func sort(
-        _ torrents: [CurrentValueSubject<StandardTorrent, Never>],
-        using sortOption: SortOption
-    ) -> [CurrentValueSubject<StandardTorrent, Never>] {
-        let compare: (StandardTorrent, StandardTorrent) -> ComparisonResult
-        switch sortOption.property {
-        case .name:
-            compare = { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) }
-        case .dateAdded:
-            compare = { $0.dateAdded.compare($1.dateAdded) }
-        case .downloadSpeed:
-            compare = {
-                $0.downloadRate == $1.downloadRate
-                    ? .orderedSame
-                    : $0.downloadRate < $1.downloadRate ? .orderedAscending : .orderedDescending
-            }
-        case .uploadSpeed:
-            compare = {
-                $0.uploadRate == $1.uploadRate
-                    ? .orderedSame
-                    : $0.uploadRate < $1.uploadRate ? .orderedAscending : .orderedDescending
-            }
-        case .progress:
-            compare = {
-                $0.progress == $1.progress
-                ? .orderedSame
-                : $0.progress < $1.progress ? .orderedAscending : .orderedDescending
-            }
-        }
+	}
 
-        return torrents.sorted { subject1, subject2 -> Bool in
-            let obj1 = subject1.value
-            let obj2 = subject2.value
-            switch compare(obj1, obj2) {
-            case .orderedAscending:
-                return sortOption.direction == .ascending
-            case .orderedDescending:
-                return sortOption.direction == .descending
-            case .orderedSame:
-                if sortOption.property != .name {
-                    let result = obj1.name.compare(obj2.name, options: [.numeric, .caseInsensitive])
-                    switch result {
-                    case .orderedAscending:
-                        return true
-                    case .orderedDescending:
-                        return false
-                    case .orderedSame:
-                        break
-                    }
-                }
+	// swiftlint:disable:next cyclomatic_complexity
+	private static func sort(
+		_ torrents: [StandardTorrent],
+		using sortOption: SortOption
+	) -> [StandardTorrent] {
+		let compare: (StandardTorrent, StandardTorrent) -> ComparisonResult
+		switch sortOption.property {
+		case .name:
+			compare = { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) }
+		case .dateAdded:
+			compare = { $0.dateAdded.compare($1.dateAdded) }
+		case .downloadSpeed:
+			compare = {
+				$0.downloadRate == $1.downloadRate
+					? .orderedSame
+					: $0.downloadRate < $1.downloadRate ? .orderedAscending : .orderedDescending
+			}
+		case .uploadSpeed:
+			compare = {
+				$0.uploadRate == $1.uploadRate
+					? .orderedSame
+					: $0.uploadRate < $1.uploadRate ? .orderedAscending : .orderedDescending
+			}
+		case .progress:
+			compare = {
+				$0.progress == $1.progress
+					? .orderedSame
+					: $0.progress < $1.progress ? .orderedAscending : .orderedDescending
+			}
+		}
 
-                return obj1.hash < obj2.hash
-            }
-        }
-    }
+		return torrents.sorted { torrent1, torrent2 -> Bool in
+			switch compare(torrent1, torrent2) {
+			case .orderedAscending:
+				return sortOption.direction == .ascending
+			case .orderedDescending:
+				return sortOption.direction == .descending
+			case .orderedSame:
+				if sortOption.property != .name {
+					let result = torrent1.name.compare(torrent2.name, options: [.numeric, .caseInsensitive])
+					switch result {
+					case .orderedAscending:
+						return true
+					case .orderedDescending:
+						return false
+					case .orderedSame:
+						break
+					}
+				}
+
+				return torrent1.hash < torrent2.hash
+			}
+		}
+	}
 }

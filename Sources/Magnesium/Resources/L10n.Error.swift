@@ -125,5 +125,23 @@ extension L10n {
         static var failedToAddTorrent: String {
             NSLocalizedString("error.failed-to-add-torrent", comment: "Failed to Add Torrent")
         }
+
+        static var torrentAlreadyInSession: String {
+            NSLocalizedString("error.torrent-already-in-session", comment: "Torrent already in session")
+        }
+
+			static var unconnected: String {
+				NSLocalizedString("error.unconnected", comment: "There is no host connected to the deluge daemon")
+			}
+
+        static var conflict: String {
+            // TODO: pass an message through based on the API call to get a better message here...
+            NSLocalizedString("error.conflict", comment: "Server was conflicted")
+        }
+
+        static var failedToDoAction: String {
+            // TODO: get a better error for this too...
+            NSLocalizedString("error.failed-to-do-action", comment: "Failed to do action")
+        }
     }
 }

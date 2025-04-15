@@ -1,3 +1,0 @@
-[submodule "Components"]
-	path = Sources/Components
-	url = ssh://git@git.jameshurst.me:10022/iOS/AppComponents.git

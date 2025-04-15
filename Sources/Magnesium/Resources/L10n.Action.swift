@@ -83,7 +83,7 @@ extension L10n {
         }
 
         static var copyDownloadPaths: String {
-            NSLocalizedString("action.copy-download-folder-paths", comment: "Copy Download Folder Path")
+            NSLocalizedString("action.copy-download-folder-path", comment: "Copy Download Folder Path")
         }
     }
 }

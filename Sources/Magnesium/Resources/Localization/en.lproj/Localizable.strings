@@ -95,6 +95,18 @@
 /* Failed to Add Torrent */
 "error.failed-to-add-torrent" = "Failed to Add Torrent";
 
+/* Torrent already in session */
+"error.torrent-already-in-session" = "Torrent already in session";
+
+/* There is no host connected to the deluge daemon */
+"error.unconnected" = "There is no host connected to the deluge daemon";
+
+/* Server was conflict */
+"error.conflict" = "Server was conflicted";
+
+/* Failed to do action */
+"error.failed-to-do-action" = "Failed to do action";
+
 /* Failed to Delete Server */
 "error.failed-to-delete-server" = "Failed to Delete Server";
 
@@ -334,6 +346,9 @@
 
 /* Transmission */
 "server.transmission" = "Transmission";
+
+/* qBittorrent */
+"server.qbittorrent" = "qBittorrent";
 
 /* Date Added */
 "sort.date-added" = "Date Added";

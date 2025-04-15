@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: General rules for Swift and SwiftUI coding style, focusing on maintainability.
+globs: **/*.swift
+---
+- You are an expert in coding with Swift and SwiftUI.
+- Always write maintainable and clean code.
+- Prefer functional programming, where it makes sense
+- Logically separate out large parts of code into functions, computed properties, or closures.
+- Descriptions should be short and concise.
+- Don't remove any comments, unless your change removes their relevance.
+- Use the latest SwiftUI features.
+- Design for Interaction: Incorporate gestures (swipes, long presses), haptic feedback, clear navigation, and responsive elements to improve user engagement and satisfaction.
+- Prefer existing implementations in the codebase over creating new structures.
