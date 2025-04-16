@@ -2,40 +2,17 @@ import Combine
 
 /// A preferences implementation that stores values in memory.
 public final class InMemoryPreferences: Preferences {
-    private let changeSubject = PassthroughSubject<PreferenceChange, Never>()
-    private let store: Store
+	private let store = [String: Any]()
 
-    /// Creates a new in-memory preferences instance.
-    public init(store: Store = .init()) {
-        self.store = store
-    }
+	public var servers: [Server] = []
 
-    public var changePublisher: AnyPublisher<PreferenceChange, Never> {
-        changeSubject.eraseToAnyPublisher()
-    }
+	public var selectedServerID: String?
 
-    public func value<T>(for key: PreferenceKey<T>) -> T {
-        store[key]
-    }
+	public var sortOption: SortOption
 
-    public func set<T>(_ value: T, for key: PreferenceKey<T>) {
-        store[key] = value
-        changeSubject.send(.updated(AnyPreferenceKey(key), value))
-    }
+	public var filterOptions: FilterOptions
 
-    public func containsValue<T>(for key: PreferenceKey<T>) -> Bool {
-        store.containsValue(for: key)
-    }
-
-    public func removeValue<T>(for key: PreferenceKey<T>) {
-        store.removeValue(for: key)
-        changeSubject.send(.deleted(AnyPreferenceKey(key)))
-    }
-
-    public func reset() {
-        store.removeAll()
-        changeSubject.send(.reset)
-    }
+	public var automaticallyLookForMagnetLinks: Bool
 }
 
 public extension InMemoryPreferences {

@@ -13,6 +13,10 @@ packages:
     path: ../QBittorrent-Swift
     # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     # branch: main
+  ObservableDefaults:
+    path: ../../fatbobman/ObservableDefaults
+    # url: https://github.com/NinjaLikesCheez/ObservableDefaults
+    # branch: allow-optionals
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
@@ -45,3 +49,4 @@ targets:
       - package: Deluge
       - package: QBittorrent
       - package: Logging
+      - package: ObservableDefaults

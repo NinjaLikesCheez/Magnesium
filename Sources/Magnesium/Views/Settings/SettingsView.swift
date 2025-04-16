@@ -82,7 +82,6 @@ public struct SettingsView: View {
 			}
 			.onChange(of: selectedRefreshInterval) { oldValue, newValue in
 				preferences.autoRefreshInterval = newValue
-				//				Current.preferences[.autoRefreshInterval] = newValue
 			}
 
 			// TODO: model settings in such a way that we can switch on them here and make adding a new setting UI typesafe
