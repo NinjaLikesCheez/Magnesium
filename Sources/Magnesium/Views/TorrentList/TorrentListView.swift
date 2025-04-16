@@ -54,7 +54,7 @@ public struct TorrentListView: View {
 	}
 
 	var torrentList: some View {
-		List(torrents, selection: $selections) { torrent in
+		List(torrents, selection: editMode.isEditing ? $selections : nil) { torrent in
 			// This is done to remove the disclosure indicator cause yes there's no actual way to do that...
 			ZStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
@@ -63,7 +63,8 @@ public struct TorrentListView: View {
 						.environment(session.actionImplementation)
 				} label: {
 					EmptyView()
-				}.opacity(0)
+				}
+				.opacity(0)
 			}
 		}
 		.environment(\.editMode, $editMode)
