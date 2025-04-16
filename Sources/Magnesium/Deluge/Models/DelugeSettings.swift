@@ -28,10 +28,17 @@ class DelugeSettings {
 	}
 
 	init() {
+		#if DEBUG
+		self.name = "Deluge"
+		self.address = "http://proxyman.debug:8112"
+		self.password = "deluge"
+		self.basicAuthentication = .init()
+		#else
 		self.name = ""
 		self.address = ""
 		self.password = ""
 		self.basicAuthentication = .init()
+		#endif
 	}
 
 	var isValid: Bool {

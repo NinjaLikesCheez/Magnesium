@@ -10,7 +10,7 @@ import SwiftUI
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(Session.self) private var session
 
-	@State var torrents: [StandardTorrent]
+	@Binding var torrents: [StandardTorrent]
 	@Binding var sheetDestination: SheetDestination?
 	@Binding var showAddTorrentConfirmation: Bool
 
@@ -47,15 +47,21 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			Button {
 				guard
 					Current.preferences.automaticallyLookForMagnetLinks,
-						let string = UIPasteboard.general.string,
-						let _ = URL(string: string)
+					let string = UIPasteboard.general.string,
+					let url = URL(string: string),
+					url.scheme == "magnet"
 				else {
 					showAddTorrentConfirmation = true
 					return
 				}
 
 				Task {
-					try await session.actionImplementation.addLink(string)
+					do {
+						try await session.actionImplementation.addLink(string)
+					} catch {
+						// TODO: Error handle
+						showAddTorrentConfirmation = true
+					}
 				}
 			} label: {
 				Image(systemName: "plus")
