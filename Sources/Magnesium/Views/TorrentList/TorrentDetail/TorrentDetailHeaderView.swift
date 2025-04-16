@@ -1,5 +1,6 @@
 import SwiftUI
 
+// TODO: this doesn't refresh automatically (i.e. if you pause)
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentActionImplementation.self) var implementation
 	@Environment(\.dismiss) private var dismiss

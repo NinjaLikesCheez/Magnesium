@@ -55,7 +55,6 @@ struct EditDelugeServerView: View {
 			additionalSections: {
 				Button("Delete", role: .destructive) {
 					do {
-						// TODO: this doesn't show the onboarding flow again (or I guess select the next server)
 						try preferences.remove(server: server)
 						dismiss()
 					} catch {
@@ -63,6 +62,7 @@ struct EditDelugeServerView: View {
 						print("Failed to remove server: \(server)")
 					}
 				}
+				.frame(maxWidth: .infinity, alignment: .center)
 			}
 		)
 		.navigationTitle("Deluge Settings")

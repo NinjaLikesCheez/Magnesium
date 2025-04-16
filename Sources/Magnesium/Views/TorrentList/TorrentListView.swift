@@ -12,18 +12,8 @@ public struct TorrentListView: View {
 
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(\.editMode) private var editMode
 
-	@State private var _allTorrents: [StandardTorrent] = []
-	private var torrents: [StandardTorrent] {
-		TorrentMapper
-			.map(
-				_allTorrents,
-				query: searchQuery,
-				sortOption: preferences.sortOption,
-				filterOptions: preferences.filterOptions
-			)
-	}
+	@State private var torrents: [StandardTorrent] = []
 	@State private var labels: [StandardLabel] = []
 	@State private var searchQuery: String = ""
 	@State private var sheetDestination: SheetDestination?
@@ -31,6 +21,7 @@ public struct TorrentListView: View {
 	@State private var showingFileImporter = false
 	@State private var showingLinkInput = false
 	@State private var linkInput = ""
+	@State private var editMode: EditMode = .inactive
 
 	// TODO: this error handling needs a _lot_ of UX love...
 	@State private var error: String?
@@ -63,7 +54,7 @@ public struct TorrentListView: View {
 	}
 
 	var torrentList: some View {
-		List(torrents, selection: $selections) { torrent in
+		List(torrents, selection: editMode.isEditing ? $selections : nil) { torrent in
 			// This is done to remove the disclosure indicator cause yes there's no actual way to do that...
 			ZStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
@@ -72,9 +63,11 @@ public struct TorrentListView: View {
 						.environment(session.actionImplementation)
 				} label: {
 					EmptyView()
-				}.opacity(0)
+				}
+				.opacity(0)
 			}
 		}
+		.environment(\.editMode, $editMode)
 		.refreshable {
 			refresh()
 		}
@@ -82,17 +75,17 @@ public struct TorrentListView: View {
 		.navigationTitle(session.server?.name ?? "Torrents")
 		.toolbar {
 			settingsToolbarItem
+
 			selectToolbarItem
 
-			// TODO: this doesn't correctly respond to changes, fix general architecture
-			if editMode?.wrappedValue.isEditing ?? false {
+			if editMode.isEditing {
 				TorrentListEditingToolbar(
 					selectedTorrents: selectedTorrents,
 					error: $error
 				)
 			} else {
 				TorrentListStatusToolbar(
-					torrents: torrents,
+					torrents: $torrents,
 					sheetDestination: $sheetDestination,
 					showAddTorrentConfirmation: $showAddTorrentConfirmation
 				)
@@ -109,7 +102,7 @@ public struct TorrentListView: View {
 		}
 		.confirmationDialog("Add Torrent", isPresented: $showAddTorrentConfirmation, titleVisibility: .visible) {
 			Button {
-				
+				showingLinkInput = true
 			} label: {
 				Text("Add Link")
 			}
@@ -175,7 +168,13 @@ public struct TorrentListView: View {
 	@ToolbarContentBuilder
 	var selectToolbarItem: some ToolbarContent {
 		ToolbarItem(placement: .topBarTrailing) {
-			EditButton()
+			// EditButton()
+			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
+			Button(editMode.isEditing ? "Done" : "Select") {
+				withAnimation {
+					editMode = editMode.isEditing ? .inactive : .active
+				}
+			}
 		}
 	}
 
@@ -185,7 +184,13 @@ public struct TorrentListView: View {
 				let (torrents, labels) = try await session.actionImplementation.refresh()
 				error = nil
 
-				self._allTorrents = torrents
+				self.torrents = TorrentMapper
+					.map(
+						torrents,
+						query: searchQuery,
+						sortOption: preferences.sortOption,
+						filterOptions: preferences.filterOptions
+					)
 				self.labels = labels
 			} catch {
 				print("Error refreshing torrents: \(error)")

@@ -24,6 +24,7 @@ enum TorrentSortOption: String, CaseIterable {
 
 struct TorrentFilterSettingsView: View {
 	@Environment(Session.self) private var session: Session
+	@Environment(\.dismiss) private var dismiss
 
 	let labels: [StandardLabel]
 
@@ -54,6 +55,7 @@ struct TorrentFilterSettingsView: View {
 
 				Button("Reset", role: .destructive) {
 					reset()
+					dismiss()
 				}
 				.frame(maxWidth: .infinity, alignment: .center)
 			}
