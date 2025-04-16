@@ -1,23 +1,47 @@
-import Combine
+//
+//  AppPreferences.swift
+//  Magnesium
+//
+//  Created by ninji on 09/04/2025.
+//
+import Foundation
+import ObservableDefaults
 
-extension Preferences {
+@ObservableDefaults
+public final class AppPreferences {
+	var autoRefreshInterval: TimeInterval = 2.0
+
+	var servers: [Server] = []
+
+	var selectedServerID: String? = nil
+
+	var sortOption: SortOption = .init(property: .dateAdded)
+
+	var filterOptions: FilterOptions = .init()
+
+	var automaticallyLookForMagnetLinks: Bool = false
+
+	init() {}
+}
+
+extension AppPreferences {
 	private func updateSelectedServerID() throws {
 		guard let server = try getSelectedServer() else {
-			removeValue(for: .selectedServerID)
+			selectedServerID = nil
 			return
 		}
 
-		self[.selectedServerID] = server.id
+		selectedServerID = server.id
 	}
 
 	func getSelectedServer() throws -> Server? {
 		let servers = try getServers()
-		guard let selectedServerID = self[.selectedServerID] else { return servers.first }
+		guard let selectedServerID = selectedServerID else { return servers.first }
 		return servers.first { $0.id == selectedServerID } ?? servers.first
 	}
 
 	func getServers() throws -> [Server] {
-		var servers = self[.servers]
+		var servers = servers
 		for (index, server) in servers.enumerated() {
 			var server = server
 			server.keychainData = try Current.keychain.data(for: .server(server))
@@ -44,7 +68,7 @@ extension Preferences {
 			}
 		}
 
-		self[.servers] = servers
+		self.servers = servers
 		try updateSelectedServerID()
 	}
 
@@ -52,13 +76,18 @@ extension Preferences {
 		var servers = try getServers()
 		servers.removeAll { $0.id == server.id }
 		try Current.keychain.removeData(for: .server(server))
-		self[.servers] = servers
+		self.servers = servers
 		try updateSelectedServerID()
 	}
 
 	func removeServers() throws {
 		try Current.keychain.removeData(for: .servers)
-		removeValue(for: .servers)
-		removeValue(for: .selectedServerID)
+		servers = []
+		selectedServerID = nil
+	}
+
+	func reset() {
+		guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
+		_userDefaults.removePersistentDomain(forName: bundleIdentifier)
 	}
 }

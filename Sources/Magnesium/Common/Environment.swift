@@ -23,7 +23,7 @@ extension AppEnvironment {
 		deluge: Deluge.init,
 		// transmission: Transmission.init,
 		qbittorrent: QBittorrent.init,
-		preferences: AppPreferences(UserDefaultsPreferences()),
+		preferences: AppPreferences(userDefaults: .standard),
 		keychain: SystemKeychain(),
 		locale: .autoupdatingCurrent,
 		calendar: .autoupdatingCurrent
