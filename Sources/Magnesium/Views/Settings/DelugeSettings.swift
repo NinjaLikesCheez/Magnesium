@@ -8,6 +8,11 @@ import Deluge
 import Foundation
 import Observation
 
+enum ServerSettingsError: Error {
+	case invalidState(message: String)
+	case unableToAuthenticate
+}
+
 @Observable
 class DelugeSettings {
 	var name: String
@@ -29,7 +34,14 @@ class DelugeSettings {
 		self.basicAuthentication = .init()
 	}
 
-	func makeServer() async throws(ServerSettingsItem.Error) -> Server {
+	var isValid: Bool {
+		!name.isEmpty && !address.isEmpty && !password.isEmpty
+		&&
+			(basicAuthentication.username.isEmpty || !basicAuthentication.password.isEmpty) ||
+			(!basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
+	}
+
+	func makeServer() async throws(ServerSettingsError) -> Server {
 		guard let url = URL(string: address) else {
 			throw .invalidState(message: "Invalid URL, ensure you add http(s)://")
 		}

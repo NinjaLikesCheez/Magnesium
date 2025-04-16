@@ -27,77 +27,6 @@ extension BasicAuthentication {
 	}
 }
 
-struct TransmissionServerSettingsView: View {
-	@State private var name: String = ""
-	@State private var address: String = ""
-	@State private var username: String = ""
-	@State private var password: String = ""
-	@State private var basicAuthentication = ServerBasicAuthentication()
-
-	var body: some View {
-		ServerSettingsView(
-			name: $name,
-			address: $address,
-			username: $username,
-			password: $password,
-			basicAuthentication: $basicAuthentication,
-			makeServer: { fatalError("Not implemented") },
-			saveServerButtonEnabled: { basicAuthenticationEnabled in
-				!name.isEmpty && !address.isEmpty && !username.isEmpty && !password.isEmpty
-					&& (!basicAuthenticationEnabled
-						|| !basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
-			}
-		)
-	}
-}
-
-struct QBittorrentServerSettingsView: View {
-	@State private var name: String
-	@State private var address: String
-	@State private var username: String
-	@State private var password: String
-	@State private var basicAuthentication: ServerBasicAuthentication
-
-	init(_ server: Server? = nil) {
-		if let server {
-			name = server.name
-
-			let settings = try? JSONDecoder().decode(QBittorrentServerSettings.self, from: server.data)
-			let keychain = server.keychainData.flatMap { try? JSONDecoder().decode(QBittorrentKeychainData.self, from: $0) }
-
-			address = settings?.url.absoluteString ?? ""
-			username = keychain?.username ?? ""
-			password = keychain?.password ?? ""
-			basicAuthentication = keychain?.basicAuthentication?.toServerBasicAuthentication() ?? ServerBasicAuthentication()
-		} else {
-			name = ""
-			address = ""
-			username = ""
-			password = ""
-			basicAuthentication = ServerBasicAuthentication()
-		}
-	}
-
-	var body: some View {
-		ServerSettingsView(
-			name: $name,
-			address: $address,
-			username: $username,
-			password: $password,
-			basicAuthentication: $basicAuthentication,
-			makeServer: { fatalError("Not implemented") },
-			saveServerButtonEnabled: { basicAuthenticationEnabled in
-				!name.isEmpty && !address.isEmpty && !username.isEmpty && !password.isEmpty
-					&& (!basicAuthenticationEnabled
-						|| !basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
-			}
-		)
-		.navigationTitle("QBittorrent Settings")
-	}
-}
-
-// TODO: this doesn't dismiss correctly in the onboarding flow
-
 struct AddServerView: View {
 	var body: some View {
 		NavigationStack {
@@ -105,9 +34,9 @@ struct AddServerView: View {
 				NavigationLink {
 					switch server {
 					case .deluge:
-						DelugeServerSettingsView()
+						AddDelugeServerView()
 					case .qbittorrent:
-						QBittorrentServerSettingsView()
+						fatalError("Not Implemented")
 					}
 				} label: {
 					Text(server.localizedString)

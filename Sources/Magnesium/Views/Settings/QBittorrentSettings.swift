@@ -33,7 +33,7 @@ class QBittorrentSettings {
 		self.basicAuthentication = .init()
 	}
 
-	func makeServer() async throws(ServerSettingsItem.Error) -> Server {
+	func makeServer() async throws(ServerSettingsError) -> Server {
 		fatalError("Not implemented")
 	}
 }

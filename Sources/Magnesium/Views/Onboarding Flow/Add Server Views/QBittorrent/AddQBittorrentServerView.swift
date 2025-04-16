@@ -53,7 +53,7 @@ struct AddQBittorrentServerView: View {
 					try preferences.addOrUpdate(server: server)
 					session.setServer(server)
 					dismiss()
-				} catch let error as ServerSettingsItem.Error {
+				} catch let error as ServerSettingsError {
 					switch error {
 					case .invalidState(let message):
 						errorMessage = message
