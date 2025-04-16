@@ -46,12 +46,11 @@ public struct SettingsView: View {
 		Section("Servers") {
 			ForEach(servers) { server in
 				NavigationLink {
-					// TODO: When saving this, we don't dismiss properly because in the onboarding we don't use a dismiss action but rather remove the view on a successful save... fix that plz
 					switch server.type {
 					case .deluge:
-						DelugeServerSettingsView(server)
+						EditDelugeServerView(server)
 					case .qbittorrent:
-						QBittorrentServerSettingsView(server)
+						fatalError("Not Implemented")
 					}
 				} label: {
 					Text(server.name)
@@ -107,7 +106,7 @@ public struct SettingsView: View {
 				preferences.reset()
 				session.reset()
 			} label: {
-				Text("Reset")
+				Text("Reset - This is for easy debugging")
 			}
 		}
 	}

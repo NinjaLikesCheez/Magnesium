@@ -16,7 +16,7 @@ struct OnboardingView: View {
 				case .deluge:
 					AddDelugeServerView()
 				case .qbittorrent:
-					QBittorrentServerSettingsView()
+					fatalError("Not Implemented")
 				}
 			}
 		}

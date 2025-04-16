@@ -4,13 +4,16 @@ import Observation
 
 @Observable
 final class Session {
-	private(set) var server: Server!
+	private(set) var server: Server?
 	private var serverObserver: AnyCancellable?
 
 	private(set) var actionImplementation: TorrentActionImplementation!
 
 	init() {
 		_setServer(try? Current.preferences.getSelectedServer())
+		withObservationTracking(of: Current.preferences.selectedServerID) { _ in
+			self._setServer(try? Current.preferences.getSelectedServer())
+		}
 	}
 
 	func setServer(_ server: Server) {
@@ -28,7 +31,6 @@ final class Session {
 			actionImplementation = Session.actionImplementation(server: server)
 		}
 	}
-
 }
 
 extension Session {

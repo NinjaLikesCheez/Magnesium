@@ -21,7 +21,6 @@ struct MagnesiumApp: App {
 			NavigationStack {
 				if session.server == nil {
 					OnboardingView()
-						.environment(session)
 						.environment(preferences)
 				} else {
 					TorrentListView()

@@ -79,7 +79,7 @@ public struct TorrentListView: View {
 			refresh()
 		}
 		.searchable(text: $searchQuery)
-		.navigationTitle(session.server.name)
+		.navigationTitle(session.server?.name ?? "Torrents")
 		.toolbar {
 			settingsToolbarItem
 			selectToolbarItem

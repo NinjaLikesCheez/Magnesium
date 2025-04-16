@@ -1,149 +1,64 @@
+//
+//  ServerSettingsView.swift
+//  Magnesium
+//
+//  Created by ninji on 16/04/2025.
+//
+
 import SwiftUI
 
-struct ServerSettingsItem {
-	let address: String
-	let username: String?
-	let password: String?
-	let basicAuthentication: ServerBasicAuthentication?
+struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
+	let formContent: () -> FormContent
+	let sectionContent: () -> SectionContent
 
-	enum Error: Swift.Error {
-		case invalidState(message: String)
-		case unableToAuthenticate
-	}
-}
-
-struct ServerSettingsView: View {
-	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(\.dismiss) private var dismiss
-	@Environment(Session.self) private var session
+	@State private var isSaving = false
 
 	@Binding var name: String
 	@Binding var address: String
-	var username: Binding<String>?
-	var password: Binding<String>?
-	var basicAuthentication: Binding<ServerBasicAuthentication>?
+	@Binding var basicAuthentication: ServerBasicAuthentication
 
-	@State private var showBasicAuthentication = false
-	@State private var errorMessage: String?
-	@State private var isSaving = false
+	let onSave: () -> Void
+	let saveButtonEnabled: () -> Bool
 
-	let makeServer: () async throws(ServerSettingsItem.Error) -> Server
-	let saveServerButtonEnabled: (Bool) -> Bool
+	init(
+		name: Binding<String>,
+		address: Binding<String>,
+		basicAuthentication: Binding<ServerBasicAuthentication>,
+		onSave: @escaping () -> Void,
+		saveButtonEnabled: @escaping () -> Bool,
+		@ViewBuilder additionalSettings: @escaping () -> FormContent,
+		@ViewBuilder additionalSections: @escaping () -> SectionContent
+	) {
+		self._name = name
+		self._address = address
+		self._basicAuthentication = basicAuthentication
+		self.onSave = onSave
+		self.saveButtonEnabled = saveButtonEnabled
+		self.formContent = additionalSettings
+		self.sectionContent = additionalSections
+	}
 
 	var body: some View {
 		Form {
-			serverSettingsSection
+			ServerSettingsSection(name: $name, address: $address, content: formContent)
 
-			if let errorMessage {
-				Text(errorMessage)
-					.foregroundStyle(.red)
-			}
+			BasicAuthenticationSection(basicAuthentication: $basicAuthentication)
 
-			if let basicAuthentication {
-				basicAuthenticationSection(basicAuthentication)
-			}
+			sectionContent()
 		}
 		.toolbar {
 			saveButton
 		}
 	}
 
-	var serverSettingsSection: some View {
-		Section(header: Text("Server Settings")) {
-			TextField("Name", text: $name)
-				.textContentType(.name)
-
-			TextField("URL", text: $address)
-				.textContentType(.URL)
-				.autocorrectionDisabled()
-				.autocapitalization(.none)
-				#if !os(macOS)
-					.keyboardType(.URL)
-				#endif
-			if let username {
-				TextField("Username", text: username.projectedValue)
-					.textContentType(.username)
-					.autocorrectionDisabled()
-					.autocapitalization(.none)
-			}
-
-			if let password {
-				SecureField("Password", text: password.projectedValue)
-					.textContentType(.password)
-					.autocorrectionDisabled()
-					.autocapitalization(.none)
-			}
-		}
-	}
-
-	func basicAuthenticationSection(_ basicAuthentication: Binding<ServerBasicAuthentication>) -> some View {
-		Section {
-			Toggle(isOn: $showBasicAuthentication) {
-				Text("Enable Basic Authentication")
-			}
-
-			if showBasicAuthentication {
-				TextField("Username", text: basicAuthentication.username)
-					.textContentType(.username)
-					.autocorrectionDisabled()
-					.autocapitalization(.none)
-
-				SecureField("Password", text: basicAuthentication.password)
-					.textContentType(.password)
-					.autocorrectionDisabled()
-					.autocapitalization(.none)
-			}
-		} header: {
-			Text("Basic Authentication Settings")
-		} footer: {
-			Text("This is an additional layer of authentication that may be provided by your server.")
-		}
-	}
-
 	var saveButton: some View {
-		Button {
-			Task {
-				isSaving = true
-				errorMessage = nil
-				do {
-					let server = try await makeServer()
-					try preferences.addOrUpdate(server: server)
-					session.setServer(server)
-					// TODO: move session into preferences?
-				} catch let error as ServerSettingsItem.Error {
-					switch error {
-					case .invalidState(let message):
-						errorMessage = message
-					case .unableToAuthenticate:
-						errorMessage = "Unable to authenticate. Please check the settings are correct."
-					}
-				} catch {
-					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
-				}
-				isSaving = false
-				dismiss()
-			}
-		} label: {
+		Button(action: onSave) {
 			if isSaving {
 				ProgressView()
 			} else {
 				Text("Save")
 			}
 		}
-		.disabled(!saveServerButtonEnabled(showBasicAuthentication))
+		.disabled(!saveButtonEnabled())
 	}
-}
-
-#Preview {
-	ServerSettingsView(
-		name: .constant(""),
-		address: .constant(""),
-		username: .constant(""),
-		password: .constant(""),
-		basicAuthentication: .constant(.init()),
-		makeServer: { fatalError("Not implemented") },
-		saveServerButtonEnabled: { basicAuthenicationEnabled in
-			false
-		}
-	)
 }
