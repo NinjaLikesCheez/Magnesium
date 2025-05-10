@@ -1,9 +1,10 @@
 import SwiftUI
 
 public struct SettingsView: View {
-	@Environment(Session.self) private var session: Session
 	@Environment(\.dismiss) private var dismiss
+	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
+	@Environment(Router.self) var router
 
 	@State private var servers: [Server] = []
 
@@ -16,20 +17,18 @@ public struct SettingsView: View {
 	}
 
 	public var body: some View {
-		NavigationStack {
-			List {
-				serverSection
+		List {
+			serverSection
 
-				generalSection
+			generalSection
 
-				resetSection
-			}
-			.navigationTitle("Settings")
-			.toolbar {
-				ToolbarItem(placement: .topBarTrailing) {
-					Button("Done") {
-						dismiss()
-					}
+			resetSection
+		}
+		.navigationTitle("Settings")
+		.toolbar {
+			ToolbarItem(placement: .topBarTrailing) {
+				Button("Done") {
+					dismiss()
 				}
 			}
 		}
@@ -45,22 +44,17 @@ public struct SettingsView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink {
-					switch server.type {
-					case .deluge:
-						EditDelugeServerView(server)
-					case .qbittorrent:
-						fatalError("Not Implemented")
-					}
-				} label: {
+				RoutableNavigationLink {
 					Text(server.name)
+				} action: {
+					router.push(SettingsCoordinator.Destinations.editServer(server))
 				}
 			}
 
-			NavigationLink {
-				AddServerView()
-			} label: {
+			RoutableNavigationLink {
 				Text("Add Server")
+			} action: {
+				router.push(SettingsCoordinator.Destinations.addAServer)
 			}
 		}
 	}

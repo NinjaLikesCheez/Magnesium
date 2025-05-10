@@ -9,9 +9,10 @@ import SwiftUI
 
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(Session.self) private var session
+	@Environment(Router.self) private var router
 
 	@Binding var torrents: [StandardTorrent]
-	@Binding var sheetDestination: SheetDestination?
+	@Binding var labels: [StandardLabel]
 	@Binding var showAddTorrentConfirmation: Bool
 
 	private var totalUploadSpeed: String {
@@ -31,7 +32,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	var items: some View {
 		HStack {
 			Button {
-				sheetDestination = .filter
+				router.present(TorrentListCoordinator.Sheets.filter(labels: labels))
 			} label: {
 				Image(systemName: "line.3.horizontal.decrease.circle")
 			}

@@ -1,22 +1,15 @@
 import SwiftUI
 
-enum SheetDestination: Identifiable {
-	var id: Self { self }
-
-	case filter
-	case settings
-}
-
 public struct TorrentListView: View {
 	public init() {}
 
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
+	@Environment(Router.self) private var router
 
 	@State private var torrents: [StandardTorrent] = []
 	@State private var labels: [StandardLabel] = []
 	@State private var searchQuery: String = ""
-	@State private var sheetDestination: SheetDestination?
 	@State private var showAddTorrentConfirmation = false
 	@State private var showingFileImporter = false
 	@State private var showingLinkInput = false
@@ -55,16 +48,15 @@ public struct TorrentListView: View {
 
 	var torrentList: some View {
 		List(torrents, selection: editMode.isEditing ? $selections : nil) { torrent in
-			// This is done to remove the disclosure indicator cause yes there's no actual way to do that...
-			ZStack {
+			HStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
-				NavigationLink {
-					TorrentDetailView(torrent: torrent)
-						.environment(session.actionImplementation)
-				} label: {
-					EmptyView()
-				}
-				.opacity(0)
+			}
+			// this is required for the tap gesture to cover the whole row
+			.contentShape(Rectangle())
+			.onTapGesture {
+				router.push(
+					TorrentListCoordinator.Destinations.detail(torrent)
+				)
 			}
 		}
 		.environment(\.editMode, $editMode)
@@ -86,18 +78,9 @@ public struct TorrentListView: View {
 			} else {
 				TorrentListStatusToolbar(
 					torrents: $torrents,
-					sheetDestination: $sheetDestination,
+					labels: $labels,
 					showAddTorrentConfirmation: $showAddTorrentConfirmation
 				)
-			}
-		}
-		.sheet(item: $sheetDestination) { sheetDestination in
-			switch sheetDestination {
-			case .filter:
-				TorrentFilterSettingsView(labels: labels)
-					.presentationDetents([.height(400), .medium, .large])
-			case .settings:
-				SettingsView()
 			}
 		}
 		.confirmationDialog("Add Torrent", isPresented: $showAddTorrentConfirmation, titleVisibility: .visible) {
@@ -158,7 +141,7 @@ public struct TorrentListView: View {
 	var settingsToolbarItem: some ToolbarContent {
 		ToolbarItem(placement: .topBarLeading) {
 			Button {
-				sheetDestination = .settings
+				router.present(TorrentListCoordinator.Sheets.settings)
 			} label: {
 				Image(systemName: "gear")
 			}

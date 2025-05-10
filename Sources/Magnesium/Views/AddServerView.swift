@@ -28,29 +28,28 @@ extension BasicAuthentication {
 }
 
 struct AddServerView: View {
+	@Environment(Router.self) var router
+
 	var body: some View {
-		NavigationStack {
-			List(ServerType.allCases) { server in
-				NavigationLink {
-					switch server {
-					case .deluge:
-						AddDelugeServerView()
-					case .qbittorrent:
-						fatalError("Not Implemented")
-					}
-				} label: {
-					Text(server.localizedString)
-						.fixedSize()
+		List(ServerType.allCases) { server in
+			RoutableNavigationLink {
+				Text(server.localizedString)
+					.fixedSize()
+			} action: {
+				switch server {
+				case .deluge:
+					router.push(SettingsCoordinator.Destinations.addServer(.deluge))
+				case .qbittorrent:
+					router.push(SettingsCoordinator.Destinations.addServer(.qbittorrent))
 				}
 			}
-			.navigationTitle("Add Server")
-			.navigationBarTitleDisplayMode(.inline)
-			#if !os(macOS)
-				.listStyle(.insetGrouped)
-			#else
-				.listStyle(.bordered)
-			#endif
 		}
-
+		.navigationTitle("Add Server")
+		.navigationBarTitleDisplayMode(.inline)
+		#if !os(macOS)
+			.listStyle(.insetGrouped)
+		#else
+			.listStyle(.bordered)
+		#endif
 	}
 }
