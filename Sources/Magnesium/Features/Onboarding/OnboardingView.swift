@@ -34,7 +34,7 @@ struct OnboardingView: View {
 	var addClientsButton: some View {
 		ForEach(ServerType.allCases) { type in 
 			Button {
-				router.push(OnboardingCoordinator.Destinations.addServer(type))
+				router.push(.addServer(type))
 			} label: {
 				Text(type.rawValue)
 					.fontWeight(.bold)

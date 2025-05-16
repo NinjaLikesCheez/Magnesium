@@ -47,14 +47,14 @@ public struct SettingsView: View {
 				RoutableNavigationLink {
 					Text(server.name)
 				} action: {
-					router.push(SettingsCoordinator.Destinations.editServer(server))
+					router.push(.editServer(server))
 				}
 			}
 
 			RoutableNavigationLink {
 				Text("Add Server")
 			} action: {
-				router.push(SettingsCoordinator.Destinations.addAServer)
+				router.push(.addAServer)
 			}
 		}
 	}

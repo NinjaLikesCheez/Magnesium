@@ -67,3 +67,9 @@ extension TorrentListCoordinator {
 		case settings
 	}
 }
+
+extension Router {
+	func push(_ destination: TorrentListCoordinator.Destinations) {
+		path.append(destination)
+	}
+}

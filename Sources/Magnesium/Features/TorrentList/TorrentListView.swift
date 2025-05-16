@@ -54,9 +54,7 @@ public struct TorrentListView: View {
 			// this is required for the tap gesture to cover the whole row
 			.contentShape(Rectangle())
 			.onTapGesture {
-				router.push(
-					TorrentListCoordinator.Destinations.detail(torrent)
-				)
+				router.push(.detail(torrent))
 			}
 		}
 		.environment(\.editMode, $editMode)

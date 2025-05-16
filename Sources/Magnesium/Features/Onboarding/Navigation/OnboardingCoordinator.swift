@@ -47,3 +47,9 @@ extension OnboardingCoordinator {
 		var id: ObjectIdentifier { self }
 	}
 }
+
+extension Router {
+	func push(_ destination: OnboardingCoordinator.Destinations) {
+		path.append(destination)
+	}
+}

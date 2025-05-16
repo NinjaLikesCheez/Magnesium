@@ -38,9 +38,9 @@ struct AddServerView: View {
 			} action: {
 				switch server {
 				case .deluge:
-					router.push(SettingsCoordinator.Destinations.addServer(.deluge))
+					router.push(.addNewServer(.deluge))
 				case .qbittorrent:
-					router.push(SettingsCoordinator.Destinations.addServer(.qbittorrent))
+					router.push(.addNewServer(.qbittorrent))
 				}
 			}
 		}

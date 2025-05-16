@@ -23,7 +23,7 @@ struct SettingsCoordinator: Coordinator {
 					switch item {
 					case .addAServer:
 						AddServerView()
-					case let .addServer(type):
+					case let .addNewServer(type):
 						switch type {
 						case .deluge:
 							AddDelugeServerView()
@@ -55,10 +55,16 @@ extension SettingsCoordinator {
 	enum Destinations: Hashable {
 		case editServer(Server)
 		case addAServer
-		case addServer(ServerType)
+		case addNewServer(ServerType)
 	}
 
 	enum Sheets: Hashable, Identifiable {
 		var id: ObjectIdentifier { self }
+	}
+}
+
+extension Router {
+	func push(_ destination: SettingsCoordinator.Destinations) {
+		path.append(destination)
 	}
 }
