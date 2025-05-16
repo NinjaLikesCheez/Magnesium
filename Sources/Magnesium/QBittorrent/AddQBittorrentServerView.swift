@@ -41,7 +41,7 @@ struct AddQBittorrentServerView: View {
 		} message: {
 			Text(errorMessage)
 		}
-		.navigationTitle("Deluge Settings")
+		.navigationTitle("QBittorrent Settings")
 	}
 
 	var saveButton: some View {

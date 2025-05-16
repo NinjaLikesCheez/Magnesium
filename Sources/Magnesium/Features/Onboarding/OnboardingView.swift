@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-	@State private var sheetDestination: ServerType?
+	@Environment(Router.self) var router
 
 	var body: some View {
 		VStack(spacing: 20) {
@@ -9,16 +9,6 @@ struct OnboardingView: View {
 			headlineText
 			subtitleText
 			addClientsButton
-		}
-		.sheet(item: $sheetDestination) { type in
-			NavigationStack {
-				switch type {
-				case .deluge:
-					AddDelugeServerView()
-				case .qbittorrent:
-					fatalError("Not Implemented")
-				}
-			}
 		}
 	}
 	var appIcon: some View {
@@ -44,7 +34,7 @@ struct OnboardingView: View {
 	var addClientsButton: some View {
 		ForEach(ServerType.allCases) { type in 
 			Button {
-				sheetDestination = type
+				router.push(.addServer(type))
 			} label: {
 				Text(type.rawValue)
 					.fontWeight(.bold)

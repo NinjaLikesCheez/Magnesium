@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddDelugeServerView: View {
 	@Environment(\.dismiss) private var dismiss
+	@Environment(Router.self) var router
 	@Environment(AppPreferences.self) private var preferences
 
 	@State private var settings: DelugeSettings = .init()
@@ -45,6 +46,7 @@ struct AddDelugeServerView: View {
 		// TODO: Error handle
 		let server = try await settings.makeServer()
 		try preferences.addOrUpdate(server: server)
-		dismiss()
+		router.popToRoot()
+//		dismiss()
 	}
 }

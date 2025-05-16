@@ -1,6 +1,6 @@
 import Foundation
 
-struct Server: Equatable {
+struct Server: Equatable, Hashable {
 	var id: String { name }
 	var name: String
 	var type: ServerType
