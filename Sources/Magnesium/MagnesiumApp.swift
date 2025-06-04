@@ -11,9 +11,9 @@ struct MagnesiumApp: App {
 	init() {
 		LoggingSystem.bootstrap { label in
 			var logger = StreamLogHandler.standardOutput(label: label)
-//			#if DEBUG
-//			logger.logLevel = .debug
-//			#endif
+			#if DEBUG
+			logger.logLevel = .debug
+			#endif
 			return logger
 		}
 	}
@@ -22,11 +22,13 @@ struct MagnesiumApp: App {
 		@Bindable var router = router
 
 		WindowGroup {
-			NavigationStack(path: $router.path) {
+			Group {
 				if session.server == nil {
-					OnboardingCoordinator(
-						dependencies: .init(preferences: preferences)
-					)
+					NavigationStack(path: $router.path) {
+						OnboardingCoordinator(
+							dependencies: .init(preferences: preferences)
+						)
+					}
 				} else {
 					TorrentListCoordinator(
 						dependencies: .init(

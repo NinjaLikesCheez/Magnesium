@@ -1,8 +1,6 @@
 import SwiftUI
 
 public struct TorrentListView: View {
-	public init() {}
-
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
 	@Environment(Router.self) private var router
@@ -18,9 +16,11 @@ public struct TorrentListView: View {
 
 	// TODO: this error handling needs a _lot_ of UX love...
 	@State private var error: String?
-	@State private var selections: Set<String> = []
+	@State private var editingSelections: Set<String> = []
 
-	private var selectedTorrents: [StandardTorrent] { torrents.filter { selections.contains($0.id) } }
+	@Binding var selections: Set<StandardTorrent>
+
+//	private var selectedTorrents: [StandardTorrent] { torrents.filter { selections.contains($0.id) } }
 
 	public var body: some View {
 //		let _ = Self._printChanges()
@@ -47,14 +47,18 @@ public struct TorrentListView: View {
 	}
 
 	var torrentList: some View {
-		List(torrents, selection: editMode.isEditing ? $selections : nil) { torrent in
+		List(torrents, selection: editMode.isEditing ? $editingSelections : nil) { torrent in
 			HStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
 			}
 			// this is required for the tap gesture to cover the whole row
 			.contentShape(Rectangle())
 			.onTapGesture {
-				router.push(.detail(torrent))
+				if editMode.isEditing {
+					selections.insert(torrent)
+				} else {
+					selections = [torrent]
+				}
 			}
 		}
 		.environment(\.editMode, $editMode)
@@ -70,7 +74,7 @@ public struct TorrentListView: View {
 
 			if editMode.isEditing {
 				TorrentListEditingToolbar(
-					selectedTorrents: selectedTorrents,
+					selectedTorrents: selections,
 					error: $error
 				)
 			} else {
@@ -182,5 +186,8 @@ public struct TorrentListView: View {
 }
 
 #Preview {
-	TorrentListView()
+	@Previewable
+	@State var selections = Set<StandardTorrent>()
+
+	TorrentListView(selections: $selections)
 }

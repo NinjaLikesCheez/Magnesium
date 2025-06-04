@@ -17,36 +17,55 @@ struct TorrentListCoordinator: Coordinator {
 	@Environment(Router.self) var router
 	@State var settingsRouter = Router("Settings Router")
 
+	@State private var selections: Set<StandardTorrent> = []
+	@State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
+
 	var body: some View {
 		@Bindable var router = router
 
-		TorrentListView()
-			.navigationDestination(for: Destinations.self) { destination in
-				switch destination {
-				case let .detail(torrent):
-					TorrentDetailView(torrent: torrent)
-						.environment(dependencies.session.actionImplementation)
-				}
-			}
-			.sheet(item: $router.presentedSheet) { item in
-				if let sheet = item.destination as? Sheets {
-					switch sheet {
-					case let .filter(labels):
-						TorrentFilterSettingsView(labels: labels)
-							.presentationDetents([.height(400), .medium, .large])
-					case .settings:
-						SettingsCoordinator(
-							dependencies: .init(
-								preferences: dependencies.preferences,
-								session: dependencies.session
+		NavigationSplitView(columnVisibility: $columnVisibility) {
+			TorrentListView(selections: $selections)
+//				.navigationDestination(for: Destinations.self) { destination in
+//					switch destination {
+//					case let .detail(torrent):
+//						TorrentDetailView(torrent: torrent)
+//							.environment(dependencies.session.actionImplementation)
+//					}
+//				}
+				.sheet(item: $router.presentedSheet) { item in
+					if let sheet = item.destination as? Sheets {
+						switch sheet {
+						case let .filter(labels):
+							TorrentFilterSettingsView(labels: labels)
+								.presentationDetents([.height(400), .medium, .large])
+						case .settings:
+							SettingsCoordinator(
+								dependencies: .init(
+									preferences: dependencies.preferences,
+									session: dependencies.session
+								)
 							)
-						)
-						.environment(settingsRouter)
+							.environment(settingsRouter)
+						}
 					}
 				}
+				.environment(dependencies.session)
+				.environment(dependencies.preferences)
+		} detail: {
+			if selections.isEmpty {
+				ContentUnavailableView(
+					"No selection",
+					systemImage: "filemenu.and.selection",
+					description: Text("Select a torrent to see details about it")
+				)
+			} else if selections.count == 1 {
+				TorrentDetailView(torrent: selections.first!)
+					.environment(dependencies.session.actionImplementation)
+			} else {
+				Text("Multiple selected what do???")
 			}
-			.environment(dependencies.session)
-			.environment(dependencies.preferences)
+		}
+		.navigationSplitViewStyle(.balanced)
 	}
 }
 

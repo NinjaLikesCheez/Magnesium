@@ -22,6 +22,9 @@ final class Router {
 	var path = NavigationPath()
 	var presentedSheet: AnySheetDestination? = nil
 
+	@ObservationIgnored
+	@Environment(\.dismiss) private var dismiss
+
 	init(_ name: String) {
 		self.name = name
 	}
