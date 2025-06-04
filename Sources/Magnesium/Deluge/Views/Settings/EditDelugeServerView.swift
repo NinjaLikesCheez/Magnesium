@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditDelugeServerView: View {
-	@Environment(\.dismiss) private var dismiss
+	@Environment(Router.self) private var router
 	@Environment(Session.self) private var session
 	@Environment(AppPreferences.self) private var preferences
 
@@ -56,7 +56,7 @@ struct EditDelugeServerView: View {
 				Button("Delete", role: .destructive) {
 					do {
 						try preferences.remove(server: server)
-						dismiss()
+						router.pop()
 					} catch {
 						// TODO: Error handle
 						print("Failed to remove server: \(server)")
@@ -73,6 +73,6 @@ struct EditDelugeServerView: View {
 		let server = try await settings.makeServer()
 		try preferences.addOrUpdate(server: server)
 		session.setServer(server)
-		dismiss()
+		router.pop()
 	}
 }

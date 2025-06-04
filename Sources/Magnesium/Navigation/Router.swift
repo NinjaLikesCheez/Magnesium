@@ -39,7 +39,12 @@ final class Router {
 	}
 
 	func popToRoot() {
+		dismissSheet()
 		path.removeLast(path.count)
+	}
+
+	func dismissSheet() {
+		presentedSheet = nil
 	}
 }
 
@@ -69,4 +74,18 @@ struct RoutableNavigationLink<Content: View>: View {
 			action()
 		}
 	}
+}
+
+extension EnvironmentValues {
+	var appRouter: Router {
+		get {
+			self[AppRouterKey]
+		} set {
+			self[AppRouterKey] = newValue
+		}
+	}
+}
+
+struct AppRouterKey: EnvironmentKey {
+	static var defaultValue: Router = .init("App")
 }

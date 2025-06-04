@@ -3,9 +3,10 @@ import Logging
 
 @main
 struct MagnesiumApp: App {
+	@Environment(\.appRouter) private var router
+
 	@State private var session = Session()
 	@State private var preferences = Current.preferences
-	@State private var router = Router("App Router")
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -18,6 +19,8 @@ struct MagnesiumApp: App {
 	}
 
 	var body: some Scene {
+		@Bindable var router = router
+
 		WindowGroup {
 			NavigationStack(path: $router.path) {
 				if session.server == nil {
