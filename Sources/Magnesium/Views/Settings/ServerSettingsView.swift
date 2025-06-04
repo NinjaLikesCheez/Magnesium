@@ -12,6 +12,7 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 	let sectionContent: () -> SectionContent
 
 	@State private var isSaving = false
+	@State private var error: String? = nil
 
 	@Binding var name: String
 	@Binding var address: String
