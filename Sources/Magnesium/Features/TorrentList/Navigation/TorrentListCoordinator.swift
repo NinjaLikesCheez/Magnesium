@@ -17,14 +17,19 @@ struct TorrentListCoordinator: Coordinator {
 	@Environment(Router.self) var router
 	@State var settingsRouter = Router("Settings Router")
 
-	@State private var selections: Set<StandardTorrent> = []
+	@State private var torrents: [StandardTorrent] = []
+	@State private var labels: [StandardLabel] = []
+	@State private var searchQuery: String = ""
+	@State private var error: String?
+
+	@State private var selections: Set<String> = []
 	@State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 
 	var body: some View {
 		@Bindable var router = router
 
 		NavigationSplitView(columnVisibility: $columnVisibility) {
-			TorrentListView(selections: $selections)
+			TorrentListView(torrents: $torrents, labels: $labels, searchQuery: $searchQuery, error: $error, selections: $selections)
 				.sheet(item: $router.presentedSheet) { item in
 					if let sheet = item.destination as? Sheets {
 						switch sheet {
@@ -52,13 +57,38 @@ struct TorrentListCoordinator: Coordinator {
 					description: Text("Select a torrent to see details about it")
 				)
 			} else if selections.count == 1 {
-				TorrentDetailView(torrent: selections.first!)
+				TorrentDetailView(torrent: torrents.first(where: { $0.id == selections.first! })!)
 					.environment(dependencies.session.actionImplementation)
 			} else {
-				Text("Multiple selected what do???")
+				ContentUnavailableView(
+					"Multiple selections",
+					systemImage: "filemenu.and.selection",
+					description: Text("Select a single torrent to see details about it")
+				)
 			}
 		}
 		.navigationSplitViewStyle(.balanced)
+	}
+
+	func refresh() {
+		Task {
+			do {
+				let (torrents, labels) = try await dependencies.session.actionImplementation.refresh()
+				error = nil
+				
+				self.torrents = TorrentMapper
+					.map(
+						torrents,
+						query: searchQuery,
+						sortOption: dependencies.preferences.sortOption,
+						filterOptions: dependencies.preferences.filterOptions
+					)
+				self.labels = labels
+			} catch {
+				print("Error refreshing torrents: \(error)")
+				self.error = error.localizedDescription
+			}
+		}
 	}
 }
 
