@@ -25,19 +25,12 @@ struct TorrentListCoordinator: Coordinator {
 
 		NavigationSplitView(columnVisibility: $columnVisibility) {
 			TorrentListView(selections: $selections)
-//				.navigationDestination(for: Destinations.self) { destination in
-//					switch destination {
-//					case let .detail(torrent):
-//						TorrentDetailView(torrent: torrent)
-//							.environment(dependencies.session.actionImplementation)
-//					}
-//				}
 				.sheet(item: $router.presentedSheet) { item in
 					if let sheet = item.destination as? Sheets {
 						switch sheet {
 						case let .filter(labels):
 							TorrentFilterSettingsView(labels: labels)
-								.presentationDetents([.height(400), .medium, .large])
+								.presentationDetents([.height(400), .large])
 						case .settings:
 							SettingsCoordinator(
 								dependencies: .init(

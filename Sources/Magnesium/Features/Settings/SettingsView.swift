@@ -29,7 +29,7 @@ public struct SettingsView: View {
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Done") {
-					router.dismissSheet()
+					appRouter.dismissSheet()
 				}
 			}
 		}
