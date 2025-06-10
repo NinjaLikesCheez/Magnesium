@@ -10,6 +10,7 @@ import SwiftUI
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(Session.self) private var session
 	@Environment(Router.self) private var router
+	@Environment(AppPreferences.self) private var preferences
 
 	@Binding var torrents: [StandardTorrent]
 	@Binding var labels: [StandardLabel]
@@ -31,11 +32,13 @@ struct TorrentListStatusToolbar: ToolbarContent {
 
 	var items: some View {
 		HStack {
-			Button {
-				router.present(TorrentListCoordinator.Sheets.filter(labels: labels))
-			} label: {
-				Image(systemName: "line.3.horizontal.decrease.circle")
-			}
+//			Button {
+//				router.present(TorrentListCoordinator.Sheets.filter(labels: labels))
+//			} label: {
+//				Image(systemName: "line.3.horizontal.decrease.circle")
+//			}
+			TorrentFilterMenu(labels: $labels)
+				.environment(preferences)
 
 			Spacer()
 
