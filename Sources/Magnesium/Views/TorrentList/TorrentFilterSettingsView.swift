@@ -23,13 +23,13 @@ enum TorrentSortOption: String, CaseIterable {
 }
 
 struct TorrentFilterMenu: View {
-	@Binding var labels: [StandardLabel]
+	var labels: [StandardLabel]
 
 	@State private var selectedStates: Set<TorrentState> = []
 	@State private var selectedLabels: Set<String> = []
 
-	init(labels: Binding<[StandardLabel]>) {
-		self._labels = labels
+	init(labels: [StandardLabel]) {
+		self.labels = labels
 
 		let filters = Current.preferences.filterOptions
 		selectedLabels = filters.labels

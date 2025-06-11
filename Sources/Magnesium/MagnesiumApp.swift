@@ -5,8 +5,10 @@ import Logging
 struct MagnesiumApp: App {
 	@Environment(\.appRouter) private var router
 
-	@State private var session = Session()
-	@State private var preferences = Current.preferences
+	let session = Session()
+	let preferences = AppPreferences(userDefaults: .standard)
+
+	@State private var torrentManager: TorrentManager
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -16,6 +18,7 @@ struct MagnesiumApp: App {
 			#endif
 			return logger
 		}
+		_torrentManager = State(wrappedValue: TorrentManager(session: session))
 	}
 
 	var body: some Scene {
@@ -36,6 +39,7 @@ struct MagnesiumApp: App {
 							session: session
 						)
 					)
+					.environment(torrentManager)
 				}
 			}
 			.environment(router)

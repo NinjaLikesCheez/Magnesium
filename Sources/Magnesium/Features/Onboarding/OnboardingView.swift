@@ -12,18 +12,22 @@ struct OnboardingView: View {
 			addClientsButton
 		}
 	}
+
 	var appIcon: some View {
 		Image("Icon")
 			.resizable()
-			.scaledToFit()
+			.scaledToFill()
 			.cornerRadius(15)
 			.padding([.horizontal, .vertical], 50)
 	}
 
 	var headlineText: some View {
-		Text("Welcome to Magnesium!")
-			.font(.largeTitle)
-			.fontWeight(.bold)
+		AnimatedMeshGradientView()
+		.mask {
+			Text("Magnesium")
+				.font(.system(size: 50))
+				.fontWeight(.bold)
+		}
 	}
 
 	var subtitleText: some View {
@@ -49,7 +53,7 @@ struct OnboardingView: View {
 							.frame(maxWidth: .infinity)
 							.padding()
 					}
-					.buttonStyle(.borderedProminent)
+					.buttonStyle(.glass)
 					.buttonBorderShape(.capsule)
 					.padding(.vertical, 10)
 					.frame(maxWidth: reader.size.width * 0.5)

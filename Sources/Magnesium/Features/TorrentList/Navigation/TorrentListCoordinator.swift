@@ -17,73 +17,65 @@ struct TorrentListCoordinator: Coordinator {
 	@Environment(Router.self) var router
 	@State var settingsRouter = Router("Settings Router")
 
-	@State private var torrents: [StandardTorrent] = []
-	@State private var labels: [StandardLabel] = []
-	@State private var searchQuery: String = ""
-	@State private var error: String?
+	@Environment(TorrentManager.self) var torrentManager
+	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
 	@State private var selections: Set<String> = []
-	@State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
+	@State private var columnVisibility: NavigationSplitViewVisibility = .automatic
 
 	var body: some View {
 		@Bindable var router = router
+		@Bindable var torrentManager = torrentManager
 
 		NavigationSplitView(columnVisibility: $columnVisibility) {
-			TorrentListView(torrents: $torrents, labels: $labels, searchQuery: $searchQuery, error: $error, selections: $selections)
-				.sheet(item: $router.presentedSheet) { item in
-					if let sheet = item.destination as? Sheets {
-						switch sheet {
-						case .settings:
-							SettingsCoordinator(
-								dependencies: .init(
-									preferences: dependencies.preferences,
-									session: dependencies.session
-								)
+			TorrentListView(
+				selections: $selections
+			)
+			.sheet(item: $router.presentedSheet) { item in
+				if let sheet = item.destination as? Sheets {
+					switch sheet {
+					case .settings:
+						SettingsCoordinator(
+							dependencies: .init(
+								preferences: dependencies.preferences,
+								session: dependencies.session
 							)
-							.environment(settingsRouter)
-						}
+						)
+						.environment(settingsRouter)
 					}
 				}
-				.environment(dependencies.session)
-				.environment(dependencies.preferences)
+			}
+			.environment(dependencies.session)
+			.environment(dependencies.preferences)
 		} detail: {
-			if selections.isEmpty {
-				ContentUnavailableView(
-					"No selection",
-					systemImage: "filemenu.and.selection",
-					description: Text("Select a torrent to see details about it")
-				)
-			} else if selections.count == 1 {
-				TorrentDetailView(torrent: torrents.first(where: { $0.id == selections.first! })!)
-					.environment(dependencies.session.actionImplementation)
-			} else {
-				ContentUnavailableView(
-					"Multiple selections",
-					systemImage: "filemenu.and.selection",
-					description: Text("Select a single torrent to see details about it")
-				)
+			Group {
+				if selections.isEmpty {
+					ContentUnavailableView(
+						"No selection",
+						systemImage: "filemenu.and.selection",
+						description: Text("Select a torrent to see details about it")
+					)
+				} else if selections.count == 1 {
+					TorrentDetailView(torrent: torrentManager.torrents.first(where: { $0.id == selections.first! })!)
+						.environment(dependencies.session.actionImplementation)
+				} else {
+					ContentUnavailableView(
+						"Multiple selections",
+						systemImage: "filemenu.and.selection",
+						description: Text("Select a single torrent to see details about it")
+					)
+				}
 			}
 		}
 		.navigationSplitViewStyle(.balanced)
 	}
 
-	func refresh() {
-		Task {
-			do {
-				let (torrents, labels) = try await dependencies.session.actionImplementation.refresh()
-				error = nil
-				
-				self.torrents = TorrentMapper
-					.map(
-						torrents,
-						query: searchQuery,
-						sortOption: dependencies.preferences.sortOption,
-						filterOptions: dependencies.preferences.filterOptions
-					)
-				self.labels = labels
-			} catch {
-				print("Error refreshing torrents: \(error)")
-				self.error = error.localizedDescription
+	var settingsToolbarItem: some ToolbarContent {
+		ToolbarItem(placement: .topBarLeading) {
+			Button {
+				router.present(TorrentListCoordinator.Sheets.settings)
+			} label: {
+				Image(systemName: "gear")
 			}
 		}
 	}

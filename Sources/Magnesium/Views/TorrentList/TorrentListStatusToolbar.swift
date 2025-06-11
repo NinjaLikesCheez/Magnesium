@@ -12,8 +12,8 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(Router.self) private var router
 	@Environment(AppPreferences.self) private var preferences
 
-	@Binding var torrents: [StandardTorrent]
-	@Binding var labels: [StandardLabel]
+	var torrents: [StandardTorrent]
+	var labels: [StandardLabel]
 	@Binding var showAddTorrentConfirmation: Bool
 
 	private var totalUploadSpeed: String {
@@ -37,7 +37,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 //			} label: {
 //				Image(systemName: "line.3.horizontal.decrease.circle")
 //			}
-			TorrentFilterMenu(labels: $labels)
+			TorrentFilterMenu(labels: labels)
 				.environment(preferences)
 
 			Spacer()
