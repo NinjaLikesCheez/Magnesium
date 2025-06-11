@@ -33,9 +33,6 @@ struct TorrentListCoordinator: Coordinator {
 				.sheet(item: $router.presentedSheet) { item in
 					if let sheet = item.destination as? Sheets {
 						switch sheet {
-						case let .filter(labels):
-							TorrentFilterSettingsView(labels: labels)
-								.presentationDetents([.height(400), .large])
 						case .settings:
 							SettingsCoordinator(
 								dependencies: .init(
@@ -105,7 +102,6 @@ extension TorrentListCoordinator {
 	enum Sheets: Hashable, Identifiable {
 		var id: Self { self }
 
-		case filter(labels: [StandardLabel])
 		case settings
 	}
 }
