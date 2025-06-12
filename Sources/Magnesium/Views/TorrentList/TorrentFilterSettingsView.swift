@@ -14,25 +14,19 @@ enum TorrentSortOption: String, CaseIterable {
 		var inverted: Self {
 			switch self {
 			case .ascending:
-				.descending
+					.descending
 			case .descending:
-				.ascending
+					.ascending
 			}
 		}
 	}
 }
 
-struct TorrentFilterSettingsView: View {
-	@Environment(Session.self) private var session: Session
-	@Environment(\.dismiss) private var dismiss
+struct TorrentFilterMenu: View {
+	var labels: [StandardLabel]
 
-	let labels: [StandardLabel]
-
-	@State private var selectedSortProperty: SortOption.Property
-	@State private var selectedSortDirection: SortOption.Direction
-	
-	@State private var selectedStates: Set<TorrentState>
-	@State private var selectedLabels: Set<String>
+	@State private var selectedStates: Set<TorrentState> = []
+	@State private var selectedLabels: Set<String> = []
 
 	init(labels: [StandardLabel]) {
 		self.labels = labels
@@ -40,188 +34,133 @@ struct TorrentFilterSettingsView: View {
 		let filters = Current.preferences.filterOptions
 		selectedLabels = filters.labels
 		selectedStates = filters.states
-
-		let sortOption = Current.preferences.sortOption
-		selectedSortProperty = sortOption.property
-		selectedSortDirection = sortOption.direction
 	}
 
 	var body: some View {
-		NavigationStack {
-			List {
-				sortSection
+		Menu {
+			filterMenu
+			viewOptionsMenu
+		} label: {
+			Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+		}
+		.onChange(of: Current.preferences.filterOptions.labels) { _, labels in
+			selectedLabels = labels
+		}
+		.onChange(of: Current.preferences.filterOptions.states) { _, states in
+			selectedStates = states
+		}
+		.onChange(of: selectedLabels) { _, labels in
+			Current.preferences.filterOptions.labels = labels
+		}
+		.onChange(of: selectedStates) { _, states in
+			Current.preferences.filterOptions.states = states
+		}
+	}
 
-				generalSection
+	var filterMenu: some View {
+		Menu("Filter") {
+			stateMenu
+			labelMenu
+		}
+		.pickerStyle(.menu)
+		.menuActionDismissBehavior(.disabled)
+	}
 
-				Button("Reset", role: .destructive) {
-					reset()
-					dismiss()
+	var stateMenu: some View {
+		@Bindable var preferences = Current.preferences
+
+		return Menu("State") {
+			ForEach(TorrentState.allCases) { state in
+				Button {
+					if selectedStates.contains(state) {
+						selectedStates.remove(state)
+					} else {
+						selectedStates.insert(state)
+					}
+				} label: {
+					HStack {
+						if preferences.filterOptions.states.contains(state) {
+							Image(systemName: "checkmark")
+							Spacer()
+						}
+						Text(state.rawValue)
+					}
 				}
-				.frame(maxWidth: .infinity, alignment: .center)
 			}
-			.navigationTitle("Filter")
-			.navigationBarTitleDisplayMode(.inline)
-			.onChange(of: selectedLabels) { _, newValue in
-				Current.preferences.filterOptions.labels = newValue
-			}
-			.onChange(of: selectedStates) { _, newValue in
-				Current.preferences.filterOptions.states = newValue
-			}
-			.onChange(of: selectedSortProperty) { _, newValue in
-				Current.preferences.sortOption.property = newValue
-			}
-			.onChange(of: selectedSortDirection) { _, newValue in
-				Current.preferences.sortOption.direction = newValue
+
+			Divider()
+
+			Button {
+				selectedStates = []
+			} label: {
+				HStack {
+					Text("All")
+					Spacer()
+					if preferences.filterOptions.states.isEmpty {
+						Image(systemName: "checkmark")
+							.foregroundStyle(.blue)
+					}
+				}
 			}
 		}
 	}
 
-	private func reset() {
-		selectedSortProperty = .dateAdded
-		selectedSortDirection = .descending
-		selectedStates = []
-		selectedLabels = []
+	var labelMenu: some View {
+		@Bindable var preferences = Current.preferences
+
+		return Menu("Label") {
+			ForEach(labels.sorted(by: { $0.name < $1.name }), id: \.self) { label in
+				Button {
+					if selectedLabels.contains(label.name) {
+						selectedLabels.remove(label.name)
+					} else {
+						selectedLabels.insert(label.name)
+					}
+				} label: {
+					Text(label.name)
+
+					Spacer()
+
+					if preferences.filterOptions.labels.contains(label.name) {
+						Image(systemName: "checkmark")
+					}
+				}
+			}
+
+			Divider()
+
+			Button {
+				preferences.filterOptions.labels = []
+			} label: {
+				HStack {
+					Text("All")
+					Spacer()
+					if preferences.filterOptions.labels.isEmpty {
+						Image(systemName: "checkmark")
+							.foregroundStyle(.blue)
+					}
+				}
+			}
+		}
 	}
 
-	var sortSection: some View {
-		Section {
-			Picker("Sort", selection: $selectedSortProperty) {
+	var viewOptionsMenu: some View {
+		@Bindable var preferences = Current.preferences
+
+		return Menu("View Options") {
+			Picker("Sort", selection: $preferences.sortOption.property) {
 				ForEach(SortOption.Property.allCases, id: \.self) { option in
 					Text(option.rawValue)
 				}
 			}
 			.pickerStyle(.menu)
-			.accentColor(.secondary)
 
-			Picker("Direction", selection: $selectedSortDirection) {
+			Picker("Direction", selection: $preferences.sortOption.direction) {
 				ForEach(SortOption.Direction.allCases, id: \.self) { option in
 					Text(option.rawValue)
 				}
 			}
 			.pickerStyle(.menu)
-			.accentColor(.secondary)
 		}
 	}
-
-	var generalSection: some View {
-		Section {
-			stateRow
-			labelRow
-		}
-	}
-
-	var stateRow: some View {
-		HStack {
-			Menu {
-				Button {
-					selectedStates = []
-				} label: {
-					HStack {
-						Text("All")
-						Spacer()
-						if selectedStates.isEmpty {
-							Image(systemName: "checkmark")
-								.foregroundStyle(.blue)
-						}
-					}
-				}
-
-				// The rest of the states
-				ForEach(TorrentState.allCases, id: \.self) { state in
-					Button {
-						if selectedStates.contains(state) {
-							selectedStates.remove(state)
-						} else {
-							selectedStates.insert(state)
-						}
-					} label: {
-						HStack {
-							Text(state.rawValue)
-							Spacer()
-							if selectedStates.contains(state) {
-								Image(systemName: "checkmark")
-									.foregroundStyle(.blue)
-							}
-						}
-					}
-				}
-			} label: {
-				Text("State")
-
-				Spacer()
-				if selectedStates.isEmpty {
-					Text("All")
-						.foregroundStyle(.secondary)
-				} else {
-					Text(selectedStates.map(\.rawValue).joined(separator: ", "))
-						.lineLimit(1)
-						.foregroundStyle(.secondary)
-				}
-			}
-			.menuActionDismissBehavior(.disabled)
-			.foregroundStyle(.primary)
-		}
-	}
-
-	var labelRow: some View {
-		HStack {
-			Menu {
-				Button {
-					selectedLabels = []
-				} label: {
-					HStack {
-						Text("All")
-						Spacer()
-						if selectedLabels.isEmpty {
-							Image(systemName: "checkmark")
-								.foregroundStyle(.blue)
-						}
-					}
-				}
-
-				// The rest of the states
-				ForEach(labels.sorted(by: { $0.name < $1.name }), id: \.self) { label in
-					Button {
-						if selectedLabels.contains(label.name) {
-							selectedLabels.remove(label.name)
-						} else {
-							selectedLabels.insert(label.name)
-						}
-					} label: {
-						HStack {
-							Text(label.name)
-							Spacer()
-							if selectedLabels.contains(label.name) {
-								Image(systemName: "checkmark")
-									.foregroundStyle(.blue)
-							}
-						}
-					}
-				}
-			} label: {
-				Text("Label")
-				Spacer()
-				if selectedLabels.isEmpty {
-					Text("All")
-						.foregroundStyle(.secondary)
-				} else {
-					Text(selectedLabels.joined(separator: ", "))
-						.lineLimit(1)
-						.foregroundStyle(.secondary)
-				}
-			}
-		}
-		.menuActionDismissBehavior(.disabled)
-		.foregroundStyle(.primary)
-	}
-}
-
-#Preview {
-	TorrentFilterSettingsView(
-		labels: [
-			.init(name: "MyLabel", count: 1),
-			.init(name: "SecondLabel", count: 2),
-		]
-	)
-	.environment(Session())
 }

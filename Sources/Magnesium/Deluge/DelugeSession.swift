@@ -5,8 +5,6 @@ typealias DelugeTorrentItem = TorrentItem
 
 struct DelugeSession {
 	let client: Deluge
-	let torrents = [StandardTorrent]()
-	let labels = [StandardLabel]()
 
 	func refresh() async throws -> ([StandardTorrent], [StandardLabel]) {
 		let torrentsAndLabels = try await client.request(.updateUIForApp)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingView: View {
 	@Environment(Router.self) var router
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
 		VStack(spacing: 20) {
@@ -11,18 +12,22 @@ struct OnboardingView: View {
 			addClientsButton
 		}
 	}
+
 	var appIcon: some View {
 		Image("Icon")
 			.resizable()
-			.scaledToFit()
+			.scaledToFill()
 			.cornerRadius(15)
-			.padding()
+			.padding([.horizontal, .vertical], 50)
 	}
 
 	var headlineText: some View {
-		Text("Welcome to Magnesium!")
-			.font(.largeTitle)
-			.fontWeight(.bold)
+		AnimatedMeshGradientView()
+		.mask {
+			Text("Magnesium")
+				.font(.system(size: 50))
+				.fontWeight(.bold)
+		}
 	}
 
 	var subtitleText: some View {
@@ -32,21 +37,30 @@ struct OnboardingView: View {
 	}
 
 	var addClientsButton: some View {
-		ForEach(ServerType.allCases) { type in 
-			Button {
-				router.push(.addServer(type))
-			} label: {
-				Text(type.rawValue)
-					.fontWeight(.bold)
-					.frame(maxWidth: .infinity)
-					.padding()
+		GeometryReader { reader in
+			VStack {
+				ForEach(ServerType.allCases) { type in
+					Button {
+						if horizontalSizeClass == .compact {
+							router.push(.addServer(type))
+						} else {
+							// On larger screens, a sheet looks better
+							router.sheet(.addServer(type))
+						}
+					} label: {
+						Text(type.rawValue)
+							.fontWeight(.bold)
+							.frame(maxWidth: .infinity)
+							.padding()
+					}
+					.buttonStyle(.glass)
+					.buttonBorderShape(.capsule)
+					.padding(.vertical, 10)
+					.frame(maxWidth: reader.size.width * 0.5)
+				}
 			}
-			.foregroundStyle(.white)
-			.background(Color.accentColor)
-			.cornerRadius(10)
-			.padding(.horizontal)
+			.frame(width: reader.size.width, alignment: .center)
 		}
-		.fixedSize(horizontal: false, vertical: true)
 	}
 }
 

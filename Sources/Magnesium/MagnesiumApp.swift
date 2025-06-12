@@ -3,27 +3,35 @@ import Logging
 
 @main
 struct MagnesiumApp: App {
-	@State private var session = Session()
-	@State private var preferences = Current.preferences
-	@State private var router = Router("App Router")
+	@Environment(\.appRouter) private var router
+
+	let session = Session()
+	let preferences = AppPreferences(userDefaults: .standard)
+
+	@State private var torrentManager: TorrentManager
 
 	init() {
 		LoggingSystem.bootstrap { label in
 			var logger = StreamLogHandler.standardOutput(label: label)
-//			#if DEBUG
-//			logger.logLevel = .debug
-//			#endif
+			#if DEBUG
+			logger.logLevel = .debug
+			#endif
 			return logger
 		}
+		_torrentManager = State(wrappedValue: TorrentManager(session: session))
 	}
 
 	var body: some Scene {
+		@Bindable var router = router
+
 		WindowGroup {
-			NavigationStack(path: $router.path) {
+			Group {
 				if session.server == nil {
-					OnboardingCoordinator(
-						dependencies: .init(preferences: preferences)
-					)
+					NavigationStack(path: $router.path) {
+						OnboardingCoordinator(
+							dependencies: .init(preferences: preferences)
+						)
+					}
 				} else {
 					TorrentListCoordinator(
 						dependencies: .init(
@@ -31,6 +39,7 @@ struct MagnesiumApp: App {
 							session: session
 						)
 					)
+					.environment(torrentManager)
 				}
 			}
 			.environment(router)

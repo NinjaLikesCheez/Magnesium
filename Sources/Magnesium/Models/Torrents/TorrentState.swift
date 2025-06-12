@@ -1,6 +1,8 @@
 import SwiftUI
 
-enum TorrentState: String, Equatable, Hashable, Codable, CaseIterable {
+enum TorrentState: String, Equatable, Hashable, Codable, CaseIterable, Identifiable {
+	var id: Self { self }
+
 	case downloading = "Downloading"
 	case seeding = "Seeding"
 	case paused = "Paused"

@@ -11,7 +11,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(Session.self) private var session: Session
 
 	@State private var isConfirmingDelete = false
-	let selectedTorrents: [StandardTorrent]
+	let selectedTorrents: Set<StandardTorrent>
 
 	@Binding var error: String?
 
@@ -25,7 +25,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		Button {
 			Task {
 				do {
-					try await session.actionImplementation.resume(selectedTorrents)
+					try await session.actionImplementation.resume(Array(selectedTorrents))
 				} catch {
 					self.error = error.localizedDescription
 				}
@@ -39,7 +39,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		Button {
 			Task {
 				do {
-					try await session.actionImplementation.pause(selectedTorrents)
+					try await session.actionImplementation.pause(Array(selectedTorrents))
 				} catch {
 					self.error = error.localizedDescription
 				}
@@ -59,7 +59,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 			Button("Keep Data") {
 				Task {
 					do {
-						try await session.actionImplementation.remove(selectedTorrents, false)
+						try await session.actionImplementation.remove(Array(selectedTorrents), false)
 					} catch {
 						self.error = error.localizedDescription
 					}
@@ -69,7 +69,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 			Button("Remove Data", role: .destructive) {
 				Task {
 					do {
-						try await session.actionImplementation.remove(selectedTorrents, true)
+						try await session.actionImplementation.remove(Array(selectedTorrents), true)
 					} catch {
 						self.error = error.localizedDescription
 					}

@@ -5,6 +5,7 @@ public struct SettingsView: View {
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
 	@Environment(Router.self) var router
+	@Environment(\.appRouter) var appRouter
 
 	@State private var servers: [Server] = []
 
@@ -28,7 +29,7 @@ public struct SettingsView: View {
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Done") {
-					dismiss()
+					appRouter.dismissSheet()
 				}
 			}
 		}
@@ -97,6 +98,8 @@ public struct SettingsView: View {
 	var resetSection: some View {
 		Section("Reset") {
 			Button(role: .destructive) {
+				router.popToRoot()
+				appRouter.popToRoot()
 				preferences.reset()
 				session.reset()
 			} label: {

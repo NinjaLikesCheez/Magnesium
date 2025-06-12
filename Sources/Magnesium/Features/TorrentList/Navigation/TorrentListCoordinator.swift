@@ -17,23 +17,23 @@ struct TorrentListCoordinator: Coordinator {
 	@Environment(Router.self) var router
 	@State var settingsRouter = Router("Settings Router")
 
+	@Environment(TorrentManager.self) var torrentManager
+	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+	@State private var selections: Set<String> = []
+	@State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+
 	var body: some View {
 		@Bindable var router = router
+		@Bindable var torrentManager = torrentManager
 
-		TorrentListView()
-			.navigationDestination(for: Destinations.self) { destination in
-				switch destination {
-				case let .detail(torrent):
-					TorrentDetailView(torrent: torrent)
-						.environment(dependencies.session.actionImplementation)
-				}
-			}
+		NavigationSplitView(columnVisibility: $columnVisibility) {
+			TorrentListView(
+				selections: $selections
+			)
 			.sheet(item: $router.presentedSheet) { item in
 				if let sheet = item.destination as? Sheets {
 					switch sheet {
-					case let .filter(labels):
-						TorrentFilterSettingsView(labels: labels)
-							.presentationDetents([.height(400), .medium, .large])
 					case .settings:
 						SettingsCoordinator(
 							dependencies: .init(
@@ -47,6 +47,37 @@ struct TorrentListCoordinator: Coordinator {
 			}
 			.environment(dependencies.session)
 			.environment(dependencies.preferences)
+		} detail: {
+			Group {
+				if selections.isEmpty {
+					ContentUnavailableView(
+						"No selection",
+						systemImage: "filemenu.and.selection",
+						description: Text("Select a torrent to see details about it")
+					)
+				} else if selections.count == 1 {
+					TorrentDetailView(torrent: torrentManager.torrents.first(where: { $0.id == selections.first! })!)
+						.environment(dependencies.session.actionImplementation)
+				} else {
+					ContentUnavailableView(
+						"Multiple selections",
+						systemImage: "filemenu.and.selection",
+						description: Text("Select a single torrent to see details about it")
+					)
+				}
+			}
+		}
+		.navigationSplitViewStyle(.balanced)
+	}
+
+	var settingsToolbarItem: some ToolbarContent {
+		ToolbarItem(placement: .topBarLeading) {
+			Button {
+				router.present(TorrentListCoordinator.Sheets.settings)
+			} label: {
+				Image(systemName: "gear")
+			}
+		}
 	}
 }
 
@@ -63,7 +94,6 @@ extension TorrentListCoordinator {
 	enum Sheets: Hashable, Identifiable {
 		var id: Self { self }
 
-		case filter(labels: [StandardLabel])
 		case settings
 	}
 }

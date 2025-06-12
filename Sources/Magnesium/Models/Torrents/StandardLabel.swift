@@ -1,4 +1,5 @@
-struct StandardLabel: Equatable {
+struct StandardLabel: Equatable, Identifiable {
+	var id: String { name }
 	var name: String
 	var count: Int?
 }
