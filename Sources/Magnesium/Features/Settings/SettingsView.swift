@@ -4,8 +4,8 @@ public struct SettingsView: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(Router.self) var router
-	@Environment(\.appRouter) var appRouter
+	@Environment(AppRouter.self) var router
+	@Environment(AppRouter.self) var appRouter
 
 	@State private var servers: [Server] = []
 
@@ -45,17 +45,13 @@ public struct SettingsView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				RoutableNavigationLink {
+				NavigationLink(value: AppDestination.editServer(server)) {
 					Text(server.name)
-				} action: {
-					router.push(.editServer(server))
 				}
 			}
 
-			RoutableNavigationLink {
+			NavigationLink(value: AppDestination.addAServer) {
 				Text("Add Server")
-			} action: {
-				router.push(.addAServer)
 			}
 		}
 	}

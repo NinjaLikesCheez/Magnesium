@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-	@Environment(Router.self) var router
+	@Environment(AppRouter.self) var router
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
@@ -45,7 +45,7 @@ struct OnboardingView: View {
 							router.push(.addServer(type))
 						} else {
 							// On larger screens, a sheet looks better
-							router.sheet(.addServer(type))
+							router.presentSheet(.addServer(type))
 						}
 					} label: {
 						Text(type.rawValue)

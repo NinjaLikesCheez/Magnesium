@@ -8,87 +8,35 @@
 import Observation
 import SwiftUI
 
-class AnySheetDestination: Identifiable {
-	let destination: any Identifiable
+protocol RoutableDestination: Hashable {}
+protocol RoutableSheet: Hashable, Identifiable {}
 
-	init(_ destination: any Identifiable) {
-		self.destination = destination
-	}
-}
-
+@MainActor
 @Observable
-final class Router {
-	let name: String
-	var path = NavigationPath()
-	var presentedSheet: AnySheetDestination? = nil
+final class Router<Destination: RoutableDestination, Sheet: RoutableSheet> {
+	var path = [Destination]()
+	var presentedSheet: Sheet?
 
-	@ObservationIgnored
-	@Environment(\.dismiss) private var dismiss
+	init() {}
 
-	init(_ name: String) {
-		self.name = name
-	}
-
-	func present(_ destination: any Identifiable) {
-		presentedSheet = AnySheetDestination(destination)
-	}
-
-	func push(_ destination: any Hashable) {
+	func push(_ destination: Destination) {
 		path.append(destination)
 	}
 
-	func pop() {
-		path.removeLast()
+	@discardableResult
+	func pop() -> Destination? {
+		path.popLast()
 	}
 
 	func popToRoot() {
-		dismissSheet()
-		path.removeLast(path.count)
+		path.removeAll()
+	}
+
+	func presentSheet(_ sheet: Sheet) {
+		presentedSheet = sheet
 	}
 
 	func dismissSheet() {
 		presentedSheet = nil
 	}
-}
-
-struct RoutableNavigationLink<Content: View>: View {
-	let content: () -> Content
-	let action: () -> Void
-	let disclosure: Bool
-
-	init(@ViewBuilder content: @escaping () -> Content, action: @escaping () -> Void, disclosure: Bool = true) {
-		self.content = content
-		self.action = action
-		self.disclosure = disclosure
-	}
-
-	var body: some View {
-		HStack {
-			content()
-			if disclosure {
-				Spacer()
-				Image(systemName: "chevron.forward")
-					.font(Font.system(.caption).weight(.bold))
-					.foregroundColor(Color(UIColor.tertiaryLabel))
-			}
-		}
-		.contentShape(Rectangle())
-		.onTapGesture {
-			action()
-		}
-	}
-}
-
-extension EnvironmentValues {
-	var appRouter: Router {
-		get {
-			self[AppRouterKey]
-		} set {
-			self[AppRouterKey] = newValue
-		}
-	}
-}
-
-struct AppRouterKey: EnvironmentKey {
-	static var defaultValue: Router = .init("App")
 }

@@ -3,7 +3,7 @@ import SwiftUI
 public struct TorrentListView: View {
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(Router.self) private var router
+	@Environment(AppRouter.self) private var router
 	@Environment(TorrentManager.self) var torrentManager
 
 	@State private var searchQuery: String = ""
@@ -33,7 +33,7 @@ public struct TorrentListView: View {
 	}
 
 	public var body: some View {
-//		let _ = Self._printChanges()
+		let _ = Self._printChanges()
 		torrentList
 			.environment(\.editMode, $editMode)
 			.refreshable {
@@ -152,7 +152,7 @@ public struct TorrentListView: View {
 	var settingsToolbarItem: some ToolbarContent {
 		ToolbarItem(placement: .topBarLeading) {
 			Button {
-				router.present(TorrentListCoordinator.Sheets.settings)
+				router.presentSheet(.settings)
 			} label: {
 				Image(systemName: "gear")
 			}

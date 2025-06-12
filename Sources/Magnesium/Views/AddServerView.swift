@@ -28,20 +28,13 @@ extension BasicAuthentication {
 }
 
 struct AddServerView: View {
-	@Environment(Router.self) var router
+	@Environment(AppRouter.self) var router
 
 	var body: some View {
 		List(ServerType.allCases) { server in
-			RoutableNavigationLink {
+			NavigationLink(value: AppDestination.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()
-			} action: {
-				switch server {
-				case .deluge:
-					router.push(.addNewServer(.deluge))
-				case .qbittorrent:
-					router.push(.addNewServer(.qbittorrent))
-				}
 			}
 		}
 		.navigationTitle("Add Server")

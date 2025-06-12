@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsCoordinator: Coordinator {
 	let dependencies: Dependencies
-	@Environment(Router.self) var router
+	@Environment(AppRouter.self) var router
 
 	init(dependencies: Dependencies) {
 		self.dependencies = dependencies
@@ -60,11 +60,5 @@ extension SettingsCoordinator {
 
 	enum Sheets: Hashable, Identifiable {
 		var id: ObjectIdentifier { self }
-	}
-}
-
-extension Router {
-	func push(_ destination: SettingsCoordinator.Destinations) {
-		path.append(destination)
 	}
 }

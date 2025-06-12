@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(Session.self) private var session
-	@Environment(Router.self) private var router
+	@Environment(AppRouter.self) private var router
 	@Environment(AppPreferences.self) private var preferences
 
 	var torrents: [StandardTorrent]

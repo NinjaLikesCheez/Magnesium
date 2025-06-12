@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EditDelugeServerView: View {
-	@Environment(Router.self) private var router
+	@Environment(AppRouter.self) private var router
 	@Environment(Session.self) private var session
 	@Environment(AppPreferences.self) private var preferences
 

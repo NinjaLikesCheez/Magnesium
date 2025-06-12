@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddDelugeServerView: View {
-	@Environment(Router.self) var router
+	@Environment(AppRouter.self) var router
 	@Environment(AppPreferences.self) private var preferences
 
 	@State private var settings: DelugeSettings = .init()
