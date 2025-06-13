@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-enum AppSheet: RoutableSheet {
+enum AppSheet: RoutableSheets {
 	var id: Self { self }
 
 	case addServer(ServerType)
@@ -23,18 +23,15 @@ struct AppSheets: ViewModifier {
 			.sheet(item: $router.presentedSheet) { sheet in
 				switch sheet {
 				case .settings:
-					SettingsCoordinator(
-						dependencies: .init(
-							preferences: preferences,
-							session: session
-						)
-					)
+					SettingsView(settingsRouter: .init(router))
 				case .addServer(let server):
-					switch server {
-					case .deluge:
-						AddDelugeServerView()
-					case .qbittorrent:
-						AddQBittorrentServerView()
+					NavigationStack {
+						switch server {
+						case .deluge:
+							AddDelugeServerView<AppRouter>()
+						case .qbittorrent:
+							AddQBittorrentServerView<AppRouter>()
+						}
 					}
 				}
 			}

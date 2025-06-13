@@ -5,7 +5,7 @@ struct OnboardingView: View {
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
-		VStack(spacing: 20) {
+		VStack {
 			appIcon
 			headlineText
 			subtitleText
@@ -16,18 +16,18 @@ struct OnboardingView: View {
 	var appIcon: some View {
 		Image("Icon")
 			.resizable()
-			.scaledToFill()
+			.scaledToFit()
 			.cornerRadius(15)
-			.padding([.horizontal, .vertical], 50)
+			.padding([.horizontal, .top], 50)
 	}
 
 	var headlineText: some View {
 		AnimatedMeshGradientView()
-		.mask {
-			Text("Magnesium")
-				.font(.system(size: 50))
-				.fontWeight(.bold)
-		}
+			.mask {
+				Text("Magnesium")
+					.font(.system(size: 50))
+					.fontWeight(.bold)
+			}
 	}
 
 	var subtitleText: some View {
@@ -55,7 +55,7 @@ struct OnboardingView: View {
 					}
 					.buttonStyle(.glass)
 					.buttonBorderShape(.capsule)
-					.padding(.vertical, 10)
+					//					.padding(.vertical, 10)
 					.frame(maxWidth: reader.size.width * 0.5)
 				}
 			}

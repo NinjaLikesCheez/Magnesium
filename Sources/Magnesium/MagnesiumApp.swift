@@ -9,7 +9,6 @@ struct MagnesiumApp: App {
 	@State var session = Session()
 	@State var preferences = AppPreferences(userDefaults: .standard)
 
-//	@State private var torrentManager: TorrentManager
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -19,7 +18,6 @@ struct MagnesiumApp: App {
 			#endif
 			return logger
 		}
-//		_torrentManager = State(wrappedValue: TorrentManager(session: session))
 	}
 
 	var body: some Scene {
@@ -28,6 +26,7 @@ struct MagnesiumApp: App {
 				Group {
 					switch appState {
 					case .unauthenticated:
+						// TODO: make a router for onboarding view flows
 						OnboardingView()
 					case .authenticated(let session):
 						TorrentsView()
@@ -55,6 +54,7 @@ struct MagnesiumApp: App {
 			}
 			.onChange(of: session.server) { _, newValue in
 				guard newValue != nil else {
+					appState = .unauthenticated
 					return
 				}
 

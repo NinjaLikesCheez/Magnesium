@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum AppDestination: RoutableDestination {
+enum AppDestination: RoutableDestinations {
 	var id: Self { self }
 
 	case torrent
@@ -27,14 +27,14 @@ struct AppDestinations: ViewModifier {
 				case .addServer(let server):
 					switch server {
 					case .deluge:
-						AddDelugeServerView()
+						AddDelugeServerView<AppRouter>()
 					case .qbittorrent:
-						AddQBittorrentServerView()
+						AddQBittorrentServerView<AppRouter>()
 					}
 				case .editServer(let server):
 					switch server.type {
 					case .deluge:
-						EditDelugeServerView(server)
+						EditDelugeServerView<AppRouter>(server)
 					case .qbittorrent:
 						//						EditQBittorrentServerView()
 						fatalError("Not yet implemented")
@@ -42,9 +42,9 @@ struct AppDestinations: ViewModifier {
 				case .addNewServer(let server):
 					switch server {
 					case .deluge:
-						AddDelugeServerView()
+						AddDelugeServerView<AppRouter>()
 					case .qbittorrent:
-						AddQBittorrentServerView()
+						AddQBittorrentServerView<AppRouter>()
 					}
 				case .addAServer:
 					AddServerView()

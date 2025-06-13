@@ -1,11 +1,10 @@
 import SwiftUI
 
-public struct SettingsView: View {
+public struct SettingsListView: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(AppRouter.self) var router
-	@Environment(AppRouter.self) var appRouter
+	@Environment(SettingsRouter.self) var router
 
 	@State private var servers: [Server] = []
 
@@ -29,7 +28,7 @@ public struct SettingsView: View {
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Done") {
-					appRouter.dismissSheet()
+					router.dismissSheet(withParent: true)
 				}
 			}
 		}
@@ -45,12 +44,12 @@ public struct SettingsView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink(value: AppDestination.editServer(server)) {
+				NavigationLink(value: SettingsDestinations.editServer(server)) {
 					Text(server.name)
 				}
 			}
 
-			NavigationLink(value: AppDestination.addAServer) {
+			NavigationLink(value: SettingsDestinations.addAServer) {
 				Text("Add Server")
 			}
 		}
@@ -94,8 +93,7 @@ public struct SettingsView: View {
 	var resetSection: some View {
 		Section("Reset") {
 			Button(role: .destructive) {
-				router.popToRoot()
-				appRouter.popToRoot()
+				router.reset()
 				preferences.reset()
 				session.reset()
 			} label: {
@@ -106,6 +104,6 @@ public struct SettingsView: View {
 }
 
 #Preview {
-	SettingsView()
+	SettingsView(settingsRouter: .init())
 		.environment(Session())
 }

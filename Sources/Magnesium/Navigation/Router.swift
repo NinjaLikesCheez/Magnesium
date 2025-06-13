@@ -8,17 +8,32 @@
 import Observation
 import SwiftUI
 
-protocol RoutableDestination: Hashable {}
-protocol RoutableSheet: Hashable, Identifiable {}
+protocol RoutableDestinations: Hashable {}
+protocol RoutableSheets: Hashable, Identifiable {}
+
+protocol RoutableSheetsViewModifible: ViewModifier {}
+protocol RoutableDestinationsViewModifible: ViewModifier {}
 
 @MainActor
-@Observable
-final class Router<Destination: RoutableDestination, Sheet: RoutableSheet> {
-	var path = [Destination]()
-	var presentedSheet: Sheet?
+protocol RouterProtocol: AnyObject, Observation.Observable {
+	associatedtype Destination
+	associatedtype Sheet
 
-	init() {}
+	var path: [Destination] { get set }
+	var presentedSheet: Sheet? { get set }
+	var parent: (any RouterProtocol)? { get }
 
+	init(_ parent: (any RouterProtocol)?)
+
+	func push(_ destination: Destination)
+	@discardableResult func pop() -> Destination?
+	func popToRoot()
+	func presentSheet(_ sheet: Sheet)
+	func dismissSheet(withParent: Bool)
+	func reset(withParent: Bool)
+}
+
+extension RouterProtocol {
 	func push(_ destination: Destination) {
 		path.append(destination)
 	}
@@ -36,7 +51,18 @@ final class Router<Destination: RoutableDestination, Sheet: RoutableSheet> {
 		presentedSheet = sheet
 	}
 
-	func dismissSheet() {
+	func dismissSheet(withParent: Bool = false) {
 		presentedSheet = nil
+		if withParent {
+			parent?.dismissSheet()
+		}
+	}
+
+	func reset(withParent: Bool = false) {
+		presentedSheet = nil
+		popToRoot()
+		if withParent {
+			parent?.reset()
+		}
 	}
 }

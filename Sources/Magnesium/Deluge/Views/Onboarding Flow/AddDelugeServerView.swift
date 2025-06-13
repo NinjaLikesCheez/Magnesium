@@ -7,9 +7,10 @@
 
 import SwiftUI
 
-struct AddDelugeServerView: View {
-	@Environment(AppRouter.self) var router
+struct AddDelugeServerView<Router: RouterProtocol>: View {
+	@Environment(Router.self) var router
 	@Environment(AppPreferences.self) private var preferences
+	@Environment(\.isPresented) private var isPresented
 
 	@State private var settings: DelugeSettings = .init()
 
@@ -45,6 +46,11 @@ struct AddDelugeServerView: View {
 		// TODO: Error handle
 		let server = try await settings.makeServer()
 		try preferences.addOrUpdate(server: server)
-		router.popToRoot()
+
+		if isPresented {
+			router.dismissSheet(withParent: true)
+		} else {
+			router.pop()
+		}
 	}
 }
