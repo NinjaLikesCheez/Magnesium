@@ -11,10 +11,6 @@ enum AppDestination: RoutableDestinations {
 	var id: Self { self }
 
 	case torrent
-	case addServer(ServerType)
-	case editServer(Server)
-	case addAServer
-	case addNewServer(ServerType)
 }
 
 struct AppDestinations: ViewModifier {
@@ -24,30 +20,6 @@ struct AppDestinations: ViewModifier {
 				switch destination {
 				case .torrent:
 					TorrentsView()
-				case .addServer(let server):
-					switch server {
-					case .deluge:
-						AddDelugeServerView<AppRouter>()
-					case .qbittorrent:
-						AddQBittorrentServerView<AppRouter>()
-					}
-				case .editServer(let server):
-					switch server.type {
-					case .deluge:
-						EditDelugeServerView<AppRouter>(server)
-					case .qbittorrent:
-						//						EditQBittorrentServerView()
-						fatalError("Not yet implemented")
-					}
-				case .addNewServer(let server):
-					switch server {
-					case .deluge:
-						AddDelugeServerView<AppRouter>()
-					case .qbittorrent:
-						AddQBittorrentServerView<AppRouter>()
-					}
-				case .addAServer:
-					AddServerView()
 				}
 			}
 	}

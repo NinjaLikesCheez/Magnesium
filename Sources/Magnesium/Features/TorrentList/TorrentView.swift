@@ -19,6 +19,7 @@ struct TorrentsView: View {
 		@Bindable var router = router
 		@Bindable var torrentManager = torrentManager
 
+		// TODO: on iOS this doesn't correctly show detail views on iOS 26 (bug??)
 		NavigationSplitView {
 			TorrentListView(selections: $selections)
 		} detail: {

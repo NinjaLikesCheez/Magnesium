@@ -1,5 +1,5 @@
 //
-//  SettingsCoordinator.swift
+//  SettingsFlow.swift
 //  Magnesium
 //
 //  Created by ninji on 10/05/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SettingsView: View {
+struct SettingsFlow: View {
 	@Environment(AppRouter.self) var router
 	@Environment(AppPreferences.self) var preferences
 	@Environment(Session.self) var session

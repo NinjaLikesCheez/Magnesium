@@ -22,27 +22,30 @@ struct MagnesiumApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			NavigationStack(path: $router.path) {
-				Group {
-					switch appState {
-					case .unauthenticated:
-						// TODO: make a router for onboarding view flows
-						OnboardingView()
-					case .authenticated(let session):
+			Group {
+				switch appState {
+				case .unauthenticated:
+					OnboardingFlow(
+						onboardingRouter: .init(router),
+						preferences: $preferences,
+						session: $session
+					)
+				case .authenticated(let session):
+					NavigationStack(path: $router.path) {
 						TorrentsView()
+							.withAppDestinations()
+							.withAppSheets(router: $router, preferences: $preferences, session: $session)
 							.environment(TorrentManager(session: session))
-					case .resuming:
-						ProgressView()
-							.containerRelativeFrame([.horizontal, .vertical])
-					case .error(let error):
-						ContentUnavailableView(
-							"Error: \(error.localizedDescription)",
-							image: "exclamationmark.triangle"
-						)
 					}
+				case .resuming:
+					ProgressView()
+						.containerRelativeFrame([.horizontal, .vertical])
+				case .error(let error):
+					ContentUnavailableView(
+						"Error: \(error.localizedDescription)",
+						image: "exclamationmark.triangle"
+					)
 				}
-				.withAppDestinations()
-				.withAppSheets(router: $router, preferences: $preferences, session: $session)
 			}
 			.task {
 				guard session.server != nil else {

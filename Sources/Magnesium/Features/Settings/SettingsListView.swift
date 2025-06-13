@@ -1,7 +1,6 @@
 import SwiftUI
 
 public struct SettingsListView: View {
-	@Environment(\.dismiss) private var dismiss
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
 	@Environment(SettingsRouter.self) var router
@@ -93,7 +92,7 @@ public struct SettingsListView: View {
 	var resetSection: some View {
 		Section("Reset") {
 			Button(role: .destructive) {
-				router.reset()
+				router.reset(withParent: true)
 				preferences.reset()
 				session.reset()
 			} label: {
@@ -104,6 +103,6 @@ public struct SettingsListView: View {
 }
 
 #Preview {
-	SettingsView(settingsRouter: .init())
+	SettingsFlow(settingsRouter: .init())
 		.environment(Session())
 }

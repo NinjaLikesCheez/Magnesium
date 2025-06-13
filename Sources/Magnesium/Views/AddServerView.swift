@@ -28,11 +28,11 @@ extension BasicAuthentication {
 }
 
 struct AddServerView: View {
-	@Environment(AppRouter.self) var router
+	@Environment(SettingsRouter.self) var router
 
 	var body: some View {
 		List(ServerType.allCases) { server in
-			NavigationLink(value: AppDestination.addNewServer(server)) {
+			NavigationLink(value: SettingsDestinations.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()
 			}

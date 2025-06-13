@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-	@Environment(AppRouter.self) var router
+	@Environment(OnboardingRouter.self) var router
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
@@ -42,10 +42,10 @@ struct OnboardingView: View {
 				ForEach(ServerType.allCases) { type in
 					Button {
 						if horizontalSizeClass == .compact {
-							router.push(.addServer(type))
+							router.push(.addNewServer(type))
 						} else {
 							// On larger screens, a sheet looks better
-							router.presentSheet(.addServer(type))
+							router.presentSheet(.addNewServer(type))
 						}
 					} label: {
 						Text(type.rawValue)

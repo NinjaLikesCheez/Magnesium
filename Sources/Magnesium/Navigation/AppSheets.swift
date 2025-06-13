@@ -23,7 +23,7 @@ struct AppSheets: ViewModifier {
 			.sheet(item: $router.presentedSheet) { sheet in
 				switch sheet {
 				case .settings:
-					SettingsView(settingsRouter: .init(router))
+					SettingsFlow(settingsRouter: .init(router))
 				case .addServer(let server):
 					NavigationStack {
 						switch server {
