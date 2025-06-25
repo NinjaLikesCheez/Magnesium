@@ -7,7 +7,7 @@
 
 enum AppState: Sendable {
 	case unauthenticated
-	case authenticated(session: Session)
+	case authenticated
 	case resuming
 	case error(Error)
 }

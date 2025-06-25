@@ -11,7 +11,6 @@ enum AppDestination: RoutableDestinations {
 	var id: Self { self }
 
 	case torrent
-	case detail(StandardTorrent)
 }
 
 struct AppDestinations: ViewModifier {
@@ -21,8 +20,6 @@ struct AppDestinations: ViewModifier {
 				switch destination {
 				case .torrent:
 					TorrentsView()
-				case let .detail(torrent):
-					TorrentDetailView(torrent: torrent)
 				}
 			}
 	}

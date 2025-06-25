@@ -8,7 +8,7 @@ struct MagnesiumApp: App {
 
 	@State var session = Session()
 	@State var preferences = AppPreferences(userDefaults: .standard)
-
+	@State var torrentManager: TorrentManager? = nil
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -18,6 +18,7 @@ struct MagnesiumApp: App {
 			#endif
 			return logger
 		}
+		self._torrentManager = State(initialValue: TorrentManager(session: session))
 	}
 
 	var body: some Scene {
@@ -30,13 +31,19 @@ struct MagnesiumApp: App {
 						preferences: $preferences,
 						session: $session
 					)
-				case .authenticated(let session):
-					NavigationStack(path: $router.path) {
-						TorrentsView()
-							.withAppDestinations()
-							.withAppSheets(router: $router, preferences: $preferences, session: $session)
-							.environment(TorrentManager(session: session))
-					}
+				case .authenticated:
+					TorrentsListFlow(
+						torrentListRouter: .init(router),
+						torrentManager: .constant(torrentManager!),
+						preferences: $preferences,
+						session: $session
+					)
+//					NavigationStack(path: $router.path) {
+//						TorrentsView()
+//							.withAppDestinations()
+//							.withAppSheets(router: $router, preferences: $preferences, session: $session)
+//							.environment(TorrentManager(session: session))
+//					}
 				case .resuming:
 					ProgressView()
 						.containerRelativeFrame([.horizontal, .vertical])
@@ -53,7 +60,7 @@ struct MagnesiumApp: App {
 					return
 				}
 
-				appState = .authenticated(session: session)
+				appState = .authenticated
 			}
 			.onChange(of: session.server) { _, newValue in
 				guard newValue != nil else {
@@ -61,7 +68,7 @@ struct MagnesiumApp: App {
 					return
 				}
 
-				appState = .authenticated(session: session)
+				appState = .authenticated
 			}
 			.environment(router)
 			.environment(preferences)

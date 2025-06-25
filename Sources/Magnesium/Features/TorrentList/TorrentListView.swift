@@ -3,8 +3,9 @@ import SwiftUI
 public struct TorrentListView: View {
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(AppRouter.self) private var router
+	@Environment(TorrentListRouter.self) private var router
 	@Environment(TorrentManager.self) var torrentManager
+	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	@State private var searchQuery: String = ""
 	@State private var showAddTorrentConfirmation = false
@@ -142,7 +143,15 @@ public struct TorrentListView: View {
 				if editMode.isEditing {
 					selections.insert(torrent.id)
 				} else {
+					#if os(iOS)
+					if UIDevice.current.userInterfaceIdiom == .pad  {
+						selections = [torrent.id]
+					} else {
+						router.push(.detail(torrent))
+					}
+					#else
 					selections = [torrent.id]
+					#endif
 				}
 			}
 		}

@@ -1,19 +1,19 @@
 //
-//  SheetDestinations.swift
+//  TorrentListSheets.swift
 //  Magnesium
 //
-//  Created by ninji on 12/06/2025.
+//  Created by ninji on 25/06/2025.
 //
 import SwiftUI
 
-enum AppSheet: RoutableSheets {
+enum TorrentListSheet: RoutableSheets {
 	var id: Self { self }
 
 	case settings
 }
 
-struct AppSheets: ViewModifier {
-	@Binding var router: AppRouter
+struct TorrentListSheetViewModifier: ViewModifier {
+	@Binding var router: TorrentListRouter
 	@Binding var preferences: AppPreferences
 	@Binding var session: Session
 
@@ -29,11 +29,17 @@ struct AppSheets: ViewModifier {
 }
 
 extension View {
-	func withAppSheets(
-		router: Binding<AppRouter>,
+	func withTorrentListSheets(
+		router: Binding<TorrentListRouter>,
 		preferences: Binding<AppPreferences>,
 		session: Binding<Session>
 	) -> some View {
-		modifier(AppSheets(router: router, preferences: preferences, session: session))
+		modifier(
+			TorrentListSheetViewModifier(
+				router: router,
+				preferences: preferences,
+				session: session
+			)
+		)
 	}
 }

@@ -19,7 +19,7 @@ struct SettingsFlow: View {
 			SettingsListView()
 				.withSettingsDestinations()
 		}
-		.environment(SettingsRouter(router))
+		.environment(settingsRouter)
 		.environment(preferences)
 		.environment(session)
 	}

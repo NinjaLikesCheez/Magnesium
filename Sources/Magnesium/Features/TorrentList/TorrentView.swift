@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TorrentsView: View {
-	@Environment(AppRouter.self) var router
+	@Environment(TorrentListRouter.self) var router
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -19,7 +19,18 @@ struct TorrentsView: View {
 		@Bindable var router = router
 		@Bindable var torrentManager = torrentManager
 
-		// TODO: on iOS this doesn't correctly show detail views on iOS 26 (bug??)
+		if horizontalSizeClass == .compact {
+			compactView
+		} else {
+			regularView
+		}
+	}
+
+	var compactView: some View {
+		TorrentListView(selections: $selections)
+	}
+
+	var regularView: some View {
 		NavigationSplitView {
 			TorrentListView(selections: $selections)
 		} detail: {
