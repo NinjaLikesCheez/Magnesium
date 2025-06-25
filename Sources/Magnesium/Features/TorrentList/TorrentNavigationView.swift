@@ -20,22 +20,22 @@ struct TorrentNavigationView: View {
 		@Bindable var torrentManager = torrentManager
 
 		if horizontalSizeClass == .compact {
-			compactView
+			contentView
 		} else {
 			regularView
 		}
 	}
 
-	var compactView: some View {
+	var contentView: some View {
 		TorrentListView(selections: $selections)
+			.toolbar {
+				settingsToolbarItem
+			}
 	}
 
 	var regularView: some View {
 		NavigationSplitView {
-			TorrentListView(selections: $selections)
-				.toolbar {
-					settingsToolbarItem
-				}
+			contentView
 		} detail: {
 			if selections.isEmpty {
 				ContentUnavailableView(
