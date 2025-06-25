@@ -5,7 +5,7 @@ public struct TorrentListView: View {
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
 	@Environment(TorrentListRouter.self) private var router
 	@Environment(TorrentManager.self) var torrentManager
-	@Environment(\.horizontalSizeClass) var horizontalSizeClass
+	@Environment(\.userInterfaceIdiom) var userInterfaceIdiom
 
 	@State private var searchQuery: String = ""
 	@State private var showAddTorrentConfirmation = false
@@ -46,8 +46,6 @@ public struct TorrentListView: View {
 			.searchable(text: $searchQuery)
 			.navigationTitle(session.server?.name ?? "Torrents")
 			.toolbar {
-				settingsToolbarItem
-
 				selectToolbarItem
 
 				if editMode.isEditing {
@@ -144,26 +142,16 @@ public struct TorrentListView: View {
 					selections.insert(torrent.id)
 				} else {
 					#if os(iOS)
-					if UIDevice.current.userInterfaceIdiom == .pad  {
-						selections = [torrent.id]
-					} else {
+					if userInterfaceIdiom == .phone  {
 						router.push(.detail(torrent))
+					} else {
+						selections = [torrent.id]
+
 					}
 					#else
 					selections = [torrent.id]
 					#endif
 				}
-			}
-		}
-	}
-
-	@ToolbarContentBuilder
-	var settingsToolbarItem: some ToolbarContent {
-		ToolbarItem(placement: .topBarLeading) {
-			Button {
-				router.presentSheet(.settings)
-			} label: {
-				Image(systemName: "gear")
 			}
 		}
 	}

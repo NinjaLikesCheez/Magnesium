@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SettingsFlow: View {
-	@Environment(AppRouter.self) var router
 	@Environment(AppPreferences.self) var preferences
 	@Environment(Session.self) var session
 

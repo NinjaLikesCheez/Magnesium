@@ -16,7 +16,7 @@ struct TorrentsListFlow: View {
 
 	var body: some View {
 		NavigationStack(path: $torrentListRouter.path) {
-			TorrentsView()
+			TorrentNavigationView()
 				.withTorrentListDestinations()
 				.withTorrentListSheets(
 					router: $torrentListRouter,

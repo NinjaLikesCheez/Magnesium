@@ -3,7 +3,6 @@ import Logging
 
 @main
 struct MagnesiumApp: App {
-	@State private var router = AppRouter()
 	@State private var appState = AppState.resuming
 
 	@State var session = Session()
@@ -27,23 +26,17 @@ struct MagnesiumApp: App {
 				switch appState {
 				case .unauthenticated:
 					OnboardingFlow(
-						onboardingRouter: .init(router),
+						onboardingRouter: .init(),
 						preferences: $preferences,
 						session: $session
 					)
 				case .authenticated:
 					TorrentsListFlow(
-						torrentListRouter: .init(router),
+						torrentListRouter: .init(),
 						torrentManager: .constant(torrentManager!),
 						preferences: $preferences,
 						session: $session
 					)
-//					NavigationStack(path: $router.path) {
-//						TorrentsView()
-//							.withAppDestinations()
-//							.withAppSheets(router: $router, preferences: $preferences, session: $session)
-//							.environment(TorrentManager(session: session))
-//					}
 				case .resuming:
 					ProgressView()
 						.containerRelativeFrame([.horizontal, .vertical])
@@ -70,7 +63,6 @@ struct MagnesiumApp: App {
 
 				appState = .authenticated
 			}
-			.environment(router)
 			.environment(preferences)
 			.environment(session)
 		}

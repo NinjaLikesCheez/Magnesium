@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TorrentsView: View {
+struct TorrentNavigationView: View {
 	@Environment(TorrentListRouter.self) var router
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -33,6 +33,9 @@ struct TorrentsView: View {
 	var regularView: some View {
 		NavigationSplitView {
 			TorrentListView(selections: $selections)
+				.toolbar {
+					settingsToolbarItem
+				}
 		} detail: {
 			if selections.isEmpty {
 				ContentUnavailableView(
