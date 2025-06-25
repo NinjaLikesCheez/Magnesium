@@ -25,28 +25,9 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	}
 
 	var body: some ToolbarContent {
-		ToolbarItem(placement: .bottomBar) {
-			items
-		}
-	}
-
-	var items: some View {
-		HStack {
-//			Button {
-//				router.present(TorrentListCoordinator.Sheets.filter(labels: labels))
-//			} label: {
-//				Image(systemName: "line.3.horizontal.decrease.circle")
-//			}
+		ToolbarItemGroup(placement: .bottomBar) {
 			TorrentFilterMenu(labels: labels)
 				.environment(preferences)
-
-			Spacer()
-
-			Text("↓ \(totalDownloadSpeed) ↑ \(totalUploadSpeed)")
-			.font(.caption)
-			.foregroundStyle(.secondary)
-
-			Spacer()
 
 			Button {
 				guard
@@ -70,6 +51,15 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			} label: {
 				Image(systemName: "plus")
 			}
+		}
+
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
+		ToolbarItem(placement: .bottomBar) {
+			Text("↓ \(totalDownloadSpeed) ↑ \(totalUploadSpeed)")
+				.font(.caption)
+				.foregroundStyle(.secondary)
+				.frame(minWidth: 100)
 		}
 	}
 }
