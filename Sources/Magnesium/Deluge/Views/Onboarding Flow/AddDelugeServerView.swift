@@ -35,7 +35,9 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 				SecureField("Password", text: $settings.password.projectedValue)
 					.textContentType(.password)
 					.autocorrectionDisabled()
+				#if !os(macOS)
 					.autocapitalization(.none)
+				#endif
 			},
 			additionalSections: {}
 		)

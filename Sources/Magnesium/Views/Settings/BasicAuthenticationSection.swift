@@ -20,12 +20,16 @@ struct BasicAuthenticationSection: View {
 				TextField("Username", text: $basicAuthentication.username)
 					.textContentType(.username)
 					.autocorrectionDisabled()
+				#if os(iOS)
 					.autocapitalization(.none)
+				#endif
 
 				SecureField("Password", text: $basicAuthentication.password)
 					.textContentType(.password)
 					.autocorrectionDisabled()
+				#if os(iOS)
 					.autocapitalization(.none)
+				#endif
 			}
 		} header: {
 			Text("Basic Authentication Settings")

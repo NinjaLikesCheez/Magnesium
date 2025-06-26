@@ -26,10 +26,10 @@ struct ServerSettingsSection<Content: View>: View {
 			TextField("URL", text: $address)
 				.textContentType(.URL)
 				.autocorrectionDisabled()
+			#if !os(macOS)
 				.autocapitalization(.none)
-#if !os(macOS)
 				.keyboardType(.URL)
-#endif
+			#endif
 
 			content()
 		}
