@@ -14,11 +14,17 @@ final class TorrentManager {
 	private(set) var torrents: [StandardTorrent] = []
 	private(set) var labels: [StandardLabel] = []
 
+	var searchQuery: String = ""
+
 	@ObservationIgnored
 	private let session: Session
 
-	init(session: Session) {
+	@ObservationIgnored
+	private let preferences: AppPreferences
+
+	init(session: Session, preferences: AppPreferences) {
 		self.session = session
+		self.preferences = preferences
 	}
 
 	func resume(_ torrents: [StandardTorrent]) async throws {
@@ -36,6 +42,11 @@ final class TorrentManager {
 		try await refresh()
 	}
 
+	func addLink(_ link: String) async throws {
+		try await session.actionImplementation.addLink(link)
+		try await refresh()
+	}
+
 	nonisolated func refresh() async throws {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
@@ -43,5 +54,28 @@ final class TorrentManager {
 			self.torrents = torrents
 			self.labels = labels
 		}
+	}
+}
+
+extension TorrentManager {
+	var filteredTorrents: [StandardTorrent] {
+		TorrentMapper.map(
+			torrents,
+			query: searchQuery,
+			sortOption: preferences.sortOption,
+			filterOptions: preferences.filterOptions
+		)
+	}
+
+	var totalUploadSpeed: String {
+		Formatters.bytes.string(
+			fromByteCount: torrents.reduce(into: 0) { $0 += $1.uploadRate }
+		)
+	}
+
+	var totalDownloadSpeed: String {
+		Formatters.bytes.string(
+			fromByteCount: torrents.reduce(into: 0) { $0 += $1.downloadRate }
+		)
 	}
 }

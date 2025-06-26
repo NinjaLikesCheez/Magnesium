@@ -12,8 +12,9 @@ struct TorrentNavigationView: View {
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-	@State private var selections: Set<String> = []
+	@State private var selections: Set<StandardTorrent> = []
 	@State private var columnVisibility: NavigationSplitViewVisibility = .all
+	@State private var editMode: EditMode = .inactive
 
 	var body: some View {
 		@Bindable var router = router
@@ -27,9 +28,19 @@ struct TorrentNavigationView: View {
 	}
 
 	var contentView: some View {
-		TorrentListView(selections: $selections)
+		TorrentListView(selections: $selections, editMode: $editMode)
 			.toolbar {
 				settingsToolbarItem
+				
+				selectToolbarItem
+
+				if editMode.isEditing {
+					TorrentListEditingToolbar(
+						selectedTorrents: selections
+					)
+				} else {
+					TorrentListStatusToolbar()
+				}
 			}
 	}
 
@@ -43,9 +54,9 @@ struct TorrentNavigationView: View {
 					systemImage: "filemenu.and.selection",
 					description: Text("Select a torrent to see details about it")
 				)
-			} else if selections.count == 1 {
+			} else if let torrent = selections.first {
 				TorrentDetailView(
-					torrent: torrentManager.torrents.first(where: { $0.id == selections.first! })!
+					torrent: torrent
 				)
 			} else {
 				ContentUnavailableView(
@@ -64,6 +75,19 @@ struct TorrentNavigationView: View {
 				router.presentSheet(.settings)
 			} label: {
 				Image(systemName: "gear")
+			}
+		}
+	}
+
+	@ToolbarContentBuilder
+	var selectToolbarItem: some ToolbarContent {
+		ToolbarItem(placement: .topBarTrailing) {
+			// EditButton()
+			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
+			Button(editMode.isEditing ? "Done" : "Select") {
+				withAnimation {
+					editMode = editMode.isEditing ? .inactive : .active
+				}
 			}
 		}
 	}

@@ -17,7 +17,9 @@ struct MagnesiumApp: App {
 			#endif
 			return logger
 		}
-		self._torrentManager = State(initialValue: TorrentManager(session: session))
+		self._torrentManager = State(
+			initialValue: TorrentManager(session: session, preferences: preferences)
+		)
 	}
 
 	var body: some Scene {

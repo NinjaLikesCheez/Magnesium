@@ -13,8 +13,6 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	@State private var isConfirmingDelete = false
 	let selectedTorrents: Set<StandardTorrent>
 
-	@Binding var error: String?
-
 	var body: some ToolbarContent {
 		ToolbarItemGroup(placement: .bottomBar) {
 			playButton
@@ -102,7 +100,8 @@ struct TorrentListEditingToolbar: ToolbarContent {
 					print("TODO")
 				}
 			} catch {
-				self.error = error.localizedDescription
+				print("Error performing toolbar action: \(error.localizedDescription)")
+//				self.error = error.localizedDescription
 			}
 		}
 	}
