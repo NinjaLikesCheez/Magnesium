@@ -23,7 +23,7 @@ struct TorrentNavigationView: View {
 		if horizontalSizeClass == .compact {
 			contentView
 		} else {
-			regularView
+			splitView
 		}
 	}
 
@@ -44,7 +44,7 @@ struct TorrentNavigationView: View {
 			}
 	}
 
-	var regularView: some View {
+	var splitView: some View {
 		NavigationSplitView {
 			contentView
 		} detail: {

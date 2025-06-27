@@ -22,9 +22,26 @@ final class TorrentManager {
 	@ObservationIgnored
 	private let preferences: AppPreferences
 
+	private var updateTimer: Timer!
+
 	init(session: Session, preferences: AppPreferences) {
 		self.session = session
 		self.preferences = preferences
+
+
+		self.updateTimer = Timer.scheduledTimer(withTimeInterval: preferences.autoRefreshInterval, repeats: true, block: { [weak self] _ in
+			guard let self else { return }
+			Task { try await self.refresh() }
+		})
+
+		withObservationTracking(of: preferences.autoRefreshInterval) { interval in
+			// if we don't invalidate here, the timers will remain on the old interval (idk why)
+			self.updateTimer.invalidate()
+			self.updateTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true, block: { [weak self] _ in
+				guard let self else { return }
+				Task { try await self.refresh() }
+			})
+		}
 	}
 
 	func resume(_ torrents: [StandardTorrent]) async throws {
@@ -47,12 +64,16 @@ final class TorrentManager {
 		try await refresh()
 	}
 
+	func paths(for torrent: StandardTorrent) async throws -> [String] {
+		try await session.actionImplementation.paths(torrent)
+	}
+
 	nonisolated func refresh() async throws {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
 		await MainActor.run {
-			self.torrents = torrents
-			self.labels = labels
+			self.torrents = torrents.sorted(by: { $0.hash < $1.hash })
+			self.labels = labels.sorted(by: { $0.name < $1.name })
 		}
 	}
 }

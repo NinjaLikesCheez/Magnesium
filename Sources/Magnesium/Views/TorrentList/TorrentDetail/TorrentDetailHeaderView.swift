@@ -2,7 +2,7 @@ import SwiftUI
 
 // TODO: this doesn't refresh automatically (i.e. if you pause)
 struct TorrentDetailHeaderView: View {
-	@Environment(Session.self) var session
+	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.dismiss) private var dismiss
 	var torrent: StandardTorrent
 
@@ -48,7 +48,7 @@ struct TorrentDetailHeaderView: View {
 			Task {
 				do {
 					torrent.isActive
-					? try await session.actionImplementation.pause([torrent]) : try await session.actionImplementation.resume([torrent])
+					? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 				} catch {
 					print("Error pausing/resuming torrent: \(error)")
 				}
@@ -79,7 +79,7 @@ struct TorrentDetailHeaderView: View {
 			Button("Remove Torrent", role: .destructive) {
 				Task {
 					do {
-						try await session.actionImplementation.remove([torrent], false)
+						try await torrentManager.delete([torrent], removeData: false)
 						dismiss()
 					} catch {
 						print("Error: Failed to remove torrent: \(error)")
@@ -89,7 +89,7 @@ struct TorrentDetailHeaderView: View {
 			Button("Remove Torrent and Data", role: .destructive) {
 				Task {
 					do {
-						try await session.actionImplementation.remove([torrent], true)
+						try await torrentManager.delete([torrent], removeData: true)
 						dismiss()
 					} catch {
 						print("Error: Failed to remove torrent and data")
@@ -106,7 +106,7 @@ struct TorrentDetailHeaderView: View {
 		Button {
 			Task {
 				do {
-					let paths = try await session.actionImplementation.paths(torrent)
+					let paths = try await torrentManager.paths(for: torrent)
 					UIPasteboard.general.string = torrent.downloadPath + "/" + paths[0]
 				} catch {
 					print("Error copying file path: \(error)")

@@ -13,19 +13,22 @@ enum TorrentListDestination: RoutableDestinations {
 }
 
 struct TorrentListDestinationModifier: ViewModifier {
+	@Binding var manager: TorrentManager
+
 	func body(content: Content) -> some View {
 		content
 			.navigationDestination(for: TorrentListDestination.self) { destination in
 				switch destination {
 				case let .detail(torrent):
 					TorrentDetailView(torrent: torrent)
+						.environment(manager)
 				}
 			}
 	}
 }
 
 extension View {
-	func withTorrentListDestinations() -> some View {
-		modifier(TorrentListDestinationModifier())
+	func withTorrentListDestinations(manager: Binding<TorrentManager>) -> some View {
+		modifier(TorrentListDestinationModifier(manager: manager))
 	}
 }

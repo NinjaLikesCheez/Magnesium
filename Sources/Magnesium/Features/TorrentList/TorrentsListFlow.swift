@@ -17,14 +17,16 @@ struct TorrentsListFlow: View {
 	var body: some View {
 		NavigationStack(path: $torrentListRouter.path) {
 			TorrentNavigationView()
-				.withTorrentListDestinations()
+				.withTorrentListDestinations(
+					manager: $torrentManager
+				)
 				.withTorrentListSheets(
 					router: $torrentListRouter,
 					preferences: $preferences,
 					session: $session
 				)
-				.environment(torrentManager)
 		}
+		.environment(torrentManager)
 		.environment(torrentListRouter)
 		.environment(preferences)
 		.environment(session)
