@@ -10,8 +10,9 @@ import SwiftUI
 @MainActor
 @Observable
 final class TorrentManager {
-	// TODO: migrate all uses of the session's actionImplementation to this class
-	private(set) var torrents: [StandardTorrent] = []
+	typealias Hash = String
+
+	private(set) var torrents: [Hash: StandardTorrent] = [:]
 	private(set) var labels: [StandardLabel] = []
 
 	var searchQuery: String = ""
@@ -68,11 +69,15 @@ final class TorrentManager {
 		try await session.actionImplementation.paths(torrent)
 	}
 
+	func refreshFiles(for torrent: StandardTorrent) async throws -> [StandardTorrentFile] {
+		try await session.actionImplementation.refreshFiles(torrent)
+	}
+
 	nonisolated func refresh() async throws {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
 		await MainActor.run {
-			self.torrents = torrents.sorted(by: { $0.hash < $1.hash })
+			self.torrents = torrents.reduce(into: [String: StandardTorrent](), { $0[$1.hash] = $1 })
 			self.labels = labels.sorted(by: { $0.name < $1.name })
 		}
 	}
@@ -81,7 +86,7 @@ final class TorrentManager {
 extension TorrentManager {
 	var filteredTorrents: [StandardTorrent] {
 		TorrentMapper.map(
-			torrents,
+			torrents.map(\.value),
 			query: searchQuery,
 			sortOption: preferences.sortOption,
 			filterOptions: preferences.filterOptions
@@ -90,13 +95,13 @@ extension TorrentManager {
 
 	var totalUploadSpeed: String {
 		Formatters.bytes.string(
-			fromByteCount: torrents.reduce(into: 0) { $0 += $1.uploadRate }
+			fromByteCount: torrents.values.reduce(into: 0) { $0 += $1.uploadRate }
 		)
 	}
 
 	var totalDownloadSpeed: String {
 		Formatters.bytes.string(
-			fromByteCount: torrents.reduce(into: 0) { $0 += $1.downloadRate }
+			fromByteCount: torrents.values.reduce(into: 0) { $0 += $1.downloadRate }
 		)
 	}
 }

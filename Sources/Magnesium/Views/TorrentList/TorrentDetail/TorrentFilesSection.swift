@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TorrentFilesSection: View {
-	@Environment(Session.self) var session
+	@Environment(TorrentManager.self) var manager
 
 	var torrent: StandardTorrent
 	@State private var files: [StandardTorrentFile] = []
@@ -33,7 +33,7 @@ struct TorrentFilesSection: View {
 		.onAppear {
 			Task {
 				do {
-					files = try await session.actionImplementation.refreshFiles(torrent)
+					files = try await manager.refreshFiles(for: torrent)
 				} catch {
 					print("error fetching file details: \(error)")
 				}
