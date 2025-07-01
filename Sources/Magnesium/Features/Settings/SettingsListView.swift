@@ -1,11 +1,9 @@
 import SwiftUI
 
-public struct SettingsView: View {
-	@Environment(\.dismiss) private var dismiss
+public struct SettingsListView: View {
 	@Environment(Session.self) private var session: Session
 	@Environment(AppPreferences.self) private var preferences: AppPreferences
-	@Environment(Router.self) var router
-	@Environment(\.appRouter) var appRouter
+	@Environment(SettingsRouter.self) var router
 
 	@State private var servers: [Server] = []
 
@@ -29,7 +27,7 @@ public struct SettingsView: View {
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Done") {
-					appRouter.dismissSheet()
+					router.dismissSheet(withParent: true)
 				}
 			}
 		}
@@ -45,17 +43,13 @@ public struct SettingsView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				RoutableNavigationLink {
+				NavigationLink(value: SettingsDestinations.editServer(server)) {
 					Text(server.name)
-				} action: {
-					router.push(.editServer(server))
 				}
 			}
 
-			RoutableNavigationLink {
+			NavigationLink(value: SettingsDestinations.addAServer) {
 				Text("Add Server")
-			} action: {
-				router.push(.addAServer)
 			}
 		}
 	}
@@ -98,8 +92,7 @@ public struct SettingsView: View {
 	var resetSection: some View {
 		Section("Reset") {
 			Button(role: .destructive) {
-				router.popToRoot()
-				appRouter.popToRoot()
+				router.reset(withParent: true)
 				preferences.reset()
 				session.reset()
 			} label: {
@@ -110,6 +103,6 @@ public struct SettingsView: View {
 }
 
 #Preview {
-	SettingsView()
+	SettingsFlow(settingsRouter: .init())
 		.environment(Session())
 }

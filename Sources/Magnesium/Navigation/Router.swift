@@ -8,87 +8,61 @@
 import Observation
 import SwiftUI
 
-class AnySheetDestination: Identifiable {
-	let destination: any Identifiable
+protocol RoutableDestinations: Hashable {}
+protocol RoutableSheets: Hashable, Identifiable {}
 
-	init(_ destination: any Identifiable) {
-		self.destination = destination
-	}
+protocol RoutableSheetsViewModifible: ViewModifier {}
+protocol RoutableDestinationsViewModifible: ViewModifier {}
+
+@MainActor
+protocol RouterProtocol: AnyObject, Observation.Observable {
+	associatedtype Destination
+	associatedtype Sheet
+
+	var path: [Destination] { get set }
+	var presentedSheet: Sheet? { get set }
+	var parent: (any RouterProtocol)? { get }
+
+	init(_ parent: (any RouterProtocol)?)
+
+	func push(_ destination: Destination)
+	@discardableResult func pop() -> Destination?
+	func popToRoot()
+	func presentSheet(_ sheet: Sheet)
+	func dismissSheet(withParent: Bool)
+	func reset(withParent: Bool)
 }
 
-@Observable
-final class Router {
-	let name: String
-	var path = NavigationPath()
-	var presentedSheet: AnySheetDestination? = nil
-
-	@ObservationIgnored
-	@Environment(\.dismiss) private var dismiss
-
-	init(_ name: String) {
-		self.name = name
-	}
-
-	func present(_ destination: any Identifiable) {
-		presentedSheet = AnySheetDestination(destination)
-	}
-
-	func push(_ destination: any Hashable) {
+extension RouterProtocol {
+	func push(_ destination: Destination) {
 		path.append(destination)
 	}
 
-	func pop() {
-		path.removeLast()
+	@discardableResult
+	func pop() -> Destination? {
+		path.popLast()
 	}
 
 	func popToRoot() {
-		dismissSheet()
-		path.removeLast(path.count)
+		path.removeAll()
 	}
 
-	func dismissSheet() {
+	func presentSheet(_ sheet: Sheet) {
+		presentedSheet = sheet
+	}
+
+	func dismissSheet(withParent: Bool = false) {
 		presentedSheet = nil
-	}
-}
-
-struct RoutableNavigationLink<Content: View>: View {
-	let content: () -> Content
-	let action: () -> Void
-	let disclosure: Bool
-
-	init(@ViewBuilder content: @escaping () -> Content, action: @escaping () -> Void, disclosure: Bool = true) {
-		self.content = content
-		self.action = action
-		self.disclosure = disclosure
-	}
-
-	var body: some View {
-		HStack {
-			content()
-			if disclosure {
-				Spacer()
-				Image(systemName: "chevron.forward")
-					.font(Font.system(.caption).weight(.bold))
-					.foregroundColor(Color(UIColor.tertiaryLabel))
-			}
-		}
-		.contentShape(Rectangle())
-		.onTapGesture {
-			action()
+		if withParent {
+			parent?.dismissSheet()
 		}
 	}
-}
 
-extension EnvironmentValues {
-	var appRouter: Router {
-		get {
-			self[AppRouterKey]
-		} set {
-			self[AppRouterKey] = newValue
+	func reset(withParent: Bool = false) {
+		presentedSheet = nil
+		popToRoot()
+		if withParent {
+			parent?.reset()
 		}
 	}
-}
-
-struct AppRouterKey: EnvironmentKey {
-	static var defaultValue: Router = .init("App")
 }

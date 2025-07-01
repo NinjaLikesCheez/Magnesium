@@ -3,46 +3,70 @@ import Logging
 
 @main
 struct MagnesiumApp: App {
-	@Environment(\.appRouter) private var router
+	@State private var appState = AppState.resuming
 
-	let session = Session()
-	let preferences = AppPreferences(userDefaults: .standard)
-
-	@State private var torrentManager: TorrentManager
+	@State var session = Session()
+	@State var preferences = AppPreferences(userDefaults: .standard)
+	@State var torrentManager: TorrentManager? = nil
 
 	init() {
 		LoggingSystem.bootstrap { label in
 			var logger = StreamLogHandler.standardOutput(label: label)
 			#if DEBUG
-			logger.logLevel = .debug
+//			logger.logLevel = .debug
 			#endif
 			return logger
 		}
-		_torrentManager = State(wrappedValue: TorrentManager(session: session))
+		self._torrentManager = State(
+			initialValue: TorrentManager(session: session, preferences: preferences)
+		)
 	}
 
 	var body: some Scene {
-		@Bindable var router = router
-
 		WindowGroup {
 			Group {
-				if session.server == nil {
-					NavigationStack(path: $router.path) {
-						OnboardingCoordinator(
-							dependencies: .init(preferences: preferences)
-						)
-					}
-				} else {
-					TorrentListCoordinator(
-						dependencies: .init(
-							preferences: preferences,
-							session: session
-						)
+				switch appState {
+				case .unauthenticated:
+					OnboardingFlow(
+						onboardingRouter: .init(),
+						preferences: $preferences,
+						session: $session
 					)
-					.environment(torrentManager)
+				case .authenticated:
+					TorrentsListFlow(
+						torrentListRouter: .init(),
+						torrentManager: .constant(torrentManager!),
+						preferences: $preferences,
+						session: $session
+					)
+				case .resuming:
+					ProgressView()
+						.containerRelativeFrame([.horizontal, .vertical])
+				case .error(let error):
+					ContentUnavailableView(
+						"Error: \(error.localizedDescription)",
+						image: "exclamationmark.triangle"
+					)
 				}
 			}
-			.environment(router)
+			.task {
+				guard session.server != nil else {
+					appState = .unauthenticated
+					return
+				}
+
+				appState = .authenticated
+			}
+			.onChange(of: session.server) { _, newValue in
+				guard newValue != nil else {
+					appState = .unauthenticated
+					return
+				}
+
+				appState = .authenticated
+			}
+			.environment(preferences)
+			.environment(session)
 		}
 	}
 }

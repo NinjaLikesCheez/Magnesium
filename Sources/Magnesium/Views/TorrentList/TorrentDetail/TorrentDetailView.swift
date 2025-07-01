@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct TorrentDetailView: View {
-	@Environment(TorrentActionImplementation.self) var implementation
 	var torrent: StandardTorrent
 
 	var body: some View {

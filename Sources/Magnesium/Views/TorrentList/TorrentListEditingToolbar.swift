@@ -8,44 +8,72 @@
 import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
-	@Environment(Session.self) private var session: Session
+	@Environment(TorrentManager.self) private var torrentManager
 
 	@State private var isConfirmingDelete = false
 	let selectedTorrents: Set<StandardTorrent>
 
-	@Binding var error: String?
-
 	var body: some ToolbarContent {
-		ToolbarItem(placement: .bottomBar) {
-			editingBarItems
+		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+			glassToolbar
+		} else {
+			oldGrandpaToolbar
+		}
+	}
+
+	@available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *)
+	@ToolbarContentBuilder
+	var glassToolbar: some ToolbarContent {
+		ToolbarItemGroup(placement: .bottomBar) {
+			playButton
+		}
+
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
+		ToolbarItemGroup(placement: .bottomBar) {
+			pauseButton
+		}
+
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
+		ToolbarItemGroup(placement: .bottomBar) {
+			deleteButton
+		}
+
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
+		ToolbarItemGroup(placement: .bottomBar) {
+			moreButton
+		}
+	}
+
+	var oldGrandpaToolbar: some ToolbarContent {
+		ToolbarItemGroup(placement: .bottomBar) {
+			HStack {
+				playButton
+				Spacer()
+				pauseButton
+				Spacer()
+				deleteButton
+				Spacer()
+				moreButton
+			}
 		}
 	}
 
 	var playButton: some View {
 		Button {
-			Task {
-				do {
-					try await session.actionImplementation.resume(Array(selectedTorrents))
-				} catch {
-					self.error = error.localizedDescription
-				}
-			}
+			perform(.resume)
 		} label: {
-			Image(systemName: "play.circle")
+			Image(systemName: "play")
 		}
 	}
 
 	var pauseButton: some View {
 		Button {
-			Task {
-				do {
-					try await session.actionImplementation.pause(Array(selectedTorrents))
-				} catch {
-					self.error = error.localizedDescription
-				}
-			}
+			perform(.pause)
 		} label: {
-			Image(systemName: "pause.circle")
+			Image(systemName: "pause")
 		}
 	}
 
@@ -53,27 +81,15 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		Button {
 			isConfirmingDelete = true
 		} label: {
-			Image(systemName: "trash.circle")
+			Image(systemName: "trash")
 		}
 		.confirmationDialog("Remove", isPresented: $isConfirmingDelete) {
 			Button("Keep Data") {
-				Task {
-					do {
-						try await session.actionImplementation.remove(Array(selectedTorrents), false)
-					} catch {
-						self.error = error.localizedDescription
-					}
-				}
+				perform(.delete(removeData: false))
 			}
 
 			Button("Remove Data", role: .destructive) {
-				Task {
-					do {
-						try await session.actionImplementation.remove(Array(selectedTorrents), true)
-					} catch {
-						self.error = error.localizedDescription
-					}
-				}
+				perform(.delete(removeData: true))
 			}
 		}
 	}
@@ -81,26 +97,36 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	var moreButton: some View {
 		Button {
 			// TODO: this
+			perform(.more)
 		} label: {
-			Image(systemName: "ellipsis.circle")
+			Image(systemName: "ellipsis")
 		}
 	}
 
-	var editingBarItems: some View {
-		HStack {
-			playButton
+	enum EditingToolbarAction {
+		case resume
+		case pause
+		case delete(removeData: Bool)
+		case more
+	}
 
-			Spacer()
-			
-			pauseButton
-
-			Spacer()
-			
-			deleteButton
-
-			Spacer()
-			
-			moreButton
+	func perform(_ action: EditingToolbarAction) {
+		Task {
+			do {
+				switch action {
+				case .resume:
+					try await torrentManager.resume(Array(selectedTorrents))
+				case .pause:
+					try await torrentManager.pause(Array(selectedTorrents))
+				case let .delete(removeData):
+					try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
+				case .more:
+					print("TODO")
+				}
+			} catch {
+				print("Error performing toolbar action: \(error.localizedDescription)")
+//				self.error = error.localizedDescription
+			}
 		}
 	}
 }

@@ -25,19 +25,19 @@ targets:
     type: application
     supportedDestinations: [iOS, tvOS, macOS, visionOS]
     deploymentTarget:
-      iOS: 18.0
-      tvOS: 18.0
-      macOS: 15.0
+      iOS: 18.4
+      tvOS: 18.4
+      macOS: 15.4
       visionOS: 2.0
     sources:
       - Sources/Magnesium
     settings:
-      PRODUCT_BUNDLE_IDENTIFIER: ca.jameshurst.Magnesium2
+      PRODUCT_BUNDLE_IDENTIFIER: bykim.cracks.Magnesium
     info:
       path: Sources/Magnesium/Resources/Info.plist
       properties:
         CFBundleDisplayName: Magnesium
-        CFBundleIdentifier: ca.jameshurst.Magnesium2
+        CFBundleIdentifier: bykim.cracks.Magnesium
         UILaunchScreen:
           UIColorName: White
         NSAppTransportSecurity:

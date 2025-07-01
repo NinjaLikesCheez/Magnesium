@@ -48,7 +48,9 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 			sectionContent()
 		}
 		.toolbar {
-			saveButton
+			ToolbarItem(placement: .topBarTrailing) {
+				saveButton
+			}
 		}
 	}
 
