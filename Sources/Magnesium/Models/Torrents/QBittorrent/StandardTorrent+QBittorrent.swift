@@ -45,29 +45,26 @@ extension StandardTorrent {
 		}
 	}
 
-	init(_ torrent: Torrent) {
-		hash = torrent.hash
-		// TODO: convert QBT to declare Int64 instead of Int
-		self.dateAdded = Date(timeIntervalSince1970: TimeInterval(torrent.addedOn))  // TODO: Decode as a date in QBittorrent
-		self.downloaded = Int64(torrent.downloaded)
-		self.downloadPath = torrent.downloadPath
-		self.downloadRate = Int64(torrent.dlspeed)
-		self.eta = TimeInterval(torrent.eta)
-		if let firstTag = torrent.tags.split(separator: ",").first {
-			self.label = String(firstTag)  // TODO: label needs to be updated to an array
-		} else {
-			self.label = ""
-		}
-		self.name = torrent.name
-		self.peers = torrent.numLeechs
-		self.progress = Float(torrent.progress)
-		self.seeds = torrent.numSeeds
-		self.size = Int64(torrent.size)
-		self.state = Self.state(for: torrent.state)
-		self.totalPeers = torrent.numIncomplete
-		self.totalSeeds = torrent.numComplete
-		self.trackers = [torrent.tracker]  // TODO: qbt only returns the first working tracker :/
-		self.uploaded = Int64(torrent.uploaded)
-		self.uploadRate = Int64(torrent.upspeed)
+	convenience init(_ torrent: Torrent) {
+		self.init(
+			dateAdded: Date(timeIntervalSince1970: TimeInterval(torrent.addedOn)),
+			downloaded: Int64(torrent.downloaded),
+			downloadPath: torrent.downloadPath,
+			downloadRate: Int64(torrent.dlspeed),
+			eta: TimeInterval(torrent.eta),
+			hash: torrent.hash,
+			label: torrent.tags.split(separator: ",").first.map(String.init) ?? "",
+			name: torrent.name,
+			peers: torrent.numLeechs,
+			progress: Float(torrent.progress),
+			seeds: torrent.numSeeds,
+			size: Int64(torrent.size),
+			state: Self.state(for: torrent.state),
+			totalPeers: torrent.numIncomplete,
+			totalSeeds: torrent.numComplete,
+			trackers: [torrent.tracker],
+			uploaded: Int64(torrent.uploaded),
+			uploadRate: Int64(torrent.upspeed)
+		)
 	}
 }

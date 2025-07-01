@@ -29,19 +29,22 @@ final class TorrentManager {
 		self.session = session
 		self.preferences = preferences
 
-
-		self.updateTimer = Timer.scheduledTimer(withTimeInterval: preferences.autoRefreshInterval, repeats: true, block: { [weak self] _ in
-			guard let self else { return }
-			Task { try await self.refresh() }
-		})
+		self.updateTimer = Timer.scheduledTimer(
+			withTimeInterval: preferences.autoRefreshInterval, repeats: true,
+			block: { [weak self] _ in
+				guard let self else { return }
+				Task { try await self.refresh() }
+			})
 
 		withObservationTracking(of: preferences.autoRefreshInterval) { interval in
 			// if we don't invalidate here, the timers will remain on the old interval (idk why)
 			self.updateTimer.invalidate()
-			self.updateTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true, block: { [weak self] _ in
-				guard let self else { return }
-				Task { try await self.refresh() }
-			})
+			self.updateTimer = Timer.scheduledTimer(
+				withTimeInterval: interval, repeats: true,
+				block: { [weak self] _ in
+					guard let self else { return }
+					Task { try await self.refresh() }
+				})
 		}
 	}
 
@@ -76,8 +79,43 @@ final class TorrentManager {
 	nonisolated func refresh() async throws {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
+		// We have to do 'delta' style updates so the view bindings work properly.
+		// First, calculate the changes in torrents
+
 		await MainActor.run {
-			self.torrents = torrents.reduce(into: [String: StandardTorrent](), { $0[$1.hash] = $1 })
+			var torrentsCopy = self.torrents
+			let updatedTorrents = torrents.reduce(into: [String: StandardTorrent](), { $0[$1.hash] = $1 })
+			let hashDifference = updatedTorrents.map(\.key).difference(from: torrentsCopy.map(\.key)).inferringMoves()
+
+			for change in hashDifference.removals {
+				switch change {
+				case .remove(offset: _, element: let hash, associatedWith: let associatedWith):
+					if associatedWith == nil {
+						torrentsCopy.removeValue(forKey: hash)
+					}
+				default:
+					continue
+				}
+			}
+
+			for (hash, element) in updatedTorrents {
+				if let torrent = torrentsCopy[hash] {
+					torrent.update(element)
+				}
+			}
+
+			for change in hashDifference.insertions {
+				switch change {
+				case .insert(offset: _, element: let hash, associatedWith: let associatedWith):
+					if associatedWith == nil {
+						torrentsCopy[hash] = updatedTorrents[hash]
+					}
+				default:
+					continue
+				}
+			}
+
+			self.torrents = torrentsCopy
 			self.labels = labels.sorted(by: { $0.name < $1.name })
 		}
 	}

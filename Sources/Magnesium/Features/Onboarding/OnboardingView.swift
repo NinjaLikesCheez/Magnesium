@@ -40,23 +40,42 @@ struct OnboardingView: View {
 		GeometryReader { reader in
 			VStack {
 				ForEach(ServerType.allCases) { type in
-					Button {
-						if horizontalSizeClass == .compact {
-							router.push(.addNewServer(type))
-						} else {
-							// On larger screens, a sheet looks better
-							router.presentSheet(.addNewServer(type))
+					if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+						Button {
+							if horizontalSizeClass == .compact {
+								router.push(.addNewServer(type))
+							} else {
+								// On larger screens, a sheet looks better
+								router.presentSheet(.addNewServer(type))
+							}
+						} label: {
+							Text(type.rawValue)
+								.fontWeight(.bold)
+								.frame(maxWidth: .infinity)
+								.padding()
 						}
-					} label: {
-						Text(type.rawValue)
-							.fontWeight(.bold)
-							.frame(maxWidth: .infinity)
-							.padding()
+						.buttonStyle(.glass)
+						.buttonBorderShape(.capsule)
+						//					.padding(.vertical, 10)
+						.frame(maxWidth: reader.size.width * 0.5)
+					} else {
+						Button {
+							if horizontalSizeClass == .compact {
+								router.push(.addNewServer(type))
+							} else {
+								// On larger screens, a sheet looks better
+								router.presentSheet(.addNewServer(type))
+							}
+						} label: {
+							Text(type.rawValue)
+								.fontWeight(.bold)
+								.frame(maxWidth: .infinity)
+								.padding()
+						}
+						.buttonBorderShape(.capsule)
+						//					.padding(.vertical, 10)
+						.frame(maxWidth: reader.size.width * 0.5)
 					}
-					.buttonStyle(.glass)
-					.buttonBorderShape(.capsule)
-					//					.padding(.vertical, 10)
-					.frame(maxWidth: reader.size.width * 0.5)
 				}
 			}
 			.frame(width: reader.size.width, alignment: .center)

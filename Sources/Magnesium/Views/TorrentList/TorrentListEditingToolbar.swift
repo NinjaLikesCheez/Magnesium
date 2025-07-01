@@ -14,6 +14,16 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	let selectedTorrents: Set<StandardTorrent>
 
 	var body: some ToolbarContent {
+		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+			glassToolbar
+		} else {
+			oldGrandpaToolbar
+		}
+	}
+
+	@available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *)
+	@ToolbarContentBuilder
+	var glassToolbar: some ToolbarContent {
 		ToolbarItemGroup(placement: .bottomBar) {
 			playButton
 		}
@@ -34,6 +44,20 @@ struct TorrentListEditingToolbar: ToolbarContent {
 
 		ToolbarItemGroup(placement: .bottomBar) {
 			moreButton
+		}
+	}
+
+	var oldGrandpaToolbar: some ToolbarContent {
+		ToolbarItemGroup(placement: .bottomBar) {
+			HStack {
+				playButton
+				Spacer()
+				pauseButton
+				Spacer()
+				deleteButton
+				Spacer()
+				moreButton
+			}
 		}
 	}
 

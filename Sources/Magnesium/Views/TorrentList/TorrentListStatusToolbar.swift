@@ -17,6 +17,16 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	@State var linkInput = ""
 
 	var body: some ToolbarContent {
+		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+			glassToolbar
+		} else {
+			oldGrandpaToolbar
+		}
+	}
+
+	@available(iOS 26, macOS 26, tvOS 26, visionOS 26, *)
+	@ToolbarContentBuilder
+	var glassToolbar: some ToolbarContent {
 		ToolbarItemGroup(placement: .bottomBar) {
 			TorrentFilterMenu(labels: torrentManager.labels)
 				.environment(preferences)
@@ -27,8 +37,8 @@ struct TorrentListStatusToolbar: ToolbarContent {
 				Image(systemName: "plus")
 			}
 			.confirmationDialog("Add Torrent",
-				isPresented: $showAddTorrentConfirmation,
-				titleVisibility: .visible
+													isPresented: $showAddTorrentConfirmation,
+													titleVisibility: .visible
 			) {
 				confirmationDialogButtons
 			} message: {
@@ -58,8 +68,53 @@ struct TorrentListStatusToolbar: ToolbarContent {
 		}
 	}
 
+	@ToolbarContentBuilder
+	var oldGrandpaToolbar: some ToolbarContent {
+		ToolbarItem(placement: .bottomBar) {
+			HStack {
+				TorrentFilterMenu(labels: torrentManager.labels)
+					.environment(preferences)
+
+				Spacer()
+
+				Text("↓ \(torrentManager.totalDownloadSpeed) ↑ \(torrentManager.totalUploadSpeed)")
+					.font(.caption)
+					.foregroundStyle(.secondary)
+					.frame(minWidth: 100)
+
+				Spacer()
+
+				Button {
+					addTorrentAction()
+				} label: {
+					Image(systemName: "plus")
+				}
+				.confirmationDialog("Add Torrent",
+														isPresented: $showAddTorrentConfirmation,
+														titleVisibility: .visible
+				) {
+					confirmationDialogButtons
+				} message: {
+					Text("How would you like to add the torrent?")
+				}
+				.alert("Enter a URL", isPresented: $showingLinkInput) {
+					alertContent
+				} message: {
+					Text("This can either be a link to a torrent or a magnet link")
+				}
+				.fileImporter(
+					isPresented: $showingFileImporter,
+					allowedContentTypes: [.init(filenameExtension: "torrent")!],
+					allowsMultipleSelection: true
+				) { result in
+					handleFileImporterResult(result)
+				}
+			}
+		}
+	}
+
 	@ViewBuilder
-	var confirmationDialogButtons: some View {
+	private var confirmationDialogButtons: some View {
 		Button("Add Link") {
 			showingLinkInput = true
 		}
@@ -70,7 +125,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	}
 
 	@ViewBuilder
-	var alertContent: some View {
+	private var alertContent: some View {
 		TextField("magnet:?xt=urn:btih:", text: $linkInput)
 
 		Button("Cancel", role: .cancel) {}
@@ -83,7 +138,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 		}
 	}
 
-	func addTorrentAction() {
+	private func addTorrentAction() {
 		guard
 			preferences.automaticallyLookForMagnetLinks,
 			let string = UIPasteboard.general.string,
@@ -104,7 +159,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 		}
 	}
 
-	func handleFileImporterResult(_ result: Result<[URL], any Error>) {
+	private func handleFileImporterResult(_ result: Result<[URL], any Error>) {
 		switch result {
 		case .success(let urls):
 			urls

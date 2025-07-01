@@ -18,7 +18,7 @@ extension StandardTorrent {
 		}
 	}
 
-	init?(_ torrent: Torrent) {
+	convenience init?(_ torrent: Torrent) {
 		guard let dateAdded = torrent.dateAdded,
 			let downloaded = torrent.downloaded,
 			let downloadPath = torrent.downloadPath,
@@ -40,23 +40,25 @@ extension StandardTorrent {
 			return nil
 		}
 
-		hash = torrent.hash
-		self.dateAdded = dateAdded
-		self.downloaded = downloaded
-		self.downloadPath = downloadPath
-		self.downloadRate = downloadRate
-		self.eta = eta
-		self.label = label
-		self.name = name
-		self.peers = peers
-		self.progress = progress
-		self.seeds = seeds
-		self.size = size
-		self.state = state
-		self.totalPeers = totalPeers
-		self.totalSeeds = totalSeeds
-		self.trackers = trackers
-		self.uploaded = uploaded
-		self.uploadRate = uploadRate
+		self.init(
+			dateAdded: dateAdded,
+			downloaded: downloaded,
+			downloadPath: downloadPath,
+			downloadRate: downloadRate,
+			eta: eta,
+			hash: torrent.hash,
+			label: label,
+			name: name,
+			peers: peers,
+			progress: progress,
+			seeds: seeds,
+			size: size,
+			state: state,
+			totalPeers: totalPeers,
+			totalSeeds: totalSeeds,
+			trackers: trackers,
+			uploaded: uploaded,
+			uploadRate: uploadRate
+		)
 	}
 }

@@ -1,7 +1,9 @@
 import Foundation
+import Observation
 
-struct StandardTorrent: Decodable, Hashable, Equatable, Identifiable {
-	var id: String { hash }
+@Observable
+final class StandardTorrent: Decodable {
+	let id: String
 
 	var dateAdded: Date
 	var downloaded: Int64
@@ -21,6 +23,68 @@ struct StandardTorrent: Decodable, Hashable, Equatable, Identifiable {
 	var trackers: [String]
 	var uploaded: Int64
 	var uploadRate: Int64
+
+	init(
+		dateAdded: Date,
+		downloaded: Int64,
+		downloadPath: String,
+		downloadRate: Int64,
+		eta: TimeInterval,
+		hash: String,
+		label: String,
+		name: String,
+		peers: Int,
+		progress: Float,
+		seeds: Int,
+		size: Int64,
+		state: TorrentState,
+		totalPeers: Int,
+		totalSeeds: Int,
+		trackers: [String],
+		uploaded: Int64,
+		uploadRate: Int64
+	) {
+		self.id = hash
+		self.dateAdded = dateAdded
+		self.downloaded = downloaded
+		self.downloadPath = downloadPath
+		self.downloadRate = downloadRate
+		self.eta = eta
+		self.hash = hash
+		self.label = label
+		self.name = name
+		self.peers = peers
+		self.progress = progress
+		self.seeds = seeds
+		self.size = size
+		self.state = state
+		self.totalPeers = totalPeers
+		self.totalSeeds = totalSeeds
+		self.trackers = trackers
+		self.uploaded = uploaded
+		self.uploadRate = uploadRate
+	}
+
+	func update(_ torrent: StandardTorrent) {
+		self.dateAdded = torrent.dateAdded
+		self.downloaded = torrent.downloaded
+		self.downloadPath = torrent.downloadPath
+		self.downloadRate = torrent.downloadRate
+		self.eta = torrent.eta
+		self.hash = torrent.hash
+		self.label = torrent.label
+		self.name = torrent.name
+		self.peers = torrent.peers
+		self.progress = torrent.progress
+		self.seeds = torrent.seeds
+		self.size = torrent.size
+		self.state = torrent.state
+		self.totalPeers = torrent.totalPeers
+		self.totalSeeds = torrent.totalSeeds
+		self.trackers = torrent.trackers
+		self.uploaded = torrent.uploaded
+		self.uploadRate = torrent.uploadRate
+	}
 }
 
 extension StandardTorrent {
@@ -67,5 +131,32 @@ extension StandardTorrent {
 		} else {
 			return L10n.Torrent.ratio(formattedRatio())
 		}
+	}
+}
+
+extension StandardTorrent: Hashable, Equatable, Identifiable {
+	static func == (lhs: StandardTorrent, rhs: StandardTorrent) -> Bool {
+//		lhs.dateAdded == rhs.dateAdded &&
+//		lhs.downloaded == rhs.downloaded &&
+//		lhs.downloadPath == rhs.downloadPath &&
+//		lhs.downloadRate == rhs.downloadRate &&
+//		lhs.eta == rhs.eta &&
+		lhs.hash == rhs.hash //&&
+//		lhs.label == rhs.label &&
+//		lhs.name == rhs.name &&
+//		lhs.peers == rhs.peers &&
+//		lhs.progress == rhs.progress &&
+//		lhs.seeds == rhs.seeds &&
+//		lhs.size == rhs.size &&
+//		lhs.state == rhs.state &&
+//		lhs.totalPeers == rhs.totalPeers &&
+//		lhs.totalSeeds == rhs.totalSeeds &&
+//		lhs.trackers == rhs.trackers &&
+//		lhs.uploaded == rhs.uploaded &&
+//		lhs.uploadRate == rhs.uploadRate
+	}
+
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(hash)
 	}
 }
