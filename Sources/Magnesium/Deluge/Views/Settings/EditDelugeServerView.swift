@@ -73,7 +73,8 @@ struct EditDelugeServerView<Router: RouterProtocol>: View {
 		// TODO: Error handle
 		let server = try await settings.makeServer()
 		try preferences.addOrUpdate(server: server)
-		session.setServer(server)
+		try session.setServer(server)
+
 		if isPresented {
 			router.dismissSheet(withParent: true)
 		} else {

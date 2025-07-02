@@ -1,5 +1,5 @@
-import SwiftUI
 import Logging
+import SwiftUI
 
 @main
 struct MagnesiumApp: App {
@@ -13,10 +13,11 @@ struct MagnesiumApp: App {
 		LoggingSystem.bootstrap { label in
 			var logger = StreamLogHandler.standardOutput(label: label)
 			#if DEBUG
-//			logger.logLevel = .debug
+				//			logger.logLevel = .debug
 			#endif
 			return logger
 		}
+
 		self._torrentManager = State(
 			initialValue: TorrentManager(session: session, preferences: preferences)
 		)

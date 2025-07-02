@@ -52,7 +52,7 @@ struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 				do {
 					let server = try await settings.makeServer()
 					try preferences.addOrUpdate(server: server)
-					session.setServer(server)
+					try session.setServer(server)
 					if isPresented {
 						router.dismissSheet(withParent: true)
 					} else {
@@ -67,6 +67,17 @@ struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 						errorMessage = "Unable to authenticate. Please check the settings are correct."
 						showingError = true
 					}
+				} catch let error as Session.Error {
+					switch error {
+					case .missingKeychainData:
+						errorMessage = "Missing keychain data. Please try again."
+						showingError = true
+					case .decodingFailed:
+						errorMessage = "Failed to decode server settings. Please try again."
+					case .notImplemented:
+						errorMessage = "This feature is not implemented yet."
+					}
+					showingError = true
 				} catch {
 					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
 					showingError = true
@@ -84,8 +95,9 @@ struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 	}
 
 	var saveButtonEnabled: Bool {
-		!settings.name.isEmpty && !settings.address.isEmpty && URL(string: settings.address) != nil && !settings.password.isEmpty
-		&& (!showBasicAuthentication
-					|| !settings.basicAuthentication.username.isEmpty && !settings.basicAuthentication.password.isEmpty)
+		!settings.name.isEmpty && !settings.address.isEmpty && URL(string: settings.address) != nil
+			&& !settings.password.isEmpty
+			&& (!showBasicAuthentication
+				|| !settings.basicAuthentication.username.isEmpty && !settings.basicAuthentication.password.isEmpty)
 	}
 }

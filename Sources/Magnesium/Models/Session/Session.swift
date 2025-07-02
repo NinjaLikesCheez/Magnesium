@@ -9,49 +9,55 @@ final class Session {
 
 	private(set) var actionImplementation: any TorrentClientActing = NullTorrentActionImplementation()
 
+	enum Error: Swift.Error {
+		case missingKeychainData(server: Server)
+		case decodingFailed(Swift.Error)
+		case notImplemented
+	}
+
 	init() {
-		_setServer(try? Current.preferences.getSelectedServer())
+		try? _setServer(try? Current.preferences.getSelectedServer())
+
 		withObservationTracking(of: Current.preferences.selectedServerID) { _ in
-			self._setServer(try? Current.preferences.getSelectedServer())
+			try? self._setServer(try? Current.preferences.getSelectedServer())
 		}
 	}
 
-	func setServer(_ server: Server) {
-		_setServer(server)
+	func setServer(_ server: Server) throws(Error) {
+		try _setServer(server)
 	}
 
 	func reset() {
 		server = nil
 	}
 
-	private func _setServer(_ server: Server?) {
+	private func _setServer(_ server: Server?) throws(Error) {
 		self.server = server
+		actionImplementation = NullTorrentActionImplementation()
+
 		if let server = server {
+			actionImplementation = try Session.actionImplementation(server: server)
 			Current.preferences.selectedServerID = server.id
-			actionImplementation = Session.actionImplementation(server: server)
-		} else {
-			actionImplementation = NullTorrentActionImplementation()
 		}
 	}
 }
 
 extension Session {
-	static func actionImplementation(server: Server) -> any TorrentClientActing {
+	static func actionImplementation(server: Server) throws(Error) -> any TorrentClientActing {
 		switch server.type {
 		case .deluge:
 			let decoder = JSONDecoder()
-			do {
-				guard let keychainData = server.keychainData else {
-					fatalError("Failed to fetch keychain data for server: \(server)")
-				}
+			guard let keychainData = server.keychainData else {
+				throw Error.missingKeychainData(server: server)
+			}
 
+			do {
 				let settings = try decoder.decode(DelugeServerSettings.self, from: server.data)
 				let keychain = try decoder.decode(DelugeKeychainData.self, from: keychainData)
-
 				let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
 				return DelugeActionImplementation(session: .init(client: client))
 			} catch {
-				fatalError("Failed to decode Deluge settings: \(error.localizedDescription)")
+				throw Error.decodingFailed(error)
 			}
 
 		// case .transmission:
@@ -65,7 +71,7 @@ extension Session {
 		// 	let client = Current.transmission(settings.url, settings.username, keychain.password)
 		// 	return .transmission(.init(client: client))
 		case .qbittorrent:
-			fatalError("Not implemented")
+			throw Error.notImplemented
 		// let decoder = JSONDecoder()
 		// guard let settings = try? decoder.decode(QBittorrentServerSettings.self, from: server.data),
 		// 	let keychainData = server.keychainData,
