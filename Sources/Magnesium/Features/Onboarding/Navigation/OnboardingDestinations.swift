@@ -7,9 +7,13 @@
 
 import SwiftUI
 
+/// Navigation destinations for the Onboarding feature.
+/// 
+/// Defines all possible push navigation targets within the onboarding flow.
 enum OnboardingDestinations: RoutableDestinations {
 	var id: Self { self }
 
+	/// Navigate to add a specific server type via push navigation
 	case addNewServer(ServerType)
 }
 
