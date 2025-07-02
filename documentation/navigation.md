@@ -250,27 +250,6 @@ router.reset()
 router.reset(withParent: true)
 ```
 
-## Existing Router Examples
-
-### Settings Router
-
-- **File**: `Sources/Magnesium/Features/Settings/Navigation/SettingsRouter.swift`
-- **Destinations**: Edit server, add server, add new server by type
-- **Usage**: Settings flow with server management
-
-### TorrentList Router
-
-- **File**: `Sources/Magnesium/Features/TorrentList/Navigation/TorrentListRouter.swift`
-- **Destinations**: Torrent detail view
-- **Sheets**: Settings modal
-- **Usage**: Main torrent list with navigation to details
-
-### Onboarding Router
-
-- **File**: `Sources/Magnesium/Features/Onboarding/Navigation/OnboardingRouter.swift`
-- **Destinations**: Add new server by type
-- **Sheets**: Add new server modal
-- **Usage**: Initial app setup flow
 
 ## Best Practices
 
