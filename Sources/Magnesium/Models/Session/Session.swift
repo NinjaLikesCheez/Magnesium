@@ -33,11 +33,11 @@ final class Session {
 
 	private func _setServer(_ server: Server?) throws(Error) {
 		self.server = server
+		actionImplementation = NullTorrentActionImplementation()
+
 		if let server = server {
-			Current.preferences.selectedServerID = server.id
 			actionImplementation = try Session.actionImplementation(server: server)
-		} else {
-			actionImplementation = NullTorrentActionImplementation()
+			Current.preferences.selectedServerID = server.id
 		}
 	}
 }
