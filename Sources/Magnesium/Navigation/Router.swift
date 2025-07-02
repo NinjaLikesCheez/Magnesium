@@ -16,8 +16,8 @@ protocol RoutableDestinationsViewModifible: ViewModifier {}
 
 @MainActor
 protocol RouterProtocol: AnyObject, Observation.Observable {
-	associatedtype Destination
-	associatedtype Sheet
+	associatedtype Destination: RoutableDestinations
+	associatedtype Sheet: RoutableSheets
 
 	var path: [Destination] { get set }
 	var presentedSheet: Sheet? { get set }

@@ -7,7 +7,7 @@ final class Session {
 	private(set) var server: Server?
 	private var serverObserver: AnyCancellable?
 
-	private(set) var actionImplementation: TorrentActionImplementation!
+	private(set) var actionImplementation: any TorrentClientActing = NullTorrentActionImplementation()
 
 	init() {
 		_setServer(try? Current.preferences.getSelectedServer())
@@ -29,12 +29,14 @@ final class Session {
 		if let server = server {
 			Current.preferences.selectedServerID = server.id
 			actionImplementation = Session.actionImplementation(server: server)
+		} else {
+			actionImplementation = NullTorrentActionImplementation()
 		}
 	}
 }
 
 extension Session {
-	static func actionImplementation(server: Server) -> TorrentActionImplementation {
+	static func actionImplementation(server: Server) -> any TorrentClientActing {
 		switch server.type {
 		case .deluge:
 			let decoder = JSONDecoder()
@@ -47,7 +49,7 @@ extension Session {
 				let keychain = try decoder.decode(DelugeKeychainData.self, from: keychainData)
 
 				let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
-				return .deluge(.init(client: client))
+				return DelugeActionImplementation(session: .init(client: client))
 			} catch {
 				fatalError("Failed to decode Deluge settings: \(error.localizedDescription)")
 			}
