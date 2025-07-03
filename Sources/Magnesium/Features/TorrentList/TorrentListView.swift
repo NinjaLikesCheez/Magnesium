@@ -10,8 +10,12 @@ public struct TorrentListView: View {
 	@State var error: String? = nil
 	@State private var editingSelections: Set<String> = []
 
-	@Binding var selections: Set<StandardTorrent>
+	@Binding var selections: Set<String>
 	@Binding var editMode: EditMode
+
+	var selectedTorrents: Set<StandardTorrent> {
+		Set(torrentManager.filteredTorrents.filter { selections.contains($0.id) })
+	}
 
 	public var body: some View {
 		let _ = Self._printChanges()
@@ -50,10 +54,10 @@ public struct TorrentListView: View {
 			.contentShape(Rectangle())
 			.onTapGesture {
 				if editMode.isEditing {
-					selections.insert(torrent)
+					selections.insert(torrent.id)
 				} else {
-					if userInterfaceIdiom == .pad || userInterfaceIdiom == .mac  {
-						selections = [torrent]
+					if userInterfaceIdiom == .pad || userInterfaceIdiom == .mac {
+						selections = [torrent.id]
 					} else {
 						router.push(.detail(torrent))
 					}
@@ -81,14 +85,12 @@ public struct TorrentListView: View {
 	@Previewable
 	@State var searchQuery = ""
 	@Previewable
-	@State var selections = Set<StandardTorrent>()
+	@State var selections = Set<String>()
 	@Previewable
 	@State var error: String?
 
 	@Previewable
 	@State var editMode: EditMode = .inactive
 
-
 	TorrentListView(selections: $selections, editMode: $editMode)
 }
-
