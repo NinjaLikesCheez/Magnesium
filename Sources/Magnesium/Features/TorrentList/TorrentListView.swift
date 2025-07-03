@@ -48,7 +48,7 @@ public struct TorrentListView: View {
 		List(torrentManager.filteredTorrents, selection: $selections) { torrent in
 			HStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
-					.tag(torrent)
+					.tag(torrent.id)
 			}
 			// this is required for the tap gesture to cover the whole row
 			.contentShape(Rectangle())
