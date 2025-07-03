@@ -66,6 +66,11 @@ final class StandardTorrent: Decodable {
 	}
 
 	func update(_ torrent: StandardTorrent) {
+		guard self != torrent else {
+			print("Warning: Attempting to update torrent with itself (hash: \(self.hash))")
+			return
+		}
+		
 		self.dateAdded = torrent.dateAdded
 		self.downloaded = torrent.downloaded
 		self.downloadPath = torrent.downloadPath
