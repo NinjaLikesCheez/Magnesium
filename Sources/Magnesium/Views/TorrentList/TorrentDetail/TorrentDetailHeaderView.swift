@@ -84,7 +84,7 @@ struct TorrentDetailHeaderView: View {
 					}
 				}
 			}
-			.buttonStyle(.glass)
+
 			Button("Remove Torrent and Data", role: .destructive) {
 				Task {
 					do {
