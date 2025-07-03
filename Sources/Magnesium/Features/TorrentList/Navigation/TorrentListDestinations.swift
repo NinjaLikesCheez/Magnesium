@@ -7,8 +7,6 @@
 import SwiftUI
 
 /// Navigation destinations for the TorrentList feature.
-/// 
-/// Defines all possible push navigation targets within the torrent list flow.
 enum TorrentListDestination: RoutableDestinations {
 	var id: Self { self }
 

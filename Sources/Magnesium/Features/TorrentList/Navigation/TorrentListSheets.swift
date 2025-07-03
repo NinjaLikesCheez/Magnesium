@@ -7,12 +7,10 @@
 import SwiftUI
 
 /// Modal presentations for the TorrentList feature.
-/// 
-/// Defines all possible sheet presentations within the torrent list flow.
 enum TorrentListSheet: RoutableSheets {
 	var id: Self { self }
 
-	/// Present the settings modal as a sheet
+	/// Present the settings screen
 	case settings
 }
 

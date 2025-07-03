@@ -1,8 +1,10 @@
-# Navigation System Documentation
+# Navigation
 
 ## Overview
 
-The app uses a router-based navigation system built on top of SwiftUI's `NavigationStack`. This system provides a clean, testable, and maintainable way to handle navigation throughout the app. The architecture consists of:
+The app uses a router-based navigation system (inspired by [Ice Cubes App](https://github.com/Dimillian/IceCubesApp) with some tweaks) built on top of SwiftUI's `NavigationStack`. This system provides a clean, testable, and maintainable way to handle navigation throughout the app.
+
+The architecture consists of:
 
 - **Router Protocol**: Defines the navigation interface
 - **Destinations**: Enum cases representing push navigation targets
@@ -18,27 +20,27 @@ The `RouterProtocol` is the core of the navigation system. It defines the interf
 ```swift
 @MainActor
 protocol RouterProtocol: AnyObject, Observation.Observable {
-    associatedtype Destination: RoutableDestinations
-    associatedtype Sheet: RoutableSheets
+	associatedtype Destination: RoutableDestinations
+	associatedtype Sheet: RoutableSheets
 
-    var path: [Destination] { get set }
-    var presentedSheet: Sheet? { get set }
-    var parent: (any RouterProtocol)? { get }
+	var path: [Destination] { get set }
+	var presentedSheet: Sheet? { get set }
+	var parent: (any RouterProtocol)? { get }
 
-    init(_ parent: (any RouterProtocol)?)
+	init(_ parent: (any RouterProtocol)?)
 
-    func push(_ destination: Destination)
-    @discardableResult func pop() -> Destination?
-    func popToRoot()
-    func presentSheet(_ sheet: Sheet)
-    func dismissSheet(withParent: Bool)
-    func reset(withParent: Bool)
+	func push(_ destination: Destination)
+	@discardableResult func pop() -> Destination?
+	func popToRoot()
+	func presentSheet(_ sheet: Sheet)
+	func dismissSheet(withParent: Bool)
+	func reset(withParent: Bool)
 }
 ```
 
 ### Key Components
 
-1. **Destinations**: Conform to `RoutableDestinations` protocol, used for push navigation
+1. **Destinations**: Conform to `RoutableDestinations` protocol, used for stack navigation
 2. **Sheets**: Conform to `RoutableSheets` protocol, used for modal presentations
 3. **Parent Router**: Enables hierarchical navigation where child routers can affect parent navigation
 
@@ -61,11 +63,11 @@ Create an enum conforming to `RoutableDestinations`:
 
 ```swift
 enum YourFeatureDestinations: RoutableDestinations {
-    var id: Self { self }
-    
-    case detailView(SomeModel)
-    case settingsView
-    case listView(parameters: SomeParameters)
+	var id: Self { self }
+
+	case detailView(SomeModel)
+	case settingsView
+	case listView(parameters: SomeParameters)
 }
 ```
 
@@ -75,11 +77,11 @@ Create an enum conforming to `RoutableSheets`:
 
 ```swift
 enum YourFeatureSheets: RoutableSheets {
-    var id: Self { self }
-    
-    case addItemSheet
-    case editItemSheet(SomeModel)
-    case confirmationSheet(message: String)
+	var id: Self { self }
+
+	case addItemSheet
+	case editItemSheet(SomeModel)
+	case confirmationSheet(message: String)
 }
 ```
 
@@ -92,16 +94,16 @@ import Observation
 
 @Observable
 final class YourFeatureRouter: RouterProtocol {
-    typealias Destination = YourFeatureDestinations
-    typealias Sheet = YourFeatureSheets
+	typealias Destination = YourFeatureDestinations
+	typealias Sheet = YourFeatureSheets
 
-    var path: [YourFeatureDestinations] = []
-    var presentedSheet: YourFeatureSheets? = nil
-    let parent: (any RouterProtocol)?
+	var path: [YourFeatureDestinations] = []
+	var presentedSheet: YourFeatureSheets? = nil
+	let parent: (any RouterProtocol)?
 
-    required init(_ parent: (any RouterProtocol)? = nil) {
-        self.parent = parent
-    }
+	required init(_ parent: (any RouterProtocol)? = nil) {
+		self.parent = parent
+	}
 }
 ```
 
@@ -111,25 +113,25 @@ Create a view modifier to handle navigation destinations:
 
 ```swift
 struct YourFeatureDestinationsModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .navigationDestination(for: YourFeatureDestinations.self) { destination in
-                switch destination {
-                case .detailView(let model):
-                    DetailView(model: model)
-                case .settingsView:
-                    SettingsView()
-                case .listView(let parameters):
-                    ListView(parameters: parameters)
-                }
-            }
-    }
+	func body(content: Content) -> some View {
+		content
+			.navigationDestination(for: YourFeatureDestinations.self) { destination in
+				switch destination {
+				case .detailView(let model):
+					DetailView(model: model)
+				case .settingsView:
+					SettingsView()
+				case .listView(let parameters):
+					ListView(parameters: parameters)
+				}
+			}
+	}
 }
 
 extension View {
-    func withYourFeatureDestinations() -> some View {
-        modifier(YourFeatureDestinationsModifier())
-    }
+	func withYourFeatureDestinations() -> some View {
+		modifier(YourFeatureDestinationsModifier())
+	}
 }
 ```
 
@@ -139,31 +141,27 @@ Create a view modifier to handle sheet presentations:
 
 ```swift
 struct YourFeatureSheetsModifier: ViewModifier {
-    @Binding var router: YourFeatureRouter
-    
-    func body(content: Content) -> some View {
-        content
-            .sheet(item: $router.presentedSheet) { sheet in
-                switch sheet {
-                case .addItemSheet:
-                    NavigationStack {
-                        AddItemView()
-                    }
-                case .editItemSheet(let model):
-                    NavigationStack {
-                        EditItemView(model: model)
-                    }
-                case .confirmationSheet(let message):
-                    ConfirmationView(message: message)
-                }
-            }
-    }
+	@Binding var router: YourFeatureRouter
+
+	func body(content: Content) -> some View {
+		content
+			.sheet(item: $router.presentedSheet) { sheet in
+				switch sheet {
+				case .addItemSheet:
+					AddItemView()
+				case .editItemSheet(let model):
+						EditItemView(model: model)
+				case .confirmationSheet(let message):
+					ConfirmationView(message: message)
+				}
+			}
+	}
 }
 
 extension View {
-    func withYourFeatureSheets(router: Binding<YourFeatureRouter>) -> some View {
-        modifier(YourFeatureSheetsModifier(router: router))
-    }
+	func withYourFeatureSheets(router: Binding<YourFeatureRouter>) -> some View {
+			modifier(YourFeatureSheetsModifier(router: router))
+	}
 }
 ```
 
@@ -173,16 +171,16 @@ Create a flow view that sets up the navigation:
 
 ```swift
 struct YourFeatureFlow: View {
-    @State var router: YourFeatureRouter
-    
-    var body: some View {
-        NavigationStack(path: $router.path) {
-            YourFeatureRootView()
-                .withYourFeatureDestinations()
-                .withYourFeatureSheets(router: $router)
-        }
-        .environment(router)
-    }
+	@State var router: YourFeatureRouter
+
+	var body: some View {
+		NavigationStack(path: $router.path) {
+			YourFeatureRootView()
+				.withYourFeatureDestinations()
+				.withYourFeatureSheets(router: $router)
+		}
+		.environment(router)
+	}
 }
 ```
 
@@ -194,11 +192,11 @@ In any view within the navigation hierarchy, access the router via environment:
 
 ```swift
 struct SomeView: View {
-    @Environment(YourFeatureRouter.self) private var router
-    
-    var body: some View {
-        // View content
-    }
+	@Environment(YourFeatureRouter.self) private var router
+
+	var body: some View {
+			// View content
+	}
 }
 ```
 
@@ -250,7 +248,6 @@ router.reset()
 router.reset(withParent: true)
 ```
 
-
 ## Best Practices
 
 ### 1. Router Naming
@@ -265,7 +262,7 @@ Always provide the router via environment in your flow view:
 
 ```swift
 NavigationStack(path: $router.path) {
-    RootView()
+	RootView()
 }
 .environment(router)
 ```
@@ -278,29 +275,17 @@ When creating child routers, pass the parent router:
 let childRouter = ChildRouter(parentRouter)
 ```
 
-### 4. Error Handling
-
-For sheets that require complex navigation, wrap them in a `NavigationStack`:
-
-```swift
-.sheet(item: $router.presentedSheet) { sheet in
-    NavigationStack {
-        SheetContentView()
-    }
-}
-```
-
-### 5. Generic Views
+### 4. Generic Views
 
 When creating views that work with multiple router types, use generics:
 
 ```swift
 struct AddServerView<Router: RouterProtocol>: View {
-    @Environment(Router.self) private var router
-    
-    var body: some View {
-        // Implementation
-    }
+	@Environment(Router.self) private var router
+
+	var body: some View {
+		// Implementation
+	}
 }
 ```
 
@@ -310,29 +295,18 @@ The router system is designed to be testable:
 
 ```swift
 func testNavigation() {
-    let router = YourFeatureRouter()
-    
-    // Test push navigation
-    router.push(.detailView(testModel))
-    XCTAssertEqual(router.path.count, 1)
-    
-    // Test sheet presentation
-    router.presentSheet(.addItemSheet)
-    XCTAssertNotNil(router.presentedSheet)
-    
-    // Test pop
-    router.pop()
-    XCTAssertEqual(router.path.count, 0)
+	let router = YourFeatureRouter()
+
+	// Test push navigation
+	router.push(.detailView(testModel))
+	XCTAssertEqual(router.path.count, 1)
+
+	// Test sheet presentation
+	router.presentSheet(.addItemSheet)
+	XCTAssertNotNil(router.presentedSheet)
+
+	// Test pop
+	router.pop()
+	XCTAssertEqual(router.path.count, 0)
 }
 ```
-
-## Migration from Coordinators
-
-If you're migrating from the deprecated Coordinator pattern:
-
-1. Replace coordinator classes with router classes
-2. Convert coordinator methods to router navigation methods
-3. Update view dependencies to use environment injection
-4. Replace coordinator-based navigation with router-based navigation
-
-The router system provides the same functionality as coordinators but with better SwiftUI integration and testability.

@@ -6,8 +6,7 @@
 //
 
 /// Modal presentations for the Settings feature.
-/// 
-/// Defines all possible sheet presentations within the settings flow.
+///
 /// Currently no sheets are implemented for this feature.
 enum SettingsSheets: RoutableSheets {
 	var id: Self { fatalError("Not implemented") }

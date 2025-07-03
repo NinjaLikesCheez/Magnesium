@@ -7,10 +7,7 @@
 
 import Observation
 
-/// Router for the TorrentList feature flow.
-/// 
-/// Handles navigation within the main torrent list screen for viewing
-/// torrent details and accessing application settings.
+/// Handles navigation within the main torrent list screen
 @Observable
 final class TorrentListRouter: RouterProtocol {
 	typealias Destination = TorrentListDestination

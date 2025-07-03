@@ -7,12 +7,10 @@
 import SwiftUI
 
 /// Modal presentations for the Onboarding feature.
-/// 
-/// Defines all possible sheet presentations within the onboarding flow.
 enum OnboardingSheets: RoutableSheets {
 	var id: Self { self }
 
-	/// Present server addition as a modal sheet
+	/// Add a new server of a specific type
 	case addNewServer(ServerType)
 }
 
