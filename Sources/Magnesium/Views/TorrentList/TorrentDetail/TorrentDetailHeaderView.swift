@@ -48,7 +48,7 @@ struct TorrentDetailHeaderView: View {
 			Task {
 				do {
 					torrent.isActive
-					? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
+						? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 				} catch {
 					print("Error pausing/resuming torrent: \(error)")
 				}
@@ -57,8 +57,7 @@ struct TorrentDetailHeaderView: View {
 			Image(systemName: torrent.isActive ? "pause.fill" : "play.fill")
 				.frame(maxWidth: .infinity)
 		}
-		.backgroundStyle(.gray)
-		.buttonStyle(.bordered)
+		.backport.glassButtonStyle()
 	}
 
 	var removeButton: some View {
@@ -69,8 +68,7 @@ struct TorrentDetailHeaderView: View {
 				.foregroundStyle(.red)
 				.frame(maxWidth: .infinity)
 		}
-		.backgroundStyle(.gray)
-		.buttonStyle(.bordered)
+		.backport.glassButtonStyle()
 		.confirmationDialog(
 			"Remove Torrent",
 			isPresented: $showingRemoveConfirmation,
@@ -86,6 +84,7 @@ struct TorrentDetailHeaderView: View {
 					}
 				}
 			}
+			.buttonStyle(.glass)
 			Button("Remove Torrent and Data", role: .destructive) {
 				Task {
 					do {
@@ -119,7 +118,6 @@ struct TorrentDetailHeaderView: View {
 			}
 			.frame(maxWidth: .infinity)
 		}
-		.backgroundStyle(.gray)
-		.buttonStyle(.bordered)
+		.backport.glassButtonStyle()
 	}
 }
