@@ -27,6 +27,15 @@ struct TorrentListStatusToolbar: ToolbarContent {
 	@available(iOS 26, macOS 26, tvOS 26, visionOS 26, *)
 	@ToolbarContentBuilder
 	var glassToolbar: some ToolbarContent {
+		ToolbarItem(placement: .bottomBar) {
+			Text("↓ \(torrentManager.totalDownloadSpeed) ↑ \(torrentManager.totalUploadSpeed)")
+				.font(.caption)
+				.foregroundStyle(.secondary)
+				.frame(minWidth: 100)
+		}
+
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
 		ToolbarItemGroup(placement: .bottomBar) {
 			TorrentFilterMenu(labels: torrentManager.labels)
 				.environment(preferences)
@@ -36,9 +45,10 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			} label: {
 				Image(systemName: "plus")
 			}
-			.confirmationDialog("Add Torrent",
-													isPresented: $showAddTorrentConfirmation,
-													titleVisibility: .visible
+			.confirmationDialog(
+				"Add Torrent",
+				isPresented: $showAddTorrentConfirmation,
+				titleVisibility: .visible
 			) {
 				confirmationDialogButtons
 			} message: {
@@ -56,15 +66,6 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			) { result in
 				handleFileImporterResult(result)
 			}
-		}
-
-		ToolbarSpacer(.flexible, placement: .bottomBar)
-
-		ToolbarItem(placement: .bottomBar) {
-			Text("↓ \(torrentManager.totalDownloadSpeed) ↑ \(torrentManager.totalUploadSpeed)")
-				.font(.caption)
-				.foregroundStyle(.secondary)
-				.frame(minWidth: 100)
 		}
 	}
 
@@ -89,9 +90,10 @@ struct TorrentListStatusToolbar: ToolbarContent {
 				} label: {
 					Image(systemName: "plus")
 				}
-				.confirmationDialog("Add Torrent",
-														isPresented: $showAddTorrentConfirmation,
-														titleVisibility: .visible
+				.confirmationDialog(
+					"Add Torrent",
+					isPresented: $showAddTorrentConfirmation,
+					titleVisibility: .visible
 				) {
 					confirmationDialogButtons
 				} message: {

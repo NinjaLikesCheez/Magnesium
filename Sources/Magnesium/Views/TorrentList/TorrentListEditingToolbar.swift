@@ -24,23 +24,19 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	@available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *)
 	@ToolbarContentBuilder
 	var glassToolbar: some ToolbarContent {
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
 		ToolbarItemGroup(placement: .bottomBar) {
 			playButton
 		}
-
-		ToolbarSpacer(.flexible, placement: .bottomBar)
 
 		ToolbarItemGroup(placement: .bottomBar) {
 			pauseButton
 		}
 
-		ToolbarSpacer(.flexible, placement: .bottomBar)
-
 		ToolbarItemGroup(placement: .bottomBar) {
 			deleteButton
 		}
-
-		ToolbarSpacer(.flexible, placement: .bottomBar)
 
 		ToolbarItemGroup(placement: .bottomBar) {
 			moreButton
@@ -118,14 +114,14 @@ struct TorrentListEditingToolbar: ToolbarContent {
 					try await torrentManager.resume(Array(selectedTorrents))
 				case .pause:
 					try await torrentManager.pause(Array(selectedTorrents))
-				case let .delete(removeData):
+				case .delete(let removeData):
 					try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
 				case .more:
 					print("TODO")
 				}
 			} catch {
 				print("Error performing toolbar action: \(error.localizedDescription)")
-//				self.error = error.localizedDescription
+				//				self.error = error.localizedDescription
 			}
 		}
 	}

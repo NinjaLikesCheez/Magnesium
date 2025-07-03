@@ -12,9 +12,14 @@ struct TorrentNavigationView: View {
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-	@State private var selections: Set<StandardTorrent> = []
+	// BEWARE: this needs to be whatever the id of StandardTorrent is. Otherwise, SwiftUI will not show editing multiselect!
+	@State private var selections: Set<String> = []
 	@State private var columnVisibility: NavigationSplitViewVisibility = .all
 	@State private var editMode: EditMode = .inactive
+
+	var selectedTorrents: Set<StandardTorrent> {
+		Set(torrentManager.filteredTorrents.filter { selections.contains($0.id) })
+	}
 
 	var body: some View {
 		@Bindable var router = router
@@ -31,12 +36,12 @@ struct TorrentNavigationView: View {
 		TorrentListView(selections: $selections, editMode: $editMode)
 			.toolbar {
 				settingsToolbarItem
-				
+
 				selectToolbarItem
 
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
-						selectedTorrents: selections
+						selectedTorrents: selectedTorrents
 					)
 				} else {
 					TorrentListStatusToolbar()
@@ -54,7 +59,7 @@ struct TorrentNavigationView: View {
 					systemImage: "filemenu.and.selection",
 					description: Text("Select a torrent to see details about it")
 				)
-			} else if let torrent = selections.first {
+			} else if let torrent = selectedTorrents.first {
 				TorrentDetailView(
 					torrent: torrent
 				)
@@ -92,4 +97,3 @@ struct TorrentNavigationView: View {
 		}
 	}
 }
-
