@@ -66,8 +66,8 @@ final class StandardTorrent: Decodable {
 	}
 
 	func update(_ torrent: StandardTorrent) {
-		guard self != torrent else {
-			print("Warning: Attempting to update torrent with itself (hash: \(self.hash))")
+		guard self.hash == torrent.hash else {
+			print("Warning: Attempting to update torrent with different hash. Current: \(self.hash), Other: \(torrent.hash)")
 			return
 		}
 		
