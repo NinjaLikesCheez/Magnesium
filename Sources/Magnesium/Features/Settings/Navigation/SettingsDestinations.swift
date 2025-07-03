@@ -7,11 +7,17 @@
 
 import SwiftUI
 
+/// Navigation destinations for the Settings feature.
 enum SettingsDestinations: RoutableDestinations {
 	var id: Self { self }
 
+	/// Navigate to edit an existing server's configuration
 	case editServer(Server)
+
+	/// Navigate to the server selection screen where users can choose which type of server to add
 	case addAServer
+
+	/// Navigate directly to add a specific server type
 	case addNewServer(ServerType)
 }
 

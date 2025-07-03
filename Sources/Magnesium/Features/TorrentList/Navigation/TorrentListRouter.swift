@@ -7,6 +7,7 @@
 
 import Observation
 
+/// Handles navigation within the main torrent list screen
 @Observable
 final class TorrentListRouter: RouterProtocol {
 	typealias Destination = TorrentListDestination

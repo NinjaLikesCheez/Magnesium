@@ -6,6 +6,7 @@
 //
 import Observation
 
+/// Handles navigation within the settings screen.
 @Observable
 final class SettingsRouter: RouterProtocol {
 	typealias Destination = SettingsDestinations

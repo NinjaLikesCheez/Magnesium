@@ -7,9 +7,11 @@
 
 import SwiftUI
 
+/// Navigation destinations for the Onboarding feature.
 enum OnboardingDestinations: RoutableDestinations {
 	var id: Self { self }
 
+	/// Add a new server of a specific type
 	case addNewServer(ServerType)
 }
 

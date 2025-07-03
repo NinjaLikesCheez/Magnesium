@@ -6,9 +6,11 @@
 //
 import SwiftUI
 
+/// Modal presentations for the Onboarding feature.
 enum OnboardingSheets: RoutableSheets {
 	var id: Self { self }
 
+	/// Add a new server of a specific type
 	case addNewServer(ServerType)
 }
 

@@ -6,6 +6,10 @@
 //
 import Observation
 
+/// Router for the Onboarding feature flow.
+///
+/// Handles navigation during the initial app setup process for server
+/// configuration.
 @Observable
 final class OnboardingRouter: RouterProtocol {
 	typealias Destination = OnboardingDestinations
