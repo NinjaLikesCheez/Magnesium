@@ -5,6 +5,7 @@
 //  Created by ninji on 13/06/2025.
 //
 import Observation
+import Router
 
 /// Handles navigation within the settings screen.
 @Observable

@@ -8,16 +8,16 @@
 import Observation
 import SwiftUI
 
-protocol RoutableDestination: Hashable {}
-protocol RoutableSheet: Hashable, Identifiable {}
-protocol RoutableError: Hashable {}
+public protocol RoutableDestination: Hashable {}
+public protocol RoutableSheet: Hashable, Identifiable {}
+public protocol RoutableError: Hashable {}
 
-protocol RoutableSheetViewModifier: ViewModifier {}
-protocol RoutableDestinationViewModifier: ViewModifier {}
-protocol RoutableErrorViewModifier: ViewModifier {}
+public protocol RoutableSheetViewModifier: ViewModifier {}
+public protocol RoutableDestinationViewModifier: ViewModifier {}
+public protocol RoutableErrorViewModifier: ViewModifier {}
 
 @MainActor
-protocol RouterProtocol: AnyObject, Observation.Observable {
+public protocol RouterProtocol: AnyObject, Observation.Observable {
 	associatedtype Destination: RoutableDestination
 	associatedtype Sheet: RoutableSheet
 	// associatedtype Error: RoutableError
@@ -36,7 +36,7 @@ protocol RouterProtocol: AnyObject, Observation.Observable {
 	func reset(withParent: Bool)
 }
 
-extension RouterProtocol {
+public extension RouterProtocol {
 	func push(_ destination: Destination) {
 		path.append(destination)
 	}

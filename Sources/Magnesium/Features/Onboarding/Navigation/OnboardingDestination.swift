@@ -5,6 +5,7 @@
 //  Created by ninji on 12/06/2025.
 //
 
+import Router
 import SwiftUI
 
 /// Navigation destinations for the Onboarding feature.

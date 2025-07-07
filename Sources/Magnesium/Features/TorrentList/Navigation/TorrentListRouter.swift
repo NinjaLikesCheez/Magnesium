@@ -6,6 +6,7 @@
 //
 
 import Observation
+import Router
 
 /// Handles navigation within the main torrent list screen
 @Observable

@@ -4,6 +4,7 @@
 //
 //  Created by ninji on 25/06/2025.
 //
+import Router
 import SwiftUI
 
 /// Navigation destinations for the TorrentList feature.

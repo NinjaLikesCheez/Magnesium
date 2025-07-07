@@ -19,7 +19,7 @@ The `RouterProtocol` is the core of the navigation system. It defines the interf
 
 ```swift
 @MainActor
-protocol RouterProtocol: AnyObject, Observation.Observable {
+public protocol RouterProtocol: AnyObject, Observation.Observable {
 	associatedtype Destination: RoutableDestination
 	associatedtype Sheet: RoutableSheet
 
@@ -62,6 +62,8 @@ The protocol provides default implementations for all navigation methods:
 Create an enum conforming to `RoutableDestination`:
 
 ```swift
+import Router
+
 enum YourFeatureDestinations: RoutableDestination {
 	var id: Self { self }
 
@@ -76,6 +78,8 @@ enum YourFeatureDestinations: RoutableDestination {
 Create an enum conforming to `RoutableSheet`:
 
 ```swift
+import Router
+
 enum YourFeatureSheets: RoutableSheet {
 	var id: Self { self }
 
@@ -91,6 +95,7 @@ Implement the `RouterProtocol`:
 
 ```swift
 import Observation
+import Router
 
 @Observable
 final class YourFeatureRouter: RouterProtocol {
@@ -112,7 +117,9 @@ final class YourFeatureRouter: RouterProtocol {
 Create a view modifier to handle navigation destinations:
 
 ```swift
-struct YourFeatureDestinationsModifier: ViewModifier {
+import Router
+
+struct YourFeatureDestinationsModifier: RoutableDestinationViewModifier {
 	func body(content: Content) -> some View {
 		content
 			.navigationDestination(for: YourFeatureDestinations.self) { destination in
@@ -140,7 +147,9 @@ extension View {
 Create a view modifier to handle sheet presentations:
 
 ```swift
-struct YourFeatureSheetsModifier: ViewModifier {
+import Router
+
+struct YourFeatureSheetsModifier: RoutableSheetViewModifier {
 	@Binding var router: YourFeatureRouter
 
 	func body(content: Content) -> some View {
@@ -170,6 +179,8 @@ extension View {
 Create a flow view that sets up the navigation:
 
 ```swift
+import Router
+
 struct YourFeatureFlow: View {
 	@State var router: YourFeatureRouter
 
@@ -191,6 +202,8 @@ struct YourFeatureFlow: View {
 In any view within the navigation hierarchy, access the router via environment:
 
 ```swift
+import Router
+
 struct SomeView: View {
 	@Environment(YourFeatureRouter.self) private var router
 
@@ -280,6 +293,8 @@ let childRouter = ChildRouter(parentRouter)
 When creating views that work with multiple router types, use generics:
 
 ```swift
+import Router
+
 struct AddServerView<Router: RouterProtocol>: View {
 	@Environment(Router.self) private var router
 
