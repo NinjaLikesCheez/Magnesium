@@ -43,12 +43,12 @@ public struct SettingsListView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink(value: SettingsDestinations.editServer(server)) {
+				NavigationLink(value: SettingsDestination.editServer(server)) {
 					Text(server.name)
 				}
 			}
 
-			NavigationLink(value: SettingsDestinations.addAServer) {
+			NavigationLink(value: SettingsDestination.addAServer) {
 				Text("Add Server")
 			}
 		}

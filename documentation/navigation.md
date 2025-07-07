@@ -20,8 +20,8 @@ The `RouterProtocol` is the core of the navigation system. It defines the interf
 ```swift
 @MainActor
 protocol RouterProtocol: AnyObject, Observation.Observable {
-	associatedtype Destination: RoutableDestinations
-	associatedtype Sheet: RoutableSheets
+	associatedtype Destination: RoutableDestination
+	associatedtype Sheet: RoutableSheet
 
 	var path: [Destination] { get set }
 	var presentedSheet: Sheet? { get set }
@@ -40,8 +40,8 @@ protocol RouterProtocol: AnyObject, Observation.Observable {
 
 ### Key Components
 
-1. **Destinations**: Conform to `RoutableDestinations` protocol, used for stack navigation
-2. **Sheets**: Conform to `RoutableSheets` protocol, used for modal presentations
+1. **Destinations**: Conform to `RoutableDestination` protocol, used for stack navigation
+2. **Sheets**: Conform to `RoutableSheet` protocol, used for modal presentations
 3. **Parent Router**: Enables hierarchical navigation where child routers can affect parent navigation
 
 ### Default Implementation
@@ -59,10 +59,10 @@ The protocol provides default implementations for all navigation methods:
 
 ### Step 1: Define Destinations
 
-Create an enum conforming to `RoutableDestinations`:
+Create an enum conforming to `RoutableDestination`:
 
 ```swift
-enum YourFeatureDestinations: RoutableDestinations {
+enum YourFeatureDestinations: RoutableDestination {
 	var id: Self { self }
 
 	case detailView(SomeModel)
@@ -73,10 +73,10 @@ enum YourFeatureDestinations: RoutableDestinations {
 
 ### Step 2: Define Sheets
 
-Create an enum conforming to `RoutableSheets`:
+Create an enum conforming to `RoutableSheet`:
 
 ```swift
-enum YourFeatureSheets: RoutableSheets {
+enum YourFeatureSheets: RoutableSheet {
 	var id: Self { self }
 
 	case addItemSheet

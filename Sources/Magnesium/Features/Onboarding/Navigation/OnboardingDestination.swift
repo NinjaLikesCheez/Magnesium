@@ -8,17 +8,17 @@
 import SwiftUI
 
 /// Navigation destinations for the Onboarding feature.
-enum OnboardingDestinations: RoutableDestinations {
+enum OnboardingDestination: RoutableDestination {
 	var id: Self { self }
 
 	/// Add a new server of a specific type
 	case addNewServer(ServerType)
 }
 
-struct OnboardingDestinationsModifier: ViewModifier {
+struct OnboardingDestinationModifier: RoutableDestinationViewModifier {
 	func body(content: Content) -> some View {
 		content
-			.navigationDestination(for: OnboardingDestinations.self) { destination in
+			.navigationDestination(for: OnboardingDestination.self) { destination in
 				switch destination {
 				case let .addNewServer(type):
 					switch type {
@@ -34,6 +34,6 @@ struct OnboardingDestinationsModifier: ViewModifier {
 
 extension View {
 	func withOnboardingDestinations() -> some View {
-		modifier(OnboardingDestinationsModifier())
+		modifier(OnboardingDestinationModifier())
 	}
 }

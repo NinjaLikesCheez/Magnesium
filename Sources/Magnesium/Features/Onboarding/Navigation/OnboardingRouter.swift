@@ -12,11 +12,11 @@ import Observation
 /// configuration.
 @Observable
 final class OnboardingRouter: RouterProtocol {
-	typealias Destination = OnboardingDestinations
-	typealias Sheet = OnboardingSheets
+	typealias Destination = OnboardingDestination
+	typealias Sheet = OnboardingSheet
 
-	var path: [OnboardingDestinations] = []
-	var presentedSheet: OnboardingSheets? = nil
+	var path: [OnboardingDestination] = []
+	var presentedSheet: OnboardingSheet? = nil
 	let parent: (any RouterProtocol)?
 
 	required init(_ parent: (any RouterProtocol)? = nil) {

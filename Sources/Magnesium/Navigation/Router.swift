@@ -8,16 +8,19 @@
 import Observation
 import SwiftUI
 
-protocol RoutableDestinations: Hashable {}
-protocol RoutableSheets: Hashable, Identifiable {}
+protocol RoutableDestination: Hashable {}
+protocol RoutableSheet: Hashable, Identifiable {}
+protocol RoutableError: Hashable {}
 
-protocol RoutableSheetsViewModifible: ViewModifier {}
-protocol RoutableDestinationsViewModifible: ViewModifier {}
+protocol RoutableSheetViewModifier: ViewModifier {}
+protocol RoutableDestinationViewModifier: ViewModifier {}
+protocol RoutableErrorViewModifier: ViewModifier {}
 
 @MainActor
 protocol RouterProtocol: AnyObject, Observation.Observable {
-	associatedtype Destination: RoutableDestinations
-	associatedtype Sheet: RoutableSheets
+	associatedtype Destination: RoutableDestination
+	associatedtype Sheet: RoutableSheet
+	// associatedtype Error: RoutableError
 
 	var path: [Destination] { get set }
 	var presentedSheet: Sheet? { get set }

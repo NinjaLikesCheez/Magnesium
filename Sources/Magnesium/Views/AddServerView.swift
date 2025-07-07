@@ -32,7 +32,7 @@ struct AddServerView: View {
 
 	var body: some View {
 		List(ServerType.allCases) { server in
-			NavigationLink(value: SettingsDestinations.addNewServer(server)) {
+			NavigationLink(value: SettingsDestination.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()
 			}

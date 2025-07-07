@@ -9,11 +9,11 @@ import Observation
 /// Handles navigation within the settings screen.
 @Observable
 final class SettingsRouter: RouterProtocol {
-	typealias Destination = SettingsDestinations
-	typealias Sheet = SettingsSheets
+	typealias Destination = SettingsDestination
+	typealias Sheet = SettingsSheet
 
-	var path: [SettingsDestinations] = []
-	var presentedSheet: SettingsSheets? = nil
+	var path: [SettingsDestination] = []
+	var presentedSheet: SettingsSheet? = nil
 	let parent: (any RouterProtocol)?
 
 	required init(_ parent: (any RouterProtocol)? = nil) {

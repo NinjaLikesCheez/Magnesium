@@ -7,7 +7,7 @@
 import SwiftUI
 
 /// Navigation destinations for the TorrentList feature.
-enum TorrentListDestination: RoutableDestinations {
+enum TorrentListDestination: RoutableDestination {
 	var id: Self { self }
 
 	/// Navigate to the detailed view of a specific torrent
