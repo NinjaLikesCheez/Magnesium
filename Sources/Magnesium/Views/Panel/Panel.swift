@@ -34,11 +34,11 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	@State private var panelOpenAnimationProgress = 0.0
 
 	private var panelSpringResponse: Double {
-		self.isPresented ? 0.25 : 0.15
+		isPresented ? 0.25 : 0.15
 	}
 
 	private var backgroundAnimationDuration: Double {
-		self.isPresented ? 0.25 : 0.15
+		isPresented ? 0.25 : 0.15
 	}
 
 	// MARK: Initialization
@@ -67,22 +67,23 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 			content
 
 			ZStack(alignment: .bottom) {
-				self.background()
-				self.panelContent()
+				background()
+				panelContent()
+					// Inset it to look more like the system panel
+					.padding([.leading, .trailing, .bottom], 15)
 			}
-			.padding([.leading, .trailing], 15)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.ignoresSafeArea()
-			.onChange(of: self.item) { _, newValue in
-				if let item = newValue {
-					// If currently presented, we need to dismiss first
+			.onChange(of: self.item) { _, item in
+				if let item {
+					// If currently presented, recompute the content
 					if self.isPresented {
-						self.closePanel()
+						self.content = AnyView(contentBuilder(item))
 					} else {
-						self.presentPanel(for: item)
+						presentPanel(for: item)
 					}
 				} else {
-					self.closePanel()
+					closePanel()
 				}
 			}
 		}
@@ -118,12 +119,12 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 
 	private func background() -> some View {
 		Group {
-			if self.isPresented {
+			if isPresented {
 				Color.black.opacity(0.8)
 					.ignoresSafeArea()
 					.transition(
 						.opacity.animation(
-							.easeInOut(duration: self.backgroundAnimationDuration)
+							.easeInOut(duration: backgroundAnimationDuration)
 						)
 					)
 			}
@@ -133,13 +134,13 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	private func panelContent() -> some View {
 		GeometryReader { proxy in
 			ZStack(alignment: .topTrailing) {
-				self.content
+				content
 					.padding(EdgeInsets(top: 32.0, leading: 24.0, bottom: 32.0, trailing: 24.0))
 
-				if let onCancel = self.onCancel {
+				if let onCancel {
 					Button(
 						action: {
-							self.item = nil
+							item = nil
 							onCancel()
 						},
 						label: {
@@ -154,8 +155,8 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 			.frame(maxWidth: .infinity, alignment: .bottom)
 			.background(
 				GeometryReader { proxy in
-					RoundedRectangle(cornerRadius: 40, style: .continuous)
-						.fill(Color.white)
+					ContainerRelativeShape()
+						.fill(.background.secondary)
 						.preference(
 							key: ViewHeightKey.self,
 							value: proxy.frame(in: .local).size.height
@@ -163,19 +164,19 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 				}
 			)
 			.onPreferenceChange(ViewHeightKey.self) {
-				self.panelHeight = $0
+				panelHeight = $0
 			}
 			.offset(
 				x: 0,
-				y: self.isPresented ? proxy.size.height - self.panelHeight : proxy.size.height
+				y: isPresented ? proxy.size.height - panelHeight : proxy.size.height
 			)
 			// Note:
 			// Speed of the "move" transition doesn't appear to change
 			// when set. Unsure if bug or on purpose.
 			// Hence we animate ourselves.
 			.animation(
-				.spring(response: self.panelSpringResponse, dampingFraction: 0.9),
-				value: self.isPresented
+				.spring(response: panelSpringResponse, dampingFraction: 0.9),
+				value: isPresented
 			)
 		}
 	}
@@ -192,52 +193,6 @@ fileprivate struct ViewHeightKey: PreferenceKey {
 	}
 }
 
-// MARK: Previews
-
-struct PanelSheet_Previews: PreviewProvider {
-	static var previews: some View {
-		VStack {
-			Text("Hello")
-		}
-		.modifier(
-			Panel(
-				item: .constant(PanelItem.wifi),
-				onCancel: {},
-				contentBuilder: { _ in
-					VStack(spacing: 24) {
-						VStack(spacing: 32) {
-							Text("Wi-Fi Password")
-								.font(.title)
-								.foregroundColor(Color(.darkGray))
-
-							Image(systemName: "wifi")
-								.font(.system(size: 100))
-								.foregroundColor(Color(.lightGray))
-
-							Text("Do you want to share the Wi-Fi password for \"Home\" with Pita Bread?")
-								.multilineTextAlignment(.center)
-						}
-
-						Button(
-							action: {},
-							label: {
-								Text("Done")
-									.frame(maxWidth: .infinity)
-							}
-						)
-						.buttonStyle(.borderedProminent)
-						.controlSize(.large)
-					}
-				}
-			)
-		)
-	}
-
-	fileprivate enum PanelItem: String, Identifiable {
-		case wifi
-		var id: String { self.rawValue }
-	}
-}
 
 public extension View {
 	/// Presents a panel using the given item as a data source for the panel's content.

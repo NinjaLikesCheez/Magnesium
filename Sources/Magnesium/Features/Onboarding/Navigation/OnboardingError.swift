@@ -15,30 +15,12 @@ struct OnboardingErrorModifier: RoutableErrorViewModifier {
 			.panel(item: $router.presentedError) { error in
 				switch error {
 				case .addServerError:
-					VStack(spacing: 24) {
-						VStack(spacing: 32) {
-							Text("Couldn't Add Server")
-								.font(.title)
-								.foregroundColor(Color(.darkGray))
-
-							Image(systemName: "exclamationmark")
-								.font(.system(size: 100))
-								.foregroundColor(Color(.lightGray))
-
-//							Text("Do you want to share the Wi-Fi password for \"Home\" with Pita Bread?")
-//								.multilineTextAlignment(.center)
-						}
-
-						Button(
-							action: { router.dismissError() },
-							label: {
-								Text("Done")
-									.frame(maxWidth: .infinity)
-							}
-						)
-						.buttonStyle(.borderedProminent)
-						.controlSize(.large)
-					}
+					// TODO: Make a 'Panel Information View'
+					PanelCard(
+						title: "Couldn't Add Server",
+						systemImage: "server.rack",
+						subtitle: ""
+					)
 				}
 			}
 	}
