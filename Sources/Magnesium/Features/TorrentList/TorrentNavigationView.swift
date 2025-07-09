@@ -75,6 +75,15 @@ struct TorrentNavigationView: View {
 	}
 
 	var settingsToolbarItem: some ToolbarContent {
+		#if os(macOS)
+		ToolbarItem(placement: .primaryAction) {
+			Button {
+				router.presentSheet(.settings)
+			} label: {
+				Image(systemName: "gear")
+			}
+		}
+		#else
 		ToolbarItem(placement: .topBarLeading) {
 			Button {
 				router.presentSheet(.settings)
@@ -82,10 +91,22 @@ struct TorrentNavigationView: View {
 				Image(systemName: "gear")
 			}
 		}
+		#endif
 	}
 
 	@ToolbarContentBuilder
 	var selectToolbarItem: some ToolbarContent {
+		#if os(macOS)
+		ToolbarItem(placement: .primaryAction) {
+			// EditButton()
+			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
+			Button(editMode.isEditing ? "Done" : "Select") {
+				withAnimation {
+					editMode = editMode.isEditing ? .inactive : .active
+				}
+			}
+		}
+		#else
 		ToolbarItem(placement: .topBarTrailing) {
 			// EditButton()
 			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
@@ -95,5 +116,6 @@ struct TorrentNavigationView: View {
 				}
 			}
 		}
+		#endif
 	}
 }

@@ -12,9 +12,11 @@ import Router
 final class SettingsRouter: RouterProtocol {
 	typealias Destination = SettingsDestination
 	typealias Sheet = SettingsSheet
+	typealias Error = SettingsError
 
-	var path: [SettingsDestination] = []
-	var presentedSheet: SettingsSheet? = nil
+	var path: [Destination] = []
+	var presentedSheet: Sheet? = nil
+	var presentedError: Error? = nil
 	let parent: (any RouterProtocol)?
 
 	required init(_ parent: (any RouterProtocol)? = nil) {

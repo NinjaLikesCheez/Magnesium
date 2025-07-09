@@ -39,6 +39,9 @@ struct OnboardingView: View {
 	var addClientsButton: some View {
 		GeometryReader { reader in
 			VStack {
+				Button("Fake Error") {
+					router.presentedError = .addServerError
+				}
 				ForEach(ServerType.allCases) { type in
 					Button {
 						if horizontalSizeClass == .compact {

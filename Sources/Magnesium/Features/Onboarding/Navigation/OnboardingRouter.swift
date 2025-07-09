@@ -16,9 +16,11 @@ import Router
 final class OnboardingRouter: RouterProtocol {
 	typealias Destination = OnboardingDestination
 	typealias Sheet = OnboardingSheet
+	typealias Error = OnboardingError
 
-	var path: [OnboardingDestination] = []
-	var presentedSheet: OnboardingSheet? = nil
+	var path: [Destination] = []
+	var presentedSheet: Sheet? = nil
+	var presentedError: Error? = nil
 	let parent: (any RouterProtocol)?
 
 	required init(_ parent: (any RouterProtocol)? = nil) {

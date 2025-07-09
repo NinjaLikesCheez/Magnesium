@@ -25,11 +25,19 @@ public struct SettingsListView: View {
 		}
 		.navigationTitle("Settings")
 		.toolbar {
+			#if os(macOS)
+			ToolbarItem(placement: .primaryAction) {
+				Button("Done") {
+					router.dismissSheet(withParent: true)
+				}
+			}
+			#else
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Done") {
 					router.dismissSheet(withParent: true)
 				}
 			}
+			#endif
 		}
 		.onAppear {
 			do {
@@ -75,6 +83,8 @@ public struct SettingsListView: View {
 			// TODO: model settings in such a way that we can switch on them here and make adding a new setting UI typesafe
 
 			Toggle("Automatically detect magnet links", isOn: automaticallyLookForMagnetLinks)
+
+			#if !os(macOS)
 			Button {
 				Task {
 					// Create the URL that deep links to your app's custom settings.
@@ -86,6 +96,7 @@ public struct SettingsListView: View {
 			} label: {
 				Text("Change system prompt behaviour")
 			}
+			#endif
 		}
 	}
 
