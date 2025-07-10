@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 @Observable
-final class StandardTorrent: Decodable {
+final class StandardTorrent {
 	let id: String
 
 	var dateAdded: Date

@@ -1,6 +1,14 @@
 import Combine
 import Foundation
 
+/// Types of keychain errors.
+public enum KeychainError: Error {
+		/// The system keychain returned an unexpected status.
+		case system(OSStatus)
+		/// An unknown error occurred.
+		case unknown
+}
+
 /// A type that is able to store data in the keychain.
 public protocol Keychain {
     /// A publisher that emits values when the keychain is modified.
@@ -8,17 +16,17 @@ public protocol Keychain {
 
     /// Retrieves the data for a keychain item.
     /// - Parameter query: The keychain query identifying the item.
-    func data(for query: KeychainQuery) throws -> Data?
+    func data(for query: KeychainQuery) throws(KeychainError) -> Data?
 
     /// Sets data for a keychain item.
     /// - Parameters:
     ///   - data: The data for the keychain item.
     ///   - query: The keychain query identifying the item.
-    func set(_ data: Data, for query: KeychainQuery) throws
+    func set(_ data: Data, for query: KeychainQuery) throws(KeychainError)
 
     /// Removes keychain data.
     /// - Parameter query: The keychain query.
-    func removeData(for query: KeychainQuery) throws
+    func removeData(for query: KeychainQuery) throws(KeychainError)
 }
 
 public extension Keychain {

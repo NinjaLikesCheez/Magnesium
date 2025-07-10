@@ -22,11 +22,7 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 			basicAuthentication: $settings.basicAuthentication,
 			onSave: {
 				Task {
-					do {
-						try await save()
-					} catch {
-						print("Error saving settings: \(error)")
-					}
+						await save()
 				}
 			},
 			saveButtonEnabled: {
@@ -45,15 +41,40 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 		.navigationTitle("Deluge Settings")
 	}
 
-	private func save() async throws {
+	private func save() async {
 		// TODO: Error handle
-		let server = try await settings.makeServer()
-		try preferences.addOrUpdate(server: server)
+		do throws(ServerSettingsError) {
+			let server = try await settings.makeServer()
 
-		if isPresented {
-			router.dismissSheet(withParent: true)
-		} else {
-			router.pop()
+			do {
+				try preferences.addOrUpdate(server: server)
+			} catch {
+				switch error {
+				case let .keychain(error):
+					switch error {
+					case let .system(status):
+						let error = NSError.init(domain: NSOSStatusErrorDomain, code: Int(status))
+						throw .keychain(message: "Keychain error: \(error.localizedDescription)")
+					case .unknown:
+						throw .keychain(message: "Couldn't save server settings to keychain")
+					}
+				}
+			}
+
+			if isPresented {
+				router.dismissSheet(withParent: true)
+			} else {
+				router.pop()
+			}
+		} catch {
+			// TODO: This is _horrible_
+			if let router =  router as? OnboardingRouter {
+				router.presentError(.addServerError(error))
+			} else if let router = router as? SettingsRouter {
+				fatalError("Not yet implemented")
+				router.presentError(.addServerError(error))
+				// TODO: UPDATE ME PLEASE
+			}
 		}
 	}
 }

@@ -32,6 +32,7 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	@State private var panelHeight = 0.0
 	@State private var isPresented = false
 	@State private var panelOpenAnimationProgress = 0.0
+	@State private var offset = CGSize.zero
 
 	private var panelSpringResponse: Double {
 		isPresented ? 0.25 : 0.15
@@ -168,7 +169,7 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 			}
 			.offset(
 				x: 0,
-				y: isPresented ? proxy.size.height - panelHeight : proxy.size.height
+				y: isPresented ? proxy.size.height - panelHeight + offset.height : proxy.size.height
 			)
 			// Note:
 			// Speed of the "move" transition doesn't appear to change
@@ -177,6 +178,24 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 			.animation(
 				.spring(response: panelSpringResponse, dampingFraction: 0.9),
 				value: isPresented
+			)
+			.gesture(
+				DragGesture()
+					.onChanged { gesture in
+						offset = gesture.translation
+					}
+					.onEnded { _ in
+						withAnimation {
+							if offset.height < 0 {
+								offset = .zero
+							} else if abs(offset.height) > 100 {
+								item = nil
+								offset = .zero
+							} else {
+								offset = .zero
+							}
+						}
+					}
 			)
 		}
 	}

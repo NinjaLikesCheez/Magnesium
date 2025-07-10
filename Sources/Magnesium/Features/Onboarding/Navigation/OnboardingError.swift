@@ -4,7 +4,7 @@ import SwiftUI
 enum OnboardingError: RoutableError {
 	var id: Self { self }
 
-	case addServerError
+	case addServerError(ServerSettingsError)
 }
 
 struct OnboardingErrorModifier: RoutableErrorViewModifier {
@@ -14,12 +14,12 @@ struct OnboardingErrorModifier: RoutableErrorViewModifier {
 		content
 			.panel(item: $router.presentedError) { error in
 				switch error {
-				case .addServerError:
-					// TODO: Make a 'Panel Information View'
+				case let .addServerError(error):
 					PanelCard(
-						title: "Couldn't Add Server",
-						systemImage: "server.rack",
-						subtitle: ""
+						title: error.title,
+						systemName: error.systemName,
+						subtitle: error.subtitle,
+						primaryButtonAction: router.dismissError
 					)
 				}
 			}
