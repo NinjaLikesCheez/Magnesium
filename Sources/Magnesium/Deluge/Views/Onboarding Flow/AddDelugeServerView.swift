@@ -72,7 +72,7 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 				router.presentError(.addServerError(error))
 			} else if let router = router as? SettingsRouter {
 				fatalError("Not yet implemented")
-				router.presentError(.addServerError(error))
+//				router.presentError(.addServerError(error))
 				// TODO: UPDATE ME PLEASE
 			}
 		}

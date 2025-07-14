@@ -25,7 +25,7 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 		name: Binding<String>,
 		address: Binding<String>,
 		basicAuthentication: Binding<ServerBasicAuthentication>,
-		onSave: @escaping ()-> Void,
+		onSave: @escaping () -> Void,
 		saveButtonEnabled: @escaping () -> Bool,
 		@ViewBuilder additionalSettings: @escaping () -> FormContent,
 		@ViewBuilder additionalSections: @escaping () -> SectionContent
@@ -66,14 +66,16 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 	}
 }
 
-enum ServerSettingsError: Error, Equatable, Hashable {
+enum ServerSettingsError: VisualError {
 	case invalidState(message: String)
 	case unableToAuthenticate
 	case request(message: String)
 	case response(message: String)
 	case keychain(message: String)
 	case unknown(message: String)
+}
 
+extension ServerSettingsError {
 	var title: String {
 		switch self {
 		case .invalidState:
@@ -87,7 +89,7 @@ enum ServerSettingsError: Error, Equatable, Hashable {
 		case .keychain:
 			"Couldn't Save Settings"
 		case .unknown:
-			"Unknown Error Occured"
+			"Unknown Error Occurred"
 		}
 	}
 
@@ -110,18 +112,10 @@ enum ServerSettingsError: Error, Equatable, Hashable {
 
 	var subtitle: String {
 		switch self {
-		case .invalidState(message: let message):
+		case let .invalidState(message), let .request(message), let .response(message), let .keychain(message), let .unknown(message):
 			message
-		case .unableToAuthenticate:
+		case let .unableToAuthenticate:
 			"Please check your settings and try again"
-		case .request(message: let message):
-			message
-		case .response(message: let message):
-			message
-		case .keychain(message: let message):
-			message
-		case .unknown(message: let message):
-			message
 		}
 	}
 }

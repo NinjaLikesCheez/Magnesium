@@ -26,24 +26,24 @@ public struct SettingsListView: View {
 		.navigationTitle("Settings")
 		.toolbar {
 			#if os(macOS)
-			ToolbarItem(placement: .primaryAction) {
-				Button("Done") {
-					router.dismissSheet(withParent: true)
+				ToolbarItem(placement: .primaryAction) {
+					Button("Done") {
+						router.dismissSheet(withParent: true)
+					}
 				}
-			}
 			#else
-			ToolbarItem(placement: .topBarTrailing) {
-				Button("Done") {
-					router.dismissSheet(withParent: true)
+				ToolbarItem(placement: .topBarTrailing) {
+					Button("Done") {
+						router.dismissSheet(withParent: true)
+					}
 				}
-			}
 			#endif
 		}
 		.onAppear {
-			do {
+			do throws(AppPreferences.Error) {
 				servers = try Current.preferences.getServers()
 			} catch {
-				print("Error getting servers: \(error)")
+				router.presentedError = .preferences(error)
 			}
 		}
 	}
@@ -85,17 +85,17 @@ public struct SettingsListView: View {
 			Toggle("Automatically detect magnet links", isOn: automaticallyLookForMagnetLinks)
 
 			#if !os(macOS)
-			Button {
-				Task {
-					// Create the URL that deep links to your app's custom settings.
-					if let url = URL(string: UIApplication.openSettingsURLString) {
-						// Ask the system to open that URL.
-						await UIApplication.shared.open(url)
+				Button {
+					Task {
+						// Create the URL that deep links to your app's custom settings.
+						if let url = URL(string: UIApplication.openSettingsURLString) {
+							// Ask the system to open that URL.
+							await UIApplication.shared.open(url)
+						}
 					}
+				} label: {
+					Text("Change system prompt behaviour")
 				}
-			} label: {
-				Text("Change system prompt behaviour")
-			}
 			#endif
 		}
 	}

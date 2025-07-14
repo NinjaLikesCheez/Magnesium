@@ -45,8 +45,31 @@ public final class AppPreferences: Preferences {
 }
 
 extension AppPreferences {
-	enum Error: Swift.Error {
+	enum Error: VisualError {
 		case keychain(KeychainError)
+	}
+}
+
+extension AppPreferences.Error {
+	var title: String {
+		switch self {
+		case let .keychain(error):
+			error.title
+		}
+	}
+
+	var systemName: String {
+		switch self {
+		case let .keychain(error):
+			error.systemName
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case let .keychain(error):
+			error.subtitle
+		}
 	}
 }
 
