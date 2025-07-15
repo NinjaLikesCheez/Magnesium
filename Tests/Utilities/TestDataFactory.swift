@@ -98,6 +98,36 @@ struct TestDataFactory {
             )
         }
     }
+    
+    // MARK: - StandardTorrentFile Factory Methods
+    
+    static func createStandardTorrentFile(
+        index: Int = 0,
+        name: String = "test-file.txt",
+        size: Int64 = 1024 * 1024, // 1 MB
+        progress: Float = 0.5,
+        priority: TorrentPriority = .normal
+    ) -> StandardTorrentFile {
+        return StandardTorrentFile(
+            index: index,
+            name: name,
+            size: size,
+            progress: progress,
+            priority: priority
+        )
+    }
+    
+    static func createMultipleTorrentFiles(count: Int) -> [StandardTorrentFile] {
+        return (0..<count).map { index in
+            createStandardTorrentFile(
+                index: index,
+                name: "file-\(index).txt",
+                size: Int64.random(in: 1024...1024*1024*100), // 1KB to 100MB
+                progress: Float.random(in: 0...1),
+                priority: TorrentPriority.allCases.randomElement() ?? .normal
+            )
+        }
+    }
 }
 
 // MARK: - Extensions for Test Data Variations

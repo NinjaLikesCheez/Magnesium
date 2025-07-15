@@ -6,32 +6,32 @@
   - Create base test utilities and helper functions
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 2. Create test data factories and mock implementations
-- [ ] 2.1 Implement TestDataFactory for creating test objects
+- [x] 2. Create test data factories and mock implementations
+- [x] 2.1 Implement TestDataFactory for creating test objects
   - Write factory methods for StandardTorrent with configurable properties
   - Write factory methods for Server, TorrentState, and other core models
   - Create methods for generating multiple test objects with variations
   - _Requirements: 6.4_
 
-- [ ] 2.2 Create MockTorrentClientActing implementation
+- [x] 2.2 Create MockTorrentClientActing implementation
   - Implement mock TorrentClientActing protocol with configurable responses
   - Add tracking for method calls and parameters
   - Include error simulation capabilities for testing error handling
   - _Requirements: 6.1_
 
-- [ ] 2.3 Create MockKeychain implementation
+- [x] 2.3 Create MockKeychain implementation
   - Implement in-memory keychain for testing secure storage operations
   - Add change publisher functionality for testing reactive behavior
   - Include error simulation for keychain operation failures
   - _Requirements: 6.2_
 
-- [ ] 2.4 Create additional mock implementations
+- [x] 2.4 Create additional mock implementations
   - Implement MockSession for testing session management
   - Create MockAppPreferences for testing preference operations
   - Add MockTimer for testing time-dependent functionality
   - _Requirements: 6.3_
 
-- [ ] 3. Implement core model tests
+- [-] 3. Implement core model tests
 - [ ] 3.1 Create StandardTorrent tests
   - Write tests for StandardTorrent initialization with all properties
   - Test the update method for correctly updating mutable properties
