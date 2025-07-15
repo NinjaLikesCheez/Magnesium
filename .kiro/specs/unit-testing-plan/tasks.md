@@ -31,8 +31,8 @@
   - Add MockTimer for testing time-dependent functionality
   - _Requirements: 6.3_
 
-- [-] 3. Implement core model tests
-- [ ] 3.1 Create StandardTorrent tests
+- [x] 3. Implement core model tests
+- [x] 3.1 Create StandardTorrent tests
   - Write tests for StandardTorrent initialization with all properties
   - Test the update method for correctly updating mutable properties
   - Test computed properties: ratio, isActive, localizedSpeed, localizedProgress
@@ -40,14 +40,14 @@
   - Test edge cases: infinite ratios, zero values, negative values
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 3.2 Create TorrentState tests
+- [x] 3.2 Create TorrentState tests
   - Test all enum cases and their string representations
   - Test localizedString property returns correct localized values
   - Test progressColor property returns correct colors for each state
   - Test Codable conformance for encoding and decoding
   - _Requirements: 1.4_
 
-- [ ] 3.3 Create Server model tests
+- [x] 3.3 Create Server model tests
   - Test Server initialization with all required properties
   - Test Codable conformance for proper encoding/decoding
   - Test Identifiable conformance and id property behavior

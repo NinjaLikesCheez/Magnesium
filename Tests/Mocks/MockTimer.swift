@@ -47,8 +47,11 @@ class MockTimer: TimerProtocol {
         self.interval = interval
         self.isValid = true
         
-        // Return a mock timer object
-        return MockTimerInstance(mockTimer: self)
+        // Create a real timer but don't schedule it - we'll control it manually
+        let timer = Timer(timeInterval: interval, repeats: repeats) { timer in
+            block(timer)
+        }
+        return timer
     }
     
     func invalidate() {
@@ -59,9 +62,19 @@ class MockTimer: TimerProtocol {
     
     // MARK: - Test Helpers
     
+    private var mockTimerInstance: Timer?
+    
     func fire() {
         guard isValid, let block = timerBlock else { return }
-        block(MockTimerInstance(mockTimer: self))
+        
+        // Create a timer instance for the callback if we don't have one
+        if mockTimerInstance == nil {
+            mockTimerInstance = Timer(timeInterval: interval, repeats: isRepeating) { _ in }
+        }
+        
+        if let timer = mockTimerInstance {
+            block(timer)
+        }
         
         if !isRepeating {
             invalidate()
@@ -98,20 +111,3 @@ class MockTimer: TimerProtocol {
     }
 }
 
-/// Mock Timer instance that conforms to Timer-like interface
-private class MockTimerInstance: Timer {
-    private weak var mockTimer: MockTimer?
-    
-    init(mockTimer: MockTimer) {
-        self.mockTimer = mockTimer
-        super.init()
-    }
-    
-    override func invalidate() {
-        mockTimer?.invalidate()
-    }
-    
-    override var isValid: Bool {
-        return mockTimer?.isTimerValid ?? false
-    }
-}

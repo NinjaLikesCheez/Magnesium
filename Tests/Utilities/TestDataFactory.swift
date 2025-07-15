@@ -85,7 +85,7 @@ struct TestDataFactory {
     
     static func createStandardLabel(
         name: String = "test-label",
-        count: Int = 5
+        count: Int? = 5
     ) -> StandardLabel {
         return StandardLabel(name: name, count: count)
     }
