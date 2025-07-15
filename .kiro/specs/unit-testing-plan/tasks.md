@@ -54,8 +54,8 @@
   - Test equality and hashing for Server instances
   - _Requirements: 1.5_
 
-- [ ] 4. Implement utility class tests
-- [ ] 4.1 Create TorrentMapper filtering tests
+- [x] 4. Implement utility class tests
+- [x] 4.1 Create TorrentMapper filtering tests
   - Test filtering torrents by single and multiple states
   - Test filtering torrents by single and multiple labels
   - Test search functionality with various query strings
@@ -63,7 +63,7 @@
   - Test edge cases: empty filters, empty torrent lists, special characters
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 4.2 Create TorrentMapper sorting tests
+- [x] 4.2 Create TorrentMapper sorting tests
   - Test sorting by name with case-insensitive and numeric ordering
   - Test sorting by dateAdded in ascending and descending order
   - Test sorting by downloadSpeed and uploadSpeed
@@ -71,7 +71,7 @@
   - Test sort stability and secondary sorting behavior
   - _Requirements: 2.4_
 
-- [ ] 4.3 Create Formatters tests
+- [x] 4.3 Create Formatters tests
   - Test byte count formatting with various sizes and units
   - Test percentage formatting with different precision levels
   - Test ETA formatting for various time intervals
