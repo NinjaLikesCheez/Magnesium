@@ -50,3 +50,12 @@ targets:
       - package: QBittorrent
       - package: Logging
       - package: ObservableDefaults
+  MagnesiumTests:
+    type: bundle.unit-test
+    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    sources:
+      - Tests
+    dependencies:
+      - target: Magnesium
+    settings:
+      GENERATE_INFOPLIST_FILE: YES

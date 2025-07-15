@@ -1,8 +1,11 @@
-// import Foundation
-// import Testing
+import Foundation
+import Testing
+@testable import Magnesium
 
-// final class MagnesiumTests: TestCase {
-// 	func test_twoPlusTwo_isFour() {
-// 		XCTAssertEqual(2 + 2, 4)
-// 	}
-// }
+@Suite("Magnesium Tests")
+struct MagnesiumTests {
+    @Test("Basic functionality test")
+    func basicFunctionalityTest() {
+        #expect(2 + 2 == 4)
+    }
+}
