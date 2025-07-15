@@ -6,7 +6,7 @@ typealias DelugeTorrentItem = TorrentItem
 struct DelugeSession {
 	let client: Deluge
 
-	func refresh() async throws -> ([StandardTorrent], [StandardLabel]) {
+	func refresh() async throws(Deluge.Error) -> ([StandardTorrent], [StandardLabel]) {
 		let torrentsAndLabels = try await client.request(.updateUIForApp)
 		let torrents = torrentsAndLabels.torrents.compactMap(StandardTorrent.init)
 		let labels = torrentsAndLabels.labels.map(StandardLabel.init)

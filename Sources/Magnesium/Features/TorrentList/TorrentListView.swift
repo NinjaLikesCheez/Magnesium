@@ -6,8 +6,6 @@ public struct TorrentListView: View {
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.userInterfaceIdiom) var userInterfaceIdiom
 
-	// TODO: this error handling needs a _lot_ of UX love...
-	@State var error: String? = nil
 	@State private var editingSelections: Set<String> = []
 
 	@Binding var selections: Set<String>
@@ -28,11 +26,7 @@ public struct TorrentListView: View {
 			.searchable(text: $torrentManager.searchQuery)
 			.navigationTitle(session.server?.name ?? "Torrents")
 			.overlay {
-				if let error {
-					ErrorView(message: error, buttonTitle: "Reload Torrents") {
-						refresh()
-					}
-				} else if torrentManager.filteredTorrents.isEmpty && !torrentManager.searchQuery.isEmpty {
+				if torrentManager.filteredTorrents.isEmpty && !torrentManager.searchQuery.isEmpty {
 					ContentUnavailableView.search
 				} else if torrentManager.filteredTorrents.isEmpty {
 					ContentUnavailableView(
@@ -48,6 +42,7 @@ public struct TorrentListView: View {
 		List(torrentManager.filteredTorrents, selection: $selections) { torrent in
 			HStack {
 				TorrentListRow(torrent: .init(torrent: torrent))
+					// This type **must** match whatever the selection's element is
 					.tag(torrent.id)
 			}
 			// this is required for the tap gesture to cover the whole row
@@ -72,6 +67,7 @@ public struct TorrentListView: View {
 				try await torrentManager.refresh()
 			} catch {
 				print("Error refreshing torrents with the torrent manager: \(error)")
+				router.presentError(error)
 			}
 		}
 	}

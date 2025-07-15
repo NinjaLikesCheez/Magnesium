@@ -9,33 +9,6 @@ public enum KeychainError: VisualError {
 	case unknown
 }
 
-extension KeychainError {
-	var title: String {
-		switch self {
-		case .system:
-			"Keychain Error"
-		case .unknown:
-			"Unknown Error"
-		}
-	}
-
-	var systemName: String {
-		switch self {
-		case .system, .unknown:
-			"key.slash"
-		}
-	}
-
-	var subtitle: String {
-		switch self {
-		case let .system(status):
-			"\(NSError(domain: NSOSStatusErrorDomain, code: Int(status)).localizedDescription)"
-		case .unknown:
-			"Please try again later"
-		}
-	}
-}
-
 /// A type that is able to store data in the keychain.
 public protocol Keychain {
 	/// A publisher that emits values when the keychain is modified.

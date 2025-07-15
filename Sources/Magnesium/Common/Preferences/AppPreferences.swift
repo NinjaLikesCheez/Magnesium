@@ -50,29 +50,6 @@ extension AppPreferences {
 	}
 }
 
-extension AppPreferences.Error {
-	var title: String {
-		switch self {
-		case let .keychain(error):
-			error.title
-		}
-	}
-
-	var systemName: String {
-		switch self {
-		case let .keychain(error):
-			error.systemName
-		}
-	}
-
-	var subtitle: String {
-		switch self {
-		case let .keychain(error):
-			error.subtitle
-		}
-	}
-}
-
 extension AppPreferences {
 	private func updateSelectedServerID() throws(Error) {
 		guard let server = try getSelectedServer() else {

@@ -26,6 +26,7 @@ struct TorrentsListFlow: View {
 					session: $session
 				)
 		}
+		.withTorrentListErrors()
 		.environment(torrentManager)
 		.environment(torrentListRouter)
 		.environment(preferences)
