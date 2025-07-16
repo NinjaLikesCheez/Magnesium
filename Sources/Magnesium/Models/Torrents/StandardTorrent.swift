@@ -118,7 +118,7 @@ extension StandardTorrent {
 
 	var formattedETA: String {
 		eta > 0
-		? Duration(secondsComponent: Int64(eta), attosecondsComponent: 0).formatted(Formatters.eta) ?? ""
+		? Duration.seconds(eta).formatted(Formatters.eta)
 		: L10n.Common.infinity
 	}
 

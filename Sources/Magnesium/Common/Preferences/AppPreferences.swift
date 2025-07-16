@@ -21,7 +21,19 @@ public final class AppPreferences: Preferences {
 
 	var automaticallyLookForMagnetLinks: Bool = false
 
-	init() {}
+	@Ignore
+	private var keychain: Keychain = InMemoryKeychain()
+
+	convenience init(userDefaults: UserDefaults? = nil, ignoreExternalChanges: Bool? = nil, prefix: String? = nil, ignoredKeyPathsForExternalUpdates: [PartialKeyPath<AppPreferences>] = [], keychain: Keychain) {
+		self.init(
+			userDefaults: userDefaults,
+			ignoreExternalChanges: ignoreExternalChanges,
+			prefix: prefix,
+			ignoredKeyPathsForExternalUpdates: ignoredKeyPathsForExternalUpdates
+		)
+		
+		self.keychain = keychain
+	}
 }
 
 extension AppPreferences {
