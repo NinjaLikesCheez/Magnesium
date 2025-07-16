@@ -3,6 +3,7 @@ import Foundation
 import Security
 @testable import Magnesium
 
+// TODO: I think most of these are terrible.... but once we move over to the new error handling system these can probably get updated to something reasonable
 @MainActor
 @Suite("Error Handling Tests")
 struct ErrorHandlingTests {

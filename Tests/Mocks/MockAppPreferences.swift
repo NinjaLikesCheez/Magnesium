@@ -6,7 +6,7 @@ import Combine
 class MockAppPreferences: ObservableObject, Preferences {
     // MARK: - Mock Storage
     
-    @Published var autoRefreshInterval: TimeInterval = 5.0
+    @Published var autoRefreshInterval: TimeInterval = 2.0
     @Published var servers: [Server] = []
     @Published var selectedServerID: String?
     @Published var sortOption: SortOption = .init(property: .dateAdded)

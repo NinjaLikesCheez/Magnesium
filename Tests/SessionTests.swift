@@ -115,8 +115,7 @@ class SessionTests {
 		let actionImplementation = try Session.actionImplementation(server: server)
 
 		// Assert
-		#expect(!(actionImplementation is NullTorrentActionImplementation))
-		// The actual type would be DelugeActionImplementation, but we can't easily test that without more setup
+		#expect(actionImplementation is DelugeActionImplementation)
 	}
 
 	@Test("Action implementation creation throws error for missing keychain data")
