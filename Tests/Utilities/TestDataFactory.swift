@@ -51,7 +51,7 @@ struct TestDataFactory {
 	static func createMultipleTorrents(count: Int) -> [StandardTorrent] {
 		return (0..<count).map { index in
 			createStandardTorrent(
-				hash: "torrent-hash-\(index)",
+				hash: "torrent-hash-\(UUID().uuidString)",
 				name: "Test Torrent \(index)",
 				state: TorrentState.allCases.randomElement() ?? .downloading,
 				progress: Float.random(in: 0...1),
