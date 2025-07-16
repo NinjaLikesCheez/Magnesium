@@ -18,14 +18,14 @@ final class TorrentManager {
 	var searchQuery: String = ""
 
 	@ObservationIgnored
-	private let session: any SessionProtocol
+	private let session: SessionProtocol
 
 	@ObservationIgnored
-	private let preferences: any Preferences
+	private let preferences: Preferences
 
 	private var updateTimer: Timer!
 
-	init(session: any SessionProtocol, preferences: any Preferences) {
+	init(session: SessionProtocol, preferences: Preferences) {
 		self.session = session
 		self.preferences = preferences
 

@@ -1,7 +1,5 @@
 import Foundation
 
-// TODO: rewrite all of these to use https://developer.apple.com/documentation/foundation/measurement/formatstyle they cache automatically to!
-
 enum Formatters {
 	static var eta: Duration.UnitsFormatStyle = {
 		Duration.UnitsFormatStyle(
@@ -9,19 +7,6 @@ enum Formatters {
 			width: .narrow
 		)
 		.locale(Current.locale)
-
-//		Date.FormatStyle(
-//			date: .omitted,
-//			time: .shortened,
-//			locale: Current.locale,
-//			calendar: Current.calendar
-//		)
-//			.locale(Current.locale)
-//		let formatter = DateComponentsFormatter()
-//		formatter.calendar = Current.calendar
-//		formatter.allowedUnits = [.day, .hour, .minute, .second]
-//		formatter.unitsStyle = .abbreviated
-//		return formatter
 	}()
 
 	static func float<T: BinaryFloatingPoint>(precision: Int) -> FloatingPointFormatStyle<T> {
@@ -35,16 +20,6 @@ enum Formatters {
 		IntegerFormatStyle<T>()
 			.locale(Current.locale)
 			.precision(.fractionLength(precision...precision))
-//		if let formatter = numberFormatters[precision] {
-//			return formatter
-//		}
-//
-//		let formatter = NumberFormatter()
-//		formatter.locale = Current.locale
-//		formatter.minimumFractionDigits = precision
-//		formatter.maximumFractionDigits = precision
-//		numberFormatters[precision] = formatter
-//		return formatter
 	}
 
 	static var number: IntegerFormatStyle<Int> {
@@ -61,8 +36,6 @@ enum Formatters {
 			.precision(.fractionLength(precision...precision))
 			.locale(Current.locale)
 			.rounded()
-
-		// TODO: see if FormatStyling will cache for us - breaks in tests
 	}
 
 	static func percentage<T: BinaryFloatingPoint>(precision: Int) -> FloatingPointFormatStyle<T>.Percent {
@@ -70,8 +43,6 @@ enum Formatters {
 			.precision(.fractionLength(precision...precision))
 			.locale(Current.locale)
 			.rounded()
-
-		// TODO: see if FormatStyling will cache for us - breaks in tests
 	}
 
 	static var percentage: FloatingPointFormatStyle<Double>.Percent {
