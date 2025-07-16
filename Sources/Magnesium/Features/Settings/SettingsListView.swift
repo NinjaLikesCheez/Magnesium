@@ -104,5 +104,5 @@ public struct SettingsListView: View {
 
 #Preview {
 	SettingsFlow(settingsRouter: .init())
-		.environment(Session())
+		.environment(Session(AppPreferences()))
 }

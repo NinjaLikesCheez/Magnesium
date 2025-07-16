@@ -8,7 +8,7 @@ import Foundation
 import ObservableDefaults
 
 @ObservableDefaults
-public final class AppPreferences {
+public final class AppPreferences: Preferences {
 	var autoRefreshInterval: TimeInterval = 2.0
 
 	var servers: [Server] = []
@@ -60,6 +60,7 @@ extension AppPreferences {
 			servers.append(server)
 		}
 
+		// TODO: this seems wrong???
 		for server in servers {
 			try Current.keychain.removeData(for: .server(server))
 
@@ -89,5 +90,10 @@ extension AppPreferences {
 	func reset() {
 		guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
 		_userDefaults.removePersistentDomain(forName: bundleIdentifier)
+
+		// In tests, the above doesn't work
+		for (key, _) in _userDefaults.dictionaryRepresentation() {
+			_userDefaults.removeObject(forKey: key)
+		}
 	}
 }

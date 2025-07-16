@@ -3,7 +3,7 @@ import Combine
 @testable import Magnesium
 
 /// Mock implementation of AppPreferences for testing
-class MockAppPreferences: ObservableObject {
+class MockAppPreferences: ObservableObject, Preferences {
     // MARK: - Mock Storage
     
     @Published var autoRefreshInterval: TimeInterval = 2.0

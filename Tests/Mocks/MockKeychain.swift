@@ -61,7 +61,7 @@ class MockKeychain: Keychain {
         let oldValue = storage.removeValue(forKey: key)
         accessGroups.removeValue(forKey: key)
         
-        if let oldValue = oldValue {
+        if oldValue != nil {
 					let change = KeychainChange.deleted(query)
             changeSubject.send(change)
         }

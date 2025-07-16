@@ -2,6 +2,14 @@ import Foundation
 import Combine
 @testable import Magnesium
 
+// MARK: - Mock Errors
+
+enum MockTorrentClientError: Error {
+    case networkError
+    case actionFailed
+    case invalidData
+}
+
 /// Mock implementation of TorrentClientActing for testing
 class MockTorrentClientActing: TorrentClientActing {
     typealias AddLinkError = DefaultAddLinkError

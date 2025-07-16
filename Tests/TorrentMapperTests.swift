@@ -269,11 +269,9 @@ struct TorrentMapperTests {
             // Assert
             #expect(result.isEmpty)
         }
-    }
-}    
-    //
- MARK: - Sorting Tests
-    
+    }   
+    // MARK: - Sorting Tests
+
     @Suite("Sorting Tests")
     struct SortingTests {
         
@@ -538,8 +536,8 @@ struct TorrentMapperTests {
             let hash1 = "aaaa"
             let hash2 = "bbbb"
             let torrents = [
-                TestDataFactory.createStandardTorrent(name: "Same Name", progress: 0.5, hash: hash2),
-                TestDataFactory.createStandardTorrent(name: "Same Name", progress: 0.5, hash: hash1)
+							TestDataFactory.createStandardTorrent(hash: hash2, name: "Same Name", progress: 0.5),
+							TestDataFactory.createStandardTorrent(hash: hash1, name: "Same Name", progress: 0.5)
             ]
             let sortOption = SortOption(property: .progress, direction: .ascending)
             

@@ -2,12 +2,14 @@ import Foundation
 import Combine
 @testable import Magnesium
 
-/// Mock implementation of Session for testing
-class MockSession: ObservableObject {
-    // MARK: - Mock Configuration
+/// Mock implementation of SessionProtocol for testing
+class MockSession: SessionProtocol {
+    // MARK: - SessionProtocol Properties
     
-    @Published var server: Server?
+    var server: Server?
     var actionImplementation: any TorrentClientActing = NullTorrentActionImplementation()
+    
+    // MARK: - Mock Configuration
     
     var setServerResult: Result<Void, Session.Error> = .success(())
     var setServerCallCount = 0
@@ -15,8 +17,10 @@ class MockSession: ObservableObject {
     
     var resetCallCount = 0
     
-    // MARK: - Session-like Interface
-    
+    // MARK: - SessionProtocol Implementation
+
+	required init(_ preferences: Preferences) {}
+
     func setServer(_ server: Server) throws(Session.Error) {
         setServerCallCount += 1
         setServerCalls.append(server)

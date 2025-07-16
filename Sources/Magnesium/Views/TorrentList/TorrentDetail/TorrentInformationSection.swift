@@ -12,11 +12,11 @@ struct TorrentInformationSection: View {
 
 	init(torrent: StandardTorrent) {
 		items = [
-			.init(label: "Size", value: Formatters.bytes.string(fromByteCount: torrent.size)),
-			.init(label: "Download Speed", value: Formatters.bytes.string(fromByteCount: torrent.downloadRate)),
-			.init(label: "Upload Speed", value: Formatters.bytes.string(fromByteCount: torrent.uploadRate)),
-			.init(label: "Downloaded", value: Formatters.bytes.string(fromByteCount: torrent.downloaded)),
-			.init(label: "Uploaded", value: Formatters.bytes.string(fromByteCount: torrent.uploaded)),
+			.init(label: "Size", value: torrent.size.formatted(Formatters.bytes)),
+			.init(label: "Download Speed", value: torrent.downloadRate.formatted(Formatters.bytes)),
+			.init(label: "Upload Speed", value: torrent.uploadRate.formatted(Formatters.bytes)),
+			.init(label: "Downloaded", value: torrent.downloaded.formatted(Formatters.bytes)),
+			.init(label: "Uploaded", value: torrent.uploaded.formatted(Formatters.bytes)),
 			.init(label: "ETA", value: torrent.formattedETA),
 			.init(label: "Ratio", value: torrent.formattedRatio()),
 			.init(label: "Peers", value: "\(torrent.peers)"),
