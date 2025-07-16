@@ -276,7 +276,7 @@ class MockTorrentClientActing: TorrentClientActing {
 
 // MARK: - Mock Errors
 
-enum MockError: Error, LocalizedError {
+enum MockError: Error, LocalizedError, Equatable {
     case networkError
     case authenticationError
     case invalidData

@@ -82,7 +82,8 @@ struct TorrentManagerTests {
     func refreshWithDeltaUpdatesExistingTorrents() async throws {
         let (torrentManager, _, _, mockClient) = createTestEnvironment()
         
-        // Arrange - Initial refresh
+        // Arrange - Initial refresh to establish baseline state
+        // This simulates the first time the app loads torrent data from the server
         let initialTorrents = [
             TestDataFactory.createStandardTorrent(hash: "hash1", name: "Torrent 1", progress: 0.5),
             TestDataFactory.createStandardTorrent(hash: "hash2", name: "Torrent 2", progress: 0.3)
@@ -90,15 +91,19 @@ struct TorrentManagerTests {
         mockClient.refreshResult = (initialTorrents, [])
         try await torrentManager.refresh()
         
-        // Act - Update with modified torrents
+        // Act - Simulate server returning updated torrent data
+        // This tests the delta update mechanism where existing torrents are updated in-place
+        // rather than being replaced, preserving object identity and performance
         let updatedTorrents = [
-            TestDataFactory.createStandardTorrent(hash: "hash1", name: "Torrent 1", progress: 0.8), // Updated progress
-            TestDataFactory.createStandardTorrent(hash: "hash2", name: "Torrent 2", progress: 0.6)  // Updated progress
+            TestDataFactory.createStandardTorrent(hash: "hash1", name: "Torrent 1", progress: 0.8), // Progress increased
+            TestDataFactory.createStandardTorrent(hash: "hash2", name: "Torrent 2", progress: 0.6)  // Progress increased
         ]
         mockClient.refreshResult = (updatedTorrents, [])
         try await torrentManager.refresh()
         
         // Assert
+        // Verify that existing torrents were updated rather than replaced
+        // This is critical for UI performance as it avoids unnecessary view updates
         #expect(torrentManager.torrents.count == 2)
         #expect(torrentManager.torrents["hash1"]?.progress == 0.8)
         #expect(torrentManager.torrents["hash2"]?.progress == 0.6)

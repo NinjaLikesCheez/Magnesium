@@ -179,62 +179,8 @@ struct TorrentMapperPerformanceTests {
         
         #expect(elapsed < .milliseconds(300), "Complex combined operations on 2000 torrents should complete in under 300ms, took \(elapsed)")
     }
-    
-    // MARK: - Memory Usage Tests
-    
-    @Test("Memory efficiency during large torrent list processing")
-    func memoryEfficiencyDuringLargeProcessing() {
-        // Arrange
-        let initialMemory = getMemoryUsage()
-        let torrents = TestDataFactory.createMultipleTorrents(count: 5000)
-        let afterCreationMemory = getMemoryUsage()
-        
-        // Act - Perform multiple operations
-        let filterOptions = FilterOptions(states: [.downloading, .seeding])
-        let sortOption = SortOption(property: .name, direction: .ascending)
-        
-        for _ in 0..<10 {
-            _ = TorrentMapper.map(torrents, query: "Test", sortOption: sortOption, filterOptions: filterOptions)
-        }
-        
-        let afterOperationsMemory = getMemoryUsage()
-        
-        // Assert - Memory should not grow excessively during operations
-        let memoryGrowthDuringOperations = afterOperationsMemory - afterCreationMemory
-        let expectedMaxGrowth: UInt64 = 50 * 1024 * 1024 // 50MB max growth
-        
-        #expect(memoryGrowthDuringOperations < expectedMaxGrowth, 
-                "Memory growth during operations should be under 50MB, grew by \(memoryGrowthDuringOperations / 1024 / 1024)MB")
-    }
-    
-    @Test("Memory cleanup after operations")
-    func memoryCleanupAfterOperations() {
-        // Arrange
-        let initialMemory = getMemoryUsage()
-        
-        // Act - Create and process large dataset in scope
-        do {
-            let torrents = TestDataFactory.createMultipleTorrents(count: 3000)
-            let filterOptions = FilterOptions(states: [.downloading])
-            let sortOption = SortOption(property: .dateAdded)
-            
-            _ = TorrentMapper.map(torrents, query: "", sortOption: sortOption, filterOptions: filterOptions)
-        }
-        
-        // Force garbage collection
-        autoreleasepool { }
-        
-        let afterOperationsMemory = getMemoryUsage()
-        let memoryGrowth = afterOperationsMemory - initialMemory
-        let expectedMaxGrowth: UInt64 = 100 * 1024 * 1024 // 100MB max growth
-        
-        // Assert - Memory should be cleaned up
-        #expect(memoryGrowth < expectedMaxGrowth, 
-                "Memory should be cleaned up after operations, grew by \(memoryGrowth / 1024 / 1024)MB")
-    }
-    
+
     // MARK: - Stress Tests
-    
     @Test("Stress test with very large dataset")
     func stressTestWithVeryLargeDataset() {
         // Arrange

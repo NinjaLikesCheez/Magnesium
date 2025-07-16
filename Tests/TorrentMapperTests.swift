@@ -4,7 +4,6 @@ import Foundation
 
 @Suite("TorrentMapper Tests")
 struct TorrentMapperTests {
-    
     // MARK: - Filtering Tests
     
     @Suite("Filtering Tests")
@@ -121,6 +120,11 @@ struct TorrentMapperTests {
         @Test("Search functionality with special characters")
         func searchFunctionalityWithSpecialCharacters() {
             // Arrange
+            // Test torrent names with common special characters found in real torrent names:
+            // - Dots (.) used as space separators
+            // - Underscores (_) used as space separators  
+            // - Hyphens (-) used as separators
+            // - Parentheses and brackets for additional info
             let torrents = [
                 TestDataFactory.createStandardTorrent(name: "Movie.Title.2023.1080p.BluRay"),
                 TestDataFactory.createStandardTorrent(name: "TV_Show_S01E01_720p"),
@@ -130,11 +134,13 @@ struct TorrentMapperTests {
             let filterOptions = FilterOptions()
             
             // Act
+            // Search should normalize special characters and match across word boundaries
             let result1 = TorrentMapper.filter(torrents, using: filterOptions, query: "movie title")
             let result2 = TorrentMapper.filter(torrents, using: filterOptions, query: "tv show")
             let result3 = TorrentMapper.filter(torrents, using: filterOptions, query: "game title")
             
             // Assert
+            // Verify that search finds matches despite special character differences
             #expect(result1.count == 1)
             #expect(result1.first?.name == "Movie.Title.2023.1080p.BluRay")
             
@@ -512,6 +518,9 @@ struct TorrentMapperTests {
         @Test("Sort stability with secondary name sorting")
         func sortStabilityWithSecondaryNameSorting() {
             // Arrange
+            // Create torrents with identical primary sort values (progress) to test secondary sorting
+            // This tests the sort stability requirement - when primary values are equal,
+            // the system should fall back to secondary sorting by name
             let torrents = [
                 TestDataFactory.createStandardTorrent(name: "Zebra", progress: 0.5),
                 TestDataFactory.createStandardTorrent(name: "Apple", progress: 0.5),
@@ -525,6 +534,7 @@ struct TorrentMapperTests {
             // Assert
             #expect(result.count == 3)
             // When progress is equal, should sort by name as secondary sort
+            // This ensures consistent ordering even when primary sort values are identical
             #expect(result[0].name == "Apple")
             #expect(result[1].name == "Banana")
             #expect(result[2].name == "Zebra")

@@ -124,25 +124,31 @@ struct StandardTorrentTests {
     
     @Test("StandardTorrent ratio calculation")
     func standardTorrentRatioCalculation() {
-        // Test normal ratio
+        // Test normal ratio calculation: uploaded / downloaded
+        // This is the standard case where both values are positive
         let torrent1 = TestDataFactory.createStandardTorrent(
 					downloaded: 500, uploaded: 1000
         )
         #expect(torrent1.ratio == 2.0)
         
-        // Test zero downloaded (should result in infinity)
+        // Test edge case: zero downloaded bytes
+        // This occurs when a torrent is added but hasn't started downloading yet
+        // Mathematical result is infinity (division by zero)
         let torrent2 = TestDataFactory.createStandardTorrent(
 					downloaded: 0, uploaded: 1000
         )
         #expect(torrent2.ratio.isInfinite)
         
-        // Test zero uploaded
+        // Test edge case: zero uploaded bytes
+        // This occurs when a torrent is downloading but hasn't uploaded anything yet
+        // Result should be 0.0 (0 divided by any positive number)
         let torrent3 = TestDataFactory.createStandardTorrent(
 					downloaded: 1000, uploaded: 0
         )
         #expect(torrent3.ratio == 0.0)
         
-        // Test equal uploaded and downloaded
+        // Test balanced ratio: equal upload and download
+        // This represents a 1:1 sharing ratio, common target for private trackers
         let torrent4 = TestDataFactory.createStandardTorrent(
 					downloaded: 1000, uploaded: 1000
         )
