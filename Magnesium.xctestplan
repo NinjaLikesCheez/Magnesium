@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "DB537240-7DDC-4744-ADEA-8EC4F792F9AF",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Magnesium.xcodeproj",
+      "identifier" : "02B1F42366609E3533897ADB",
+      "name" : "Magnesium"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Magnesium.xcodeproj",
+        "identifier" : "30B191621C02E0CBB93088F4",
+        "name" : "MagnesiumTests"
+      }
+    }
+  ],
+  "version" : 1
+}

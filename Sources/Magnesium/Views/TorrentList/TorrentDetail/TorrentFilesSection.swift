@@ -20,7 +20,7 @@ struct TorrentFilesSection: View {
 				HStack {
 					VStack(alignment: .leading) {
 						Text("\(file.name)")
-						Text("\(Formatters.bytes.string(fromByteCount: file.size)) (\(Formatters.percentage.string(for: file.progress) ?? "0%"))")
+						Text("\(file.size.formatted(Formatters.bytes))) (\(file.progress.formatted(Formatters.percentage)))")
 							.font(.subheadline)
 							.foregroundStyle(.secondary)
 					}

@@ -98,11 +98,11 @@ extension StandardTorrent {
 
 	var localizedSpeed: String {
 		if state == .downloading {
-			let download = Formatters.bytes.string(fromByteCount: downloadRate)
-			let upload = Formatters.bytes.string(fromByteCount: uploadRate)
+			let download = downloadRate.formatted(Formatters.bytes)
+			let upload = uploadRate.formatted(Formatters.bytes)
 			return L10n.Torrent.downloadUploadSpeed(downloadSpeed: download, uploadSpeed: upload)
 		} else if state == .seeding {
-			return L10n.Torrent.uploadSpeed(Formatters.bytes.string(fromByteCount: uploadRate))
+			return L10n.Torrent.uploadSpeed(uploadRate.formatted(Formatters.bytes))
 		} else {
 			return ""
 		}
@@ -110,19 +110,21 @@ extension StandardTorrent {
 
 	var localizedProgress: String {
 		L10n.Torrent.progress(
-			downloaded: Formatters.bytes.string(fromByteCount: downloaded),
-			size: Formatters.bytes.string(fromByteCount: size),
-			progress: Formatters.percentage.string(for: progress) ?? ""
+			downloaded: downloaded.formatted(Formatters.bytes),
+			size: size.formatted(Formatters.bytes),
+			progress: progress.formatted(Formatters.percentage)
 		)
 	}
 
 	var formattedETA: String {
-		eta > 0 ? Formatters.eta.string(from: eta) ?? "" : L10n.Common.infinity
+		eta > 0
+		? Duration.seconds(eta).formatted(Formatters.eta)
+		: L10n.Common.infinity
 	}
 
 	func formattedRatio(precision: Int = 1) -> String {
 		guard !ratio.isInfinite, !ratio.isNaN else { return L10n.Common.infinity }
-		return Formatters.number(precision: precision).string(for: ratio) ?? ""
+		return ratio.formatted(Formatters.float(precision: precision))
 	}
 
 	var localizedRatioOrETA: String {

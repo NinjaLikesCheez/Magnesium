@@ -3,8 +3,9 @@ import Foundation
 import Observation
 
 @Observable
-final class Session {
+final class Session: SessionProtocol {
 	private(set) var server: Server?
+	private var preferences: Preferences
 	private var serverObserver: AnyCancellable?
 
 	private(set) var actionImplementation: any TorrentClientActing = NullTorrentActionImplementation()
@@ -15,11 +16,12 @@ final class Session {
 		case notImplemented
 	}
 
-	init() {
-		try? _setServer(try? Current.preferences.getSelectedServer())
+	init(_ preferences: Preferences) {
+		self.preferences = preferences
+		try? _setServer(try? preferences.getSelectedServer())
 
-		withObservationTracking(of: Current.preferences.selectedServerID) { _ in
-			try? self._setServer(try? Current.preferences.getSelectedServer())
+		withObservationTracking(of: preferences.selectedServerID) { _ in
+			try? self._setServer(try? preferences.getSelectedServer())
 		}
 	}
 
@@ -29,15 +31,22 @@ final class Session {
 
 	func reset() {
 		server = nil
+		actionImplementation = NullTorrentActionImplementation()
+		preferences.selectedServerID = nil
 	}
 
 	private func _setServer(_ server: Server?) throws(Error) {
-		self.server = server
-		actionImplementation = NullTorrentActionImplementation()
-
 		if let server = server {
-			actionImplementation = try Session.actionImplementation(server: server)
-			Current.preferences.selectedServerID = server.id
+			do {
+				actionImplementation = try Session.actionImplementation(server: server)
+				self.server = server
+				preferences.selectedServerID = server.id
+			} catch{
+				reset()
+				throw error
+			}
+		} else {
+			reset()
 		}
 	}
 }

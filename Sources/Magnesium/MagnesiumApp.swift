@@ -5,9 +5,9 @@ import SwiftUI
 struct MagnesiumApp: App {
 	@State private var appState = AppState.resuming
 
-	@State var session = Session()
-	@State var preferences = AppPreferences(userDefaults: .standard)
-	@State var torrentManager: TorrentManager? = nil
+	@State var session: Session
+	@State var preferences: AppPreferences
+	@State var torrentManager: TorrentManager
 
 	init() {
 		LoggingSystem.bootstrap { label in
@@ -18,9 +18,9 @@ struct MagnesiumApp: App {
 			return logger
 		}
 
-		self._torrentManager = State(
-			initialValue: TorrentManager(session: session, preferences: preferences)
-		)
+		self._preferences = .init(initialValue: AppPreferences(userDefaults: .standard, keychain: SystemKeychain()))
+		self._session = .init(initialValue: Session(_preferences.wrappedValue))
+		self._torrentManager = .init(initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
 	}
 
 	var body: some Scene {
@@ -36,7 +36,7 @@ struct MagnesiumApp: App {
 				case .authenticated:
 					TorrentsListFlow(
 						torrentListRouter: .init(),
-						torrentManager: .constant(torrentManager!),
+						torrentManager: $torrentManager,
 						preferences: $preferences,
 						session: $session
 					)

@@ -18,14 +18,14 @@ final class TorrentManager {
 	var searchQuery: String = ""
 
 	@ObservationIgnored
-	private let session: Session
+	private let session: SessionProtocol
 
 	@ObservationIgnored
-	private let preferences: AppPreferences
+	private let preferences: Preferences
 
 	private var updateTimer: Timer!
 
-	init(session: Session, preferences: AppPreferences) {
+	init(session: SessionProtocol, preferences: Preferences) {
 		self.session = session
 		self.preferences = preferences
 
@@ -132,14 +132,16 @@ extension TorrentManager {
 	}
 
 	var totalUploadSpeed: String {
-		Formatters.bytes.string(
-			fromByteCount: torrents.values.reduce(into: 0) { $0 += $1.uploadRate }
-		)
+		torrents
+			.values
+			.reduce(into: 0) { $0 += $1.uploadRate }
+			.formatted(Formatters.bytes)
 	}
 
 	var totalDownloadSpeed: String {
-		Formatters.bytes.string(
-			fromByteCount: torrents.values.reduce(into: 0) { $0 += $1.downloadRate }
-		)
+		torrents
+			.values
+			.reduce(into: 0) { $0 += $1.downloadRate }
+			.formatted(Formatters.bytes)
 	}
 }
