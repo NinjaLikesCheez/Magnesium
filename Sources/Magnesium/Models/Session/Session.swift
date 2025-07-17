@@ -32,13 +32,19 @@ final class Session: SessionProtocol {
 	func reset() {
 		server = nil
 		actionImplementation = NullTorrentActionImplementation()
+		preferences.selectedServerID = nil
 	}
 
 	private func _setServer(_ server: Server?) throws(Error) {
 		if let server = server {
-			actionImplementation = try Session.actionImplementation(server: server)
-			self.server = server
-			preferences.selectedServerID = server.id
+			do {
+				actionImplementation = try Session.actionImplementation(server: server)
+				self.server = server
+				preferences.selectedServerID = server.id
+			} catch{
+				reset()
+				throw error
+			}
 		} else {
 			reset()
 		}

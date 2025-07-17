@@ -364,8 +364,8 @@ struct ErrorHandlingTests {
 			try session.setServer(invalidServer)
 		}
 
-		// Session should still have the valid server
-		#expect(session.server?.name == "Valid Server")
+		// Setting an invalid server should result in a nil server selected
+		#expect(session.server?.name == nil)
 
 		// Should be able to set another valid server
 		let anotherValidServer = TestDataFactory.createServer(

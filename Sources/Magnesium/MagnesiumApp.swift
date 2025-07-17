@@ -18,9 +18,9 @@ struct MagnesiumApp: App {
 			return logger
 		}
 
-		self._preferences = .init(initialValue: .init(userDefaults: .standard))
-		self._session = .init(initialValue: .init(_preferences.wrappedValue))
-		self._torrentManager = .init(initialValue: .init(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
+		self._preferences = .init(initialValue: AppPreferences(userDefaults: .standard, keychain: SystemKeychain()))
+		self._session = .init(initialValue: Session(_preferences.wrappedValue))
+		self._torrentManager = .init(initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
 	}
 
 	var body: some Scene {

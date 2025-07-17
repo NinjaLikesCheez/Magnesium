@@ -34,7 +34,7 @@ class SessionTests {
 	@Test("Session initializes with selected server from preferences")
 	func sessionInitializesWithSelectedServerFromPreferences() throws {
 		// Arrange - Set up server in preferences first
-		let preferences = AppPreferences()
+		let preferences = AppPreferences(keychain: MockKeychain())
 		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try preferences.addOrUpdate(server: server)
 		preferences.selectedServerID = server.id

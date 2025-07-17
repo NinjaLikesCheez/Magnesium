@@ -7,6 +7,7 @@
 import Foundation
 import ObservableDefaults
 
+// TODO: fork this or use @AppStorage or something to allow for a custom init
 @ObservableDefaults
 public final class AppPreferences: Preferences {
 	var autoRefreshInterval: TimeInterval = 2.0
@@ -22,9 +23,15 @@ public final class AppPreferences: Preferences {
 	var automaticallyLookForMagnetLinks: Bool = false
 
 	@Ignore
-	private var keychain: Keychain = InMemoryKeychain()
+	private var keychain: Keychain!
 
-	convenience init(userDefaults: UserDefaults? = nil, ignoreExternalChanges: Bool? = nil, prefix: String? = nil, ignoredKeyPathsForExternalUpdates: [PartialKeyPath<AppPreferences>] = [], keychain: Keychain) {
+	convenience init(
+		userDefaults: UserDefaults? = nil,
+		ignoreExternalChanges: Bool? = nil,
+		prefix: String? = nil,
+		ignoredKeyPathsForExternalUpdates: [PartialKeyPath<AppPreferences>] = [],
+		keychain: Keychain
+	) {
 		self.init(
 			userDefaults: userDefaults,
 			ignoreExternalChanges: ignoreExternalChanges,
@@ -56,7 +63,7 @@ extension AppPreferences {
 		var servers = servers
 		for (index, server) in servers.enumerated() {
 			var server = server
-			server.keychainData = try Current.keychain.data(for: .server(server))
+			server.keychainData = try keychain.data(for: .server(server))
 			servers[index] = server
 		}
 
@@ -74,10 +81,10 @@ extension AppPreferences {
 
 		// TODO: this seems wrong???
 		for server in servers {
-			try Current.keychain.removeData(for: .server(server))
+			try keychain.removeData(for: .server(server))
 
 			if let data = server.keychainData {
-				try Current.keychain.set(data, for: .server(server))
+				try keychain.set(data, for: .server(server))
 			}
 		}
 
@@ -88,13 +95,13 @@ extension AppPreferences {
 	func remove(server: Server) throws {
 		var servers = try getServers()
 		servers.removeAll { $0.id == server.id }
-		try Current.keychain.removeData(for: .server(server))
+		try keychain.removeData(for: .server(server))
 		self.servers = servers
 		try updateSelectedServerID()
 	}
 
 	func removeServers() throws {
-		try Current.keychain.removeData(for: .servers)
+		try keychain.removeData(for: .servers)
 		servers = []
 		selectedServerID = nil
 	}

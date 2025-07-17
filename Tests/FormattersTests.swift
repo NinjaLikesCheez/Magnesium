@@ -162,22 +162,22 @@ struct FormattersTests {
 		@Test("Format ETA with various time intervals")
 		func formatETAWithVariousTimeIntervals() {
 			// Test seconds
-			#expect(Duration.seconds(30).formatted(Formatters.eta) == "30s")
-			#expect(Duration.seconds(59).formatted(Formatters.eta) == "59s")
+			#expect(Duration.seconds(30).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "30s")
+			#expect(Duration.seconds(59).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "59s")
 
 			// Test minutes
-			#expect(Duration.seconds(60).formatted(Formatters.eta) == "1m")
-			#expect(Duration.seconds(90).formatted(Formatters.eta) == "1m 30s")
-			#expect(Duration.seconds(3600 - 1).formatted(Formatters.eta) == "59m 59s")
+			#expect(Duration.seconds(60).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1m")
+			#expect(Duration.seconds(90).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1m 30s")
+			#expect(Duration.seconds(3600 - 1).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "59m 59s")
 
 			// Test hours
-			#expect(Duration.seconds(3600).formatted(Formatters.eta) == "1h")
-			#expect(Duration.seconds(3660).formatted(Formatters.eta) == "1h 1m")
-			#expect(Duration.seconds(7200).formatted(Formatters.eta) == "2h")
+			#expect(Duration.seconds(3600).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1h")
+			#expect(Duration.seconds(3660).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1h 1m")
+			#expect(Duration.seconds(7200).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "2h")
 
 			// Test days
-			#expect(Duration.seconds(86400).formatted(Formatters.eta) == "1d")
-			#expect(Duration.seconds(90000).formatted(Formatters.eta) == "1d 1h")
+			#expect(Duration.seconds(86400).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1d")
+			#expect(Duration.seconds(90000).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) == "1d 1h")
 		}
 
 		@Test("Format ETA with zero and negative values")
