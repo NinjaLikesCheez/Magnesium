@@ -57,6 +57,42 @@ extension AppPreferences.Error {
 	}
 }
 
+extension ClientError: @retroactive Hashable where ResponseError: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .encoding(error):
+            hasher.combine(0)
+            hasher.combine(error.localizedDescription)
+        case let .decoding(error):
+            hasher.combine(1)
+            hasher.combine(error.localizedDescription)
+        case let .request(requestError):
+            hasher.combine(2)
+            hasher.combine(requestError)
+        case let .response(responseError):
+            hasher.combine(3)
+            hasher.combine(responseError)
+        }
+    }
+}
+
+extension ClientError: @retroactive Equatable where ResponseError: Equatable {
+    public static func == (lhs: ClientError<ResponseError>, rhs: ClientError<ResponseError>) -> Bool {
+        switch (lhs, rhs) {
+        case let (.encoding(lhsError), .encoding(rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        case let (.decoding(lhsError), .decoding(rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        case let (.request(lhsRequest), .request(rhsRequest)):
+            return lhsRequest == rhsRequest
+        case let (.response(lhsResponse), .response(rhsResponse)):
+            return lhsResponse == rhsResponse
+        default:
+            return false
+        }
+    }
+}
+
 extension Deluge.Error: VisualError {
 	var title: String {
 		switch self {
@@ -73,7 +109,7 @@ extension Deluge.Error: VisualError {
 
 	var systemName: String {
 		switch self {
-		case let .encoding(error):
+		case .encoding:
 			"gear.badge.xmark"
 		case .decoding(_):
 			"gear.badge.xmark"
@@ -98,7 +134,24 @@ extension Deluge.Error: VisualError {
 	}
 }
 
-extension Deluge.ResponseError: @retroactive Hashable {}
+extension Deluge.ResponseError: @retroactive Hashable {
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .message(message):
+            hasher.combine(0)
+            hasher.combine(message)
+        case .unauthenticated:
+            hasher.combine(1)
+        case .unconnected:
+            hasher.combine(2)
+        case .torrentAlreadyInSession:
+            hasher.combine(3)
+        case let .unknown(error):
+            hasher.combine(4)
+            hasher.combine(error.localizedDescription)
+        }
+    }
+}
 extension Deluge.ResponseError: @retroactive Equatable {
 	public static func == (lhs: Deluge.ResponseError, rhs: Deluge.ResponseError) -> Bool {
 		switch (lhs, rhs) {
@@ -162,8 +215,8 @@ extension Deluge.ResponseError: VisualError {
 	}
 }
 
-extension DelugeRequestError: @retroactive Equatable {
-	public static func == (lhs: DelugeRequestError, rhs: DelugeRequestError) -> Bool {
+extension RequestError: @retroactive Equatable {
+	public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
 		switch (lhs, rhs) {
 		case let (.urlError(lhsError), .urlError(rhsError)):
 			lhsError.localizedDescription == rhsError.localizedDescription
@@ -175,7 +228,7 @@ extension DelugeRequestError: @retroactive Equatable {
 	}
 }
 
-extension DelugeRequestError: @retroactive Hashable {
+extension RequestError: @retroactive Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .urlError(error):
@@ -184,17 +237,22 @@ extension DelugeRequestError: @retroactive Hashable {
 		case let .unknown(error):
 			hasher.combine(1)
 			hasher.combine(error.localizedDescription)
+		case let .invalidRequest(error):
+			hasher.combine(2)
+			hasher.combine(error.localizedDescription)
 		}
 	}
 }
 
-extension DelugeRequestError: VisualError {
+extension RequestError: VisualError {
 	var title: String {
 		switch self {
 		case .urlError:
 			"URL Error"
 		case .unknown:
 			"Unknown Error"
+		case .invalidRequest:
+			"Invalid Request"
 		}
 	}
 
@@ -202,7 +260,7 @@ extension DelugeRequestError: VisualError {
 		switch self {
 		case .urlError:
 			"network.slash"
-		case .unknown:
+		case .unknown, .invalidRequest:
 			"questionmark"
 		}
 	}
@@ -213,6 +271,37 @@ extension DelugeRequestError: VisualError {
 			error.localizedDescription
 		case let .unknown(error):
 			error.localizedDescription
+		case let .invalidRequest(error):
+			error.localizedDescription
+		}
+	}
+}
+
+extension TorrentClientError: Equatable {
+	public static func == (lhs: TorrentClientError, rhs: TorrentClientError) -> Bool {
+		switch (lhs, rhs) {
+		case (.nullImplementation, .nullImplementation):
+			return true
+		case (.invalidLinkAdded, .invalidLinkAdded):
+			return true
+		case let (.deluge(lhsError), .deluge(rhsError)):
+			return lhsError == rhsError
+		default:
+			return false
+		}
+	}
+}
+
+extension TorrentClientError: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case .nullImplementation:
+			hasher.combine(0)
+		case .invalidLinkAdded:
+			hasher.combine(1)
+		case .deluge(let error):
+			hasher.combine(2)
+			hasher.combine(error)
 		}
 	}
 }
@@ -296,4 +385,3 @@ extension ServerSettingsError {
 		}
 	}
 }
-

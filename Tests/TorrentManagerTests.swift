@@ -398,10 +398,10 @@ class TorrentManagerTests {
 	@Test("Refresh handles client errors gracefully")
 	func refreshHandlesClientErrorsGracefully() async throws {
 		// Arrange
-		mockClient.refreshError = MockTorrentClientError.networkError
-		
+		mockClient.refreshError = TorrentClientError.deluge(.response(.unauthenticated))
+
 		// Act & Assert
-		await #expect(throws: MockTorrentClientError.self) {
+		await #expect(throws: TorrentClientError.self) {
 			try await torrentManager.refresh()
 		}
 		
@@ -414,10 +414,10 @@ class TorrentManagerTests {
 	func torrentActionsHandleClientErrorsGracefully() async throws {
 		// Arrange
 		let testTorrents = TestDataFactory.createMultipleTorrents(count: 1)
-		mockClient.resumeResult = .failure(MockTorrentClientError.actionFailed)
+		mockClient.resumeResult = .failure(TorrentClientError.deluge(.response(.unauthenticated)))
 		
 		// Act & Assert
-		await #expect(throws: MockTorrentClientError.self) {
+		await #expect(throws: TorrentClientError.self) {
 			try await torrentManager.resume(testTorrents)
 		}
 		

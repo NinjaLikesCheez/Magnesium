@@ -53,6 +53,12 @@ targets:
       - package: Logging
       - package: ObservableDefaults
       - package: Router
+    scheme:
+      testTargets:
+        - MagnesiumTests
+      gatherCoverageData: true
+      coverageTargets:
+        - Magnesium
   MagnesiumTests:
     type: bundle.unit-test
     supportedDestinations: [iOS, tvOS, macOS, visionOS]

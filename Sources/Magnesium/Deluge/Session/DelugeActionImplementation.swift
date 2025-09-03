@@ -11,7 +11,11 @@ final class DelugeActionImplementation: TorrentClientActing {
 	}
 
 	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel]) {
-		try await into { session.refresh() }
+		do {
+			return try await session.refresh()
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func refreshFiles(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] {
@@ -25,7 +29,11 @@ final class DelugeActionImplementation: TorrentClientActing {
 				}
 			}
 		}
-		return torrentFiles(in: try await into { client.request(.torrentItems(hash: torrent.hash)) })
+		do {
+			return torrentFiles(in: try await client.request(.torrentItems(hash: torrent.hash)))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func addLink(_ url: String) async throws(TorrentClientError) {
@@ -33,10 +41,14 @@ final class DelugeActionImplementation: TorrentClientActing {
 			throw .invalidLinkAdded
 		}
 
-		if url.scheme == "magnet" {
-			try await into { client.request(.add(magnetURL: url)) }
-		} else {
-			try await into { client.request(.add(fileURL: url)) }
+		do {
+			if url.scheme == "magnet" {
+				try await client.request(.add(magnetURL: url))
+			} else {
+				try await client.request(.add(fileURL: url))
+			}
+		} catch {
+			throw .deluge(error)
 		}
 	}
 
@@ -53,52 +65,70 @@ final class DelugeActionImplementation: TorrentClientActing {
 			}
 		}
 		// TODO: Make deluge use a cross import overlay so we don't get fucking combine all the time... : https://sundayswift.com/posts/cross-import-overlays/
-		let items = try await into { client.request(.torrentItems(hash: torrent.hash)) }
-		return torrentPaths(in: items)
+		do {
+			let items = try await client.request(.torrentItems(hash: torrent.hash))
+			return torrentPaths(in: items)
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		try await into { client.request(.pause(hashes: torrents.map(\.hash))) }
+		do {
+			try await client.request(.pause(hashes: torrents.map(\.hash)))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		try await into { client.request(.resume(hashes: torrents.map(\.hash))) }
+		do {
+			try await client.request(.resume(hashes: torrents.map(\.hash)))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func remove(_ torrents: [StandardTorrent], _ removeData: Bool) async throws(TorrentClientError) {
-		try await into { client.request(.remove(hashes: torrents.map(\.hash), removeData: removeData)) }
+		do {
+			try await  client.request(.remove(hashes: torrents.map(\.hash), removeData: removeData))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func verify(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		try await into { client.request(.recheck(hashes: torrents.map(\.hash))) }
+		do {
+			try await client.request(.recheck(hashes: torrents.map(\.hash)))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func setLabel(_ label: StandardLabel, _ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		await withThrowingTaskGroup(of: Void.self) { group in
-			for torrent in torrents {
-				group.addTask {
-					try await self.client.request(.setLabel(hash: torrent.hash, label: label.name))
-				}
+		for torrent in torrents {
+			do throws(Deluge.Error) {
+				try await self.client.request(.setLabel(hash: torrent.hash, label: label.name))
+			} catch {
+				throw .deluge(error)
 			}
 		}
 	}
 
 	func updateTrackers(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		try await into { client.request(.reannounce(hashes: torrents.map(\.hash))) }
+		do {
+			try await client.request(.reannounce(hashes: torrents.map(\.hash)))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 
 	func moveDownloadFolder(_ path: String, _ torrents: [StandardTorrent]) async throws(TorrentClientError) {
-		try await into { client.request(.move(hashes: torrents.map(\.hash), path: path)) }
-	}
-}
-
-//	request<Value: Decodable>(_ request: DelugeRequest<Value>) async throws(Deluge.Error) -> Value {
-@discardableResult
-fileprivate func into<ReturnType>(_ operation: () async throws(Deluge.Error) -> ReturnType) async throws(TorrentClientError) -> ReturnType {
-	do throws(Deluge.Error) {
-		return try await operation()
-	} catch {
-		throw .deluge(error)
+		do {
+			try await client.request(.move(hashes: torrents.map(\.hash), path: path))
+		} catch {
+			throw .deluge(error)
+		}
 	}
 }
 

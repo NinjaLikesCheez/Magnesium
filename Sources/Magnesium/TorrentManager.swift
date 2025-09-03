@@ -76,7 +76,7 @@ final class TorrentManager {
 		try await session.actionImplementation.refreshFiles(torrent)
 	}
 
-	nonisolated func refresh() async throws {
+	nonisolated func refresh() async throws(TorrentClientError) {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
 		// We have to do 'delta' style updates so the view bindings work properly.

@@ -63,11 +63,11 @@ public struct TorrentListView: View {
 
 	func refresh() {
 		Task {
-			do {
+			do throws(TorrentClientError) {
 				try await torrentManager.refresh()
 			} catch {
 				print("Error refreshing torrents with the torrent manager: \(error)")
-				router.presentError(error)
+				router.presentError(.clientError(error))
 			}
 		}
 	}

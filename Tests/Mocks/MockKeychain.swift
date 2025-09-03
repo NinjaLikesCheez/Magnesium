@@ -4,6 +4,7 @@ import Combine
 
 /// Mock implementation of Keychain for testing
 class MockKeychain: Keychain {
+	
 	// MARK: - Mock Storage
 
 	private var storage: [String: Data] = [:]
@@ -14,9 +15,9 @@ class MockKeychain: Keychain {
 	var shouldFailOnRead = false
 	var shouldFailOnWrite = false
 	var shouldFailOnDelete = false
-	var readError: Error?
-	var writeError: Error?
-	var deleteError: Error?
+	var readError: KeychainError?
+	var writeError: KeychainError?
+	var deleteError: KeychainError?
 
 	// MARK: - Change Publisher
 
@@ -28,18 +29,18 @@ class MockKeychain: Keychain {
 
 	// MARK: - Keychain Implementation
 
-	func data(for query: KeychainQuery) throws -> Data? {
+	func data(for query: KeychainQuery) throws(KeychainError) -> Data? {
 		if shouldFailOnRead {
-			throw readError ?? MockKeychainError.readFailed
+			throw readError ?? KeychainError.system(OSStatus(1))
 		}
 
 		let key = makeKey(from: query)
 		return storage[key]
 	}
 
-	func set(_ data: Data, for query: KeychainQuery) throws {
+	func set(_ data: Data, for query: KeychainQuery) throws(KeychainError) {
 		if shouldFailOnWrite {
-			throw writeError ?? MockKeychainError.writeFailed
+			throw writeError ?? KeychainError.system(OSStatus(1))
 		}
 
 		let key = makeKey(from: query)
@@ -50,9 +51,9 @@ class MockKeychain: Keychain {
 		changeSubject.send(KeychainChange.updated(query, data))
 	}
 
-	func removeData(for query: KeychainQuery) throws {
+	func removeData(for query: KeychainQuery) throws(KeychainError) {
 		if shouldFailOnDelete {
-			throw deleteError ?? MockKeychainError.deleteFailed
+			throw deleteError ?? KeychainError.system(OSStatus(1))
 		}
 
 		let key = makeKey(from: query)
@@ -118,30 +119,3 @@ class MockKeychain: Keychain {
 	}
 }
 
-// MARK: - Mock Keychain Errors
-
-enum MockKeychainError: Error, LocalizedError {
-	case readFailed
-	case writeFailed
-	case deleteFailed
-	case itemNotFound
-	case duplicateItem
-	case invalidParameters
-
-	var errorDescription: String? {
-		switch self {
-		case .readFailed:
-			return "Failed to read from keychain"
-		case .writeFailed:
-			return "Failed to write to keychain"
-		case .deleteFailed:
-			return "Failed to delete from keychain"
-		case .itemNotFound:
-			return "Keychain item not found"
-		case .duplicateItem:
-			return "Duplicate keychain item"
-		case .invalidParameters:
-			return "Invalid keychain parameters"
-		}
-	}
-}
