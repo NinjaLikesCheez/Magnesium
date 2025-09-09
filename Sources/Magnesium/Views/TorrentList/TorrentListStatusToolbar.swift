@@ -135,8 +135,11 @@ struct TorrentListStatusToolbar: ToolbarContent {
 
 		Button("Ok") {
 			Task {
-				// TODO: Error handle
-				try await torrentManager.addLink(linkInput)
+				do throws(TorrentClientError) {
+					try await torrentManager.addLink(linkInput)
+				} catch {
+					router.presentError(.clientError(error))
+				}
 			}
 		}
 	}
@@ -153,11 +156,10 @@ struct TorrentListStatusToolbar: ToolbarContent {
 		}
 
 		Task {
-			do {
+			do throws(TorrentClientError) {
 				try await torrentManager.addLink(string)
 			} catch {
-				// TODO: Error handle
-				showAddTorrentConfirmation = true
+				router.presentError(.clientError(error))
 			}
 		}
 	}
@@ -168,7 +170,6 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			urls
 				.forEach { url in
 					Task {
-						// TODO: Handle error
 						_ = url.startAccessingSecurityScopedResource()
 						do throws(TorrentClientError) {
 							try await torrentManager.addLink(url.path())

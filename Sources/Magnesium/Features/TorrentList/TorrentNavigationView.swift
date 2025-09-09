@@ -22,9 +22,6 @@ struct TorrentNavigationView: View {
 	}
 
 	var body: some View {
-		@Bindable var router = router
-		@Bindable var torrentManager = torrentManager
-
 		if horizontalSizeClass == .compact {
 			contentView
 		} else {
