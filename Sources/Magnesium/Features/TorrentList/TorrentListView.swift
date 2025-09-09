@@ -24,6 +24,8 @@ public struct TorrentListView: View {
 			.refreshable { refresh() }
 			.onAppear { refresh() }
 			.searchable(text: $torrentManager.searchQuery)
+			// If we ever migrate to a tab bar... I want that nice ass search bar...
+			.searchToolbarBehavior(.minimize)
 			.navigationTitle(session.server?.name ?? "Torrents")
 			.overlay {
 				if torrentManager.filteredTorrents.isEmpty && !torrentManager.searchQuery.isEmpty {
