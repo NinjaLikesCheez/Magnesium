@@ -12,6 +12,8 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentListRouter.self) var router
 
 	@State private var isConfirmingDelete = false
+	@Binding var editMode: EditMode
+
 	let selectedTorrents: Set<StandardTorrent>
 
 	var body: some ToolbarContent {
@@ -117,6 +119,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 					try await torrentManager.pause(Array(selectedTorrents))
 				case .delete(let removeData):
 					try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
+					editMode = .inactive
 				case .more:
 					// TODO: implement this please
 					print("TODO")
