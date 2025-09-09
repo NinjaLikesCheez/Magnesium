@@ -9,6 +9,7 @@ The architecture consists of:
 - **Router Protocol**: Defines the navigation interface
 - **Destinations**: Enum cases representing push navigation targets
 - **Sheets**: Enum cases representing modal presentations
+- **Errors**: Enum cases representing error modals
 - **View Modifiers**: Extensions that handle navigation destination and sheet presentation
 
 ## Architecture
@@ -19,12 +20,14 @@ The `RouterProtocol` is the core of the navigation system. It defines the interf
 
 ```swift
 @MainActor
-protocol RouterProtocol: AnyObject, Observation.Observable {
-	associatedtype Destination: RoutableDestinations
-	associatedtype Sheet: RoutableSheets
+public protocol RouterProtocol: AnyObject, Observation.Observable {
+	associatedtype Destination: RoutableDestination
+	associatedtype Sheet: RoutableSheet
+	associatedtype Error: RoutableError
 
 	var path: [Destination] { get set }
 	var presentedSheet: Sheet? { get set }
+	var presentedError: Error? { get set }
 	var parent: (any RouterProtocol)? { get }
 
 	init(_ parent: (any RouterProtocol)?)
@@ -33,16 +36,19 @@ protocol RouterProtocol: AnyObject, Observation.Observable {
 	@discardableResult func pop() -> Destination?
 	func popToRoot()
 	func presentSheet(_ sheet: Sheet)
+	func presentError(_ error: Error)
 	func dismissSheet(withParent: Bool)
+	func dismissError()
 	func reset(withParent: Bool)
 }
 ```
 
 ### Key Components
 
-1. **Destinations**: Conform to `RoutableDestinations` protocol, used for stack navigation
-2. **Sheets**: Conform to `RoutableSheets` protocol, used for modal presentations
-3. **Parent Router**: Enables hierarchical navigation where child routers can affect parent navigation
+1. **Destinations**: Conform to `RoutableDestination` protocol, used for stack navigation
+2. **Sheets**: Conform to `RoutableSheet` protocol, used for modal presentations
+3. **Errors**: Conform to `RoutableError` protocol, used for modal presentations
+4. **Parent Router**: Enables hierarchical navigation where child routers can affect parent navigation
 
 ### Default Implementation
 
@@ -52,17 +58,21 @@ The protocol provides default implementations for all navigation methods:
 - `pop()`: Removes the last destination from the path
 - `popToRoot()`: Clears the entire navigation path
 - `presentSheet(_:)`: Sets the presented sheet
+- `presentError(_:)`: Sets the presented error
 - `dismissSheet(withParent:)`: Dismisses the sheet, optionally affecting parent router
+- `dismissError()`: Dismisses the error
 - `reset(withParent:)`: Resets both path and sheet, optionally affecting parent router
 
 ## Creating a New Router
 
 ### Step 1: Define Destinations
 
-Create an enum conforming to `RoutableDestinations`:
+Create an enum conforming to `RoutableDestination`:
 
 ```swift
-enum YourFeatureDestinations: RoutableDestinations {
+import Router
+
+enum YourFeatureDestinations: RoutableDestination {
 	var id: Self { self }
 
 	case detailView(SomeModel)
@@ -73,10 +83,12 @@ enum YourFeatureDestinations: RoutableDestinations {
 
 ### Step 2: Define Sheets
 
-Create an enum conforming to `RoutableSheets`:
+Create an enum conforming to `RoutableSheet`:
 
 ```swift
-enum YourFeatureSheets: RoutableSheets {
+import Router
+
+enum YourFeatureSheets: RoutableSheet {
 	var id: Self { self }
 
 	case addItemSheet
@@ -85,12 +97,27 @@ enum YourFeatureSheets: RoutableSheets {
 }
 ```
 
-### Step 3: Create the Router
+### Step 3: Define Errors
+
+Create an enum conforming to `RoutableError`:
+
+```swift
+import Router
+
+enum YourFeatureErrors: RoutableError {
+	var id: Self { self }
+
+	case someError
+}
+```
+
+### Step 4: Create the Router
 
 Implement the `RouterProtocol`:
 
 ```swift
 import Observation
+import Router
 
 @Observable
 final class YourFeatureRouter: RouterProtocol {
@@ -107,12 +134,14 @@ final class YourFeatureRouter: RouterProtocol {
 }
 ```
 
-### Step 4: Create Destination Modifier
+### Step 5: Create Destination Modifier
 
 Create a view modifier to handle navigation destinations:
 
 ```swift
-struct YourFeatureDestinationsModifier: ViewModifier {
+import Router
+
+struct YourFeatureDestinationsModifier: RoutableDestinationViewModifier {
 	func body(content: Content) -> some View {
 		content
 			.navigationDestination(for: YourFeatureDestinations.self) { destination in
@@ -135,12 +164,14 @@ extension View {
 }
 ```
 
-### Step 5: Create Sheet Modifier
+### Step 6: Create Sheet Modifier
 
 Create a view modifier to handle sheet presentations:
 
 ```swift
-struct YourFeatureSheetsModifier: ViewModifier {
+import Router
+
+struct YourFeatureSheetsModifier: RoutableSheetViewModifier {
 	@Binding var router: YourFeatureRouter
 
 	func body(content: Content) -> some View {
@@ -165,11 +196,41 @@ extension View {
 }
 ```
 
-### Step 6: Create the Flow View
+### Step 7: Create Error Modifier
+
+Create a view modifier to handle sheet presentations:
+
+```swift
+import Router
+
+struct YourFeatureErrorModifier: RoutableErrorViewModifier {
+	@Binding var router: YourFeatureRouter
+
+	func body(content: Content) -> some View {
+		content
+			.sheet(item: $router.presentedError) { error in
+				switch sheet {
+				case .someError:
+					SomeErrorView()
+				}
+			}
+	}
+}
+
+extension View {
+	func withYourFeatureError(router: Binding<YourFeatureRouter>) -> some View {
+			modifier(YourFeatureErrorModifier(router: router))
+	}
+}
+```
+
+### Step 8: Create the Flow View
 
 Create a flow view that sets up the navigation:
 
 ```swift
+import Router
+
 struct YourFeatureFlow: View {
 	@State var router: YourFeatureRouter
 
@@ -191,6 +252,8 @@ struct YourFeatureFlow: View {
 In any view within the navigation hierarchy, access the router via environment:
 
 ```swift
+import Router
+
 struct SomeView: View {
 	@Environment(YourFeatureRouter.self) private var router
 
@@ -280,6 +343,8 @@ let childRouter = ChildRouter(parentRouter)
 When creating views that work with multiple router types, use generics:
 
 ```swift
+import Router
+
 struct AddServerView<Router: RouterProtocol>: View {
 	@Environment(Router.self) private var router
 

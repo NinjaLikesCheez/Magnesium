@@ -393,66 +393,49 @@ class SessionTests {
 		let testLabel = TestDataFactory.createStandardLabel()
 
 		// Test all methods throw NotReadyError
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.refresh()
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.refreshFiles(testTorrent)
 		}
 
-		await #expect(throws: DefaultAddLinkError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.addLink("http://example.com")
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.paths(testTorrent)
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.pause([testTorrent])
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.resume([testTorrent])
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.remove([testTorrent], false)
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.verify([testTorrent])
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.setLabel(testLabel, [testTorrent])
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.updateTrackers([testTorrent])
 		}
 
-		await #expect(throws: NullTorrentActionImplementation.NotReadyError.self) {
+		await #expect(throws: TorrentClientError.nullImplementation.self) {
 			try await nullImplementation.moveDownloadFolder("/test/path", [testTorrent])
 		}
-	}
-
-	@Test("DefaultAddLinkError has correct properties")
-	func defaultAddLinkErrorHasCorrectProperties() async {
-		let nullImplementation = NullTorrentActionImplementation()
-
-		let error = await #expect(throws: DefaultAddLinkError.self) {
-			try await nullImplementation.addLink("http://example.com")
-		}
-
-		guard let error else {
-			Issue.record("Expected addLink to throw DefaultAddLinkError")
-			return
-		}
-
-		#expect(error.title == "Not Ready")
-		#expect(error.message == "Torrent actions are not ready.")
 	}
 }
 

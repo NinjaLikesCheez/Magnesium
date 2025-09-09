@@ -8,11 +8,6 @@ import Deluge
 import Foundation
 import Observation
 
-enum ServerSettingsError: Error {
-	case invalidState(message: String)
-	case unableToAuthenticate
-}
-
 @Observable
 class DelugeSettings {
 	var name: String
@@ -62,7 +57,7 @@ class DelugeSettings {
 				throw Deluge.Error.response(.unauthenticated)
 			}
 		} catch {
-			throw .unableToAuthenticate
+			throw error.intoServerSettingsError()
 		}
 
 		let serverSettings = DelugeServerSettings(url: url)
@@ -88,5 +83,50 @@ class DelugeSettings {
 			data: data,
 			keychainData: keychainData
 		)
+	}
+}
+
+fileprivate extension Deluge.Error {
+	func intoServerSettingsError() -> ServerSettingsError {
+		switch self {
+		case let .encoding(error):
+			.invalidState(message: error.localizedDescription)
+		case let .decoding(error):
+			.invalidState(message: error.localizedDescription)
+		case let .request(error):
+			error.intoServerSettingsError()
+		case let .response(error):
+			error.intoServerSettingsError()
+		}
+	}
+}
+
+fileprivate extension Deluge.ResponseError {
+	func intoServerSettingsError() -> ServerSettingsError {
+		switch self {
+		case let .message(message: message):
+			if let message {
+				.invalidState(message: message)
+			} else {
+				.unknown(message: "Please try again later")
+			}
+		case .unauthenticated:
+			.unableToAuthenticate
+		default:
+			.unknown(message: "Please try again later!")
+		}
+	}
+}
+
+fileprivate extension RequestError {
+	func intoServerSettingsError() -> ServerSettingsError {
+		switch self {
+		case let .urlError(error):
+			.request(message: error.localizedDescription)
+		case let .invalidRequest(error):
+			.request(message: error.localizedDescription)
+		case let .unknown(error):
+			.unknown(message: error.localizedDescription)
+		}
 	}
 }

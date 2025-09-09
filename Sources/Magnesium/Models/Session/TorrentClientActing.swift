@@ -1,39 +1,39 @@
 import Foundation
+import Deluge
 
-protocol TorrentClientActing: AnyObject {
-	associatedtype AddLinkError: Error
-	func refresh() async throws -> ([StandardTorrent], [StandardLabel])
-	func refreshFiles(_ torrent: StandardTorrent) async throws -> [StandardTorrentFile]
-	func addLink(_ url: String) async throws(AddLinkError)
-	func paths(_ torrent: StandardTorrent) async throws -> [String]
-	func pause(_ torrents: [StandardTorrent]) async throws
-	func resume(_ torrents: [StandardTorrent]) async throws
-	func remove(_ torrents: [StandardTorrent], _ removeData: Bool) async throws
-	func verify(_ torrents: [StandardTorrent]) async throws
-	func setLabel(_ label: StandardLabel, _ torrents: [StandardTorrent]) async throws
-	func updateTrackers(_ torrents: [StandardTorrent]) async throws
-	func moveDownloadFolder(_ path: String, _ torrents: [StandardTorrent]) async throws
+enum TorrentClientError: VisualError {
+	/// Represents an error thrown by the Null Implementation (a testing implementation, this should not happen in production)
+	case nullImplementation
+
+	case invalidLinkAdded
+
+	case deluge(Deluge.Error)
 }
 
-struct DefaultAddLinkError: Error {
-	let title: String
-	let message: String
+protocol TorrentClientActing: AnyObject {
+	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel])
+	func refreshFiles(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile]
+	func addLink(_ url: String) async throws(TorrentClientError)
+	func paths(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [String]
+	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError)
+	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError)
+	func remove(_ torrents: [StandardTorrent], _ removeData: Bool) async throws(TorrentClientError)
+	func verify(_ torrents: [StandardTorrent]) async throws(TorrentClientError)
+	func setLabel(_ label: StandardLabel, _ torrents: [StandardTorrent]) async throws(TorrentClientError)
+	func updateTrackers(_ torrents: [StandardTorrent]) async throws(TorrentClientError)
+	func moveDownloadFolder(_ path: String, _ torrents: [StandardTorrent]) async throws(TorrentClientError)
 }
 
 final class NullTorrentActionImplementation: TorrentClientActing {
-	struct NotReadyError: Error {}
-	typealias AddLinkError = DefaultAddLinkError
-	func refresh() async throws -> ([StandardTorrent], [StandardLabel]) { throw NotReadyError() }
-	func refreshFiles(_ torrent: StandardTorrent) async throws -> [StandardTorrentFile] { throw NotReadyError() }
-	func addLink(_ url: String) async throws(AddLinkError) {
-		throw DefaultAddLinkError(title: "Not Ready", message: "Torrent actions are not ready.")
-	}
-	func paths(_ torrent: StandardTorrent) async throws -> [String] { throw NotReadyError() }
-	func pause(_ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
-	func resume(_ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
-	func remove(_ torrents: [StandardTorrent], _ removeData: Bool) async throws { throw NotReadyError() }
-	func verify(_ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
-	func setLabel(_ label: StandardLabel, _ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
-	func updateTrackers(_ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
-	func moveDownloadFolder(_ path: String, _ torrents: [StandardTorrent]) async throws { throw NotReadyError() }
+	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel]) { throw .nullImplementation }
+	func refreshFiles(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] { throw .nullImplementation }
+	func addLink(_ url: String) async throws(TorrentClientError) { throw .nullImplementation }
+	func paths(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [String] { throw .nullImplementation }
+	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
+	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
+	func remove(_ torrents: [StandardTorrent], _ removeData: Bool) async throws(TorrentClientError) { throw .nullImplementation }
+	func verify(_ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
+	func setLabel(_ label: StandardLabel, _ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
+	func updateTrackers(_ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
+	func moveDownloadFolder(_ path: String, _ torrents: [StandardTorrent]) async throws(TorrentClientError) { throw .nullImplementation }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TorrentFilesSection: View {
 	@Environment(TorrentManager.self) var manager
+	@Environment(TorrentListRouter.self) private var router
 
 	var torrent: StandardTorrent
 	@State private var files: [StandardTorrentFile] = []
@@ -32,10 +33,10 @@ struct TorrentFilesSection: View {
 		}
 		.onAppear {
 			Task {
-				do {
+				do throws(TorrentClientError) {
 					files = try await manager.refreshFiles(for: torrent)
 				} catch {
-					print("error fetching file details: \(error)")
+					router.presentError(.clientError(error))
 				}
 			}
 		}

@@ -48,35 +48,35 @@ final class TorrentManager {
 		}
 	}
 
-	func resume(_ torrents: [StandardTorrent]) async throws {
+	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
 		try await session.actionImplementation.resume(torrents)
 		try await refresh()
 	}
 
-	func pause(_ torrents: [StandardTorrent]) async throws {
+	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
 		try await session.actionImplementation.pause(torrents)
 		try await refresh()
 	}
 
-	func delete(_ torrents: [StandardTorrent], removeData: Bool) async throws {
+	func delete(_ torrents: [StandardTorrent], removeData: Bool) async throws(TorrentClientError) {
 		try await session.actionImplementation.remove(torrents, removeData)
 		try await refresh()
 	}
 
-	func addLink(_ link: String) async throws {
+	func addLink(_ link: String) async throws(TorrentClientError) {
 		try await session.actionImplementation.addLink(link)
 		try await refresh()
 	}
 
-	func paths(for torrent: StandardTorrent) async throws -> [String] {
+	func paths(for torrent: StandardTorrent) async throws(TorrentClientError) -> [String] {
 		try await session.actionImplementation.paths(torrent)
 	}
 
-	func refreshFiles(for torrent: StandardTorrent) async throws -> [StandardTorrentFile] {
+	func refreshFiles(for torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] {
 		try await session.actionImplementation.refreshFiles(torrent)
 	}
 
-	nonisolated func refresh() async throws {
+	nonisolated func refresh() async throws(TorrentClientError) {
 		let (torrents, labels) = try await session.actionImplementation.refresh()
 
 		// We have to do 'delta' style updates so the view bindings work properly.

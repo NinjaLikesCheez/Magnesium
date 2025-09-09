@@ -5,10 +5,11 @@
 //  Created by ninji on 12/06/2025.
 //
 
+import Router
 import SwiftUI
 
 /// Navigation destinations for the Settings feature.
-enum SettingsDestinations: RoutableDestinations {
+enum SettingsDestination: RoutableDestination {
 	var id: Self { self }
 
 	/// Navigate to edit an existing server's configuration
@@ -21,10 +22,10 @@ enum SettingsDestinations: RoutableDestinations {
 	case addNewServer(ServerType)
 }
 
-struct SettingsDestinationsModifier: ViewModifier {
+struct SettingsDestinationModifier: RoutableDestinationViewModifier {
 	func body(content: Content) -> some View {
 		content
-			.navigationDestination(for: SettingsDestinations.self) { destination in
+			.navigationDestination(for: SettingsDestination.self) { destination in
 				switch destination {
 				case .addAServer:
 					AddServerView()
@@ -38,7 +39,7 @@ struct SettingsDestinationsModifier: ViewModifier {
 				case .editServer(let server):
 					switch server.type {
 					case .deluge:
-						EditDelugeServerView<SettingsRouter>(server)
+						EditDelugeServerView(server)
 					case .qbittorrent:
 						//						EditQBittorrentServerView()
 						fatalError("Not yet implemented")
@@ -50,6 +51,6 @@ struct SettingsDestinationsModifier: ViewModifier {
 
 extension View {
 	func withSettingsDestinations() -> some View {
-		modifier(SettingsDestinationsModifier())
+		modifier(SettingsDestinationModifier())
 	}
 }

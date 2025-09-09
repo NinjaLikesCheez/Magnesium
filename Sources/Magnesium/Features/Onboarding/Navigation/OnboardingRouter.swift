@@ -4,7 +4,9 @@
 //
 //  Created by ninji on 13/06/2025.
 //
+
 import Observation
+import Router
 
 /// Router for the Onboarding feature flow.
 ///
@@ -12,11 +14,13 @@ import Observation
 /// configuration.
 @Observable
 final class OnboardingRouter: RouterProtocol {
-	typealias Destination = OnboardingDestinations
-	typealias Sheet = OnboardingSheets
+	typealias Destination = OnboardingDestination
+	typealias Sheet = OnboardingSheet
+	typealias Error = OnboardingError
 
-	var path: [OnboardingDestinations] = []
-	var presentedSheet: OnboardingSheets? = nil
+	var path: [Destination] = []
+	var presentedSheet: Sheet? = nil
+	var presentedError: Error? = nil
 	let parent: (any RouterProtocol)?
 
 	required init(_ parent: (any RouterProtocol)? = nil) {

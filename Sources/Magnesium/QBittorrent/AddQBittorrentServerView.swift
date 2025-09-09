@@ -5,6 +5,7 @@
 //  Created by ninji on 11/04/2025.
 //
 
+import Router
 import SwiftUI
 
 struct AddQBittorrentServerView<Router: RouterProtocol>: View {
@@ -66,6 +67,14 @@ struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 					case .unableToAuthenticate:
 						errorMessage = "Unable to authenticate. Please check the settings are correct."
 						showingError = true
+					case .request(message: let message):
+						errorMessage = "Request could not be completed: \(message)"
+					case .response(message: let message):
+						errorMessage = "Response was unexpected: \(message)"
+					case .keychain(message: let message):
+						errorMessage = "Keychain save failed: \(message)"
+					case .unknown(message: let message):
+						errorMessage = "Unknown error occurred: \(message)"
 					}
 				} catch let error as Session.Error {
 					switch error {

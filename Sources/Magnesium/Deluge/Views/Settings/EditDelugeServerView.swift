@@ -5,10 +5,11 @@
 //  Created by ninji on 16/04/2025.
 //
 
+import Router
 import SwiftUI
 
-struct EditDelugeServerView<Router: RouterProtocol>: View {
-	@Environment(Router.self) private var router
+struct EditDelugeServerView: View {
+	@Environment(SettingsRouter.self) private var router
 	@Environment(Session.self) private var session
 	@Environment(AppPreferences.self) private var preferences
 	@Environment(\.isPresented) private var isPresented
@@ -37,11 +38,7 @@ struct EditDelugeServerView<Router: RouterProtocol>: View {
 			basicAuthentication: $settings.basicAuthentication,
 			onSave: {
 				Task {
-					do {
-						try await save()
-					} catch {
-						print("Error saving settings: \(error)")
-					}
+					await save()
 				}
 			},
 			saveButtonEnabled: {
@@ -55,12 +52,11 @@ struct EditDelugeServerView<Router: RouterProtocol>: View {
 			},
 			additionalSections: {
 				Button("Delete", role: .destructive) {
-					do {
+					do throws(AppPreferences.Error) {
 						try preferences.remove(server: server)
 						router.pop()
 					} catch {
-						// TODO: Error handle
-						print("Failed to remove server: \(server)")
+						router.presentError(.preferences(error))
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -69,16 +65,25 @@ struct EditDelugeServerView<Router: RouterProtocol>: View {
 		.navigationTitle("Deluge Settings")
 	}
 
-	private func save() async throws {
-		// TODO: Error handle
-		let server = try await settings.makeServer()
-		try preferences.addOrUpdate(server: server)
-		try session.setServer(server)
+	private func save() async {
+		do {
+			let server = try await settings.makeServer()
+			try preferences.addOrUpdate(server: server)
+			try session.setServer(server)
 
-		if isPresented {
-			router.dismissSheet(withParent: true)
-		} else {
-			router.popToRoot()
+			if isPresented {
+				router.dismissSheet(withParent: true)
+			} else {
+				router.popToRoot()
+			}
+		} catch let error as ServerSettingsError {
+			router.presentError(.serverSettings(error))
+		} catch let error as AppPreferences.Error {
+			router.presentError(.preferences(error))
+		} catch let error as Session.Error {
+			router.presentError(.session(error))
+		} catch {
+			fatalError("Unhandled error: \(error)")
 		}
 	}
 }

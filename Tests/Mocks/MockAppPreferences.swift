@@ -132,7 +132,7 @@ class MockAppPreferences: ObservableObject, Preferences {
     }
     
     func simulateKeychainError() {
-        let error = MockKeychainError.readFailed
+        let error = KeychainError.system(OSStatus(1))
         getSelectedServerResult = .failure(error)
         getServersResult = .failure(error)
         addOrUpdateResult = .failure(error)

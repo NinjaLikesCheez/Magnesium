@@ -12,7 +12,7 @@ final class Session: SessionProtocol {
 
 	enum Error: Swift.Error {
 		case missingKeychainData(server: Server)
-		case decodingFailed(Swift.Error)
+		case decodingFailed(String)
 		case notImplemented
 	}
 
@@ -41,7 +41,7 @@ final class Session: SessionProtocol {
 				actionImplementation = try Session.actionImplementation(server: server)
 				self.server = server
 				preferences.selectedServerID = server.id
-			} catch{
+			} catch {
 				reset()
 				throw error
 			}
@@ -65,8 +65,10 @@ extension Session {
 				let keychain = try decoder.decode(DelugeKeychainData.self, from: keychainData)
 				let client = Current.deluge(settings.url, keychain.password, keychain.basicAuthentication)
 				return DelugeActionImplementation(session: .init(client: client))
+			} catch let error as DecodingError {
+				throw Error.decodingFailed(error.localizedDescription)
 			} catch {
-				throw Error.decodingFailed(error)
+				fatalError("Unhandled Error: \(error)")
 			}
 
 		// case .transmission:
@@ -90,6 +92,41 @@ extension Session {
 		// }
 		// let client = Current.qbittorrent(settings.url, settings.username, keychain.password, keychain.basicAuthentication)
 		// return .qbittorrent(.init(client: client))
+		}
+	}
+}
+
+extension Session.Error: VisualError {
+	var title: String {
+		switch self {
+		case .missingKeychainData:
+			"Keychain Data is Missing"
+		case .decodingFailed:
+			"Decoding Failed"
+		case .notImplemented:
+			"Not Implemented"
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case let .missingKeychainData(server):
+			"Keychain data is missing for server: \(server.name)"
+		case let .decodingFailed(error):
+			"Couldn't decode server settings: \(error)"
+		case .notImplemented:
+			"This feature is not implemented yet"
+		}
+	}
+
+	var systemName: String {
+		switch self {
+		case .missingKeychainData:
+			"lock.trianglebadge.exclamationmark.fill"
+		case .decodingFailed:
+			"gear.badge.xmark"
+		case .notImplemented:
+			"questionmark.diamond"
 		}
 	}
 }

@@ -10,23 +10,23 @@ struct ErrorHandlingTests {
 	@Test("SystemKeychainError provides appropriate error information")
 	func systemKeychainErrorProvidesAppropriateErrorInformation() {
 		// Test keychain error with status code
-		let keychainError = SystemKeychainError.keychain(errSecItemNotFound)
+		let keychainError = KeychainError.system(errSecItemNotFound)
 
 		switch keychainError {
-		case .keychain(let status):
+		case .system(let status):
 			#expect(status == errSecItemNotFound)
 		case .unknown:
 			Issue.record("Expected keychain error, got unknown")
 		}
 
 		// Test unknown error
-		let unknownError = SystemKeychainError.unknown
+		let unknownError = KeychainError.unknown
 
 		switch unknownError {
 		case .unknown:
 			// Expected
 			break
-		case .keychain:
+		case .system:
 			Issue.record("Expected unknown error, got keychain")
 		}
 	}
@@ -105,42 +105,19 @@ struct ErrorHandlingTests {
 		let mockClient = MockTorrentClientActing()
 
 		// Test refresh error
-		mockClient.refreshError = MockError.networkError
+		mockClient.refreshError = TorrentClientError.deluge(.response(.unconnected))
 
-		await #expect(throws: MockError.self) {
+		await #expect(throws: TorrentClientError.self) {
 			try await mockClient.refresh()
 		}
 
 		// Test action errors
-		mockClient.resumeResult = .failure(MockError.authenticationError)
+		mockClient.resumeResult = .failure(TorrentClientError.deluge(.response(.unauthenticated)))
 
 		let testTorrents = TestDataFactory.createMultipleTorrents(count: 1)
-		await #expect(throws: MockError.self) {
+		await #expect(throws: TorrentClientError.self) {
 			try await mockClient.resume(testTorrents)
 		}
-
-		// Test addLink error
-		mockClient.addLinkResult = .failure(DefaultAddLinkError(title: "Invalid Link", message: "The provided link is invalid"))
-
-		await #expect(throws: DefaultAddLinkError.self) {
-			try await mockClient.addLink("invalid-link")
-		}
-	}
-
-	@Test("MockError provides appropriate error types")
-	func mockErrorProvidesAppropriateErrorTypes() {
-		let networkError = MockError.networkError
-		let authError = MockError.authenticationError
-		let invalidDataError = MockError.invalidData
-		let timeoutError = MockError.timeout
-		let serverError = MockError.serverError(500)
-
-		// Verify all error types can be created and provide descriptions
-		#expect(networkError.errorDescription == "Network connection failed")
-		#expect(authError.errorDescription == "Authentication failed")
-		#expect(invalidDataError.errorDescription == "Invalid data received")
-		#expect(timeoutError.errorDescription == "Request timed out")
-		#expect(serverError.errorDescription == "Server error with code 500")
 	}
 
 	// MARK: - Data Validation Error Handling Tests
@@ -757,10 +734,10 @@ struct ErrorHandlingTests {
 
 		// Test error followed by success (retry scenario)
 		mockClient.reset()
-		mockClient.refreshError = MockError.networkError
+		mockClient.refreshError = TorrentClientError.deluge(.response(.unconnected))
 
 		// First call should fail
-		await #expect(throws: MockError.self) {
+		await #expect(throws: TorrentClientError.self) {
 			try await mockClient.refresh()
 		}
 

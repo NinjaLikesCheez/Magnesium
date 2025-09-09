@@ -10,6 +10,7 @@ import SwiftUI
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
 	@Environment(AppPreferences.self) private var preferences
+	@Environment(TorrentListRouter.self) private var router
 
 	@State var showAddTorrentConfirmation = false
 	@State var showingLinkInput = false
@@ -169,13 +170,16 @@ struct TorrentListStatusToolbar: ToolbarContent {
 					Task {
 						// TODO: Handle error
 						_ = url.startAccessingSecurityScopedResource()
-						try await torrentManager.addLink(url.path())
+						do throws(TorrentClientError) {
+							try await torrentManager.addLink(url.path())
+						} catch {
+							router.presentError(.clientError(error))
+						}
 						url.stopAccessingSecurityScopedResource()
 					}
 				}
 		case .failure(let error):
-			// TODO: handle error
-			print("file import error: \(error)")
+			router.presentError(.fileImportError(error.localizedDescription))
 		}
 	}
 }

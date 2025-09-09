@@ -18,6 +18,7 @@ struct OnboardingFlow: View {
 				.withOnboardingDestinations()
 				.withOnboardingSheets(router: $onboardingRouter, preferences: $preferences, session: $session)
 		}
+		.withOnboardingErrors(router: $onboardingRouter)
 		.environment(onboardingRouter)
 		.environment(preferences)
 		.environment(session)

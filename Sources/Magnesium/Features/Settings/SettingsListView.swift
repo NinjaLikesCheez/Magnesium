@@ -25,17 +25,25 @@ public struct SettingsListView: View {
 		}
 		.navigationTitle("Settings")
 		.toolbar {
-			ToolbarItem(placement: .topBarTrailing) {
-				Button("Done") {
-					router.dismissSheet(withParent: true)
+			#if os(macOS)
+				ToolbarItem(placement: .primaryAction) {
+					Button("Done") {
+						router.dismissSheet(withParent: true)
+					}
 				}
-			}
+			#else
+				ToolbarItem(placement: .topBarTrailing) {
+					Button("Done") {
+						router.dismissSheet(withParent: true)
+					}
+				}
+			#endif
 		}
 		.onAppear {
-			do {
-				servers = try Current.preferences.getServers()
+			do throws(AppPreferences.Error) {
+				servers = try preferences.getServers()
 			} catch {
-				print("Error getting servers: \(error)")
+				router.presentError(.preferences(error))
 			}
 		}
 	}
@@ -43,12 +51,12 @@ public struct SettingsListView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink(value: SettingsDestinations.editServer(server)) {
+				NavigationLink(value: SettingsDestination.editServer(server)) {
 					Text(server.name)
 				}
 			}
 
-			NavigationLink(value: SettingsDestinations.addAServer) {
+			NavigationLink(value: SettingsDestination.addAServer) {
 				Text("Add Server")
 			}
 		}
@@ -75,17 +83,20 @@ public struct SettingsListView: View {
 			// TODO: model settings in such a way that we can switch on them here and make adding a new setting UI typesafe
 
 			Toggle("Automatically detect magnet links", isOn: automaticallyLookForMagnetLinks)
-			Button {
-				Task {
-					// Create the URL that deep links to your app's custom settings.
-					if let url = URL(string: UIApplication.openSettingsURLString) {
-						// Ask the system to open that URL.
-						await UIApplication.shared.open(url)
+
+			#if !os(macOS)
+				Button {
+					Task {
+						// Create the URL that deep links to your app's custom settings.
+						if let url = URL(string: UIApplication.openSettingsURLString) {
+							// Ask the system to open that URL.
+							await UIApplication.shared.open(url)
+						}
 					}
+				} label: {
+					Text("Change system prompt behaviour")
 				}
-			} label: {
-				Text("Change system prompt behaviour")
-			}
+			#endif
 		}
 	}
 

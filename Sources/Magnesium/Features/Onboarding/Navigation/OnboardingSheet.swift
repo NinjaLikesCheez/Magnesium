@@ -1,3 +1,4 @@
+import Router
 //
 //  OnboardingSheets.swift
 //  Magnesium
@@ -7,14 +8,14 @@
 import SwiftUI
 
 /// Modal presentations for the Onboarding feature.
-enum OnboardingSheets: RoutableSheets {
+enum OnboardingSheet: RoutableSheet {
 	var id: Self { self }
 
 	/// Add a new server of a specific type
 	case addNewServer(ServerType)
 }
 
-struct OnboardingSheetsModifier: ViewModifier {
+struct OnboardingSheetModifier: RoutableSheetViewModifier {
 	@Binding var router: OnboardingRouter
 	@Binding var preferences: AppPreferences
 	@Binding var session: Session
@@ -43,6 +44,6 @@ extension View {
 		preferences: Binding<AppPreferences>,
 		session: Binding<Session>
 	) -> some View {
-		modifier(OnboardingSheetsModifier(router: router, preferences: preferences, session: session))
+		modifier(OnboardingSheetModifier(router: router, preferences: preferences, session: session))
 	}
 }

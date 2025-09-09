@@ -5,6 +5,7 @@
 //  Created by ninji on 11/04/2025.
 //
 
+import Router
 import SwiftUI
 
 struct AddDelugeServerView<Router: RouterProtocol>: View {
@@ -21,11 +22,7 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 			basicAuthentication: $settings.basicAuthentication,
 			onSave: {
 				Task {
-					do {
-						try await save()
-					} catch {
-						print("Error saving settings: \(error)")
-					}
+					await save()
 				}
 			},
 			saveButtonEnabled: {
@@ -44,15 +41,36 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 		.navigationTitle("Deluge Settings")
 	}
 
-	private func save() async throws {
-		// TODO: Error handle
-		let server = try await settings.makeServer()
-		try preferences.addOrUpdate(server: server)
+	private func save() async {
+		do throws(ServerSettingsError) {
+			let server = try await settings.makeServer()
 
-		if isPresented {
-			router.dismissSheet(withParent: true)
-		} else {
-			router.pop()
+			do {
+				try preferences.addOrUpdate(server: server)
+			} catch {
+				switch error {
+				case let .keychain(error):
+					switch error {
+					case let .system(status):
+						let error = NSError.init(domain: NSOSStatusErrorDomain, code: Int(status))
+						throw .keychain(message: "Keychain error: \(error.localizedDescription)")
+					case .unknown:
+						throw .keychain(message: "Couldn't save server settings to keychain")
+					}
+				}
+			}
+
+			if isPresented {
+				router.dismissSheet(withParent: true)
+			} else {
+				router.pop()
+			}
+		} catch {
+			if let router = router as? OnboardingRouter {
+				router.presentError(.addServerError(error))
+			} else if let router = router as? SettingsRouter {
+				router.presentError(.serverSettings(error))
+			}
 		}
 	}
 }

@@ -65,3 +65,13 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 		.disabled(!saveButtonEnabled())
 	}
 }
+
+enum ServerSettingsError: VisualError {
+	case invalidState(message: String)
+	case unableToAuthenticate
+	case request(message: String)
+	case response(message: String)
+	case keychain(message: String)
+	case unknown(message: String)
+}
+
