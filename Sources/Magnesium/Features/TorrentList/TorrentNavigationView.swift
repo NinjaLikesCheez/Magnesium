@@ -41,6 +41,7 @@ struct TorrentNavigationView: View {
 
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
+						editMode: $editMode,
 						selectedTorrents: selectedTorrents
 					)
 				} else {
