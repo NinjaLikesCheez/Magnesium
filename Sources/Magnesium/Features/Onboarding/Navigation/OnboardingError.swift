@@ -15,10 +15,8 @@ struct OnboardingErrorModifier: RoutableErrorViewModifier {
 			.panel(item: $router.presentedError) { error in
 				switch error {
 				case let .addServerError(error):
-					PanelCard(
-						title: error.title,
-						systemName: error.systemName,
-						subtitle: error.subtitle,
+					ErrorPanelCard(
+						error: error,
 						primaryButtonAction: router.dismissError
 					)
 				}

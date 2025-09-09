@@ -66,7 +66,6 @@ public struct TorrentListView: View {
 			do throws(TorrentClientError) {
 				try await torrentManager.refresh()
 			} catch {
-				print("Error refreshing torrents with the torrent manager: \(error)")
 				router.presentError(.clientError(error))
 			}
 		}

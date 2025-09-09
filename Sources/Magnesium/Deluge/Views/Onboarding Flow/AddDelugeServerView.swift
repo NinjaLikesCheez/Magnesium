@@ -22,7 +22,7 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 			basicAuthentication: $settings.basicAuthentication,
 			onSave: {
 				Task {
-						await save()
+					await save()
 				}
 			},
 			saveButtonEnabled: {
@@ -42,7 +42,6 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 	}
 
 	private func save() async {
-		// TODO: Error handle
 		do throws(ServerSettingsError) {
 			let server = try await settings.makeServer()
 
@@ -67,13 +66,10 @@ struct AddDelugeServerView<Router: RouterProtocol>: View {
 				router.pop()
 			}
 		} catch {
-			// TODO: This is _horrible_
-			if let router =  router as? OnboardingRouter {
+			if let router = router as? OnboardingRouter {
 				router.presentError(.addServerError(error))
 			} else if let router = router as? SettingsRouter {
-				fatalError("Not yet implemented")
-//				router.presentError(.addServerError(error))
-				// TODO: UPDATE ME PLEASE
+				router.presentError(.serverSettings(error))
 			}
 		}
 	}

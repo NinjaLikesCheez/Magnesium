@@ -41,9 +41,9 @@ public struct SettingsListView: View {
 		}
 		.onAppear {
 			do throws(AppPreferences.Error) {
-				servers = try Current.preferences.getServers()
+				servers = try preferences.getServers()
 			} catch {
-				router.presentedError = .preferences(error)
+				router.presentError(.preferences(error))
 			}
 		}
 	}

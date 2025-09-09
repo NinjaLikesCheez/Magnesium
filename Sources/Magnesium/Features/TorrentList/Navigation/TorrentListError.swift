@@ -5,6 +5,7 @@ enum TorrentListError: RoutableError {
 	var id: Self { self }
 
 	case clientError(TorrentClientError)
+	case fileImportError(String) // fileImport API throws any Error... so manually build it
 }
 
 struct TorrentListErrorModifier: RoutableErrorViewModifier {
@@ -15,10 +16,15 @@ struct TorrentListErrorModifier: RoutableErrorViewModifier {
 			.panel(item: $router.presentedError) { error in
 				switch error {
 				case let .clientError(error):
+					ErrorPanelCard(
+						error: error,
+						primaryButtonAction: router.dismissError
+					)
+				case let .fileImportError(message):
 					PanelCard(
-						title: error.title,
-						systemName: error.systemName,
-						subtitle: error.subtitle,
+						title: "File Import Error",
+						systemName: "square.and.arrow.down.badge.xmark",
+						subtitle: message,
 						primaryButtonAction: router.dismissError
 					)
 				}

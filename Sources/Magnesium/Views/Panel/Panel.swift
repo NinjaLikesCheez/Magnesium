@@ -212,7 +212,6 @@ fileprivate struct ViewHeightKey: PreferenceKey {
 	}
 }
 
-
 public extension View {
 	/// Presents a panel using the given item as a data source for the panel's content.
 	/// - Parameters:

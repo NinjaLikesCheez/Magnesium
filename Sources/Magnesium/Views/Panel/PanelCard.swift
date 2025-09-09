@@ -5,7 +5,6 @@
 //  Created by ninji on 09/07/2025.
 //
 
-
 /* Based on https://github.com/reddavis/Panel/ */
 
 // MIT License
@@ -19,6 +18,41 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import SwiftUI
+
+struct ErrorPanelCard: View {
+	let error: any VisualError
+
+	let primaryButtonTitle: String
+	let secondaryButtonTitle: String?
+
+	let primaryButtonAction: () -> Void
+	let secondaryButtonAction: (() -> Void)?
+
+	init(
+		error: any VisualError,
+		primaryButtonTitle: String = "Done",
+		primaryButtonAction: @escaping () -> Void,
+		secondaryButtonTitle: String? = nil,
+		secondaryButtonAction: (() -> Void)? = nil,
+	) {
+		self.error = error
+		self.primaryButtonTitle = primaryButtonTitle
+		self.primaryButtonAction = primaryButtonAction
+
+		self.secondaryButtonTitle = secondaryButtonTitle
+		self.secondaryButtonAction = secondaryButtonAction
+	}
+
+	var body: some View {
+		PanelCard(
+			title: error.title,
+			systemName: error.systemName,
+			subtitle: error.subtitle,
+			primaryButtonTitle: primaryButtonTitle,
+			primaryButtonAction: primaryButtonAction,
+		)
+	}
+}
 
 struct PanelCard: View {
 	let title: String

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
+	@Environment(TorrentListRouter.self) var router
 
 	@State private var isConfirmingDelete = false
 	let selectedTorrents: Set<StandardTorrent>
@@ -108,7 +109,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 
 	func perform(_ action: EditingToolbarAction) {
 		Task {
-			do {
+			do throws(TorrentClientError) {
 				switch action {
 				case .resume:
 					try await torrentManager.resume(Array(selectedTorrents))
@@ -117,11 +118,11 @@ struct TorrentListEditingToolbar: ToolbarContent {
 				case .delete(let removeData):
 					try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
 				case .more:
+					// TODO: implement this please
 					print("TODO")
 				}
 			} catch {
-				print("Error performing toolbar action: \(error.localizedDescription)")
-				//				self.error = error.localizedDescription
+				router.presentError(.clientError(error))
 			}
 		}
 	}

@@ -58,39 +58,39 @@ extension AppPreferences.Error {
 }
 
 extension ClientError: @retroactive Hashable where ResponseError: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .encoding(error):
-            hasher.combine(0)
-            hasher.combine(error.localizedDescription)
-        case let .decoding(error):
-            hasher.combine(1)
-            hasher.combine(error.localizedDescription)
-        case let .request(requestError):
-            hasher.combine(2)
-            hasher.combine(requestError)
-        case let .response(responseError):
-            hasher.combine(3)
-            hasher.combine(responseError)
-        }
-    }
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .encoding(error):
+			hasher.combine(0)
+			hasher.combine(error.localizedDescription)
+		case let .decoding(error):
+			hasher.combine(1)
+			hasher.combine(error.localizedDescription)
+		case let .request(requestError):
+			hasher.combine(2)
+			hasher.combine(requestError)
+		case let .response(responseError):
+			hasher.combine(3)
+			hasher.combine(responseError)
+		}
+	}
 }
 
 extension ClientError: @retroactive Equatable where ResponseError: Equatable {
-    public static func == (lhs: ClientError<ResponseError>, rhs: ClientError<ResponseError>) -> Bool {
-        switch (lhs, rhs) {
-        case let (.encoding(lhsError), .encoding(rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        case let (.decoding(lhsError), .decoding(rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        case let (.request(lhsRequest), .request(rhsRequest)):
-            return lhsRequest == rhsRequest
-        case let (.response(lhsResponse), .response(rhsResponse)):
-            return lhsResponse == rhsResponse
-        default:
-            return false
-        }
-    }
+	public static func == (lhs: ClientError<ResponseError>, rhs: ClientError<ResponseError>) -> Bool {
+		switch (lhs, rhs) {
+		case let (.encoding(lhsError), .encoding(rhsError)):
+			return lhsError.localizedDescription == rhsError.localizedDescription
+		case let (.decoding(lhsError), .decoding(rhsError)):
+			return lhsError.localizedDescription == rhsError.localizedDescription
+		case let (.request(lhsRequest), .request(rhsRequest)):
+			return lhsRequest == rhsRequest
+		case let (.response(lhsResponse), .response(rhsResponse)):
+			return lhsResponse == rhsResponse
+		default:
+			return false
+		}
+	}
 }
 
 extension Deluge.Error: VisualError {
@@ -135,22 +135,22 @@ extension Deluge.Error: VisualError {
 }
 
 extension Deluge.ResponseError: @retroactive Hashable {
-    public func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .message(message):
-            hasher.combine(0)
-            hasher.combine(message)
-        case .unauthenticated:
-            hasher.combine(1)
-        case .unconnected:
-            hasher.combine(2)
-        case .torrentAlreadyInSession:
-            hasher.combine(3)
-        case let .unknown(error):
-            hasher.combine(4)
-            hasher.combine(error.localizedDescription)
-        }
-    }
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .message(message):
+			hasher.combine(0)
+			hasher.combine(message)
+		case .unauthenticated:
+			hasher.combine(1)
+		case .unconnected:
+			hasher.combine(2)
+		case .torrentAlreadyInSession:
+			hasher.combine(3)
+		case let .unknown(error):
+			hasher.combine(4)
+			hasher.combine(error.localizedDescription)
+		}
+	}
 }
 extension Deluge.ResponseError: @retroactive Equatable {
 	public static func == (lhs: Deluge.ResponseError, rhs: Deluge.ResponseError) -> Bool {
@@ -183,7 +183,7 @@ extension Deluge.ResponseError: VisualError {
 			"Unknown Error"
 		}
 	}
-	
+
 	var systemName: String {
 		switch self {
 		case .message:
@@ -198,7 +198,7 @@ extension Deluge.ResponseError: VisualError {
 			"questionmark"
 		}
 	}
-	
+
 	var subtitle: String {
 		switch self {
 		case let .message(message):
@@ -378,9 +378,10 @@ extension ServerSettingsError {
 
 	var subtitle: String {
 		switch self {
-		case let .invalidState(message), let .request(message), let .response(message), let .keychain(message), let .unknown(message):
+		case let .invalidState(message), let .request(message), let .response(message), let .keychain(message),
+			let .unknown(message):
 			message
-		case let .unableToAuthenticate:
+		case .unableToAuthenticate:
 			"Please check your settings and try again"
 		}
 	}

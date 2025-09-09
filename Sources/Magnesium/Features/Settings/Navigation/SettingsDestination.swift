@@ -39,7 +39,7 @@ struct SettingsDestinationModifier: RoutableDestinationViewModifier {
 				case .editServer(let server):
 					switch server.type {
 					case .deluge:
-						EditDelugeServerView<SettingsRouter>(server)
+						EditDelugeServerView(server)
 					case .qbittorrent:
 						//						EditQBittorrentServerView()
 						fatalError("Not yet implemented")

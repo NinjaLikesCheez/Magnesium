@@ -57,7 +57,7 @@ enum Formatters {
 		ByteCountFormatStyle(
 			style: .binary,
 			allowedUnits: .all.subtracting(.bytes),
-			spellsOutZero: true,
+			spellsOutZero: false,
 			includesActualByteCount: false,
 			locale: Current.locale
 		)

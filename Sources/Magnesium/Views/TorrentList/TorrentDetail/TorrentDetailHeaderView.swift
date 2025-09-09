@@ -1,9 +1,9 @@
 import SwiftUI
 
-// TODO: this doesn't refresh automatically (i.e. if you pause)
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentManager.self) var torrentManager
-	@Environment(\.dismiss) private var dismiss
+	@Environment(TorrentListRouter.self) private var router
+
 	var torrent: StandardTorrent
 
 	@State private var showingRemoveConfirmation = false
@@ -46,11 +46,11 @@ struct TorrentDetailHeaderView: View {
 	var pauseResumeButton: some View {
 		Button {
 			Task {
-				do {
+				do throws(TorrentClientError) {
 					torrent.isActive
 						? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 				} catch {
-					print("Error pausing/resuming torrent: \(error)")
+					router.presentError(.clientError(error))
 				}
 			}
 		} label: {
@@ -76,22 +76,22 @@ struct TorrentDetailHeaderView: View {
 		) {
 			Button("Remove Torrent", role: .destructive) {
 				Task {
-					do {
+					do throws(TorrentClientError) {
 						try await torrentManager.delete([torrent], removeData: false)
-						dismiss()
+						router.pop()
 					} catch {
-						print("Error: Failed to remove torrent: \(error)")
+						router.presentError(.clientError(error))
 					}
 				}
 			}
 
 			Button("Remove Torrent and Data", role: .destructive) {
 				Task {
-					do {
+					do throws(TorrentClientError) {
 						try await torrentManager.delete([torrent], removeData: true)
-						dismiss()
+						router.pop()
 					} catch {
-						print("Error: Failed to remove torrent and data")
+						router.presentError(.clientError(error))
 					}
 				}
 			}
@@ -104,11 +104,11 @@ struct TorrentDetailHeaderView: View {
 	var copyFilePathButton: some View {
 		Button {
 			Task {
-				do {
+				do throws(TorrentClientError) {
 					let paths = try await torrentManager.paths(for: torrent)
 					UIPasteboard.general.string = torrent.downloadPath + "/" + paths[0]
 				} catch {
-					print("Error copying file path: \(error)")
+					router.presentError(.clientError(error))
 				}
 			}
 		} label: {
