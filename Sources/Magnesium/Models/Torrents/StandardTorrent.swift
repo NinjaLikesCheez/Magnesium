@@ -66,6 +66,11 @@ final class StandardTorrent {
 	}
 
 	func update(_ torrent: StandardTorrent) {
+		guard self.hash == torrent.hash else {
+			print("Warning: Attempting to update torrent with different hash. Current: \(self.hash), Other: \(torrent.hash)")
+			return
+		}
+		
 		self.dateAdded = torrent.dateAdded
 		self.downloaded = torrent.downloaded
 		self.downloadPath = torrent.downloadPath
