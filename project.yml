@@ -14,9 +14,9 @@ packages:
     # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     # branch: main
   ObservableDefaults:
-    path: ../../fatbobman/ObservableDefaults
-    # url: https://github.com/NinjaLikesCheez/ObservableDefaults
-    # branch: allow-optionals
+    # path: ../../fatbobman/ObservableDefaults
+    url: https://github.com/NinjaLikesCheez/ObservableDefaults
+    branch: allow-optionals
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
