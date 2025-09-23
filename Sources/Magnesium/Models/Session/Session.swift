@@ -1,4 +1,5 @@
 import Combine
+import Common
 import Foundation
 import Observation
 
@@ -20,8 +21,14 @@ final class Session: SessionProtocol {
 		self.preferences = preferences
 		try? _setServer(try? preferences.getSelectedServer())
 
-		withObservationTracking(of: preferences.selectedServerID) { _ in
-			try? self._setServer(try? preferences.getSelectedServer())
+		let selectedServerID = Observations {
+			preferences.selectedServerID
+		}
+
+		Task {
+			for await _ in selectedServerID {
+				try? self._setServer(try preferences.getSelectedServer())
+			}
 		}
 	}
 

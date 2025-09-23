@@ -3,9 +3,11 @@ import Foundation
 // import Keychain
 // import Preferences
 import QBittorrent
+import Common
 
 // import Transmission
 
+// TODO: remove all of this...
 struct AppEnvironment {
 	var deluge: (URL, String, BasicAuthentication?) -> Deluge
 	// var transmission: (URL, String?, String?) -> TransmissionClient

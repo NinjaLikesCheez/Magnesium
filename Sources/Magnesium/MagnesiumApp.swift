@@ -1,3 +1,4 @@
+import Common
 import Logging
 import SwiftUI
 
@@ -23,61 +24,51 @@ struct MagnesiumApp: App {
 		self._torrentManager = .init(initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
 	}
 
-	var body: some Scene {
-		WindowGroup {
-			TabView {
-				Tab {
+	 var body: some Scene {
+	 	WindowGroup {
+	 		Group {
+	 			switch appState {
+	 			case .unauthenticated:
+	 				OnboardingFlow(
+	 					onboardingRouter: .init(),
+	 					preferences: $preferences,
+	 					session: $session
+	 				)
+	 			case .authenticated:
+	 				TorrentsListFlow(
+	 					torrentListRouter: .init(),
+	 					torrentManager: $torrentManager,
+	 					preferences: $preferences,
+	 					session: $session
+	 				)
+	 			case .resuming:
+	 				ProgressView()
+	 					.containerRelativeFrame([.horizontal, .vertical])
+	 			case .error(let error):
+	 				ContentUnavailableView(
+	 					"Error: \(error.localizedDescription)",
+	 					image: "exclamationmark.triangle"
+	 				)
+	 			}
+	 		}
+	 		.task {
+	 			guard session.server != nil else {
+	 				appState = .unauthenticated
+	 				return
+	 			}
 
-				}
-			}
-		}
-	}
+	 			appState = .authenticated
+	 		}
+	 		.onChange(of: session.server) { _, newValue in
+	 			guard newValue != nil else {
+	 				appState = .unauthenticated
+	 				return
+	 			}
 
-	// var body: some Scene {
-	// 	WindowGroup {
-	// 		Group {
-	// 			switch appState {
-	// 			case .unauthenticated:
-	// 				OnboardingFlow(
-	// 					onboardingRouter: .init(),
-	// 					preferences: $preferences,
-	// 					session: $session
-	// 				)
-	// 			case .authenticated:
-	// 				TorrentsListFlow(
-	// 					torrentListRouter: .init(),
-	// 					torrentManager: $torrentManager,
-	// 					preferences: $preferences,
-	// 					session: $session
-	// 				)
-	// 			case .resuming:
-	// 				ProgressView()
-	// 					.containerRelativeFrame([.horizontal, .vertical])
-	// 			case .error(let error):
-	// 				ContentUnavailableView(
-	// 					"Error: \(error.localizedDescription)",
-	// 					image: "exclamationmark.triangle"
-	// 				)
-	// 			}
-	// 		}
-	// 		.task {
-	// 			guard session.server != nil else {
-	// 				appState = .unauthenticated
-	// 				return
-	// 			}
-
-	// 			appState = .authenticated
-	// 		}
-	// 		.onChange(of: session.server) { _, newValue in
-	// 			guard newValue != nil else {
-	// 				appState = .unauthenticated
-	// 				return
-	// 			}
-
-	// 			appState = .authenticated
-	// 		}
-	// 		.environment(preferences)
-	// 		.environment(session)
-	// 	}
+	 			appState = .authenticated
+	 		}
+	 		.environment(preferences)
+	 		.environment(session)
+	 	}
 	}
 }

@@ -1,6 +1,7 @@
 import Security
+import Common
 
-extension KeychainQuery {
+public extension KeychainQuery {
 	static var servers: Self {
 		.init(class: kSecClassGenericPassword as String, service: "servers")
 	}

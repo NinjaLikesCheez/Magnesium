@@ -1,7 +1,7 @@
 import Foundation
 
-struct Server: Equatable, Hashable {
-	var id: String { name }
+public struct Server: Equatable, Hashable {
+	public var id: String { name }
 	var name: String
 	var type: ServerType
 	var data: Data

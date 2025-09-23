@@ -5,6 +5,8 @@ configFiles:
   Debug: config/Debug.xcconfig
   Release: config/Release.xcconfig
 packages:
+  Common:
+    path: Sources/Common
   Deluge:
     # path: ../Deluge-Swift
     url: https://github.com/NinjaLikesCheez/Deluge-Swift
@@ -28,10 +30,10 @@ targets:
     type: application
     supportedDestinations: [iOS, tvOS, macOS, visionOS]
     deploymentTarget:
-      iOS: 18.4
-      tvOS: 18.4
-      macOS: 15.4
-      visionOS: 2.0
+      iOS: 26
+      tvOS: 26
+      macOS: 26
+      visionOS: 26
     sources:
       - Sources/Magnesium
     settings:
@@ -49,6 +51,7 @@ targets:
       Debug: config/Magnesium-Debug.xcconfig
       Release: config/Magnesium-Release.xcconfig
     dependencies:
+      - package: Common
       - package: Deluge
       - package: QBittorrent
       - package: Logging

@@ -1,5 +1,6 @@
 import Router
 import SwiftUI
+import Common
 
 enum SettingsError: RoutableError {
 	var id: Self { self }

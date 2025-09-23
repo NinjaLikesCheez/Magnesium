@@ -6,27 +6,28 @@
 //
 import Foundation
 import ObservableDefaults
+import Common
 
 // TODO: fork this or use @AppStorage or something to allow for a custom init
 @ObservableDefaults
-public final class AppPreferences: Preferences {
+final class AppPreferences: Preferences {
 	var autoRefreshInterval: TimeInterval = 2.0
 
 	// TODO: Create a fork of observable defaults that allows you to transform before storing or something - servers can have keychainData which should be stored in the keychain and not in defaults
-	var servers: [Server] = []
+	public var servers: [Server] = []
 
-	var selectedServerID: String? = nil
+	public var selectedServerID: String? = nil
 
-	var sortOption: SortOption = .init(property: .dateAdded)
+	public var sortOption: SortOption = .init(property: .dateAdded)
 
-	var filterOptions: FilterOptions = .init()
+	public var filterOptions: FilterOptions = .init()
 
-	var automaticallyLookForMagnetLinks: Bool = false
+	public var automaticallyLookForMagnetLinks: Bool = false
 
 	@Ignore
 	private var keychain: Keychain!
 
-	convenience init(
+	public convenience init(
 		userDefaults: UserDefaults? = nil,
 		ignoreExternalChanges: Bool? = nil,
 		prefix: String? = nil,
@@ -45,8 +46,50 @@ public final class AppPreferences: Preferences {
 }
 
 extension AppPreferences {
-	enum Error: VisualError {
+	public enum Error: VisualError {
 		case keychain(KeychainError)
+
+		var title: String {
+			switch self {
+			case let .keychain(error):
+				error.title
+			}
+		}
+
+		var systemName: String {
+			switch self {
+			case let .keychain(error):
+				error.systemName
+			}
+		}
+
+		var subtitle: String {
+			switch self {
+			case let .keychain(error):
+				error.subtitle
+			}
+		}
+	}
+}
+
+extension AppPreferences.Error: Equatable {
+	static func == (lhs: AppPreferences.Error, rhs: AppPreferences.Error) -> Bool {
+		switch (lhs, rhs) {
+		case let (.keychain(lhs), .keychain(rhs)):
+			// Prefer structural equality if available, otherwise fall back to a stable string description
+			return lhs == rhs
+		}
+	}
+}
+
+extension AppPreferences.Error: Hashable {
+	func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .keychain(error):
+			// Use a stable textual representation to hash when underlying type may not be Hashable
+			hasher.combine("keychain")
+			hasher.combine(String(describing: error))
+		}
 	}
 }
 
@@ -60,13 +103,13 @@ extension AppPreferences {
 		selectedServerID = server.id
 	}
 
-	func getSelectedServer() throws(Error) -> Server? {
+	public func getSelectedServer() throws(Error) -> Server? {
 		let servers = try getServers()
 		guard let selectedServerID = selectedServerID else { return servers.first }
 		return servers.first { $0.id == selectedServerID } ?? servers.first
 	}
 
-	func getServers() throws(Error) -> [Server] {
+	public func getServers() throws(Error) -> [Server] {
 		var servers = servers
 		for (index, server) in servers.enumerated() {
 			var server = server
@@ -81,7 +124,7 @@ extension AppPreferences {
 		return servers
 	}
 
-	func addOrUpdate(server: Server) throws(Error) {
+	public func addOrUpdate(server: Server) throws(Error) {
 		var servers = try getServers()
 
 		if let index = servers.firstIndex(where: { $0.id == server.id }) {
@@ -104,7 +147,7 @@ extension AppPreferences {
 		try updateSelectedServerID()
 	}
 
-	func remove(server: Server) throws(Error) {
+	public func remove(server: Server) throws(Error) {
 		var servers = try getServers()
 		servers.removeAll { $0.id == server.id }
 		do {
@@ -116,7 +159,7 @@ extension AppPreferences {
 		try updateSelectedServerID()
 	}
 
-	func removeServers() throws(Error) {
+	public func removeServers() throws(Error) {
 		do {
 			try keychain.removeData(for: .servers)
 		} catch {
@@ -126,7 +169,7 @@ extension AppPreferences {
 		selectedServerID = nil
 	}
 
-	func reset() {
+	public func reset() {
 		guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
 		_userDefaults.removePersistentDomain(forName: bundleIdentifier)
 

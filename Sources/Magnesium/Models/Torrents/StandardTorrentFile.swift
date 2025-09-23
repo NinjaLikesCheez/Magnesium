@@ -4,6 +4,7 @@
 //
 //  Created by ninji on 10/04/2025.
 //
+import Common
 
 struct StandardTorrentFile: Equatable, Hashable, Identifiable {
 	var id: Int { index }

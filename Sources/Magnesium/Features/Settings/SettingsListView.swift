@@ -1,4 +1,5 @@
 import SwiftUI
+import Common
 
 public struct SettingsListView: View {
 	@Environment(Session.self) private var session: Session

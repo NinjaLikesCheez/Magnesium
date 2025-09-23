@@ -1,4 +1,5 @@
 import SwiftUI
+import Common
 
 struct TorrentInformationItem: Identifiable {
 	var id: String { label }

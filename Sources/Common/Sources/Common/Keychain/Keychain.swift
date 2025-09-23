@@ -2,11 +2,38 @@ import Combine
 import Foundation
 
 /// Types of keychain errors.
-public enum KeychainError: VisualError {
+public enum KeychainError: VisualError, Equatable {
 	/// The system keychain returned an unexpected status.
 	case system(OSStatus)
 	/// An unknown error occurred.
 	case unknown
+}
+
+public extension KeychainError {
+	var title: String {
+		switch self {
+		case .system:
+			"Keychain Error"
+		case .unknown:
+			"Unknown Error"
+		}
+	}
+
+	var systemName: String {
+		switch self {
+		case .system, .unknown:
+			"key.slash"
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case let .system(status):
+			"\(NSError(domain: NSOSStatusErrorDomain, code: Int(status)).localizedDescription)"
+		case .unknown:
+			"Please try again later"
+		}
+	}
 }
 
 /// A type that is able to store data in the keychain.

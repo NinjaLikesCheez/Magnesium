@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-enum Idiom {
+public enum Idiom: Sendable{
 	case unspecified
 	case phone
 	case pad
@@ -17,7 +17,7 @@ enum Idiom {
 	case mac
 
 	#if !os(macOS)
-	init(_ idiom: UIUserInterfaceIdiom) {
+	public init(_ idiom: UIUserInterfaceIdiom) {
 		self = switch idiom {
 		case .unspecified: .unspecified
 		case .phone: .phone
@@ -33,7 +33,8 @@ enum Idiom {
 	#endif
 }
 
-private struct UserInterfaceIdiomEnvironmentKey: EnvironmentKey {
+@MainActor
+private struct UserInterfaceIdiomEnvironmentKey: @MainActor EnvironmentKey {
 	#if !os(macOS)
 	static let defaultValue: Idiom = .init(UIDevice.current.userInterfaceIdiom)
 	#elseif os(macOS)
@@ -43,7 +44,8 @@ private struct UserInterfaceIdiomEnvironmentKey: EnvironmentKey {
 	#endif
 }
 
-extension EnvironmentValues {
+@MainActor
+public extension EnvironmentValues {
 	var userInterfaceIdiom: Idiom {
 		get { self[UserInterfaceIdiomEnvironmentKey.self] }
 		set { self[UserInterfaceIdiomEnvironmentKey.self] = newValue }

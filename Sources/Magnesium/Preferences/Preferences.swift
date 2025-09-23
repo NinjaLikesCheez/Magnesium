@@ -1,5 +1,9 @@
 import Foundation
 
+/*
+* TODO: this needs to be refactored to have like a generic preferences container, and then each module
+* can provide additional preferences for their specific implementation details
+*/
 protocol Preferences: AnyObject {
 	var autoRefreshInterval: TimeInterval { get set }
 	var servers: [Server] { get set }

@@ -6,6 +6,7 @@
 //
 import Observation
 import SwiftUI
+import Common
 
 @MainActor
 @Observable
@@ -23,12 +24,13 @@ final class TorrentManager {
 	@ObservationIgnored
 	private let preferences: Preferences
 
-	private var updateTimer: Timer!
+	private var updateTimer: Timer
 
 	init(session: SessionProtocol, preferences: Preferences) {
 		self.session = session
 		self.preferences = preferences
 
+		self.updateTimer = Timer() // Needs to be initialized before the block is used..
 		self.updateTimer = Timer.scheduledTimer(
 			withTimeInterval: preferences.autoRefreshInterval, repeats: true,
 			block: { [weak self] _ in
@@ -36,15 +38,20 @@ final class TorrentManager {
 				Task { try await self.refresh() }
 			})
 
-		withObservationTracking(of: preferences.autoRefreshInterval) { interval in
-			// if we don't invalidate here, the timers will remain on the old interval (idk why)
-			self.updateTimer.invalidate()
-			self.updateTimer = Timer.scheduledTimer(
-				withTimeInterval: interval, repeats: true,
-				block: { [weak self] _ in
-					guard let self else { return }
-					Task { try await self.refresh() }
-				})
+		let timerValue = Observations {
+			preferences.autoRefreshInterval
+		}
+
+		Task {
+			for await value in timerValue {
+				self.updateTimer.invalidate()
+				self.updateTimer = Timer.scheduledTimer(
+					withTimeInterval: value, repeats: true,
+					block: { [weak self] _ in
+						guard let self else { return }
+						Task { try await self.refresh() }
+					})
+			}
 		}
 	}
 
