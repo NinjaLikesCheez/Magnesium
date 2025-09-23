@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 /// Types of keychain errors.
-public enum KeychainError: VisualError, Equatable {
+public enum KeychainError: VisualError, Equatable, Hashable {
 	/// The system keychain returned an unexpected status.
 	case system(OSStatus)
 	/// An unknown error occurred.
@@ -82,4 +82,3 @@ public extension Keychain {
 			.eraseToAnyPublisher()
 	}
 }
-

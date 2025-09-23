@@ -13,6 +13,7 @@ public extension View {
 	var backport: Backport<Self> { Backport(self) }
 }
 
+@MainActor
 public extension Backport where Content: View {
 	@ViewBuilder func glassButtonStyle() -> some View {
 		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
