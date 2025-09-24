@@ -5,14 +5,6 @@ typealias DelugeTorrentItem = TorrentItem
 
 struct DelugeSession {
 	let client: Deluge
-
-	func refresh() async throws(Deluge.Error) -> ([StandardTorrent], [StandardLabel]) {
-		let torrentsAndLabels = try await client.request(.updateUIForApp)
-		let torrents = torrentsAndLabels.torrents.compactMap(StandardTorrent.init)
-		let labels = torrentsAndLabels.labels.map(StandardLabel.init)
-
-		return (torrents, labels)
-	}
 }
 
 extension DelugeTorrentFile {
@@ -45,7 +37,7 @@ extension Priority {
 }
 
 extension DelugeRequest {
-	fileprivate static var updateUIForApp: DelugeRequest<TorrentsAndLabels> {
+	static var updateUIForApp: DelugeRequest<TorrentsAndLabels> {
 		let properties: [Torrent.PropertyKeys] = [
 			.dateAdded,
 			.downloaded,

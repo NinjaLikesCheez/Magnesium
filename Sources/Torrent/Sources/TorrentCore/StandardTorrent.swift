@@ -2,6 +2,7 @@ import Common
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 public final class StandardTorrent {
 	public let id: String
@@ -146,7 +147,7 @@ extension StandardTorrent {
 	}
 }
 
-extension StandardTorrent: Hashable, Equatable, Identifiable {
+extension StandardTorrent: @MainActor Hashable, @MainActor Equatable, Identifiable {
 	public static func == (lhs: StandardTorrent, rhs: StandardTorrent) -> Bool {
 		lhs.hash == rhs.hash
 	}

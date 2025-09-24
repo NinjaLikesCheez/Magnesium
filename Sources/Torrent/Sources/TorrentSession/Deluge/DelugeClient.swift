@@ -12,7 +12,14 @@ final class DelugeClient: TorrentClient {
 
 	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel]) {
 		do {
-			return try await session.refresh()
+			let torrentsAndLabels = try await client.request(.updateUIForApp)
+
+			return await MainActor.run {
+				let torrents = torrentsAndLabels.torrents.compactMap(StandardTorrent.init)
+				let labels = torrentsAndLabels.labels.map(StandardLabel.init)
+
+				return (torrents, labels)
+			}
 		} catch {
 			throw .deluge(error)
 		}

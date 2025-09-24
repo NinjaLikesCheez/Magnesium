@@ -9,23 +9,25 @@ let package = Package(
 	products: [
 		// Products define the executables and libraries a package produces, making them visible to other packages.
 		.library(
-			name: "TorrentUI",
-			targets: ["TorrentUI"]
+			name: "Torrent",
+			targets: ["Torrent"]
 		)
 	],
 	dependencies: [
 		.package(path: "../Common"),
 		.package(url: "https://github.com/NinjaLikesCheez/Deluge-Swift", from: "1.2.0"),
 		.package(url: "https://github.com/NinjaLikesCheez/qBittorrent-Swift", from: "0.0.2"),
-		// .package(url: "https://github.com/fatbobman/ObservableDefaults", from: "1.6.0"),
-		.package(url: "https://github.com/NinjaLikesCheez/ObservableDefaults", branch: "codable"),
+		.package(url: "https://github.com/fatbobman/ObservableDefaults", from: "1.7.0"),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
 		// Targets can depend on other targets in this package and products from dependencies.
 		.target(
-			name: "TorrentUI",
-			dependencies: ["TorrentManager"]
+			name: "Torrent",
+			dependencies: [
+				"TorrentManager",
+				"TorrentSession",
+			]
 		),
 		.target(
 			name: "TorrentManager",
@@ -62,7 +64,7 @@ let package = Package(
 		),
 		.testTarget(
 			name: "TorrentTests",
-			dependencies: ["TorrentUI"]
+			dependencies: ["Torrent"]
 		),
 	]
 )

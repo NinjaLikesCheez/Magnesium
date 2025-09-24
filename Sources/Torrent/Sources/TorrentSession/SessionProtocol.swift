@@ -2,6 +2,7 @@ import Foundation
 import TorrentPreferences
 
 /// Protocol defining the interface for session management
+@MainActor
 public protocol SessionProtocol: AnyObject {
 	/// initialize a session
 	init(_ preferences: TorrentPreferences)

@@ -5,6 +5,8 @@ configFiles:
   Debug: config/Debug.xcconfig
   Release: config/Release.xcconfig
 packages:
+  Torrent:
+    path: Sources/Torrent
   Common:
     path: Sources/Common
   Deluge:
@@ -17,8 +19,8 @@ packages:
     # branch: main
   ObservableDefaults:
     # path: ../../fatbobman/ObservableDefaults
-    url: https://github.com/NinjaLikesCheez/ObservableDefaults
-    branch: allow-optionals
+    url: https://github.com/fatbobman/ObservableDefaults
+    from: 1.7.0
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
@@ -52,6 +54,7 @@ targets:
       Release: config/Magnesium-Release.xcconfig
     dependencies:
       - package: Common
+      - package: Torrent
       - package: Deluge
       - package: QBittorrent
       - package: Logging

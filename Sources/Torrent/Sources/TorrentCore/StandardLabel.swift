@@ -1,7 +1,7 @@
-public struct StandardLabel: Equatable, Identifiable {
+public struct StandardLabel: Sendable, Equatable, Identifiable {
 	public var id: String { name }
-	public var name: String
-	public var count: Int?
+	public let name: String
+	public let count: Int?
 
 	public init(name: String, count: Int?) {
 		self.name = name

@@ -7,7 +7,7 @@
 import Deluge
 import Common
 
-extension Deluge.Error: VisualError {
+extension Deluge.Error: @retroactive VisualError {
 	public var title: String {
 		switch self {
 		case .encoding(_):
@@ -82,7 +82,7 @@ extension Deluge.ResponseError: @retroactive Equatable {
 		}
 	}
 }
-extension Deluge.ResponseError: VisualError {
+extension Deluge.ResponseError: @retroactive VisualError {
 	public var title: String {
 		switch self {
 		case .message:
@@ -129,7 +129,7 @@ extension Deluge.ResponseError: VisualError {
 	}
 }
 
-extension RequestError: VisualError {
+extension RequestError: @retroactive VisualError {
 	public var title: String {
 		switch self {
 		case .urlError:

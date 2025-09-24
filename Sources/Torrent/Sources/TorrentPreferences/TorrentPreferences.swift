@@ -10,6 +10,7 @@ import ObservableDefaults
 
 // TODO: fork this or use @AppStorage or something to allow for a custom init
 @ObservableDefaults
+@MainActor
 public final class TorrentPreferences: Preferences {
 	public var autoRefreshInterval: TimeInterval = 2.0
 

@@ -22,15 +22,15 @@ public final class Session: SessionProtocol {
 		try? _setServer(try? preferences.getSelectedServer())
 
 		// TODO: fix this... sendable nonsense
-		// let selectedServerID = Observations {
-		// 	preferences.selectedServerID
-		// }
+		let selectedServerID = Observations {
+			preferences.selectedServerID
+		}
 
-		// Task {
-		// 	for await _ in selectedServerID {
-		// 		try? self._setServer(try preferences.getSelectedServer())
-		// 	}
-		// }
+		Task {
+			for await _ in selectedServerID {
+				try? self._setServer(try preferences.getSelectedServer())
+			}
+		}
 	}
 
 	public func setServer(_ server: TorrentServer) throws(Error) {

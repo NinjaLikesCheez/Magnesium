@@ -1,0 +1,152 @@
+//
+//  TorrentManager.swift
+//  Magnesium
+//
+//  Created by ninji on 11/06/2025.
+//
+import Common
+import Observation
+import SwiftUI
+
+@MainActor
+@Observable
+public final class TorrentManager {
+	public typealias Hash = String
+
+	private(set) var torrents: [Hash: StandardTorrent] = [:]
+	private(set) var labels: [StandardLabel] = []
+
+	public var searchQuery: String = ""
+
+	@ObservationIgnored
+	private let session: SessionProtocol
+
+	@ObservationIgnored
+	private let preferences: TorrentPreferences
+
+	private var updateTimer: Timer
+
+	public init(session: SessionProtocol, preferences: TorrentPreferences) {
+		self.session = session
+		self.preferences = preferences
+
+		self.updateTimer = Timer()  // Needs to be initialized before the block is used..
+		self.updateTimer = Timer.scheduledTimer(
+			withTimeInterval: preferences.autoRefreshInterval, repeats: true,
+			block: { _ in
+				Task { try await self.refresh() }
+			})
+
+		let timerValue = Observations {
+			preferences.autoRefreshInterval
+		}
+
+		Task {
+			for await value in timerValue {
+				self.updateTimer.invalidate()
+				self.updateTimer = Timer.scheduledTimer(
+					withTimeInterval: value, repeats: true,
+					block: { _ in
+						Task { try await self.refresh() }
+					})
+			}
+		}
+	}
+
+	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+		try await session.client.resume(torrents)
+		try await refresh()
+	}
+
+	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+		try await session.client.pause(torrents)
+		try await refresh()
+	}
+
+	func delete(_ torrents: [StandardTorrent], removeData: Bool) async throws(TorrentClientError) {
+		try await session.client.remove(torrents, removeData)
+		try await refresh()
+	}
+
+	func addLink(_ link: String) async throws(TorrentClientError) {
+		try await session.client.addLink(link)
+		try await refresh()
+	}
+
+	func paths(for torrent: StandardTorrent) async throws(TorrentClientError) -> [String] {
+		try await session.client.paths(torrent)
+	}
+
+	func refreshFiles(for torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] {
+		try await session.client.refreshFiles(torrent)
+	}
+
+	func refresh() async throws(TorrentClientError) {
+		let (torrents, labels) = try await session.client.refresh()
+
+		// We have to do 'delta' style updates so the view bindings work properly.
+		// First, calculate the changes in torrents
+
+		await MainActor.run {
+			var torrentsCopy = self.torrents
+			let updatedTorrents = torrents.reduce(into: [String: StandardTorrent](), { $0[$1.hash] = $1 })
+			let hashDifference = updatedTorrents.map(\.key).difference(from: torrentsCopy.map(\.key)).inferringMoves()
+
+			for change in hashDifference.removals {
+				switch change {
+				case .remove(offset: _, element: let hash, associatedWith: let associatedWith):
+					if associatedWith == nil {
+						torrentsCopy.removeValue(forKey: hash)
+					}
+				default:
+					continue
+				}
+			}
+
+			for (hash, element) in updatedTorrents {
+				if let torrent = torrentsCopy[hash] {
+					torrent.update(element)
+				}
+			}
+
+			for change in hashDifference.insertions {
+				switch change {
+				case .insert(offset: _, element: let hash, associatedWith: let associatedWith):
+					if associatedWith == nil {
+						torrentsCopy[hash] = updatedTorrents[hash]
+					}
+				default:
+					continue
+				}
+			}
+
+			self.torrents = torrentsCopy
+			self.labels = labels.sorted(by: { $0.name < $1.name })
+		}
+	}
+}
+
+extension TorrentManager {
+	public var filteredTorrents: [StandardTorrent] {
+		TorrentMapper.map(
+			torrents.map(\.value),
+			query: searchQuery,
+			sortOption: preferences.sortOption,
+			filterOptions: preferences.filterOptions
+		)
+	}
+
+	public var totalUploadSpeed: String {
+		torrents
+			.values
+			.reduce(into: 0) { $0 += $1.uploadRate }
+			.formatted(Formatters.bytes)
+	}
+
+	public var totalDownloadSpeed: String {
+		torrents
+			.values
+			.reduce(into: 0) { $0 += $1.downloadRate }
+			.formatted(Formatters.bytes)
+	}
+}

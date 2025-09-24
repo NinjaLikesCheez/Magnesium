@@ -2,7 +2,8 @@ import Common
 import Deluge
 import QBittorrent
 
-public protocol TorrentClient: AnyObject {
+@MainActor
+public protocol TorrentClient: AnyObject, Sendable {
 	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel])
 	func refreshFiles(_ torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile]
 	func addLink(_ url: String) async throws(TorrentClientError)

@@ -1,5 +1,5 @@
 {
-  "originHash" : "1537272c7fd8a30c72ab6b97d6b75c875446b893b6958cfaefdee459ad916be3",
+  "originHash" : "a05612acb88432f9fab503ef7814a7d33873dc4e22e5a0fee5c35afcc7136ddc",
   "pins" : [
     {
       "identity" : "deluge-swift",
@@ -13,10 +13,10 @@
     {
       "identity" : "observabledefaults",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/NinjaLikesCheez/ObservableDefaults",
+      "location" : "https://github.com/fatbobman/ObservableDefaults",
       "state" : {
-        "branch" : "codable",
-        "revision" : "426f826c904eea2f60b08ca18967a4c1b59ce235"
+        "revision" : "10e05251945124bb7e5048f6908cff8e6bf8e76f",
+        "version" : "1.7.0"
       }
     },
     {
