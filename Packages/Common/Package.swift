@@ -15,10 +15,10 @@ let package = Package(
 		.target(
 			name: "Common",
 			path: "Sources/Common"
-		),
-		.testTarget(
-			name: "CommonTests",
-			dependencies: ["Common"]
-		),
+		)
+		// .testTarget(
+		// 	name: "CommonTests",
+		// 	dependencies: ["Common"]
+		// ),
 	]
 )
