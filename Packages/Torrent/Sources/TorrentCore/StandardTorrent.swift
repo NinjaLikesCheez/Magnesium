@@ -126,19 +126,19 @@ extension StandardTorrent {
 		return "\(downloaded) / \(size) (\(progress))"
 	}
 
-	var formattedETA: String {
+	public var formattedETA: String {
 		eta > 0
 			? Duration.seconds(eta).formatted(Formatters.eta)
 			: "∞"
 	}
 
-	func formattedRatio(precision: Int = 1) -> String {
+	public func formattedRatio(precision: Int = 1) -> String {
 		guard !ratio.isInfinite, !ratio.isNaN else { return "∞" }
 
 		return ratio.formatted(Formatters.float(precision: precision))
 	}
 
-	var localizedRatioOrETA: String {
+	public var localizedRatioOrETA: String {
 		if state == .downloading {
 			return formattedETA
 		} else {

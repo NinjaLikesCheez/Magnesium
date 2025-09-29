@@ -1,12 +1,13 @@
 import SwiftUI
 import Common
+import Torrent
 
 public struct SettingsListView: View {
 	@Environment(Session.self) private var session: Session
-	@Environment(AppPreferences.self) private var preferences: AppPreferences
+	@Environment(TorrentPreferences.self) private var preferences: TorrentPreferences
 	@Environment(SettingsRouter.self) var router
 
-	@State private var servers: [Server] = []
+	@State private var servers: [TorrentServer] = []
 
 	@State private var selectedRefreshInterval: TimeInterval = Current.preferences.autoRefreshInterval
 
@@ -41,7 +42,7 @@ public struct SettingsListView: View {
 			#endif
 		}
 		.onAppear {
-			do throws(AppPreferences.Error) {
+			do throws(TorrentPreferences.Error) {
 				servers = try preferences.getServers()
 			} catch {
 				router.presentError(.preferences(error))
@@ -116,5 +117,5 @@ public struct SettingsListView: View {
 
 #Preview {
 	SettingsFlow(settingsRouter: .init())
-		.environment(Session(AppPreferences(keychain: InMemoryKeychain())))
+		.environment(Session(TorrentPreferences(keychain: InMemoryKeychain())))
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Torrent
 
 struct TorrentTrackerSection: View {
 	var torrent: StandardTorrent

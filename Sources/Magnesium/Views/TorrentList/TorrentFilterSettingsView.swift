@@ -1,5 +1,7 @@
 import SwiftUI
+import Torrent
 
+// TODO: rename this (or get rid)
 enum TorrentSortOption: String, CaseIterable {
 	case dateAdded = "Date Added"
 	case name = "Name"
@@ -25,7 +27,7 @@ enum TorrentSortOption: String, CaseIterable {
 struct TorrentFilterMenu: View {
 	var labels: [StandardLabel]
 
-	@State private var selectedStates: Set<TorrentState> = []
+	@State private var selectedStates: Set<StandardTorrentState> = []
 	@State private var selectedLabels: Set<String> = []
 
 	init(labels: [StandardLabel]) {
@@ -70,7 +72,7 @@ struct TorrentFilterMenu: View {
 		@Bindable var preferences = Current.preferences
 
 		return Menu("State") {
-			ForEach(TorrentState.allCases) { state in
+			ForEach(StandardTorrentState.allCases) { state in
 				Button {
 					if selectedStates.contains(state) {
 						selectedStates.remove(state)
@@ -149,14 +151,14 @@ struct TorrentFilterMenu: View {
 
 		return Menu("View Options") {
 			Picker("Sort", selection: $preferences.sortOption.property) {
-				ForEach(SortOption.Property.allCases, id: \.self) { option in
+				ForEach(Torrent.TorrentSortOption.Property.allCases, id: \.self) { option in
 					Text(option.rawValue)
 				}
 			}
 			.pickerStyle(.menu)
 
 			Picker("Direction", selection: $preferences.sortOption.direction) {
-				ForEach(SortOption.Direction.allCases, id: \.self) { option in
+				ForEach(Torrent.TorrentSortOption.Direction.allCases, id: \.self) { option in
 					Text(option.rawValue)
 				}
 			}

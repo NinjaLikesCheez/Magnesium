@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Torrent
 
 struct TorrentsListFlow: View {
 	@State var torrentListRouter: TorrentListRouter
 
 	@Binding var torrentManager: TorrentManager
-	@Binding var preferences: AppPreferences
+	@Binding var preferences: TorrentPreferences
 	@Binding var session: Session
 
 	var body: some View {

@@ -7,10 +7,11 @@
 
 import Router
 import SwiftUI
+import Torrent
 
 struct AddDelugeServerView<Router: RouterProtocol>: View {
 	@Environment(Router.self) var router
-	@Environment(AppPreferences.self) private var preferences
+	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(\.isPresented) private var isPresented
 
 	@State private var settings: DelugeSettings = .init()

@@ -1,13 +1,14 @@
 import Common
 import Logging
 import SwiftUI
+import Torrent
 
 @main
 struct MagnesiumApp: App {
 	@State private var appState = AppState.resuming
 
 	@State var session: Session
-	@State var preferences: AppPreferences
+	@State var preferences: TorrentPreferences
 	@State var torrentManager: TorrentManager
 
 	init() {
@@ -19,7 +20,7 @@ struct MagnesiumApp: App {
 			return logger
 		}
 
-		self._preferences = .init(initialValue: AppPreferences(userDefaults: .standard, keychain: SystemKeychain()))
+		self._preferences = .init(initialValue: TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain()))
 		self._session = .init(initialValue: Session(_preferences.wrappedValue))
 		self._torrentManager = .init(initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
 	}

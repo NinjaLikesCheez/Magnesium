@@ -4,15 +4,17 @@ import Foundation
 // import Preferences
 import QBittorrent
 import Common
+import Torrent
 
 // import Transmission
 
 // TODO: remove all of this...
+@MainActor
 struct AppEnvironment {
 	var deluge: (URL, String, BasicAuthentication?) -> Deluge
 	// var transmission: (URL, String?, String?) -> TransmissionClient
 	var qbittorrent: (URL, String, String, BasicAuthentication?) -> QBittorrent
-	var preferences: AppPreferences
+	var preferences: TorrentPreferences
 	var keychain: Keychain
 	var locale: Locale
 	var calendar: Calendar
@@ -25,7 +27,7 @@ extension AppEnvironment {
 		deluge: Deluge.init,
 		// transmission: Transmission.init,
 		qbittorrent: QBittorrent.init,
-		preferences: AppPreferences(userDefaults: .standard),
+		preferences: TorrentPreferences(userDefaults: .standard),
 		keychain: SystemKeychain(),
 		locale: .autoupdatingCurrent,
 		calendar: .autoupdatingCurrent

@@ -1,4 +1,5 @@
 import SwiftUI
+import Torrent
 
 struct OnboardingView: View {
 	@Environment(OnboardingRouter.self) var router
@@ -39,7 +40,7 @@ struct OnboardingView: View {
 	var addClientsButton: some View {
 		GeometryReader { reader in
 			VStack {
-				ForEach(ServerType.allCases) { type in
+				ForEach(TorrentServerType.allCases) { type in
 					Button {
 						if horizontalSizeClass == .compact {
 							router.push(.addNewServer(type))

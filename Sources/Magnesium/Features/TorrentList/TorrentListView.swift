@@ -1,4 +1,5 @@
 import SwiftUI
+import Torrent
 
 public struct TorrentListView: View {
 	@Environment(Session.self) private var session: Session

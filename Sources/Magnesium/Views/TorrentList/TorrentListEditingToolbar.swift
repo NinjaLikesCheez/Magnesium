@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Torrent
+import Torrent
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
@@ -62,7 +64,9 @@ struct TorrentListEditingToolbar: ToolbarContent {
 
 	var playButton: some View {
 		Button {
-			perform(.resume)
+			Task {
+				try await perform(.resume)
+			}
 		} label: {
 			Image(systemName: "play")
 		}
@@ -70,7 +74,9 @@ struct TorrentListEditingToolbar: ToolbarContent {
 
 	var pauseButton: some View {
 		Button {
-			perform(.pause)
+			Task {
+				try await perform(.pause)
+			}
 		} label: {
 			Image(systemName: "pause")
 		}
@@ -84,11 +90,15 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		}
 		.confirmationDialog("Remove", isPresented: $isConfirmingDelete) {
 			Button("Keep Data") {
-				perform(.delete(removeData: false))
+				Task {
+					try await perform(.delete(removeData: false))
+				}
 			}
 
 			Button("Remove Data", role: .destructive) {
-				perform(.delete(removeData: true))
+				Task {
+					try await perform(.delete(removeData: true))
+				}
 			}
 		}
 	}
@@ -96,7 +106,9 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	var moreButton: some View {
 		Button {
 			// TODO: this
-			perform(.more)
+			Task {
+				try await perform(.more)
+			}
 		} label: {
 			Image(systemName: "ellipsis")
 		}
@@ -109,24 +121,22 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		case more
 	}
 
-	func perform(_ action: EditingToolbarAction) {
-		Task {
-			do throws(TorrentClientError) {
-				switch action {
-				case .resume:
-					try await torrentManager.resume(Array(selectedTorrents))
-				case .pause:
-					try await torrentManager.pause(Array(selectedTorrents))
-				case .delete(let removeData):
-					try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
-					editMode = .inactive
-				case .more:
-					// TODO: implement this please
-					print("TODO")
-				}
-			} catch {
-				router.presentError(.clientError(error))
+	func perform(_ action: EditingToolbarAction) async throws {
+		do throws(TorrentClientError) {
+			switch action {
+			case .resume:
+				try await torrentManager.resume(Array(selectedTorrents))
+			case .pause:
+				try await torrentManager.pause(Array(selectedTorrents))
+			case .delete(let removeData):
+				try await torrentManager.delete(Array(selectedTorrents), removeData: removeData)
+				editMode = .inactive
+			case .more:
+				// TODO: implement this please
+				print("TODO")
 			}
+		} catch {
+			router.presentError(.clientError(error))
 		}
 	}
 }

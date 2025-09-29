@@ -1,4 +1,3 @@
-import Router
 //
 //  TorrentListSheets.swift
 //  Magnesium
@@ -6,6 +5,8 @@ import Router
 //  Created by ninji on 25/06/2025.
 //
 import SwiftUI
+import Router
+import Torrent
 
 /// Modal presentations for the TorrentList feature.
 enum TorrentListSheet: RoutableSheet {
@@ -17,7 +18,7 @@ enum TorrentListSheet: RoutableSheet {
 
 struct TorrentListSheetViewModifier: ViewModifier {
 	@Binding var router: TorrentListRouter
-	@Binding var preferences: AppPreferences
+	@Binding var preferences: TorrentPreferences
 	@Binding var session: Session
 
 	func body(content: Content) -> some View {
@@ -34,7 +35,7 @@ struct TorrentListSheetViewModifier: ViewModifier {
 extension View {
 	func withTorrentListSheets(
 		router: Binding<TorrentListRouter>,
-		preferences: Binding<AppPreferences>,
+		preferences: Binding<TorrentPreferences>,
 		session: Binding<Session>
 	) -> some View {
 		modifier(

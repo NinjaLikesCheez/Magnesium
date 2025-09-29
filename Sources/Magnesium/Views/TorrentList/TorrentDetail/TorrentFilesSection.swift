@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Common
+import Torrent
 
 struct TorrentFilesSection: View {
 	@Environment(TorrentManager.self) var manager

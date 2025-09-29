@@ -6,48 +6,9 @@
 //
 import Deluge
 import Common
+import Torrent
 
-extension Deluge.Error: @retroactive VisualError {
-	public var title: String {
-		switch self {
-		case .encoding(_):
-			"Failed to Encode"
-		case .decoding(_):
-			"Failed to Decode"
-		case let .request(error):
-			error.title
-		case let .response(error):
-			error.title
-		}
-	}
-
-	public var systemName: String {
-		switch self {
-		case .encoding:
-			"gear.badge.xmark"
-		case .decoding(_):
-			"gear.badge.xmark"
-		case .request(_):
-			"network.slash"
-		case .response(_):
-			"network.slash"
-		}
-	}
-
-	public var subtitle: String {
-		switch self {
-		case let .encoding(error):
-			error.localizedDescription
-		case let .decoding(error):
-			error.localizedDescription
-		case let .request(error):
-			error.subtitle
-		case let .response(error):
-			error.subtitle
-		}
-	}
-}
-
+// MARK: - Deluge errors
 extension Deluge.ResponseError: @retroactive Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {
@@ -129,6 +90,7 @@ extension Deluge.ResponseError: @retroactive VisualError {
 	}
 }
 
+// MARK: - Request errors
 extension RequestError: @retroactive VisualError {
 	public var title: String {
 		switch self {
@@ -162,6 +124,7 @@ extension RequestError: @retroactive VisualError {
 	}
 }
 
+// TODO: Move into API Client
 extension RequestError: @retroactive Equatable {
 	public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
 		switch (lhs, rhs) {
@@ -175,6 +138,7 @@ extension RequestError: @retroactive Equatable {
 	}
 }
 
+// TODO: Move into API Client
 extension RequestError: @retroactive Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {

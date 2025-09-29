@@ -7,18 +7,19 @@
 
 import Router
 import SwiftUI
+import Torrent
 
 struct EditDelugeServerView: View {
 	@Environment(SettingsRouter.self) private var router
 	@Environment(Session.self) private var session
-	@Environment(AppPreferences.self) private var preferences
+	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(\.isPresented) private var isPresented
 
 	@State private var settings: DelugeSettings
 
-	private let server: Server
+	private let server: TorrentServer
 
-	init(_ server: Server) {
+	init(_ server: TorrentServer) {
 		self.server = server
 		let serverSettings = try! JSONDecoder().decode(DelugeServerSettings.self, from: server.data)
 		let keychain = try! JSONDecoder().decode(DelugeKeychainData.self, from: server.keychainData!)
@@ -52,7 +53,7 @@ struct EditDelugeServerView: View {
 			},
 			additionalSections: {
 				Button("Delete", role: .destructive) {
-					do throws(AppPreferences.Error) {
+					do throws(TorrentPreferences.Error) {
 						try preferences.remove(server: server)
 						router.pop()
 					} catch {
@@ -78,7 +79,7 @@ struct EditDelugeServerView: View {
 			}
 		} catch let error as ServerSettingsError {
 			router.presentError(.serverSettings(error))
-		} catch let error as AppPreferences.Error {
+		} catch let error as TorrentPreferences.Error {
 			router.presentError(.preferences(error))
 		} catch let error as Session.Error {
 			router.presentError(.session(error))

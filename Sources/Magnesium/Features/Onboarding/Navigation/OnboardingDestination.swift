@@ -7,13 +7,14 @@
 
 import Router
 import SwiftUI
+import Torrent
 
 /// Navigation destinations for the Onboarding feature.
 enum OnboardingDestination: RoutableDestination {
 	var id: Self { self }
 
 	/// Add a new server of a specific type
-	case addNewServer(ServerType)
+	case addNewServer(TorrentServerType)
 }
 
 struct OnboardingDestinationModifier: RoutableDestinationViewModifier {

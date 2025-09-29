@@ -8,13 +8,13 @@ class SessionTests {
 	// MARK: - Test Setup
 	private let suiteName: String
 	private let testDefaults: UserDefaults
-	private let preferences: AppPreferences
+	private let preferences: TorrentPreferences
 	private let session: Session
 
 	init() {
 		suiteName = "test-\(UUID().uuidString)"
 		testDefaults = UserDefaults(suiteName: suiteName)!
-		preferences = AppPreferences(userDefaults: testDefaults)
+		preferences = TorrentPreferences(userDefaults: testDefaults)
 		session = .init(preferences)
 	}
 
@@ -34,7 +34,7 @@ class SessionTests {
 	@Test("Session initializes with selected server from preferences")
 	func sessionInitializesWithSelectedServerFromPreferences() throws {
 		// Arrange - Set up server in preferences first
-		let preferences = AppPreferences(keychain: MockKeychain())
+		let preferences = TorrentPreferences(keychain: MockKeychain())
 		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try preferences.addOrUpdate(server: server)
 		preferences.selectedServerID = server.id

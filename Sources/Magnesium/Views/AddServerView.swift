@@ -1,6 +1,7 @@
 import Deluge
 import Observation
 import SwiftUI
+import Torrent
 
 @Observable
 class ServerBasicAuthentication {
@@ -31,7 +32,7 @@ struct AddServerView: View {
 	@Environment(SettingsRouter.self) var router
 
 	var body: some View {
-		List(ServerType.allCases) { server in
+		List(TorrentServerType.allCases) { server in
 			NavigationLink(value: SettingsDestination.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()

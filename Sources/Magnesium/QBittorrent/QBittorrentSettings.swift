@@ -8,6 +8,7 @@
 import QBittorrent
 import Foundation
 import Observation
+import Torrent
 
 @Observable
 class QBittorrentSettings {
@@ -33,7 +34,7 @@ class QBittorrentSettings {
 		self.basicAuthentication = .init()
 	}
 
-	func makeServer() async throws(ServerSettingsError) -> Server {
+	func makeServer() async throws(ServerSettingsError) -> TorrentServer {
 		fatalError("Not implemented")
 	}
 }

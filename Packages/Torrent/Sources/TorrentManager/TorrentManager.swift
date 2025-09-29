@@ -13,8 +13,8 @@ import SwiftUI
 public final class TorrentManager {
 	public typealias Hash = String
 
-	private(set) var torrents: [Hash: StandardTorrent] = [:]
-	private(set) var labels: [StandardLabel] = []
+	private(set) public var torrents: [Hash: StandardTorrent] = [:]
+	private(set) public var labels: [StandardLabel] = []
 
 	public var searchQuery: String = ""
 
@@ -53,35 +53,35 @@ public final class TorrentManager {
 		}
 	}
 
-	func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+	public func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
 		try await session.client.resume(torrents)
 		try await refresh()
 	}
 
-	func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+	public func pause(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
 		try await session.client.pause(torrents)
 		try await refresh()
 	}
 
-	func delete(_ torrents: [StandardTorrent], removeData: Bool) async throws(TorrentClientError) {
+	public func delete(_ torrents: [StandardTorrent], removeData: Bool) async throws(TorrentClientError) {
 		try await session.client.remove(torrents, removeData)
 		try await refresh()
 	}
 
-	func addLink(_ link: String) async throws(TorrentClientError) {
+	public func addLink(_ link: String) async throws(TorrentClientError) {
 		try await session.client.addLink(link)
 		try await refresh()
 	}
 
-	func paths(for torrent: StandardTorrent) async throws(TorrentClientError) -> [String] {
+	public func paths(for torrent: StandardTorrent) async throws(TorrentClientError) -> [String] {
 		try await session.client.paths(torrent)
 	}
 
-	func refreshFiles(for torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] {
+	public func refreshFiles(for torrent: StandardTorrent) async throws(TorrentClientError) -> [StandardTorrentFile] {
 		try await session.client.refreshFiles(torrent)
 	}
 
-	func refresh() async throws(TorrentClientError) {
+	public func refresh() async throws(TorrentClientError) {
 		let (torrents, labels) = try await session.client.refresh()
 
 		// We have to do 'delta' style updates so the view bindings work properly.

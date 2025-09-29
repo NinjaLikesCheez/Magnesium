@@ -7,6 +7,7 @@
 import Deluge
 import Foundation
 import Observation
+import Torrent
 
 @Observable
 class DelugeSettings {
@@ -43,12 +44,12 @@ class DelugeSettings {
 			(!basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
 	}
 
-	func makeServer() async throws(ServerSettingsError) -> Server {
+	func makeServer() async throws(ServerSettingsError) -> TorrentServer {
 		guard let url = URL(string: address) else {
 			throw .invalidState(message: "Invalid URL, ensure you add http(s)://")
 		}
 
-		let client = Current.deluge(url, password, basicAuthentication.toAPIClient())
+		let client = await Current.deluge(url, password, basicAuthentication.toAPIClient())
 		let authenticated: Bool
 
 		do throws(Deluge.Error) {

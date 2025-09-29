@@ -1,6 +1,6 @@
 import Common
 //
-//  AppPreferences.swift
+//  TorrentPreferences.swift
 //  Magnesium
 //
 //  Created by ninji on 09/04/2025.

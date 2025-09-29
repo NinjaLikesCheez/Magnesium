@@ -1,5 +1,6 @@
 import Router
 import SwiftUI
+import Torrent
 
 enum TorrentListError: RoutableError {
 	var id: Self { self }

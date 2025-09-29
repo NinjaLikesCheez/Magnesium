@@ -19,6 +19,10 @@ packages:
     path: ../QBittorrent-Swift
     # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     # branch: main
+  Router:
+    # path: ../Router
+    url: https://github.com/NinjaLikesCheez/Router
+    from: 1.0.0
   ObservableDefaults:
     # path: ../../fatbobman/ObservableDefaults
     url: https://github.com/fatbobman/ObservableDefaults
@@ -26,9 +30,6 @@ packages:
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
-  Router:
-    url: https://github.com/NinjaLikesCheez/Router
-    from: 1.0.0
 targets:
   Magnesium:
     type: application

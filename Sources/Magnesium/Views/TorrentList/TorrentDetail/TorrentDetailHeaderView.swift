@@ -1,4 +1,5 @@
 import SwiftUI
+import Torrent
 
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentManager.self) var torrentManager

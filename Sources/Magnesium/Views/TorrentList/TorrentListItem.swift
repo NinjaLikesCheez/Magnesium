@@ -1,4 +1,5 @@
 import SwiftUI
+import Torrent
 
 struct TorrentListItem: Identifiable {
 	var id: String { hash }
@@ -13,6 +14,7 @@ struct TorrentListItem: Identifiable {
 	let progressText: String
 	let ratioOrETA: String
 
+	@MainActor
 	init(torrent: StandardTorrent) {
 		self.hash = torrent.hash
 		self.name = torrent.name

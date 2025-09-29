@@ -182,7 +182,7 @@ struct ErrorHandlingTests {
 
 	// MARK: - Preferences Error Handling Tests
 
-	@Test("AppPreferences handles corrupted UserDefaults gracefully")
+	@Test("TorrentPreferences handles corrupted UserDefaults gracefully")
 	func appPreferencesHandlesCorruptedUserDefaultsGracefully() throws {
 		let suiteName = "test-corrupted-\(UUID().uuidString)"
 		let testDefaults = UserDefaults(suiteName: suiteName)!
@@ -191,7 +191,7 @@ struct ErrorHandlingTests {
 		testDefaults.set("invalid-data", forKey: "servers")
 		testDefaults.set(["invalid": "data"], forKey: "selectedServerID")
 
-		let preferences = AppPreferences(userDefaults: testDefaults)
+		let preferences = TorrentPreferences(userDefaults: testDefaults)
 
 		// Verify preferences can be created and provide defaults
 		#expect(preferences.servers.isEmpty) // Should fall back to empty array
@@ -312,7 +312,7 @@ struct ErrorHandlingTests {
 	func sessionRecoversFromTemporaryErrors() throws {
 		let suiteName = "test-recovery-\(UUID().uuidString)"
 		let testDefaults = UserDefaults(suiteName: suiteName)!
-		let preferences = AppPreferences(userDefaults: testDefaults)
+		let preferences = TorrentPreferences(userDefaults: testDefaults)
 		let session = Session(preferences)
 
 		// First, set a valid server

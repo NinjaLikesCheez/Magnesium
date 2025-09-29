@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import Torrent
 
 struct SettingsFlow: View {
-	@Environment(AppPreferences.self) var preferences
+	@Environment(TorrentPreferences.self) var preferences
 	@Environment(Session.self) var session
 
 	@State var settingsRouter: SettingsRouter

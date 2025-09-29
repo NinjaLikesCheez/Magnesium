@@ -6,18 +6,19 @@ import Router
 //  Created by ninji on 13/06/2025.
 //
 import SwiftUI
+import Torrent
 
 /// Modal presentations for the Onboarding feature.
 enum OnboardingSheet: RoutableSheet {
 	var id: Self { self }
 
 	/// Add a new server of a specific type
-	case addNewServer(ServerType)
+	case addNewServer(TorrentServerType)
 }
 
 struct OnboardingSheetModifier: RoutableSheetViewModifier {
 	@Binding var router: OnboardingRouter
-	@Binding var preferences: AppPreferences
+	@Binding var preferences: TorrentPreferences
 	@Binding var session: Session
 
 	func body(content: Content) -> some View {
@@ -41,7 +42,7 @@ struct OnboardingSheetModifier: RoutableSheetViewModifier {
 extension View {
 	func withOnboardingSheets(
 		router: Binding<OnboardingRouter>,
-		preferences: Binding<AppPreferences>,
+		preferences: Binding<TorrentPreferences>,
 		session: Binding<Session>
 	) -> some View {
 		modifier(OnboardingSheetModifier(router: router, preferences: preferences, session: session))

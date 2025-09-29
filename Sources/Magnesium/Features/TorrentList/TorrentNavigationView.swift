@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Torrent
 
 struct TorrentNavigationView: View {
 	@Environment(TorrentListRouter.self) var router

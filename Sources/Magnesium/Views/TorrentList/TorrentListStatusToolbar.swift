@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import Torrent
 
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
-	@Environment(AppPreferences.self) private var preferences
+	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(TorrentListRouter.self) private var router
 
 	@State var showAddTorrentConfirmation = false

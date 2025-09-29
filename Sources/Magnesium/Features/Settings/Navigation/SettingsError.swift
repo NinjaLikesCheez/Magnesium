@@ -1,11 +1,12 @@
 import Router
 import SwiftUI
 import Common
+import Torrent
 
 enum SettingsError: RoutableError {
 	var id: Self { self }
 
-	case preferences(AppPreferences.Error)
+	case preferences(TorrentPreferences.Error)
 	case serverSettings(ServerSettingsError)
 	case session(Session.Error)
 }

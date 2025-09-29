@@ -5,11 +5,12 @@
 //  Created by ninji on 13/06/2025.
 //
 import SwiftUI
+import Torrent
 
 struct OnboardingFlow: View {
 	@State var onboardingRouter: OnboardingRouter
 
-	@Binding var preferences: AppPreferences
+	@Binding var preferences: TorrentPreferences
 	@Binding var session: Session
 
 	var body: some View {

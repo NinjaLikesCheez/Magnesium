@@ -7,10 +7,11 @@
 
 import Router
 import SwiftUI
+import Torrent
 
 struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 	@Environment(Session.self) private var session
-	@Environment(AppPreferences.self) private var preferences
+	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(Router.self) private var router
 	@Environment(\.isPresented) private var isPresented
 
