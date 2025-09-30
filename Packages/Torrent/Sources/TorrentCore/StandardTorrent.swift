@@ -5,14 +5,14 @@ import Observation
 @MainActor
 @Observable
 public final class StandardTorrent {
-	public let id: String
+	nonisolated public let id: String
 
 	public private(set) var dateAdded: Date
 	public private(set) var downloaded: Int64
 	public private(set) var downloadPath: String
 	public private(set) var downloadRate: Int64
 	public private(set) var eta: TimeInterval
-	public private(set) var hash: String
+	public nonisolated let hash: String
 	public private(set) var label: String
 	public private(set) var name: String
 	public private(set) var peers: Int
@@ -79,7 +79,6 @@ public final class StandardTorrent {
 		self.downloadPath = torrent.downloadPath
 		self.downloadRate = torrent.downloadRate
 		self.eta = torrent.eta
-		self.hash = torrent.hash
 		self.label = torrent.label
 		self.name = torrent.name
 		self.peers = torrent.peers
@@ -147,12 +146,12 @@ extension StandardTorrent {
 	}
 }
 
-extension StandardTorrent: @MainActor Hashable, @MainActor Equatable, Identifiable {
-	public static func == (lhs: StandardTorrent, rhs: StandardTorrent) -> Bool {
+extension StandardTorrent: Hashable, Equatable, Identifiable {
+	public nonisolated static func == (lhs: StandardTorrent, rhs: StandardTorrent) -> Bool {
 		lhs.hash == rhs.hash
 	}
 
-	public func hash(into hasher: inout Hasher) {
+	public nonisolated func hash(into hasher: inout Hasher) {
 		hasher.combine(hash)
 	}
 }

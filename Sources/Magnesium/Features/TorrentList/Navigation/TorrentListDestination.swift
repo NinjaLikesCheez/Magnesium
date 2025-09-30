@@ -9,7 +9,7 @@ import SwiftUI
 import Torrent
 
 /// Navigation destinations for the TorrentList feature.
-enum TorrentListDestination: @MainActor RoutableDestination {
+enum TorrentListDestination: RoutableDestination {
 	var id: Self { self }
 
 	/// Navigate to the detailed view of a specific torrent
