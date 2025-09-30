@@ -8,7 +8,7 @@
 import QBittorrent
 import Foundation
 import Observation
-import Torrent
+import TorrentUI
 
 @Observable
 class QBittorrentSettings {

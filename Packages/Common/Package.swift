@@ -8,14 +8,21 @@ let package = Package(
 		.library(
 			name: "Common",
 			targets: ["Common"]
-		)
+		),
+		.library(
+			name: "CommonUI",
+			targets: ["CommonUI"]
+		),
 	],
 	dependencies: [],
 	targets: [
 		.target(
 			name: "Common",
-			path: "Sources/Common"
-		)
+		),
+		.target(
+			name: "CommonUI",
+			dependencies: ["Common"]
+		),
 		// .testTarget(
 		// 	name: "CommonTests",
 		// 	dependencies: ["Common"]

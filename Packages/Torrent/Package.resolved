@@ -1,5 +1,5 @@
 {
-  "originHash" : "a05612acb88432f9fab503ef7814a7d33873dc4e22e5a0fee5c35afcc7136ddc",
+  "originHash" : "c1be1db395cb37d16753249510fd48c0730dbfc3d2979ceeb91d490692b29afb",
   "pins" : [
     {
       "identity" : "deluge-swift",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "413e2c0aa7960991bec817e3f2121f43f58ce4a0",
         "version" : "0.0.2"
+      }
+    },
+    {
+      "identity" : "router",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NinjaLikesCheez/Router",
+      "state" : {
+        "revision" : "35c17531da474ae49f7798e18a724fa4d923607d",
+        "version" : "1.0.0"
       }
     },
     {

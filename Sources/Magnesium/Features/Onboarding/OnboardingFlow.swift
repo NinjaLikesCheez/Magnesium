@@ -5,13 +5,13 @@
 //  Created by ninji on 13/06/2025.
 //
 import SwiftUI
-import Torrent
+import TorrentUI
 
 struct OnboardingFlow: View {
 	@State var onboardingRouter: OnboardingRouter
 
 	@Binding var preferences: TorrentPreferences
-	@Binding var session: Session
+	@Binding var session: TorrentSession
 
 	var body: some View {
 		NavigationStack(path: $onboardingRouter.path) {

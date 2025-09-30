@@ -1,5 +1,4 @@
 import SwiftUI
-import Torrent
 
 struct TorrentListItem: Identifiable {
 	var id: String { hash }

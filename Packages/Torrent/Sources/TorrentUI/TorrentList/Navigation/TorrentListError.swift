@@ -1,55 +1,45 @@
-//
-//  VisualErrors+Extensions.swift
-//  Magnesium
-//
-//  Created by ninji on 29/09/2025.
-//
-import Torrent
-import Common
-import APIClient
+import Router
+import SwiftUI
+import CommonUI
 
-extension ClientError: @retroactive VisualError where ResponseError: VisualError {
-	public var title: String {
-		switch self {
-		case .encoding(_):
-			"Failed to Encode"
-		case .decoding(_):
-			"Failed to Decode"
-		case let .request(error):
-			error.title
-		case let .response(error):
-			error.title
-		}
-	}
+enum TorrentListError: RoutableError {
+	var id: Self { self }
 
-	public var systemName: String {
-		switch self {
-		case .encoding:
-			"gear.badge.xmark"
-		case .decoding(_):
-			"gear.badge.xmark"
-		case .request(_):
-			"network.slash"
-		case .response(_):
-			"network.slash"
-		}
-	}
+	case clientError(TorrentClientError)
+	case fileImportError(String) // fileImport API throws any Error... so manually build it
+}
 
-	public var subtitle: String {
-		switch self {
-		case let .encoding(error):
-			error.localizedDescription
-		case let .decoding(error):
-			error.localizedDescription
-		case let .request(error):
-			error.subtitle
-		case let .response(error):
-			error.subtitle
-		}
+struct TorrentListErrorModifier: RoutableErrorViewModifier {
+	@Binding var router: TorrentListRouter
+
+	func body(content: Content) -> some View {
+		content
+			.panel(item: $router.presentedError) { error in
+				switch error {
+				case let .clientError(error):
+					ErrorPanelCard(
+						error: error,
+						primaryButtonAction: router.dismissError
+					)
+				case let .fileImportError(message):
+					PanelCard(
+						title: "File Import Error",
+						systemName: "square.and.arrow.down.badge.xmark",
+						subtitle: message,
+						primaryButtonAction: router.dismissError
+					)
+				}
+			}
 	}
 }
 
-extension TorrentClientError: @retroactive VisualError {
+extension View {
+	func withTorrentListErrors(router: Binding<TorrentListRouter>) -> some View {
+		modifier(TorrentListErrorModifier(router: router))
+	}
+}
+
+extension TorrentClientError: VisualError {
 	public var title: String {
 		switch self {
 		case .nullImplementation:
@@ -111,7 +101,7 @@ extension TorrentClientError: @retroactive VisualError {
 
 // MARK: - Torrent client errors
 // TODO: Move this into Torrent and make Deluge and QBittorrent errors equatable and hashable...
-extension TorrentClientError: @retroactive Equatable {
+extension TorrentClientError: Equatable {
 	public static func == (lhs: TorrentClientError, rhs: TorrentClientError) -> Bool {
 		switch (lhs, rhs) {
 		case (.nullImplementation, .nullImplementation):
@@ -127,4 +117,3 @@ extension TorrentClientError: @retroactive Equatable {
 		}
 	}
 }
-

@@ -3,7 +3,7 @@ import TorrentPreferences
 
 /// Protocol defining the interface for session management
 @MainActor
-public protocol SessionProtocol: AnyObject {
+public protocol TorrentSessionProtocol: AnyObject {
 	/// initialize a session
 	init(_ preferences: TorrentPreferences)
 
@@ -15,8 +15,8 @@ public protocol SessionProtocol: AnyObject {
 
 	/// Sets the current server
 	/// - Parameter server: The server to set
-	/// - Throws: Session.Error if the server configuration is invalid
-	func setServer(_ server: TorrentServer) throws(Session.Error)
+	/// - Throws: TorrentSession.Error if the server configuration is invalid
+	func setServer(_ server: TorrentServer) throws(TorrentSession.Error)
 
 	/// Resets the session, clearing the current server
 	func reset()

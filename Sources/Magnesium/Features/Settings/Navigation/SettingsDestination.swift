@@ -7,7 +7,7 @@
 
 import Router
 import SwiftUI
-import Torrent
+import TorrentUI
 
 /// Navigation destinations for the Settings feature.
 enum SettingsDestination: RoutableDestination {

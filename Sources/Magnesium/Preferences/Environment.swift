@@ -4,7 +4,7 @@ import Foundation
 // import Preferences
 import QBittorrent
 import Common
-import Torrent
+import TorrentUI
 
 // import Transmission
 

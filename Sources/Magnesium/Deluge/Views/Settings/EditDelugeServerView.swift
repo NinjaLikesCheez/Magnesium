@@ -7,11 +7,11 @@
 
 import Router
 import SwiftUI
-import Torrent
+import TorrentUI
 
 struct EditDelugeServerView: View {
 	@Environment(SettingsRouter.self) private var router
-	@Environment(Session.self) private var session
+	@Environment(TorrentSession.self) private var session
 	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(\.isPresented) private var isPresented
 
@@ -81,7 +81,7 @@ struct EditDelugeServerView: View {
 			router.presentError(.serverSettings(error))
 		} catch let error as TorrentPreferences.Error {
 			router.presentError(.preferences(error))
-		} catch let error as Session.Error {
+		} catch let error as TorrentSession.Error {
 			router.presentError(.session(error))
 		} catch {
 			fatalError("Unhandled error: \(error)")

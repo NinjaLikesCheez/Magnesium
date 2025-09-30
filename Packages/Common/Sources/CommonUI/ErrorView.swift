@@ -7,22 +7,26 @@
 
 import SwiftUI
 
-struct ErrorView: View {
+public struct ErrorView: View {
 	var message: String
 	var buttonTitle: String
 	var action: () async throws -> Void
 
-	init(message: String, buttonTitle: String = "Retry", action: @escaping () async throws -> Void) {
+	public init(
+		message: String,
+		buttonTitle: String = "Retry",
+		action: @escaping () async throws -> Void
+	) {
 		self.message = message
 		self.buttonTitle = buttonTitle
 		self.action = action
 	}
 
-	var body: some View {
+	public var body: some View {
 		VStack(alignment: .center) {
 			Text(message)
-				 .font(.largeTitle)
-				 .padding()
+				.font(.largeTitle)
+				.padding()
 
 			Button(buttonTitle) {
 				Task {

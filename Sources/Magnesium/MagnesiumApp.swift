@@ -1,13 +1,13 @@
 import Common
 import Logging
 import SwiftUI
-import Torrent
+import TorrentUI
 
 @main
 struct MagnesiumApp: App {
 	@State private var appState = AppState.resuming
 
-	@State var session: Session
+	@State var session: TorrentSession
 	@State var preferences: TorrentPreferences
 	@State var torrentManager: TorrentManager
 
@@ -15,13 +15,13 @@ struct MagnesiumApp: App {
 		LoggingSystem.bootstrap { label in
 			var logger = StreamLogHandler.standardOutput(label: label)
 			#if DEBUG
-				//			logger.logLevel = .debug
+				logger.logLevel = .debug
 			#endif
 			return logger
 		}
 
 		self._preferences = .init(initialValue: TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain()))
-		self._session = .init(initialValue: Session(_preferences.wrappedValue))
+		self._session = .init(initialValue: TorrentSession(_preferences.wrappedValue))
 		self._torrentManager = .init(initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue))
 	}
 
@@ -36,12 +36,7 @@ struct MagnesiumApp: App {
 	 					session: $session
 	 				)
 	 			case .authenticated:
-	 				TorrentsListFlow(
-	 					torrentListRouter: .init(),
-	 					torrentManager: $torrentManager,
-	 					preferences: $preferences,
-	 					session: $session
-	 				)
+	 				TorrentTab()
 	 			case .resuming:
 	 				ProgressView()
 	 					.containerRelativeFrame([.horizontal, .vertical])

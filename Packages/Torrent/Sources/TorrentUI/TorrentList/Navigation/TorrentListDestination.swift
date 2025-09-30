@@ -6,7 +6,6 @@
 //
 import Router
 import SwiftUI
-import Torrent
 
 /// Navigation destinations for the TorrentList feature.
 enum TorrentListDestination: RoutableDestination {
@@ -21,7 +20,7 @@ struct TorrentListDestinationModifier: ViewModifier {
 
 	func body(content: Content) -> some View {
 		content
-			.navigationDestination(for: TorrentListDestination.self) { destination in
+			.navigationDestination(for: TorrentListDestination.self) {  destination in
 				switch destination {
 				case let .detail(torrent):
 					TorrentDetailView(torrent: torrent)

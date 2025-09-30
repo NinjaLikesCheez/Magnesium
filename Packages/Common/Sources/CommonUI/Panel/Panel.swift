@@ -202,10 +202,9 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 }
 
 // MARK: ViewHeightKey
-
 fileprivate struct ViewHeightKey: PreferenceKey {
 	typealias Value = Double
-	static var defaultValue = 0.0
+	static let defaultValue = 0.0
 
 	static func reduce(value: inout Value, nextValue: () -> Value) {
 		value += nextValue()
@@ -236,7 +235,7 @@ public extension View {
 }
 
 // Thanks to https://www.avanderlee.com/swiftui/withanimation-completion-callback/
-struct AnimationCompletionObserverModifier<Value>: AnimatableModifier where Value: VectorArithmetic {
+struct AnimationCompletionObserverModifier<Value>: @MainActor AnimatableModifier where Value: VectorArithmetic {
 	var animatableData: Value {
 		didSet {
 			self.callCompletionIfFinished()

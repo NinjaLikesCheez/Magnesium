@@ -1,9 +1,9 @@
 import SwiftUI
 import Common
-import Torrent
+import TorrentUI
 
 public struct SettingsListView: View {
-	@Environment(Session.self) private var session: Session
+	@Environment(TorrentSession.self) private var session: TorrentSession
 	@Environment(TorrentPreferences.self) private var preferences: TorrentPreferences
 	@Environment(SettingsRouter.self) var router
 
@@ -117,5 +117,5 @@ public struct SettingsListView: View {
 
 #Preview {
 	SettingsFlow(settingsRouter: .init())
-		.environment(Session(TorrentPreferences(keychain: InMemoryKeychain())))
+		.environment(TorrentSession(TorrentPreferences(keychain: InMemoryKeychain())))
 }

@@ -1,8 +1,7 @@
 import SwiftUI
-import Torrent
 
 public struct TorrentListView: View {
-	@Environment(Session.self) private var session: Session
+	@Environment(TorrentSession.self) private var session: TorrentSession
 	@Environment(TorrentListRouter.self) private var router
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.userInterfaceIdiom) var userInterfaceIdiom

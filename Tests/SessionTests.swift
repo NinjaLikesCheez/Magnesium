@@ -2,14 +2,14 @@ import Testing
 import Foundation
 @testable import Magnesium
 
-@Suite("Session Tests")
+@Suite("TorrentSession Tests")
 class SessionTests {
 
 	// MARK: - Test Setup
 	private let suiteName: String
 	private let testDefaults: UserDefaults
 	private let preferences: TorrentPreferences
-	private let session: Session
+	private let session: TorrentSession
 
 	init() {
 		suiteName = "test-\(UUID().uuidString)"
@@ -24,14 +24,14 @@ class SessionTests {
 
 	// MARK: - Initialization Tests
 
-	@Test("Session initializes with no server when preferences are empty")
+	@Test("TorrentSession initializes with no server when preferences are empty")
 	func sessionInitializesWithNoServerWhenPreferencesAreEmpty() {
 		// Assert
 		#expect(session.server == nil)
 		#expect(session.actionImplementation is NullTorrentActionImplementation)
 	}
 
-	@Test("Session initializes with selected server from preferences")
+	@Test("TorrentSession initializes with selected server from preferences")
 	func sessionInitializesWithSelectedServerFromPreferences() throws {
 		// Arrange - Set up server in preferences first
 		let preferences = TorrentPreferences(keychain: MockKeychain())
@@ -40,7 +40,7 @@ class SessionTests {
 		preferences.selectedServerID = server.id
 
 		// Act - Create new session
-		let session = Session(preferences)
+		let session = TorrentSession(preferences)
 
 		// Assert
 		#expect(session.server?.name == "Test Server")
@@ -112,7 +112,7 @@ class SessionTests {
 		)
 
 		// Act
-		let actionImplementation = try Session.actionImplementation(server: server)
+		let actionImplementation = try TorrentSession.actionImplementation(server: server)
 
 		// Assert
 		#expect(actionImplementation is DelugeActionImplementation)
@@ -133,8 +133,8 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
-			try Session.actionImplementation(server: server)
+		let error = #expect(throws: TorrentSession.Error.self) {
+			try TorrentSession.actionImplementation(server: server)
 		}
 
 		if case .missingKeychainData(let errorServer) = error {
@@ -161,8 +161,8 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
-			try Session.actionImplementation(server: server)
+		let error = #expect(throws: TorrentSession.Error.self) {
+			try TorrentSession.actionImplementation(server: server)
 		}
 
 		if case .decodingFailed = error {
@@ -188,8 +188,8 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
-			try Session.actionImplementation(server: server)
+		let error = #expect(throws: TorrentSession.Error.self) {
+			try TorrentSession.actionImplementation(server: server)
 		}
 		if case .decodingFailed = error {
 			// Expected error type
@@ -209,8 +209,8 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
-			try Session.actionImplementation(server: server)
+		let error = #expect(throws: TorrentSession.Error.self) {
+			try TorrentSession.actionImplementation(server: server)
 		}
 		if case .notImplemented = error {
 			// Expected error type
@@ -295,7 +295,7 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
+		let error = #expect(throws: TorrentSession.Error.self) {
 			try session.setServer(server)
 		}
 
@@ -323,7 +323,7 @@ class SessionTests {
 		)
 
 		// Act & Assert
-		let error = #expect(throws: Session.Error.self) {
+		let error = #expect(throws: TorrentSession.Error.self) {
 			try session.setServer(server)
 		}
 

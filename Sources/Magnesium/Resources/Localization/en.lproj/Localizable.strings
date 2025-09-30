@@ -152,8 +152,8 @@
 /* There are no servers. */
 "error.no-servers-message" = "There are no servers.";
 
-/* Unable to retrieve Session ID. */
-"error.no-session-id" = "Unable to retrieve Session ID.";
+/* Unable to retrieve TorrentSession ID. */
+"error.no-session-id" = "Unable to retrieve TorrentSession ID.";
 
 /* The server returned an error. */
 "error.server-error" = "The server returned an error.";

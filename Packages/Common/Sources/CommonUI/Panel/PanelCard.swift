@@ -17,10 +17,10 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import SwiftUI
 import Common
+import SwiftUI
 
-struct ErrorPanelCard: View {
+public struct ErrorPanelCard: View {
 	let error: any VisualError
 
 	let primaryButtonTitle: String
@@ -29,7 +29,7 @@ struct ErrorPanelCard: View {
 	let primaryButtonAction: () -> Void
 	let secondaryButtonAction: (() -> Void)?
 
-	init(
+	public init(
 		error: any VisualError,
 		primaryButtonTitle: String = "Done",
 		primaryButtonAction: @escaping () -> Void,
@@ -44,7 +44,7 @@ struct ErrorPanelCard: View {
 		self.secondaryButtonAction = secondaryButtonAction
 	}
 
-	var body: some View {
+	public var body: some View {
 		PanelCard(
 			title: error.title,
 			systemName: error.systemName,
@@ -55,7 +55,7 @@ struct ErrorPanelCard: View {
 	}
 }
 
-struct PanelCard: View {
+public struct PanelCard: View {
 	let title: String
 	let systemName: String
 	let subtitle: String?
@@ -66,7 +66,7 @@ struct PanelCard: View {
 	let primaryButtonAction: () -> Void
 	let secondaryButtonAction: (() -> Void)?
 
-	init(
+	public init(
 		title: String,
 		systemName: String,
 		subtitle: String? = nil,
@@ -85,7 +85,7 @@ struct PanelCard: View {
 		self.secondaryButtonAction = secondaryButtonAction
 	}
 
-	var body: some View {
+	public var body: some View {
 		VStack(spacing: 24) {
 			VStack(spacing: 32) {
 				Text(title)

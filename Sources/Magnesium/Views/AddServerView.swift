@@ -1,7 +1,7 @@
 import Deluge
 import Observation
 import SwiftUI
-import Torrent
+import TorrentUI
 
 @Observable
 class ServerBasicAuthentication {

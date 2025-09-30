@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Torrent
-import Torrent
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager

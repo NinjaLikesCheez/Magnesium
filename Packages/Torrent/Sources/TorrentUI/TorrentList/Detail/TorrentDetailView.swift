@@ -1,5 +1,4 @@
 import SwiftUI
-import Torrent
 
 struct TorrentDetailView: View {
 	var torrent: StandardTorrent

@@ -6,7 +6,7 @@ import Router
 //  Created by ninji on 13/06/2025.
 //
 import SwiftUI
-import Torrent
+import TorrentUI
 
 /// Modal presentations for the Onboarding feature.
 enum OnboardingSheet: RoutableSheet {
@@ -19,7 +19,7 @@ enum OnboardingSheet: RoutableSheet {
 struct OnboardingSheetModifier: RoutableSheetViewModifier {
 	@Binding var router: OnboardingRouter
 	@Binding var preferences: TorrentPreferences
-	@Binding var session: Session
+	@Binding var session: TorrentSession
 
 	func body(content: Content) -> some View {
 		content
@@ -43,7 +43,7 @@ extension View {
 	func withOnboardingSheets(
 		router: Binding<OnboardingRouter>,
 		preferences: Binding<TorrentPreferences>,
-		session: Binding<Session>
+		session: Binding<TorrentSession>
 	) -> some View {
 		modifier(OnboardingSheetModifier(router: router, preferences: preferences, session: session))
 	}

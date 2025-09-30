@@ -6,29 +6,20 @@
 //
 import SwiftUI
 import Router
-import Torrent
 
 /// Modal presentations for the TorrentList feature.
 enum TorrentListSheet: RoutableSheet {
-	var id: Self { self }
-
-	/// Present the settings screen
-	case settings
+	var id: Self { fatalError("Not implemented") }
 }
 
 struct TorrentListSheetViewModifier: ViewModifier {
 	@Binding var router: TorrentListRouter
 	@Binding var preferences: TorrentPreferences
-	@Binding var session: Session
+	@Binding var session: TorrentSession
 
 	func body(content: Content) -> some View {
 		content
-			.sheet(item: $router.presentedSheet) { sheet in
-				switch sheet {
-				case .settings:
-					SettingsFlow(settingsRouter: .init(router))
-				}
-			}
+			.sheet(item: $router.presentedSheet) { sheet in }
 	}
 }
 
@@ -36,7 +27,7 @@ extension View {
 	func withTorrentListSheets(
 		router: Binding<TorrentListRouter>,
 		preferences: Binding<TorrentPreferences>,
-		session: Binding<Session>
+		session: Binding<TorrentSession>
 	) -> some View {
 		modifier(
 			TorrentListSheetViewModifier(

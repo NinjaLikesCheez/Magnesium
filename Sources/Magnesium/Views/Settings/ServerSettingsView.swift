@@ -123,38 +123,3 @@ extension ServerSettingsError: VisualError {
 	}
 }
 
-extension ClientError: @retroactive Hashable where ResponseError: Hashable {
-	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case let .encoding(error):
-			hasher.combine(0)
-			hasher.combine(error.localizedDescription)
-		case let .decoding(error):
-			hasher.combine(1)
-			hasher.combine(error.localizedDescription)
-		case let .request(requestError):
-			hasher.combine(2)
-			hasher.combine(requestError)
-		case let .response(responseError):
-			hasher.combine(3)
-			hasher.combine(responseError)
-		}
-	}
-}
-
-extension ClientError: @retroactive Equatable where ResponseError: Equatable {
-	public static func == (lhs: ClientError<ResponseError>, rhs: ClientError<ResponseError>) -> Bool {
-		switch (lhs, rhs) {
-		case let (.encoding(lhsError), .encoding(rhsError)):
-			return lhsError.localizedDescription == rhsError.localizedDescription
-		case let (.decoding(lhsError), .decoding(rhsError)):
-			return lhsError.localizedDescription == rhsError.localizedDescription
-		case let (.request(lhsRequest), .request(rhsRequest)):
-			return lhsRequest == rhsRequest
-		case let (.response(lhsResponse), .response(rhsResponse)):
-			return lhsResponse == rhsResponse
-		default:
-			return false
-		}
-	}
-}

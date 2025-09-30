@@ -6,7 +6,7 @@ configFiles:
   Release: config/Release.xcconfig
 packages:
   #### Local Packages ####
-  Torrent:
+  TorrentUI:
     path: Packages/Torrent
   Common:
     path: Packages/Common
@@ -57,7 +57,10 @@ targets:
       Release: config/Magnesium-Release.xcconfig
     dependencies:
       - package: Common
-      - package: Torrent
+        products:
+          - Common
+          - CommonUI
+      - package: TorrentUI
       - package: Deluge
       - package: QBittorrent
       - package: Logging

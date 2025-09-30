@@ -19,23 +19,25 @@ public final class TorrentManager {
 	public var searchQuery: String = ""
 
 	@ObservationIgnored
-	private let session: SessionProtocol
+	private let session: TorrentSessionProtocol
 
 	@ObservationIgnored
 	private let preferences: TorrentPreferences
 
 	private var updateTimer: Timer
 
-	public init(session: SessionProtocol, preferences: TorrentPreferences) {
+	public init(session: TorrentSessionProtocol, preferences: TorrentPreferences) {
 		self.session = session
 		self.preferences = preferences
 
 		self.updateTimer = Timer()  // Needs to be initialized before the block is used..
-		self.updateTimer = Timer.scheduledTimer(
-			withTimeInterval: preferences.autoRefreshInterval, repeats: true,
-			block: { _ in
-				Task { try await self.refresh() }
-			})
+		if preferences.autoRefreshInterval != 0 {
+			self.updateTimer = Timer.scheduledTimer(
+				withTimeInterval: preferences.autoRefreshInterval, repeats: true,
+				block: { _ in
+					Task { try await self.refresh() }
+				})
+		}
 
 		let timerValue = Observations {
 			preferences.autoRefreshInterval
@@ -44,11 +46,14 @@ public final class TorrentManager {
 		Task {
 			for await value in timerValue {
 				self.updateTimer.invalidate()
-				self.updateTimer = Timer.scheduledTimer(
-					withTimeInterval: value, repeats: true,
-					block: { _ in
-						Task { try await self.refresh() }
-					})
+
+				if value != 0 {
+					self.updateTimer = Timer.scheduledTimer(
+						withTimeInterval: value, repeats: true,
+						block: { _ in
+							Task { try await self.refresh() }
+						})
+				}
 			}
 		}
 	}

@@ -7,7 +7,7 @@
 
 import Router
 import SwiftUI
-import Torrent
+import TorrentUI
 
 struct AddDelugeServerView<Router: RouterProtocol>: View {
 	@Environment(Router.self) var router

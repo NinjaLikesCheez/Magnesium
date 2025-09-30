@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Torrent
 
 struct TorrentNavigationView: View {
 	@Environment(TorrentListRouter.self) var router
@@ -33,8 +32,6 @@ struct TorrentNavigationView: View {
 	var contentView: some View {
 		TorrentListView(selections: $selections, editMode: $editMode)
 			.toolbar {
-				settingsToolbarItem
-
 				selectToolbarItem
 
 				if editMode.isEditing {
@@ -71,26 +68,6 @@ struct TorrentNavigationView: View {
 			}
 		}
 		.navigationSplitViewStyle(.balanced)
-	}
-
-	var settingsToolbarItem: some ToolbarContent {
-		#if os(macOS)
-		ToolbarItem(placement: .primaryAction) {
-			Button {
-				router.presentSheet(.settings)
-			} label: {
-				Image(systemName: "gear")
-			}
-		}
-		#else
-		ToolbarItem(placement: .topBarLeading) {
-			Button {
-				router.presentSheet(.settings)
-			} label: {
-				Image(systemName: "gear")
-			}
-		}
-		#endif
 	}
 
 	@ToolbarContentBuilder

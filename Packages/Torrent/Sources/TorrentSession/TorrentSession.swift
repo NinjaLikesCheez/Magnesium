@@ -5,7 +5,7 @@ import Observation
 import TorrentPreferences
 
 @Observable
-public final class Session: SessionProtocol {
+public final class TorrentSession: TorrentSessionProtocol {
 	public private(set) var server: TorrentServer?
 	private var preferences: TorrentPreferences
 
@@ -46,7 +46,7 @@ public final class Session: SessionProtocol {
 	private func _setServer(_ server: TorrentServer?) throws(Error) {
 		if let server = server {
 			do {
-				client = try Session.client(server: server)
+				client = try TorrentSession.client(server: server)
 				self.server = server
 				preferences.selectedServerID = server.id
 			} catch {
@@ -59,7 +59,7 @@ public final class Session: SessionProtocol {
 	}
 }
 
-extension Session {
+extension TorrentSession {
 	static func client(server: TorrentServer) throws(Error) -> any TorrentClient {
 		switch server.type {
 		case .deluge:
@@ -89,7 +89,7 @@ extension Session {
 	}
 }
 
-extension Session.Error: VisualError {
+extension TorrentSession.Error: VisualError {
 	public var title: String {
 		switch self {
 		case .missingKeychainData:

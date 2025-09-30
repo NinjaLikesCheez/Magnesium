@@ -1,5 +1,4 @@
 import SwiftUI
-import Torrent
 
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentManager.self) var torrentManager
@@ -115,7 +114,7 @@ struct TorrentDetailHeaderView: View {
 		} label: {
 			HStack {
 				Image(systemName: "document.on.document")
-				Text(L10n.Screen.TorrentInfo.copyFilePath)
+				Text("Copy File Path")
 			}
 			.frame(maxWidth: .infinity)
 		}
