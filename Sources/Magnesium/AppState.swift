@@ -6,8 +6,8 @@
 //
 
 enum AppState: Sendable {
-	case unauthenticated
-	case authenticated
+	case unboarded
+	case onboarded
 	case resuming
 	case error(Error)
 }

@@ -1,5 +1,4 @@
 import SwiftUI
-import TorrentUI
 
 struct OnboardingView: View {
 	@Environment(OnboardingRouter.self) var router

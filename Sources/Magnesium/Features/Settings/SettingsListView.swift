@@ -52,15 +52,16 @@ public struct SettingsListView: View {
 
 	var serverSection: some View {
 		Section("Servers") {
-			ForEach(servers) { server in
-				NavigationLink(value: SettingsDestination.editServer(server)) {
+			List(servers) { server in
+				// TODO: fix
+//				NavigationLink(value: SettingsDestination.editServer(server)) {
 					Text(server.name)
-				}
+//				}
 			}
 
-			NavigationLink(value: SettingsDestination.addAServer) {
+//			NavigationLink(value: SettingsDestination.addAServer) {
 				Text("Add Server")
-			}
+//			}
 		}
 	}
 

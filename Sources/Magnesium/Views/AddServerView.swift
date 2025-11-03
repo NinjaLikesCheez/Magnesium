@@ -33,10 +33,11 @@ struct AddServerView: View {
 
 	var body: some View {
 		List(TorrentServerType.allCases) { server in
-			NavigationLink(value: SettingsDestination.addNewServer(server)) {
+			// TODO: this
+//			NavigationLink(value: SettingsDestination.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()
-			}
+//			}
 		}
 		.navigationTitle("Add Server")
 		.navigationBarTitleDisplayMode(.inline)

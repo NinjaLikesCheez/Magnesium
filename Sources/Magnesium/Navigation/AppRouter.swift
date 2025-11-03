@@ -1,5 +1,5 @@
 //
-//  OnboardingRouter.swift
+//  AppRouter.swift
 //  Magnesium
 //
 //  Created by ninji on 03/11/2025.
@@ -7,12 +7,12 @@
 import Observation
 import Router
 
-/// Handles navigation within the Onboarding screen.
+/// Handles navigation within the app.
 @Observable
-final class OnboardingRouter: Routable {
-	typealias Destination = OnboardingDestination
-	typealias Sheet = OnboardingSheet
-	typealias Error = OnboardingError
+final class AppRouter: Routable {
+	typealias Destination = AppDestination
+	typealias Sheet = AppSheet
+	typealias Error = AppError
 
 	var path: [Destination] = []
 	var presentedSheet: Sheet? = nil

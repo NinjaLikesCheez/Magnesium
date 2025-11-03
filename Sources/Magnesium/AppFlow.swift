@@ -1,5 +1,5 @@
 //
-//  OnboardingFlow.swift
+//  AppFlow.swift
 //  Magnesium
 //
 //  Created by ninji on 03/11/2025.
@@ -8,15 +8,15 @@
 import SwiftUI
 import Router
 
-struct OnboardingFlow: Flow {
-	typealias Router = OnboardingRouter
+struct AppFlow: Flow {
+	typealias Router = AppRouter
 
-	@State var router: OnboardingRouter
+	@State var router: AppRouter
 
 	var body: some View {
 		NavigationStack(path: $router.path) {
-			OnboardingListView()
-				.withOnboardingDestinations()
+			AppView()
+				.withAppDestinations()
 		}
 		.environment(router)
 	}

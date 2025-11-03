@@ -12,9 +12,6 @@ import Router
 struct SettingsFlow: Flow {
 	typealias Router = SettingsRouter
 
-	@Environment(TorrentPreferences.self) var preferences
-	@Environment(TorrentSession.self) var session
-
 	@State var router: SettingsRouter
 
 	var body: some View {
@@ -23,7 +20,5 @@ struct SettingsFlow: Flow {
 				.withSettingsDestinations()
 		}
 		.environment(router)
-		.environment(preferences)
-		.environment(session)
 	}
 }
