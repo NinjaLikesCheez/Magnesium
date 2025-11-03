@@ -26,45 +26,45 @@ struct MagnesiumApp: App {
 	}
 
 	 var body: some Scene {
-	 	WindowGroup {
-	 		Group {
-	 			switch appState {
-	 			case .unauthenticated:
-	 				OnboardingFlow(
-	 					onboardingRouter: .init(),
-	 					preferences: $preferences,
-	 					session: $session
-	 				)
-	 			case .authenticated:
-	 				TorrentTab()
-	 			case .resuming:
-	 				ProgressView()
-	 					.containerRelativeFrame([.horizontal, .vertical])
-	 			case .error(let error):
-	 				ContentUnavailableView(
-	 					"Error: \(error.localizedDescription)",
-	 					image: "exclamationmark.triangle"
-	 				)
-	 			}
-	 		}
-	 		.task {
-	 			guard session.server != nil else {
-	 				appState = .unauthenticated
-	 				return
-	 			}
+		WindowGroup {
+			Group {
+				switch appState {
+				case .unauthenticated:
+					OnboardingFlow(
+						router: .init(),
+						preferences: $preferences,
+						session: $session
+					)
+				case .authenticated:
+					TorrentModule.entry
+				case .resuming:
+					ProgressView()
+						.containerRelativeFrame([.horizontal, .vertical])
+				case .error(let error):
+					ContentUnavailableView(
+						"Error: \(error.localizedDescription)",
+						image: "exclamationmark.triangle"
+					)
+				}
+			}
+			.task {
+				guard session.server != nil else {
+					appState = .unauthenticated
+					return
+				}
 
-	 			appState = .authenticated
-	 		}
-	 		.onChange(of: session.server) { _, newValue in
-	 			guard newValue != nil else {
-	 				appState = .unauthenticated
-	 				return
-	 			}
+				appState = .authenticated
+			}
+			.onChange(of: session.server) { _, newValue in
+				guard newValue != nil else {
+					appState = .unauthenticated
+					return
+				}
 
-	 			appState = .authenticated
-	 		}
-	 		.environment(preferences)
-	 		.environment(session)
-	 	}
+				appState = .authenticated
+			}
+			.environment(preferences)
+			.environment(session)
+		}
 	}
 }

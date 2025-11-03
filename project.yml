@@ -10,6 +10,8 @@ packages:
     path: Packages/Torrent
   Common:
     path: Packages/Common
+  MagnesiumModule:
+    path: Packages/MagnesiumModule
   #### Remote Packages ####
   Deluge:
     # path: ../Deluge-Swift
@@ -20,9 +22,9 @@ packages:
     # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     # branch: main
   Router:
-    # path: ../Router
-    url: https://github.com/NinjaLikesCheez/Router
-    from: 1.0.0
+    path: ../Router
+    # url: https://github.com/NinjaLikesCheez/Router
+    # from: 1.0.0
   ObservableDefaults:
     # path: ../../fatbobman/ObservableDefaults
     url: https://github.com/fatbobman/ObservableDefaults
@@ -61,6 +63,7 @@ targets:
           - Common
           - CommonUI
       - package: TorrentUI
+      - package: MagnesiumModule
       - package: Deluge
       - package: QBittorrent
       - package: Logging

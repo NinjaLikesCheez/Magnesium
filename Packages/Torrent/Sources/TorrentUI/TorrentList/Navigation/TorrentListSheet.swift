@@ -8,8 +8,8 @@ import SwiftUI
 import Router
 
 /// Modal presentations for the TorrentList feature.
-enum TorrentListSheet: RoutableSheet {
-	var id: Self { fatalError("Not implemented") }
+public enum TorrentListSheet: RoutableSheet {
+	public var id: Self { fatalError("Not implemented") }
 }
 
 struct TorrentListSheetViewModifier: ViewModifier {

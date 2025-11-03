@@ -10,17 +10,17 @@ import Router
 
 /// Handles navigation within the main torrent list screen
 @Observable
-final class TorrentListRouter: RouterProtocol {
-	typealias Destination = TorrentListDestination
-	typealias Sheet = TorrentListSheet
-	typealias Error = TorrentListError
+public final class TorrentListRouter: Routable {
+	public typealias Destination = TorrentListDestination
+	public typealias Sheet = TorrentListSheet
+	public typealias Error = TorrentListError
 
-	var path: [Destination] = []
-	var presentedSheet: Sheet? = nil
-	var presentedError: Error? = nil
-	let parent: (any RouterProtocol)?
+	public var path: [Destination] = []
+	public var presentedSheet: Sheet? = nil
+	public var presentedError: Error? = nil
+	public let parent: (any Routable)?
 
-	required init(_ parent: (any RouterProtocol)? = nil) {
+	public required init(_ parent: (any Routable)? = nil) {
 		self.parent = parent
 	}
 }

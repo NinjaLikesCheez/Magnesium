@@ -6,7 +6,6 @@
 //
 import Deluge
 import Common
-import TorrentUI
 
 // MARK: - Deluge errors
 extension Deluge.ResponseError: @retroactive Hashable {

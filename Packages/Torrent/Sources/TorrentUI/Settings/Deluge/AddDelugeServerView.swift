@@ -4,10 +4,8 @@
 //
 //  Created by ninji on 11/04/2025.
 //
-
 import Router
 import SwiftUI
-import TorrentUI
 
 struct AddDelugeServerView<Router: Routable>: View {
 	@Environment(Router.self) var router
@@ -67,9 +65,7 @@ struct AddDelugeServerView<Router: Routable>: View {
 				router.pop()
 			}
 		} catch {
-			if let router = router as? OnboardingRouter {
-				router.presentError(.addServerError(error))
-			} else if let router = router as? SettingsRouter {
+			if let router = router as? TorrentSettingsRouter {
 				router.presentError(.serverSettings(error))
 			}
 		}

@@ -1,20 +1,21 @@
 import SwiftUI
 import Common
-import TorrentUI
 
-public struct SettingsListView: View {
+public struct TorrentSettingsListView: View {
 	@Environment(TorrentSession.self) private var session: TorrentSession
 	@Environment(TorrentPreferences.self) private var preferences: TorrentPreferences
-	@Environment(SettingsRouter.self) var router
+	@Environment(TorrentSettingsRouter.self) var router
 
 	@State private var servers: [TorrentServer] = []
 
-	@State private var selectedRefreshInterval: TimeInterval = Current.preferences.autoRefreshInterval
+	@State private var selectedRefreshInterval: TimeInterval = 0
 
-	let automaticallyLookForMagnetLinks = Binding {
-		Current.preferences.automaticallyLookForMagnetLinks
-	} set: { newValue in
-		Current.preferences.automaticallyLookForMagnetLinks = newValue
+	private var automaticallyLookForMagnetLinks: Binding<Bool> {
+		Binding {
+			preferences.automaticallyLookForMagnetLinks
+		} set: { newValue in
+			preferences.automaticallyLookForMagnetLinks = newValue
+		}
 	}
 
 	public var body: some View {
@@ -44,6 +45,7 @@ public struct SettingsListView: View {
 		.onAppear {
 			do throws(TorrentPreferences.Error) {
 				servers = try preferences.getServers()
+				selectedRefreshInterval = preferences.autoRefreshInterval
 			} catch {
 				router.presentError(.preferences(error))
 			}
@@ -53,12 +55,12 @@ public struct SettingsListView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink(value: SettingsDestination.editServer(server)) {
+				NavigationLink(value: TorrentSettingsDestination.editServer(server)) {
 					Text(server.name)
 				}
 			}
 
-			NavigationLink(value: SettingsDestination.addAServer) {
+			NavigationLink(value: TorrentSettingsDestination.addAServer) {
 				Text("Add Server")
 			}
 		}
@@ -116,6 +118,6 @@ public struct SettingsListView: View {
 }
 
 #Preview {
-	SettingsFlow(router: .init())
+	TorrentSettingsFlow(router: .init())
 		.environment(TorrentSession(TorrentPreferences(keychain: InMemoryKeychain())))
 }

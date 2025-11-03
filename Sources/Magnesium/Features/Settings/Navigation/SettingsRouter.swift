@@ -9,7 +9,7 @@ import Router
 
 /// Handles navigation within the settings screen.
 @Observable
-final class SettingsRouter: RouterProtocol {
+final class SettingsRouter: Routable {
 	typealias Destination = SettingsDestination
 	typealias Sheet = SettingsSheet
 	typealias Error = SettingsError
@@ -17,9 +17,9 @@ final class SettingsRouter: RouterProtocol {
 	var path: [Destination] = []
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
-	let parent: (any RouterProtocol)?
+	let parent: (any Routable)?
 
-	required init(_ parent: (any RouterProtocol)? = nil) {
+	required init(_ parent: (any Routable)? = nil) {
 		self.parent = parent
 	}
 }

@@ -6,21 +6,24 @@
 //
 import SwiftUI
 import TorrentUI
+import Router
 
-struct OnboardingFlow: View {
-	@State var onboardingRouter: OnboardingRouter
+struct OnboardingFlow: Flow {
+	typealias Router = OnboardingRouter
+
+	@State var router: OnboardingRouter
 
 	@Binding var preferences: TorrentPreferences
 	@Binding var session: TorrentSession
 
 	var body: some View {
-		NavigationStack(path: $onboardingRouter.path) {
+		NavigationStack(path: $router.path) {
 			OnboardingView()
 				.withOnboardingDestinations()
-				.withOnboardingSheets(router: $onboardingRouter, preferences: $preferences, session: $session)
+				.withOnboardingSheets(router: $router, preferences: $preferences, session: $session)
 		}
-		.withOnboardingErrors(router: $onboardingRouter)
-		.environment(onboardingRouter)
+		.withOnboardingErrors(router: $router)
+		.environment(router)
 		.environment(preferences)
 		.environment(session)
 	}

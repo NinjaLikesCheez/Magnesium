@@ -7,7 +7,6 @@
 
 import Router
 import SwiftUI
-import TorrentUI
 
 struct AddQBittorrentServerView<Router: Routable>: View {
 	@Environment(TorrentSession.self) private var session

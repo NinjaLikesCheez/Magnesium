@@ -8,8 +8,8 @@ import Router
 import SwiftUI
 
 /// Navigation destinations for the TorrentList feature.
-enum TorrentListDestination: RoutableDestination {
-	var id: Self { self }
+public enum TorrentListDestination: RoutableDestination {
+	public var id: Self { self }
 
 	/// Navigate to the detailed view of a specific torrent
 	case detail(StandardTorrent)

@@ -13,7 +13,7 @@ import Router
 /// Handles navigation during the initial app setup process for server
 /// configuration.
 @Observable
-final class OnboardingRouter: RouterProtocol {
+final class OnboardingRouter: Routable {
 	typealias Destination = OnboardingDestination
 	typealias Sheet = OnboardingSheet
 	typealias Error = OnboardingError
@@ -21,9 +21,9 @@ final class OnboardingRouter: RouterProtocol {
 	var path: [Destination] = []
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
-	let parent: (any RouterProtocol)?
+	let parent: (any Routable)?
 
-	required init(_ parent: (any RouterProtocol)? = nil) {
+	required init(_ parent: (any Routable)? = nil) {
 		self.parent = parent
 	}
 }

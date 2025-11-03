@@ -2,8 +2,8 @@ import Router
 import SwiftUI
 import CommonUI
 
-enum TorrentListError: RoutableError {
-	var id: Self { self }
+public enum TorrentListError: RoutableError {
+	public var id: Self { self }
 
 	case clientError(TorrentClientError)
 	case fileImportError(String) // fileImport API throws any Error... so manually build it

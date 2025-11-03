@@ -7,19 +7,22 @@
 
 import SwiftUI
 import TorrentUI
+import Router
 
-struct SettingsFlow: View {
+struct SettingsFlow: Flow {
+	typealias Router = SettingsRouter
+
 	@Environment(TorrentPreferences.self) var preferences
 	@Environment(TorrentSession.self) var session
 
-	@State var settingsRouter: SettingsRouter
+	@State var router: SettingsRouter
 
 	var body: some View {
-		NavigationStack(path: $settingsRouter.path) {
+		NavigationStack(path: $router.path) {
 			SettingsListView()
 				.withSettingsDestinations()
 		}
-		.environment(settingsRouter)
+		.environment(router)
 		.environment(preferences)
 		.environment(session)
 	}

@@ -23,9 +23,9 @@ let package = Package(
 			name: "CommonUI",
 			dependencies: ["Common"]
 		),
-		// .testTarget(
-		// 	name: "CommonTests",
-		// 	dependencies: ["Common"]
-		// ),
+		 .testTarget(
+		 	name: "CommonTests",
+		 	dependencies: ["Common"]
+		 ),
 	]
 )

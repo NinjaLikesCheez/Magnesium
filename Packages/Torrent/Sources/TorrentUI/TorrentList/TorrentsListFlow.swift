@@ -6,29 +6,45 @@
 //
 
 import SwiftUI
+import Router
+import Common
 
-struct TorrentsListFlow: View {
-	@State var torrentListRouter: TorrentListRouter
+public struct TorrentsListFlow: Flow {
+	public typealias Router = TorrentListRouter
 
-	@Binding var torrentManager: TorrentManager
-	@Binding var preferences: TorrentPreferences
-	@Binding var session: TorrentSession
+	// TODO: fix plz
+	@State public var router: TorrentListRouter = .init()
+	@State private var session: TorrentSession
+	@State private var preferences: TorrentPreferences
+	@State private var manager: TorrentManager
 
-	var body: some View {
-		NavigationStack(path: $torrentListRouter.path) {
+	public init() {
+		self._preferences = .init(
+			initialValue: TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain())
+		)
+		self._session = .init(
+			initialValue: TorrentSession(_preferences.wrappedValue)
+		)
+		self._manager = .init(
+			initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue)
+		)
+	}
+
+	public var body: some View {
+		NavigationStack(path: $router.path) {
 			TorrentNavigationView()
 				.withTorrentListDestinations(
-					manager: $torrentManager
+					manager: $manager
 				)
 				.withTorrentListSheets(
-					router: $torrentListRouter,
+					router: $router,
 					preferences: $preferences,
 					session: $session
 				)
 		}
-		.withTorrentListErrors(router: $torrentListRouter)
-		.environment(torrentManager)
-		.environment(torrentListRouter)
+		.withTorrentListErrors(router: $router)
+		.environment(manager)
+		.environment(router)
 		.environment(preferences)
 		.environment(session)
 	}
