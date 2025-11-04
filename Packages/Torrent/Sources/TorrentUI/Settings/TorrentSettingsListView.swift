@@ -116,8 +116,3 @@ public struct TorrentSettingsListView: View {
 		}
 	}
 }
-
-#Preview {
-	TorrentSettingsFlow(router: .init())
-		.environment(TorrentSession(TorrentPreferences(keychain: InMemoryKeychain())))
-}

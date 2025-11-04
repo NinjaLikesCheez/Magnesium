@@ -4,10 +4,12 @@
 import Router
 
 @MainActor
-public protocol MagnesiumFeatureModule<EntryPoint, SettingsFlow> {
+public protocol MagnesiumFeatureModule<EntryPoint, SettingsFlow, OnboardingFlow> {
 	associatedtype EntryPoint: Flow
 	associatedtype SettingsFlow: Flow
+	associatedtype OnboardingFlow: Flow
 
-	static var entry: EntryPoint { get }
-	static var settings: SettingsFlow { get }
+	var entry: EntryPoint { get }
+	var settings: SettingsFlow { get }
+	var onboarding: OnboardingFlow? { get }
 }

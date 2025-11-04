@@ -14,21 +14,9 @@ public struct TorrentsListFlow: Flow {
 
 	// TODO: fix plz
 	@State public var router: TorrentListRouter = .init()
-	@State private var session: TorrentSession
-	@State private var preferences: TorrentPreferences
-	@State private var manager: TorrentManager
-
-	public init() {
-		self._preferences = .init(
-			initialValue: TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain())
-		)
-		self._session = .init(
-			initialValue: TorrentSession(_preferences.wrappedValue)
-		)
-		self._manager = .init(
-			initialValue: TorrentManager(session: _session.wrappedValue, preferences: _preferences.wrappedValue)
-		)
-	}
+	@Binding var session: TorrentSession
+	@Binding var preferences: TorrentPreferences
+	@Binding var manager: TorrentManager
 
 	public var body: some View {
 		NavigationStack(path: $router.path) {

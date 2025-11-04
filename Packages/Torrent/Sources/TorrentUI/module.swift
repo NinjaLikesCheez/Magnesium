@@ -3,15 +3,33 @@ import Router
 import Observation
 import SwiftUI
 import MagnesiumModule
+import Common
 
 @MainActor
-public struct TorrentModule: MagnesiumFeatureModule {
+@Observable
+public class TorrentModule: MagnesiumFeatureModule {
 	public typealias EntryPoint = TorrentsListFlow
 	public typealias SettingsFlow = TorrentSettingsFlow
+	public typealias OnboardingFlow = TorrentOnboardingFlow
 
-	public static var entry: TorrentsListFlow { .init() }
+	private var session: TorrentSession
+	private var preferences: TorrentPreferences
+	private var manager: TorrentManager
 
-	public static var settings: TorrentSettingsFlow { .init() }
+	public var entry: EntryPoint
+	public var settings: SettingsFlow
+	public var onboarding: OnboardingFlow?
+
+	public init() {
+		preferences = TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain())
+		session = TorrentSession(preferences)
+		manager = TorrentManager(session: session, preferences: preferences)
+
+		let bindable = Bindable(self)
+		self.entry = .init(session: bindable.session, preferences: bindable.preferences, manager: bindable.manager)
+		self.settings = .init(preferences: bindable.preferences, session: bindable.session)
+		self.onboarding = .init(preferences: bindable.preferences, session: bindable.session)
+	}
 }
 
 //@MainActor
@@ -55,3 +73,4 @@ public struct TorrentModule: MagnesiumFeatureModule {
 //		Text("Hello")
 //	}
 //}
+//

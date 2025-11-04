@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct OnboardingView: View {
-	@Environment(OnboardingRouter.self) var router
+struct TorrentOnboardingView: View {
+	@Environment(TorrentOnboardingRouter.self) var router
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
@@ -65,5 +65,5 @@ struct OnboardingView: View {
 }
 
 #Preview {
-	OnboardingView()
+	TorrentOnboardingView()
 }

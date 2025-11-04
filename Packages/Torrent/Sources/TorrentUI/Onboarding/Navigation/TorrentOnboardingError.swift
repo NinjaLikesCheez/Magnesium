@@ -2,14 +2,14 @@ import Router
 import CommonUI
 import SwiftUI
 
-enum OnboardingError: RoutableError {
-	var id: Self { self }
+public enum TorrentOnboardingError: RoutableError {
+	public var id: Self { self }
 
 	case addServerError(ServerSettingsError)
 }
 
-struct OnboardingErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: OnboardingRouter
+struct TorrentOnboardingErrorModifier: RoutableErrorViewModifier {
+	@Binding var router: TorrentOnboardingRouter
 
 	func body(content: Content) -> some View {
 		content
@@ -26,7 +26,7 @@ struct OnboardingErrorModifier: RoutableErrorViewModifier {
 }
 
 extension View {
-	func withOnboardingErrors(router: Binding<OnboardingRouter>) -> some View {
-		modifier(OnboardingErrorModifier(router: router))
+	func withTorrentOnboardingErrors(router: Binding<TorrentOnboardingRouter>) -> some View {
+		modifier(TorrentOnboardingErrorModifier(router: router))
 	}
 }

@@ -1,6 +1,6 @@
 import Router
 //
-//  OnboardingSheets.swift
+//  TorrentOnboardingSheets.swift
 //  Magnesium
 //
 //  Created by ninji on 13/06/2025.
@@ -8,15 +8,15 @@ import Router
 import SwiftUI
 
 /// Modal presentations for the Onboarding feature.
-enum OnboardingSheet: RoutableSheet {
-	var id: Self { self }
+public enum TorrentOnboardingSheet: RoutableSheet {
+	public var id: Self { self }
 
 	/// Add a new server of a specific type
 	case addNewServer(TorrentServerType)
 }
 
-struct OnboardingSheetModifier: RoutableSheetViewModifier {
-	@Binding var router: OnboardingRouter
+struct TorrentOnboardingSheetModifier: RoutableSheetViewModifier {
+	@Binding var router: TorrentOnboardingRouter
 	@Binding var preferences: TorrentPreferences
 	@Binding var session: TorrentSession
 
@@ -28,9 +28,9 @@ struct OnboardingSheetModifier: RoutableSheetViewModifier {
 					NavigationStack {
 						switch server {
 						case .deluge:
-							AddDelugeServerView<OnboardingRouter>()
+							AddDelugeServerView<TorrentOnboardingRouter>()
 						case .qbittorrent:
-							AddQBittorrentServerView<OnboardingRouter>()
+							AddQBittorrentServerView<TorrentOnboardingRouter>()
 						}
 					}
 				}
@@ -39,11 +39,11 @@ struct OnboardingSheetModifier: RoutableSheetViewModifier {
 }
 
 extension View {
-	func withOnboardingSheets(
-		router: Binding<OnboardingRouter>,
+	func withTorrentOnboardingSheets(
+		router: Binding<TorrentOnboardingRouter>,
 		preferences: Binding<TorrentPreferences>,
 		session: Binding<TorrentSession>
 	) -> some View {
-		modifier(OnboardingSheetModifier(router: router, preferences: preferences, session: session))
+		modifier(TorrentOnboardingSheetModifier(router: router, preferences: preferences, session: session))
 	}
 }

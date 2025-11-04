@@ -11,8 +11,8 @@ import Router
 public struct TorrentSettingsFlow: Flow {
 	public typealias Router = TorrentSettingsRouter
 
-	@Environment(TorrentPreferences.self) var preferences
-	@Environment(TorrentSession.self) var session
+	@Binding var preferences: TorrentPreferences
+	@Binding var session: TorrentSession
 
 // TODO: Fix plz
 	@State public  var router: TorrentSettingsRouter = .init()
