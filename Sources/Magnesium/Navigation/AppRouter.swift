@@ -6,6 +6,7 @@
 //
 import Observation
 import Router
+import SwiftUI
 
 /// Handles navigation within the app.
 @Observable
@@ -14,7 +15,7 @@ final class AppRouter: Routable {
 	typealias Sheet = AppSheet
 	typealias Error = AppError
 
-	var path: [Destination] = []
+	var path = NavigationPath()
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
 	let parent: (any Routable)?

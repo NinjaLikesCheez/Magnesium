@@ -8,10 +8,13 @@
 import Router
 import SwiftUI
 import TorrentUI
+import MagnesiumModule
 
 /// Navigation destinations for the Settings feature.
 enum SettingsDestination: RoutableDestination {
-	var id: Self { fatalError("Not yet implemented") }
+	var id: Self { self }
+
+	case moduleSettings(AppModules.ModuleType)
 }
 
 struct SettingsDestinationModifier: RoutableDestinationViewModifier {
@@ -19,7 +22,11 @@ struct SettingsDestinationModifier: RoutableDestinationViewModifier {
 		content
 			.navigationDestination(for: SettingsDestination.self) { destination in
 				switch destination {
-				default: fatalError("Not yet implemented")
+				case let .moduleSettings(moduleType):
+					switch moduleType {
+					case let .torrent(module):
+						module.settings
+					}
 				}
 			}
 	}

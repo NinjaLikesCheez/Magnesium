@@ -4,6 +4,7 @@
 //
 //  Created by ninji on 13/06/2025.
 //
+import SwiftUI
 import Observation
 import Router
 
@@ -14,7 +15,7 @@ final class SettingsRouter: Routable {
 	typealias Sheet = SettingsSheet
 	typealias Error = SettingsError
 
-	var path: [Destination] = []
+	var path = NavigationPath()
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
 	let parent: (any Routable)?

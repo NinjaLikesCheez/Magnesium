@@ -9,7 +9,7 @@ public enum TorrentOnboardingError: RoutableError {
 }
 
 struct TorrentOnboardingErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: TorrentOnboardingRouter
+	@Bindable var router: TorrentOnboardingRouter
 
 	func body(content: Content) -> some View {
 		content
@@ -26,7 +26,7 @@ struct TorrentOnboardingErrorModifier: RoutableErrorViewModifier {
 }
 
 extension View {
-	func withTorrentOnboardingErrors(router: Binding<TorrentOnboardingRouter>) -> some View {
+	func withTorrentOnboardingErrors(router: TorrentOnboardingRouter) -> some View {
 		modifier(TorrentOnboardingErrorModifier(router: router))
 	}
 }

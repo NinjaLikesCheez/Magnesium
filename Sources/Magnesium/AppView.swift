@@ -14,6 +14,8 @@ import SwiftUI
 import TorrentUI
 
 struct AppView: View {
+	@Environment(AppModules.self) var modules
+
 	@State private var appState = AppState.resuming
 	@State private var appPreferences = AppPreferences()
 	@State var showingSettings = false
@@ -22,10 +24,14 @@ struct AppView: View {
 		Group {
 			switch appState {
 			case .unboarded:
-				OnboardingFlow(router: .init())
+//				OnboardingFlow(router: .init())
+				modules
+					.torrent
+					.onboarding
 			case .onboarded:
 				NavigationStack {
-					TorrentModule
+					modules
+						.torrent
 						.entry
 						.toolbar {
 #if os(macOS)
@@ -48,6 +54,7 @@ struct AppView: View {
 						}
 						.sheet(isPresented: $showingSettings) {
 							SettingsFlow(router: .init())
+								.environment(modules)
 						}
 				}
 			case .resuming:
@@ -61,9 +68,10 @@ struct AppView: View {
 			}
 		}
 		.task {
-			appState = appPreferences.onboarded ? .onboarded : .unboarded
+			appState = modules.torrent.isEnabled ? .onboarded : .unboarded
+//			appState = appPreferences.onboarded ? .onboarded : .unboarded
 		}
-		.onChange(of: appPreferences.onboarded) { _, newValue in
+		.onChange(of: modules.torrent.isEnabled) { _, newValue in
 			appState = newValue ? .onboarded : .unboarded
 		}
 	}

@@ -6,6 +6,7 @@
 //
 import Observation
 import Router
+import SwiftUI
 
 /// Handles navigation within the Onboarding screen.
 @Observable
@@ -14,7 +15,7 @@ final class OnboardingRouter: Routable {
 	typealias Sheet = OnboardingSheet
 	typealias Error = OnboardingError
 
-	var path: [Destination] = []
+	var path = NavigationPath()
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
 	let parent: (any Routable)?

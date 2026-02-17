@@ -26,22 +26,22 @@ public struct TorrentSettingsListView: View {
 
 			resetSection
 		}
-		.navigationTitle("Settings")
-		.toolbar {
-			#if os(macOS)
-				ToolbarItem(placement: .primaryAction) {
-					Button("Done") {
-						router.dismissSheet(withParent: true)
-					}
-				}
-			#else
-				ToolbarItem(placement: .topBarTrailing) {
-					Button("Done") {
-						router.dismissSheet(withParent: true)
-					}
-				}
-			#endif
-		}
+		.navigationTitle("Torrent Settings")
+//		.toolbar {
+//			#if os(macOS)
+//				ToolbarItem(placement: .primaryAction) {
+//					Button("Done") {
+//						router.dismissSheet(withParent: true)
+//					}
+//				}
+//			#else
+//				ToolbarItem(placement: .topBarTrailing) {
+//					Button("Done") {
+//						router.dismissSheet(withParent: true)
+//					}
+//				}
+//			#endif
+//		}
 		.onAppear {
 			do throws(TorrentPreferences.Error) {
 				servers = try preferences.getServers()

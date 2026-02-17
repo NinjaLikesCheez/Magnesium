@@ -6,71 +6,56 @@ import MagnesiumModule
 import Common
 
 @MainActor
-@Observable
-public class TorrentModule: MagnesiumFeatureModule {
+public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
 	public typealias EntryPoint = TorrentsListFlow
 	public typealias SettingsFlow = TorrentSettingsFlow
 	public typealias OnboardingFlow = TorrentOnboardingFlow
 
-	private var session: TorrentSession
-	private var preferences: TorrentPreferences
-	private var manager: TorrentManager
+	let session: TorrentSession
+	let preferences: TorrentPreferences
+	let manager: TorrentManager
 
-	public var entry: EntryPoint
-	public var settings: SettingsFlow
-	public var onboarding: OnboardingFlow?
+	let parentRouter: (any Routable)?
 
-	public init() {
-		preferences = TorrentPreferences(userDefaults: .standard, keychain: SystemKeychain())
-		session = TorrentSession(preferences)
-		manager = TorrentManager(session: session, preferences: preferences)
+	public init(_ parentRouter: (any Routable)? = nil) {
+		preferences = .init(userDefaults: .standard, keychain: SystemKeychain())
+		session = .init(preferences)
+		manager = .init(session: session, preferences: preferences)
+		self.parentRouter = parentRouter
+	}
 
-		let bindable = Bindable(self)
-		self.entry = .init(session: bindable.session, preferences: bindable.preferences, manager: bindable.manager)
-		self.settings = .init(preferences: bindable.preferences, session: bindable.session)
-		self.onboarding = .init(preferences: bindable.preferences, session: bindable.session)
+	public let name: String  = "Torrent"
+
+	public var icon: Image { Image(systemName: "square.and.arrow.down") }
+
+	public var entry: TorrentsListFlow {
+		.init(session: session, preferences: preferences, manager: manager)
+	}
+
+	public var settings: TorrentSettingsFlow {
+		.init(preferences: preferences, session: session, router: .init(parentRouter))
+	}
+
+	public var onboarding: TorrentOnboardingFlow {
+		.init(preferences: preferences, session: session)
+	}
+
+	public var isEnabled: Bool {
+		session.server != nil
+	}
+
+	public func reset() {
+		preferences.reset()
+		session.reset()
+	}
+
+	public nonisolated static func == (lhs: TorrentModule, rhs: TorrentModule) -> Bool {
+		ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+	}
+
+	nonisolated public func hash(into hasher: inout Hasher) {
+		// TODO: this is terrible...
+		hasher.combine(name)
 	}
 }
 
-//@MainActor
-//public struct TorrentModule: @MainActor MagnesiumFeatureModule {
-//	public typealias EntryPoint = TorrentsListFlow
-//	public typealias SettingsFlow = SettingsFlow2
-//
-//	static public var entry: EntryPoint = {
-//		TorrentsListFlow()
-//	}()
-//	static public var settings: SettingsFlow = {
-//		SettingsFlow2(router: .init())
-//	}()
-//}
-//
-//extension Never: @retroactive RoutableDestination, @retroactive RoutableSheet, @retroactive RoutableError {}
-///// Handles navigation within the settings screen.
-//@Observable
-//final class SettingsRouter: Routable {
-//	typealias Destination = Never
-//	typealias Sheet = Never
-//	typealias Error = Never
-//
-//	var path: [Destination] = []
-//	var presentedSheet: Sheet? = nil
-//	var presentedError: Error? = nil
-//	let parent: (any Routable)?
-//
-//	required init(_ parent: (any Routable)? = nil) {
-//		self.parent = parent
-//	}
-//}
-//
-//
-//public struct SettingsFlow2: Flow {
-//	var router: SettingsRouter = .init()
-//
-//	typealias Router = SettingsRouter
-//
-//	public var body: some View {
-//		Text("Hello")
-//	}
-//}
-//

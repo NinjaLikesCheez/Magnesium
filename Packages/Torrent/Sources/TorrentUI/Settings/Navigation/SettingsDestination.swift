@@ -23,23 +23,35 @@ public enum TorrentSettingsDestination: RoutableDestination {
 }
 
 struct TorrentSettingsDestinationModifier: RoutableDestinationViewModifier {
+	let router: TorrentSettingsRouter
+	let session: TorrentSession
+	let preferences: TorrentPreferences
+
 	func body(content: Content) -> some View {
 		content
 			.navigationDestination(for: TorrentSettingsDestination.self) { destination in
 				switch destination {
 				case .addAServer:
 					AddServerView()
+						.environment(router)
 				case let .addNewServer(type):
 					switch type {
 					case .deluge:
 						AddDelugeServerView<TorrentSettingsRouter>()
+							.environment(router)
+							.environment(preferences)
 					case .qbittorrent:
 						AddQBittorrentServerView<TorrentSettingsRouter>()
+							.environment(router)
+							.environment(preferences)
 					}
 				case .editServer(let server):
 					switch server.type {
 					case .deluge:
 						EditDelugeServerView(server)
+							.environment(router)
+							.environment(preferences)
+							.environment(session)
 					case .qbittorrent:
 						//						EditQBittorrentServerView()
 						fatalError("Not yet implemented")
@@ -50,7 +62,7 @@ struct TorrentSettingsDestinationModifier: RoutableDestinationViewModifier {
 }
 
 extension View {
-	func withTorrentSettingsDestinations() -> some View {
-		modifier(TorrentSettingsDestinationModifier())
+	func withTorrentSettingsDestinations(router: TorrentSettingsRouter, session: TorrentSession, preferences: TorrentPreferences) -> some View {
+		modifier(TorrentSettingsDestinationModifier(router: router, session: session, preferences: preferences))
 	}
 }

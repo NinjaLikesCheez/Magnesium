@@ -6,6 +6,7 @@
 //
 import Observation
 import Router
+import SwiftUI
 
 /// Handles navigation within the settings screen.
 @Observable
@@ -14,7 +15,7 @@ public final class TorrentSettingsRouter: Routable {
 	public typealias Sheet = TorrentSettingsSheet
 	public typealias Error = TorrentSettingsError
 
-	public var path: [Destination] = []
+	public var path = NavigationPath()
 	public var presentedSheet: Sheet? = nil
 	public var presentedError: Error? = nil
 	public let parent: (any Routable)?

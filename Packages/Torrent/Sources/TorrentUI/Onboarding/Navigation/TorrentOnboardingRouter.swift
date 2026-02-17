@@ -7,6 +7,7 @@
 
 import Observation
 import Router
+import SwiftUI
 
 /// Router for the Onboarding feature flow.
 ///
@@ -18,12 +19,12 @@ public final class TorrentOnboardingRouter: Routable {
 	public typealias Sheet = TorrentOnboardingSheet
 	public typealias Error = TorrentOnboardingError
 
-	public var path: [Destination] = []
+	public var path: NavigationPath = .init()
 	public var presentedSheet: Sheet? = nil
 	public var presentedError: Error? = nil
 	public let parent: (any Routable)?
 
-	public required init(_ parent: (any Routable)? = nil) {
+	public required init(_ parent: (any Router.Routable)? = nil) {
 		self.parent = parent
 	}
 }

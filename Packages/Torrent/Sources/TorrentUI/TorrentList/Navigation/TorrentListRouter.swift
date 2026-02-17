@@ -7,6 +7,7 @@
 
 import Observation
 import Router
+import SwiftUI
 
 /// Handles navigation within the main torrent list screen
 @Observable
@@ -15,7 +16,7 @@ public final class TorrentListRouter: Routable {
 	public typealias Sheet = TorrentListSheet
 	public typealias Error = TorrentListError
 
-	public var path: [Destination] = []
+	public var path = NavigationPath()
 	public var presentedSheet: Sheet? = nil
 	public var presentedError: Error? = nil
 	public let parent: (any Routable)?

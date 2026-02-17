@@ -14,20 +14,21 @@ public struct TorrentsListFlow: Flow {
 
 	// TODO: fix plz
 	@State public var router: TorrentListRouter = .init()
-	@Binding var session: TorrentSession
-	@Binding var preferences: TorrentPreferences
-	@Binding var manager: TorrentManager
+
+	let session: TorrentSession
+	let preferences: TorrentPreferences
+	let manager: TorrentManager
 
 	public var body: some View {
 		NavigationStack(path: $router.path) {
 			TorrentNavigationView()
 				.withTorrentListDestinations(
-					manager: $manager
+					manager: manager
 				)
 				.withTorrentListSheets(
-					router: $router,
-					preferences: $preferences,
-					session: $session
+					router: router,
+					preferences: preferences,
+					session: session
 				)
 		}
 		.withTorrentListErrors(router: $router)

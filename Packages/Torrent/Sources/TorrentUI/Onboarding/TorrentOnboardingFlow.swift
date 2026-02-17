@@ -12,16 +12,16 @@ public struct TorrentOnboardingFlow: Flow {
 
 	@State public var router: TorrentOnboardingRouter = .init()
 
-	@Binding var preferences: TorrentPreferences
-	@Binding var session: TorrentSession
+	let preferences: TorrentPreferences
+	let session: TorrentSession
 
 	public var body: some View {
 		NavigationStack(path: $router.path) {
 			TorrentOnboardingView()
 				.withTorrentOnboardingDestinations()
-				.withTorrentOnboardingSheets(router: $router, preferences: $preferences, session: $session)
+				.withTorrentOnboardingSheets(router: router, preferences: preferences, session: session)
 		}
-		.withTorrentOnboardingErrors(router: $router)
+		.withTorrentOnboardingErrors(router: router)
 		.environment(router)
 		.environment(preferences)
 		.environment(session)

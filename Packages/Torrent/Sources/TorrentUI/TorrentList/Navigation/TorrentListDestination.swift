@@ -16,7 +16,7 @@ public enum TorrentListDestination: RoutableDestination {
 }
 
 struct TorrentListDestinationModifier: ViewModifier {
-	@Binding var manager: TorrentManager
+	let manager: TorrentManager
 
 	func body(content: Content) -> some View {
 		content
@@ -31,7 +31,7 @@ struct TorrentListDestinationModifier: ViewModifier {
 }
 
 extension View {
-	func withTorrentListDestinations(manager: Binding<TorrentManager>) -> some View {
+	func withTorrentListDestinations(manager: TorrentManager) -> some View {
 		modifier(TorrentListDestinationModifier(manager: manager))
 	}
 }

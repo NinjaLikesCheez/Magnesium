@@ -11,16 +11,17 @@ import Router
 public struct TorrentSettingsFlow: Flow {
 	public typealias Router = TorrentSettingsRouter
 
-	@Binding var preferences: TorrentPreferences
-	@Binding var session: TorrentSession
+	let preferences: TorrentPreferences
+	let session: TorrentSession
 
 // TODO: Fix plz
-	@State public  var router: TorrentSettingsRouter = .init()
+	@State public  var router: TorrentSettingsRouter
 
 	public var body: some View {
-		NavigationStack(path: $router.path) {
+//		NavigationStack(path: $router.path) {
+		Group {
 			TorrentSettingsListView()
-				.withTorrentSettingsDestinations()
+				.withTorrentSettingsDestinations(router: router, session: session, preferences: preferences)
 		}
 		.environment(router)
 		.environment(preferences)

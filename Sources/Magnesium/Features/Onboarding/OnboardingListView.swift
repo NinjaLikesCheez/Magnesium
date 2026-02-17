@@ -1,5 +1,4 @@
 import SwiftUI
-import Common
 import TorrentUI
 
 public struct OnboardingListView: View {

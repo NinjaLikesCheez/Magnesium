@@ -13,9 +13,9 @@ public enum TorrentListSheet: RoutableSheet {
 }
 
 struct TorrentListSheetViewModifier: ViewModifier {
-	@Binding var router: TorrentListRouter
-	@Binding var preferences: TorrentPreferences
-	@Binding var session: TorrentSession
+	@Bindable var router: TorrentListRouter
+	let preferences: TorrentPreferences
+	let session: TorrentSession
 
 	func body(content: Content) -> some View {
 		content
@@ -25,9 +25,9 @@ struct TorrentListSheetViewModifier: ViewModifier {
 
 extension View {
 	func withTorrentListSheets(
-		router: Binding<TorrentListRouter>,
-		preferences: Binding<TorrentPreferences>,
-		session: Binding<TorrentSession>
+		router: TorrentListRouter,
+		preferences: TorrentPreferences,
+		session: TorrentSession
 	) -> some View {
 		modifier(
 			TorrentListSheetViewModifier(
