@@ -23,6 +23,7 @@ public struct TorrentsListFlow: Flow {
 		NavigationStack(path: $router.path) {
 			TorrentNavigationView()
 				.withTorrentListDestinations(
+					router: router,
 					manager: manager
 				)
 				.withTorrentListSheets(

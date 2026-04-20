@@ -16,6 +16,7 @@ public enum TorrentListDestination: RoutableDestination {
 }
 
 struct TorrentListDestinationModifier: ViewModifier {
+	let router: TorrentListRouter
 	let manager: TorrentManager
 
 	func body(content: Content) -> some View {
@@ -25,13 +26,14 @@ struct TorrentListDestinationModifier: ViewModifier {
 				case let .detail(torrent):
 					TorrentDetailView(torrent: torrent)
 						.environment(manager)
+						.environment(router)
 				}
 			}
 	}
 }
 
 extension View {
-	func withTorrentListDestinations(manager: TorrentManager) -> some View {
-		modifier(TorrentListDestinationModifier(manager: manager))
+	func withTorrentListDestinations(router: TorrentListRouter, manager: TorrentManager) -> some View {
+		modifier(TorrentListDestinationModifier(router: router, manager: manager))
 	}
 }
