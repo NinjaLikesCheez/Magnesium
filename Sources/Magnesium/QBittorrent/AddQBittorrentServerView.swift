@@ -7,10 +7,11 @@
 
 import Router
 import SwiftUI
+import TorrentUI
 
-struct AddQBittorrentServerView<Router: RouterProtocol>: View {
-	@Environment(Session.self) private var session
-	@Environment(AppPreferences.self) private var preferences
+struct AddQBittorrentServerView<Router: Routable>: View {
+	@Environment(TorrentSession.self) private var session
+	@Environment(TorrentPreferences.self) private var preferences
 	@Environment(Router.self) private var router
 	@Environment(\.isPresented) private var isPresented
 
@@ -76,7 +77,7 @@ struct AddQBittorrentServerView<Router: RouterProtocol>: View {
 					case .unknown(message: let message):
 						errorMessage = "Unknown error occurred: \(message)"
 					}
-				} catch let error as Session.Error {
+				} catch let error as TorrentSession.Error {
 					switch error {
 					case .missingKeychainData:
 						errorMessage = "Missing keychain data. Please try again."

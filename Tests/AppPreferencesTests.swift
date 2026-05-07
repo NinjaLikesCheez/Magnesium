@@ -2,16 +2,16 @@ import Testing
 import Foundation
 @testable import Magnesium
 
-@Suite("AppPreferences Tests")
+@Suite("TorrentPreferences Tests")
 class AppPreferencesTests {
 	// MARK: - Test Setup
 	private let suiteName = "test-\(UUID().uuidString)"
 	private let testDefaults: UserDefaults
-	private let preferences: AppPreferences
+	private let preferences: TorrentPreferences
 
 	init() {
 		testDefaults = UserDefaults(suiteName: suiteName)!
-		preferences = AppPreferences(userDefaults: testDefaults)
+		preferences = TorrentPreferences(userDefaults: testDefaults)
 	}
 
 	deinit {
@@ -83,7 +83,7 @@ class AppPreferencesTests {
 		preferences.reset()
 
 		// Assert - Create new preferences instance to verify persistence was cleared
-		let newPreferences = AppPreferences(userDefaults: testDefaults)
+		let newPreferences = TorrentPreferences(userDefaults: testDefaults)
 		#expect(newPreferences.autoRefreshInterval == 2.0) // Default value
 		#expect(newPreferences.automaticallyLookForMagnetLinks == false)
 		#expect(newPreferences.sortOption.property == .dateAdded) // Default value
@@ -136,7 +136,7 @@ class AppPreferencesTests {
 	@Test("Preferences persist across instances")
 	func preferencesPersistAcrossInstances() {
 		// Arrange - Set preferences in first instance
-		let preferences1 = AppPreferences(userDefaults: testDefaults)
+		let preferences1 = TorrentPreferences(userDefaults: testDefaults)
 		preferences1.autoRefreshInterval = 7.5
 		preferences1.automaticallyLookForMagnetLinks = true
 		preferences1.sortOption = SortOption(property: .uploadSpeed, direction: .descending)
@@ -147,7 +147,7 @@ class AppPreferencesTests {
 		preferences1.selectedServerID = "persistent-server"
 
 		// Act - Create new instance with same UserDefaults
-		let preferences2 = AppPreferences(userDefaults: testDefaults)
+		let preferences2 = TorrentPreferences(userDefaults: testDefaults)
 
 		// Assert - Values should persist
 		#expect(preferences2.autoRefreshInterval == 7.5)
@@ -161,7 +161,7 @@ class AppPreferencesTests {
 
 	// MARK: - Default Values Tests
 
-	@Test("AppPreferences has correct default values")
+	@Test("TorrentPreferences has correct default values")
 	func appPreferencesHasCorrectDefaultValues() {
 		// Assert default values
 		#expect(preferences.autoRefreshInterval == 2.0)

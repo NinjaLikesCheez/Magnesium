@@ -1,10 +1,9 @@
 import Router
 import SwiftUI
+import CommonUI
 
 enum OnboardingError: RoutableError {
-	var id: Self { self }
-
-	case addServerError(ServerSettingsError)
+	var id: Self { fatalError("Not yet implemented") }
 }
 
 struct OnboardingErrorModifier: RoutableErrorViewModifier {
@@ -14,11 +13,7 @@ struct OnboardingErrorModifier: RoutableErrorViewModifier {
 		content
 			.panel(item: $router.presentedError) { error in
 				switch error {
-				case let .addServerError(error):
-					ErrorPanelCard(
-						error: error,
-						primaryButtonAction: router.dismissError
-					)
+				default: fatalError("Not yet implemented")
 				}
 			}
 	}

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import APIClient
+import Common
 
 struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 	let formContent: () -> FormContent
@@ -66,12 +68,58 @@ struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 	}
 }
 
-enum ServerSettingsError: VisualError {
+enum ServerSettingsError {
 	case invalidState(message: String)
 	case unableToAuthenticate
 	case request(message: String)
 	case response(message: String)
 	case keychain(message: String)
 	case unknown(message: String)
+}
+
+extension ServerSettingsError: VisualError {
+	var title: String {
+		switch self {
+		case .invalidState:
+			"Couldn't Add Server"
+		case .unableToAuthenticate:
+			"Couldn't Authenticate"
+		case .request:
+			"Request Error"
+		case .response:
+			"Response Error"
+		case .keychain:
+			"Couldn't Save Settings"
+		case .unknown:
+			"Unknown Error Occurred"
+		}
+	}
+
+	var systemName: String {
+		switch self {
+		case .invalidState:
+			"nosign"
+		case .unableToAuthenticate:
+			"server.rack"
+		case .request:
+			"network.slash"
+		case .response:
+			"network.slash"
+		case .unknown:
+			"questionmark"
+		case .keychain:
+			"person.badge.key"
+		}
+	}
+
+	var subtitle: String {
+		switch self {
+		case let .invalidState(message), let .request(message), let .response(message), let .keychain(message),
+			let .unknown(message):
+			message
+		case .unableToAuthenticate:
+			"Please check your settings and try again"
+		}
+	}
 }
 

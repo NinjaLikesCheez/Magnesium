@@ -2,25 +2,22 @@
 //  OnboardingFlow.swift
 //  Magnesium
 //
-//  Created by ninji on 13/06/2025.
+//  Created by ninji on 03/11/2025.
 //
+
 import SwiftUI
+import Router
 
-struct OnboardingFlow: View {
-	@State var onboardingRouter: OnboardingRouter
+struct OnboardingFlow: Flow {
+	typealias Router = OnboardingRouter
 
-	@Binding var preferences: AppPreferences
-	@Binding var session: Session
+	@State var router: OnboardingRouter
 
 	var body: some View {
-		NavigationStack(path: $onboardingRouter.path) {
-			OnboardingView()
+		NavigationStack(path: $router.path) {
+			OnboardingListView()
 				.withOnboardingDestinations()
-				.withOnboardingSheets(router: $onboardingRouter, preferences: $preferences, session: $session)
 		}
-		.withOnboardingErrors(router: $onboardingRouter)
-		.environment(onboardingRouter)
-		.environment(preferences)
-		.environment(session)
+		.environment(router)
 	}
 }

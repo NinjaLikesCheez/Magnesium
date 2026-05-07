@@ -2,7 +2,7 @@ import Foundation
 import Combine
 @testable import Magnesium
 
-/// Mock implementation of AppPreferences for testing
+/// Mock implementation of TorrentPreferences for testing
 class MockAppPreferences: ObservableObject, Preferences {
     // MARK: - Mock Storage
     
@@ -34,7 +34,7 @@ class MockAppPreferences: ObservableObject, Preferences {
     
     var resetCallCount = 0
     
-    // MARK: - AppPreferences-like Interface
+    // MARK: - TorrentPreferences-like Interface
     
     func getSelectedServer() throws -> Server? {
         getSelectedServerCallCount += 1

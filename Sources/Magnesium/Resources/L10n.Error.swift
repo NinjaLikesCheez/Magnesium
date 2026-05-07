@@ -85,7 +85,7 @@ extension L10n {
         }
 
         static var noSessionID: String {
-            NSLocalizedString("error.no-session-id", comment: "Unable to retrieve Session ID.")
+            NSLocalizedString("error.no-session-id", comment: "Unable to retrieve TorrentSession ID.")
         }
 
         static func unexpectedStatusCode(_ statusCode: Int) -> String {

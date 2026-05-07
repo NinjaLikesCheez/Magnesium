@@ -5,32 +5,45 @@ configFiles:
   Debug: config/Debug.xcconfig
   Release: config/Release.xcconfig
 packages:
+  #### Local Packages ####
+  TorrentUI:
+    path: Packages/Torrent
+  Common:
+    path: Packages/Common
+  MagnesiumModule:
+    path: Packages/MagnesiumModule
+  #### Remote Packages ####
   Deluge:
-    path: ../Deluge-Swift
-    # url: https://github.com/jameshurst/Deluge-Swift
-    # branch: connected
+    # path: ../Deluge-Swift
+    url: https://github.com/NinjaLikesCheez/Deluge-Swift
+    from: 1.2.0
   QBittorrent:
     path: ../QBittorrent-Swift
     # url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     # branch: main
+  Router:
+    path: ../Router
+    # url: https://github.com/NinjaLikesCheez/Router
+    # from: 1.0.0
   ObservableDefaults:
-    path: ../../fatbobman/ObservableDefaults
-    # url: https://github.com/NinjaLikesCheez/ObservableDefaults
-    # branch: allow-optionals
+    # path: ../../fatbobman/ObservableDefaults
+    url: https://github.com/fatbobman/ObservableDefaults
+    from: 1.7.0
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
-  Router:
-    path: Sources/Router
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    from: 9.10.0
 targets:
   Magnesium:
     type: application
     supportedDestinations: [iOS, tvOS, macOS, visionOS]
     deploymentTarget:
-      iOS: 18.4
-      tvOS: 18.4
-      macOS: 15.4
-      visionOS: 2.0
+      iOS: 26
+      tvOS: 26
+      macOS: 26
+      visionOS: 26
     sources:
       - Sources/Magnesium
     settings:
@@ -48,11 +61,18 @@ targets:
       Debug: config/Magnesium-Debug.xcconfig
       Release: config/Magnesium-Release.xcconfig
     dependencies:
+      - package: Common
+        products:
+          - Common
+          - CommonUI
+      - package: TorrentUI
+      - package: MagnesiumModule
       - package: Deluge
       - package: QBittorrent
       - package: Logging
       - package: ObservableDefaults
       - package: Router
+      - package: Sentry
     scheme:
       testTargets:
         - MagnesiumTests

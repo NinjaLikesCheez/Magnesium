@@ -2,28 +2,25 @@
 //  OnboardingRouter.swift
 //  Magnesium
 //
-//  Created by ninji on 13/06/2025.
+//  Created by ninji on 03/11/2025.
 //
-
 import Observation
 import Router
+import SwiftUI
 
-/// Router for the Onboarding feature flow.
-///
-/// Handles navigation during the initial app setup process for server
-/// configuration.
+/// Handles navigation within the Onboarding screen.
 @Observable
-final class OnboardingRouter: RouterProtocol {
+final class OnboardingRouter: Routable {
 	typealias Destination = OnboardingDestination
 	typealias Sheet = OnboardingSheet
 	typealias Error = OnboardingError
 
-	var path: [Destination] = []
+	var path = NavigationPath()
 	var presentedSheet: Sheet? = nil
 	var presentedError: Error? = nil
-	let parent: (any RouterProtocol)?
+	let parent: (any Routable)?
 
-	required init(_ parent: (any RouterProtocol)? = nil) {
+	required init(_ parent: (any Routable)? = nil) {
 		self.parent = parent
 	}
 }

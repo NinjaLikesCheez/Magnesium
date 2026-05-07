@@ -7,19 +7,14 @@
 
 import Router
 import SwiftUI
+import TorrentUI
+import MagnesiumModule
 
 /// Navigation destinations for the Settings feature.
 enum SettingsDestination: RoutableDestination {
 	var id: Self { self }
 
-	/// Navigate to edit an existing server's configuration
-	case editServer(Server)
-
-	/// Navigate to the server selection screen where users can choose which type of server to add
-	case addAServer
-
-	/// Navigate directly to add a specific server type
-	case addNewServer(ServerType)
+	case moduleSettings(AppModules.ModuleType)
 }
 
 struct SettingsDestinationModifier: RoutableDestinationViewModifier {
@@ -27,22 +22,10 @@ struct SettingsDestinationModifier: RoutableDestinationViewModifier {
 		content
 			.navigationDestination(for: SettingsDestination.self) { destination in
 				switch destination {
-				case .addAServer:
-					AddServerView()
-				case let .addNewServer(type):
-					switch type {
-					case .deluge:
-						AddDelugeServerView<SettingsRouter>()
-					case .qbittorrent:
-						AddQBittorrentServerView<SettingsRouter>()
-					}
-				case .editServer(let server):
-					switch server.type {
-					case .deluge:
-						EditDelugeServerView(server)
-					case .qbittorrent:
-						//						EditQBittorrentServerView()
-						fatalError("Not yet implemented")
+				case let .moduleSettings(moduleType):
+					switch moduleType {
+					case let .torrent(module):
+						module.settings
 					}
 				}
 			}

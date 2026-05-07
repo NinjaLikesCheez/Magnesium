@@ -18,7 +18,7 @@ Tests/
 ├── ErrorHandlingTests.swift           # Error handling and edge cases
 ├── FormattersTests.swift              # Data formatting utilities
 ├── ServerTests.swift                  # Server model tests
-├── SessionTests.swift                 # Session management tests
+├── SessionTests.swift                 # TorrentSession management tests
 ├── StandardTorrentTests.swift         # Core torrent model tests
 ├── TorrentManagerTests.swift          # Business logic tests
 ├── TorrentMapperTests.swift           # Filtering and sorting tests
@@ -205,7 +205,7 @@ The following components require 90%+ coverage:
 - StandardTorrent model and computed properties
 - TorrentMapper filtering and sorting
 - TorrentManager business logic
-- Session management and error handling
+- TorrentSession management and error handling
 
 ## Best Practices
 

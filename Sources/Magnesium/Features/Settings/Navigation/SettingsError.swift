@@ -1,12 +1,14 @@
 import Router
 import SwiftUI
+import CommonUI
+import TorrentUI
 
 enum SettingsError: RoutableError {
 	var id: Self { self }
 
-	case preferences(AppPreferences.Error)
+	case preferences(TorrentPreferences.Error)
 	case serverSettings(ServerSettingsError)
-	case session(Session.Error)
+	case session(TorrentSession.Error)
 }
 
 struct SettingsErrorModifier: RoutableErrorViewModifier {

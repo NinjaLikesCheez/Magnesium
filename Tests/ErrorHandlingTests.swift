@@ -31,15 +31,15 @@ struct ErrorHandlingTests {
 		}
 	}
 
-	// MARK: - Session Error Handling Tests
+	// MARK: - TorrentSession Error Handling Tests
 
-	@Test("Session.Error provides detailed error information")
+	@Test("TorrentSession.Error provides detailed error information")
 	func sessionErrorProvidesDetailedErrorInformation() throws {
 		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge)
 		let underlyingError = NSError(domain: "TestDomain", code: 123, userInfo: [NSLocalizedDescriptionKey: "Test error"])
 
 		// Test missingKeychainData error
-		let missingKeychainError = Session.Error.missingKeychainData(server: server)
+		let missingKeychainError = TorrentSession.Error.missingKeychainData(server: server)
 
 		switch missingKeychainError {
 		case .missingKeychainData(let errorServer):
@@ -50,7 +50,7 @@ struct ErrorHandlingTests {
 		}
 
 		// Test decodingFailed error
-		let decodingError = Session.Error.decodingFailed(underlyingError)
+		let decodingError = TorrentSession.Error.decodingFailed(underlyingError)
 
 		switch decodingError {
 		case .decodingFailed(let error):
@@ -62,7 +62,7 @@ struct ErrorHandlingTests {
 		}
 
 		// Test notImplemented error
-		let notImplementedError = Session.Error.notImplemented
+		let notImplementedError = TorrentSession.Error.notImplemented
 
 		switch notImplementedError {
 		case .notImplemented:
@@ -73,7 +73,7 @@ struct ErrorHandlingTests {
 		}
 	}
 
-	@Test("Session error handling preserves original error context")
+	@Test("TorrentSession error handling preserves original error context")
 	func sessionErrorHandlingPreservesOriginalErrorContext() throws {
 		// Create a complex underlying error with userInfo
 		let userInfo: [String: Any] = [
@@ -83,7 +83,7 @@ struct ErrorHandlingTests {
 		]
 		let underlyingError = NSError(domain: "DecodingDomain", code: 4865, userInfo: userInfo)
 
-		let sessionError = Session.Error.decodingFailed(underlyingError)
+		let sessionError = TorrentSession.Error.decodingFailed(underlyingError)
 
 		switch sessionError {
 		case .decodingFailed(let error):
@@ -177,12 +177,12 @@ struct ErrorHandlingTests {
 		#expect(server.keychainData == nil)
 
 		// The actual validation happens when trying to decode the data
-		// which is tested in Session tests
+		// which is tested in TorrentSession tests
 	}
 
 	// MARK: - Preferences Error Handling Tests
 
-	@Test("AppPreferences handles corrupted UserDefaults gracefully")
+	@Test("TorrentPreferences handles corrupted UserDefaults gracefully")
 	func appPreferencesHandlesCorruptedUserDefaultsGracefully() throws {
 		let suiteName = "test-corrupted-\(UUID().uuidString)"
 		let testDefaults = UserDefaults(suiteName: suiteName)!
@@ -191,7 +191,7 @@ struct ErrorHandlingTests {
 		testDefaults.set("invalid-data", forKey: "servers")
 		testDefaults.set(["invalid": "data"], forKey: "selectedServerID")
 
-		let preferences = AppPreferences(userDefaults: testDefaults)
+		let preferences = TorrentPreferences(userDefaults: testDefaults)
 
 		// Verify preferences can be created and provide defaults
 		#expect(preferences.servers.isEmpty) // Should fall back to empty array
@@ -267,14 +267,14 @@ struct ErrorHandlingTests {
 
 	// MARK: - Invalid State Error Handling Tests
 
-	@Test("Session handles invalid server type gracefully")
+	@Test("TorrentSession handles invalid server type gracefully")
 	func sessionHandlesInvalidServerTypeGracefully() throws {
 		// This test verifies that adding new server types doesn't break existing code
 		let server = TestDataFactory.createServer(name: "Future Server", type: .qbittorrent)
 
 		// Should throw notImplemented error for unimplemented server types
-		#expect(throws: Session.Error.self) {
-			try Session.actionImplementation(server: server)
+		#expect(throws: TorrentSession.Error.self) {
+			try TorrentSession.actionImplementation(server: server)
 		}
 	}
 
@@ -308,12 +308,12 @@ struct ErrorHandlingTests {
 
 	// MARK: - Error Recovery Tests
 
-	@Test("Session recovers from temporary errors")
+	@Test("TorrentSession recovers from temporary errors")
 	func sessionRecoversFromTemporaryErrors() throws {
 		let suiteName = "test-recovery-\(UUID().uuidString)"
 		let testDefaults = UserDefaults(suiteName: suiteName)!
-		let preferences = AppPreferences(userDefaults: testDefaults)
-		let session = Session(preferences)
+		let preferences = TorrentPreferences(userDefaults: testDefaults)
+		let session = TorrentSession(preferences)
 
 		// First, set a valid server
 		let validServerData = try JSONEncoder().encode(DelugeServerSettings(url: URL(string: "http://localhost:8112")!))
@@ -337,7 +337,7 @@ struct ErrorHandlingTests {
 			keychainData: validKeychainData
 		)
 
-		#expect(throws: Session.Error.self) {
+		#expect(throws: TorrentSession.Error.self) {
 			try session.setServer(invalidServer)
 		}
 
@@ -823,7 +823,7 @@ struct ErrorHandlingTests {
 			#expect(server.name == "Test Server")
 			#expect(server.data == data)
 
-			// Decoding should fail gracefully (tested in Session tests)
+			// Decoding should fail gracefully (tested in TorrentSession tests)
 		}
 	}
 

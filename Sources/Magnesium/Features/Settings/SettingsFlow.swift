@@ -6,20 +6,19 @@
 //
 
 import SwiftUI
+import TorrentUI
+import Router
 
-struct SettingsFlow: View {
-	@Environment(AppPreferences.self) var preferences
-	@Environment(Session.self) var session
+struct SettingsFlow: Flow {
+	typealias Router = SettingsRouter
 
-	@State var settingsRouter: SettingsRouter
+	@State var router: SettingsRouter
 
 	var body: some View {
-		NavigationStack(path: $settingsRouter.path) {
+		NavigationStack(path: $router.path) {
 			SettingsListView()
 				.withSettingsDestinations()
 		}
-		.environment(settingsRouter)
-		.environment(preferences)
-		.environment(session)
+		.environment(router)
 	}
 }
