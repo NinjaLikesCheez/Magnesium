@@ -32,6 +32,9 @@ packages:
   Logging:
     url: https://github.com/apple/swift-log
     from: 1.6.2
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    from: 9.10.0
 targets:
   Magnesium:
     type: application
@@ -69,6 +72,7 @@ targets:
       - package: Logging
       - package: ObservableDefaults
       - package: Router
+      - package: Sentry
     scheme:
       testTargets:
         - MagnesiumTests

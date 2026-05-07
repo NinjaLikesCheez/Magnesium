@@ -67,3 +67,5 @@ buildServer.json
 Magnesium.xcodeproj
 .build
 .build/workspace-state.json
+
+.sentryclirc
