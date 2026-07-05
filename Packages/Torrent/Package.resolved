@@ -1,13 +1,13 @@
 {
-  "originHash" : "a830272279fc879e26b4be7ecb487396538011fa517b98cd6d736a08b46c33a3",
+  "originHash" : "d3bff1c3dc18e14d384f4cd50047b1b1555514cf61144968d400f1b69cbdd371",
   "pins" : [
     {
       "identity" : "deluge-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/NinjaLikesCheez/Deluge-Swift",
       "state" : {
-        "branch" : "feature/seeding-time",
-        "revision" : "153774354337d2573321a90608b6cc9760791f02"
+        "revision" : "9fdf33e0cdaecd44e236dbc638f9c70c1d6e9818",
+        "version" : "1.2.2"
       }
     },
     {

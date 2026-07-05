@@ -35,7 +35,6 @@ struct MagnesiumApp: App {
 			options.enableLogs = true
 
 			options.enableAutoPerformanceTracing = true
-			options.experimental.enableSessionReplayInUnreliableEnvironment = true
 		}
 
 		LoggingSystem.bootstrap { label in

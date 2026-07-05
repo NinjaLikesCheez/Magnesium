@@ -16,7 +16,7 @@ let package = Package(
 	dependencies: [
 		.package(path: "../Common"),
 		.package(path: "../MagnesiumModule"),
-		.package(url: "https://github.com/NinjaLikesCheez/Deluge-Swift", branch: "feature/seeding-time"),
+		.package(url: "https://github.com/NinjaLikesCheez/Deluge-Swift", from: "1.2.2"),
 		.package(url: "https://github.com/NinjaLikesCheez/qBittorrent-Swift", from: "0.0.2"),
 		.package(url: "https://github.com/NinjaLikesCheez/Router", branch: "main"),
 		.package(url: "https://github.com/fatbobman/ObservableDefaults", from: "1.7.0"),
