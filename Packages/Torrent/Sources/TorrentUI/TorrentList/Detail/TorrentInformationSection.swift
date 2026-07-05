@@ -22,6 +22,7 @@ struct TorrentInformationSection: View {
 			.init(label: "Ratio", value: torrent.formattedRatio()),
 			.init(label: "Peers", value: "\(torrent.peers)"),
 			.init(label: "Seeds", value: "\(torrent.seeds)"),
+			.init(label: "Seeding Time", value: torrent.formattedSeedingTime),
 			.init(label: "Download Folder", value: torrent.downloadPath)
 		]
 	}

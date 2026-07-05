@@ -58,6 +58,7 @@ public extension StandardTorrent {
 			peers: torrent.numLeechs,
 			progress: Float(torrent.progress),
 			seeds: torrent.numSeeds,
+			seedingTime: TimeInterval(torrent.seedingTime),
 			size: Int64(torrent.size),
 			state: Self.state(for: torrent.state),
 			totalPeers: torrent.numIncomplete,

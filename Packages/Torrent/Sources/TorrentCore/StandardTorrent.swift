@@ -18,6 +18,7 @@ public final class StandardTorrent {
 	public private(set) var peers: Int
 	public private(set) var progress: Float
 	public private(set) var seeds: Int
+	public private(set) var seedingTime: TimeInterval
 	public private(set) var size: Int64
 	public private(set) var state: StandardTorrentState
 	public private(set) var totalPeers: Int
@@ -38,6 +39,7 @@ public final class StandardTorrent {
 		peers: Int,
 		progress: Float,
 		seeds: Int,
+		seedingTime: TimeInterval,
 		size: Int64,
 		state: StandardTorrentState,
 		totalPeers: Int,
@@ -58,6 +60,7 @@ public final class StandardTorrent {
 		self.peers = peers
 		self.progress = progress
 		self.seeds = seeds
+		self.seedingTime = seedingTime
 		self.size = size
 		self.state = state
 		self.totalPeers = totalPeers
@@ -84,6 +87,7 @@ public final class StandardTorrent {
 		self.peers = torrent.peers
 		self.progress = torrent.progress
 		self.seeds = torrent.seeds
+		self.seedingTime = torrent.seedingTime
 		self.size = torrent.size
 		self.state = torrent.state
 		self.totalPeers = torrent.totalPeers
@@ -129,6 +133,12 @@ extension StandardTorrent {
 		eta > 0
 			? Duration.seconds(eta).formatted(Formatters.eta)
 			: "∞"
+	}
+
+	public var formattedSeedingTime: String {
+		seedingTime > 0
+			? Duration.seconds(seedingTime).formatted(Formatters.eta)
+			: "-"
 	}
 
 	public func formattedRatio(precision: Int = 1) -> String {

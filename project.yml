@@ -16,7 +16,7 @@ packages:
   Deluge:
     # path: ../Deluge-Swift
     url: https://github.com/NinjaLikesCheez/Deluge-Swift
-    from: 1.2.0
+    branch: feature/seeding-time
   QBittorrent:
     # path: ../QBittorrent-Swift
     url: https://github.com/NinjaLikesCheez/QBittorrent-Swift

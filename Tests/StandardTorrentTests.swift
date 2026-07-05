@@ -20,6 +20,7 @@ struct StandardTorrentTests {
 		let peers = 5
 		let progress: Float = 0.75
 		let seeds = 10
+		let seedingTime: TimeInterval = 7200 // 2 hours
 		let size: Int64 = 1024 * 1024 * 1024 // 1 GB
 		let state = TorrentState.downloading
 		let totalPeers = 20
@@ -41,6 +42,7 @@ struct StandardTorrentTests {
 			peers: peers,
 			progress: progress,
 			seeds: seeds,
+			seedingTime: seedingTime,
 			size: size,
 			state: state,
 			totalPeers: totalPeers,
@@ -63,6 +65,7 @@ struct StandardTorrentTests {
 		#expect(torrent.peers == peers)
 		#expect(torrent.progress == progress)
 		#expect(torrent.seeds == seeds)
+		#expect(torrent.seedingTime == seedingTime)
 		#expect(torrent.size == size)
 		#expect(torrent.state == state)
 		#expect(torrent.totalPeers == totalPeers)
@@ -92,7 +95,8 @@ struct StandardTorrentTests {
 			downloaded: 2048,
 			uploaded: 1024,
 			downloadRate: 500,
-			uploadRate: 250
+			uploadRate: 250,
+			seedingTime: 3600
 		)
 
 		// Act
@@ -113,6 +117,7 @@ struct StandardTorrentTests {
 		#expect(originalTorrent.label == updatedTorrent.label)
 		#expect(originalTorrent.peers == updatedTorrent.peers)
 		#expect(originalTorrent.seeds == updatedTorrent.seeds)
+		#expect(originalTorrent.seedingTime == updatedTorrent.seedingTime)
 		#expect(originalTorrent.size == updatedTorrent.size)
 		#expect(originalTorrent.totalPeers == updatedTorrent.totalPeers)
 		#expect(originalTorrent.totalSeeds == updatedTorrent.totalSeeds)
