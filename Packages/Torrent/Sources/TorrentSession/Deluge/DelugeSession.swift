@@ -49,6 +49,7 @@ extension DelugeRequest {
 			.peers,
 			.progress,
 			.seeds,
+			.seedingTime,
 			.size,
 			.state,
 			.totalPeers,

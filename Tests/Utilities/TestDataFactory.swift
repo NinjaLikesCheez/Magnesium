@@ -22,6 +22,7 @@ struct TestDataFactory {
 		downloadPath: String = "/downloads",
 		peers: Int = 5,
 		seeds: Int = 10,
+		seedingTime: TimeInterval = 0,
 		totalPeers: Int = 20,
 		totalSeeds: Int = 30,
 		trackers: [String] = ["http://tracker.example.com"]
@@ -38,6 +39,7 @@ struct TestDataFactory {
 			peers: peers,
 			progress: progress,
 			seeds: seeds,
+			seedingTime: seedingTime,
 			size: size,
 			state: state,
 			totalPeers: totalPeers,
