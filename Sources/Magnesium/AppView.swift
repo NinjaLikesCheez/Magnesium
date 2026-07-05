@@ -18,7 +18,7 @@ struct AppView: View {
 
 	@State private var appState = AppState.resuming
 	@State private var appPreferences = AppPreferences()
-	@State var showingSettings = false
+	@State private var router = AppRouter()
 
 	var body: some View {
 		Group {
@@ -37,7 +37,7 @@ struct AppView: View {
 #if os(macOS)
 							ToolbarItem(placement: .primaryAction) {
 								Button {
-									showingSettings.toggle()
+									router.presentSheet(.settings)
 								} label: {
 									Image(systemName: "gear")
 								}
@@ -45,17 +45,14 @@ struct AppView: View {
 #else
 							ToolbarItem(placement: .topBarLeading) {
 								Button {
-									showingSettings.toggle()
+									router.presentSheet(.settings)
 								} label: {
 									Image(systemName: "gear")
 								}
 							}
 #endif
 						}
-						.sheet(isPresented: $showingSettings) {
-							SettingsFlow(router: .init())
-								.environment(modules)
-						}
+						.withAppSheets(router: router, modules: modules)
 				}
 			case .resuming:
 				ProgressView()
