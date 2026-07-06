@@ -1,9 +1,14 @@
-import Testing
+import Common
 import Foundation
-@testable import Magnesium
+import Testing
+
+@testable import TorrentCore
+@testable import TorrentPreferences
+@testable import TorrentSession
 
 @Suite("TorrentSession Tests")
-class SessionTests {
+@MainActor
+class TorrentSessionTests {
 
 	// MARK: - Test Setup
 	private let suiteName: String
@@ -14,12 +19,12 @@ class SessionTests {
 	init() {
 		suiteName = "test-\(UUID().uuidString)"
 		testDefaults = UserDefaults(suiteName: suiteName)!
-		preferences = TorrentPreferences(userDefaults: testDefaults)
+		preferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 		session = .init(preferences)
 	}
 
 	deinit {
-		testDefaults.removePersistentDomain(forName: suiteName)
+		UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
 	}
 
 	// MARK: - Initialization Tests
@@ -28,14 +33,15 @@ class SessionTests {
 	func sessionInitializesWithNoServerWhenPreferencesAreEmpty() {
 		// Assert
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	@Test("TorrentSession initializes with selected server from preferences")
 	func sessionInitializesWithSelectedServerFromPreferences() throws {
 		// Arrange - Set up server in preferences first
-		let preferences = TorrentPreferences(keychain: MockKeychain())
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let preferences = TorrentPreferences(keychain: InMemoryKeychain())
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try preferences.addOrUpdate(server: server)
 		preferences.selectedServerID = server.id
 
@@ -54,7 +60,8 @@ class SessionTests {
 	@Test("Set server updates server property")
 	func setServerUpdatesServerProperty() throws {
 		// Arrange
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 
 		// Act
 		try session.setServer(server)
@@ -69,7 +76,8 @@ class SessionTests {
 	@Test("Set server updates selected server ID in preferences")
 	func setServerUpdatesSelectedServerIDInPreferences() throws {
 		// Arrange
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 
 		// Act
 		try session.setServer(server)
@@ -81,7 +89,8 @@ class SessionTests {
 	@Test("Set server with nil clears server")
 	func setServerWithNilClearsServer() throws {
 		// Arrange - First set a server
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try session.setServer(server)
 
 		// Act
@@ -89,13 +98,13 @@ class SessionTests {
 
 		// Assert
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	// MARK: - Action Implementation Creation Tests
 
-	@Test("Action implementation creation for Deluge server with valid data")
-	func actionImplementationCreationForDelugeServerWithValidData() throws {
+	@Test("Client creation for Deluge server with valid data")
+	func clientCreationForDelugeServerWithValidData() throws {
 		// Arrange
 		let serverSettings = DelugeServerSettings(url: URL(string: "http://localhost:58846")!)
 		let keychainData = DelugeKeychainData(password: "test-password", basicAuthentication: nil)
@@ -112,14 +121,14 @@ class SessionTests {
 		)
 
 		// Act
-		let actionImplementation = try TorrentSession.actionImplementation(server: server)
+		try session.setServer(server)
 
 		// Assert
-		#expect(actionImplementation is DelugeActionImplementation)
+		#expect(!(session.client is NullTorrentClient))
 	}
 
-	@Test("Action implementation creation throws error for missing keychain data")
-	func actionImplementationCreationThrowsErrorForMissingKeychainData() throws {
+	@Test("Client creation throws error for missing keychain data")
+	func clientCreationThrowsErrorForMissingKeychainData() throws {
 		// Arrange
 		let serverSettings = DelugeServerSettings(url: URL(string: "http://localhost:58846")!)
 		let encoder = JSONEncoder()
@@ -129,12 +138,12 @@ class SessionTests {
 			name: "Deluge Server",
 			type: .deluge,
 			data: serverData,
-			keychainData: nil // Missing keychain data
+			keychainData: nil  // Missing keychain data
 		)
 
 		// Act & Assert
 		let error = #expect(throws: TorrentSession.Error.self) {
-			try TorrentSession.actionImplementation(server: server)
+			try session.setServer(server)
 		}
 
 		if case .missingKeychainData(let errorServer) = error {
@@ -144,8 +153,8 @@ class SessionTests {
 		}
 	}
 
-	@Test("Action implementation creation throws error for invalid server data")
-	func actionImplementationCreationThrowsErrorForInvalidServerData() throws {
+	@Test("Client creation throws error for invalid server data")
+	func clientCreationThrowsErrorForInvalidServerData() throws {
 		// Arrange
 		let invalidServerData = "invalid json".data(using: .utf8)!
 		let keychainData = DelugeKeychainData(password: "test-password", basicAuthentication: nil)
@@ -162,7 +171,7 @@ class SessionTests {
 
 		// Act & Assert
 		let error = #expect(throws: TorrentSession.Error.self) {
-			try TorrentSession.actionImplementation(server: server)
+			try session.setServer(server)
 		}
 
 		if case .decodingFailed = error {
@@ -172,8 +181,8 @@ class SessionTests {
 		}
 	}
 
-	@Test("Action implementation creation throws error for invalid keychain data")
-	func actionImplementationCreationThrowsErrorForInvalidKeychainData() throws {
+	@Test("Client creation throws error for invalid keychain data")
+	func clientCreationThrowsErrorForInvalidKeychainData() throws {
 		// Arrange
 		let serverSettings = DelugeServerSettings(url: URL(string: "http://localhost:58846")!)
 		let encoder = JSONEncoder()
@@ -189,7 +198,7 @@ class SessionTests {
 
 		// Act & Assert
 		let error = #expect(throws: TorrentSession.Error.self) {
-			try TorrentSession.actionImplementation(server: server)
+			try session.setServer(server)
 		}
 		if case .decodingFailed = error {
 			// Expected error type
@@ -198,8 +207,8 @@ class SessionTests {
 		}
 	}
 
-	@Test("Action implementation creation throws not implemented for QBittorrent")
-	func actionImplementationCreationThrowsNotImplementedForQBittorrent() throws {
+	@Test("Client creation throws not implemented for QBittorrent")
+	func clientCreationThrowsNotImplementedForQBittorrent() throws {
 		// Arrange
 		let server = TestDataFactory.createServer(
 			name: "QBittorrent Server",
@@ -210,7 +219,7 @@ class SessionTests {
 
 		// Act & Assert
 		let error = #expect(throws: TorrentSession.Error.self) {
-			try TorrentSession.actionImplementation(server: server)
+			try session.setServer(server)
 		}
 		if case .notImplemented = error {
 			// Expected error type
@@ -221,31 +230,34 @@ class SessionTests {
 
 	// MARK: - Server Switching Tests
 
-	@Test("Server switching updates action implementation")
-	func serverSwitchingUpdatesActionImplementation() throws {
+	@Test("Server switching updates client")
+	func serverSwitchingUpdatesClient() throws {
 		// Arrange
-		let server1 = TestDataFactory.createServer(name: "Server 1", type: .deluge, data: serverSettingsData, keychainData: keychainData)
-		let server2 = TestDataFactory.createServer(name: "Server 2", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server1 = TestDataFactory.createServer(
+			name: "Server 1", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server2 = TestDataFactory.createServer(
+			name: "Server 2", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 
 		// Act - Set first server
 		try session.setServer(server1)
-		let firstImplementation = session.actionImplementation
+		let firstClient = session.client
 
 		// Act - Switch to second server
 		try session.setServer(server2)
-		let secondImplementation = session.actionImplementation
+		let secondClient = session.client
 
 		// Assert
 		#expect(session.server?.name == "Server 2")
 		#expect(preferences.selectedServerID == server2.id)
-		// The action implementations should be different instances
-		#expect(!(firstImplementation === secondImplementation))
+		// The clients should be different instances
+		#expect(!(firstClient === secondClient))
 	}
 
 	@Test("Server switching from valid server to nil resets to null implementation")
 	func serverSwitchingFromValidServerToNilResetsToNullImplementation() throws {
 		// Arrange
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try session.setServer(server)
 
 		// Act
@@ -253,15 +265,16 @@ class SessionTests {
 
 		// Assert
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	// MARK: - Reset Functionality Tests
 
-	@Test("Reset clears server and resets action implementation")
-	func resetClearsServerAndResetsActionImplementation() throws {
+	@Test("Reset clears server and resets client")
+	func resetClearsServerAndResetsClient() throws {
 		// Arrange
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 		try session.setServer(server)
 
 		// Act
@@ -269,7 +282,7 @@ class SessionTests {
 
 		// Assert
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	@Test("Reset works when no server is set")
@@ -279,7 +292,7 @@ class SessionTests {
 
 		// Assert
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	// MARK: - Error Handling Tests
@@ -307,7 +320,7 @@ class SessionTests {
 
 		// Verify session state remains unchanged
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	@Test("Set server handles decoding failures gracefully")
@@ -335,7 +348,7 @@ class SessionTests {
 
 		// Verify session state remains unchanged
 		#expect(session.server == nil)
-		#expect(session.actionImplementation is NullTorrentActionImplementation)
+		#expect(session.client is NullTorrentClient)
 	}
 
 	// MARK: - Edge Cases Tests
@@ -344,9 +357,12 @@ class SessionTests {
 	func multipleConsecutiveServerSetsWorkCorrectly() throws {
 		// Arrange
 		let servers = [
-			TestDataFactory.createServer(name: "Server 1", type: .deluge, data: serverSettingsData, keychainData: keychainData),
-			TestDataFactory.createServer(name: "Server 2", type: .deluge, data: serverSettingsData, keychainData: keychainData),
-			TestDataFactory.createServer(name: "Server 3", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+			TestDataFactory.createServer(
+				name: "Server 1", type: .deluge, data: serverSettingsData, keychainData: keychainData),
+			TestDataFactory.createServer(
+				name: "Server 2", type: .deluge, data: serverSettingsData, keychainData: keychainData),
+			TestDataFactory.createServer(
+				name: "Server 3", type: .deluge, data: serverSettingsData, keychainData: keychainData),
 		]
 
 		// Act & Assert
@@ -363,79 +379,61 @@ class SessionTests {
 	@Test("Set server with same server multiple times")
 	func setServerWithSameServerMultipleTimes() throws {
 		// Arrange
-		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
+		let server = TestDataFactory.createServer(
+			name: "Test Server", type: .deluge, data: serverSettingsData, keychainData: keychainData)
 
 		// Act - Set same server multiple times
 		try session.setServer(server)
-		let firstImplementation = session.actionImplementation
+		let firstClient = session.client
 
 		try session.setServer(server)
-		let secondImplementation = session.actionImplementation
+		let secondClient = session.client
 
 		try session.setServer(server)
-		let thirdImplementation = session.actionImplementation
+		let thirdClient = session.client
 
 		// Assert
 		#expect(session.server?.name == "Test Server")
 		#expect(preferences.selectedServerID == server.id)
 
-		// Each call should create a new action implementation
-		#expect(!(firstImplementation === secondImplementation))
-		#expect(!(secondImplementation === thirdImplementation))
+		// Each call should create a new client
+		#expect(!(firstClient === secondClient))
+		#expect(!(secondClient === thirdClient))
 	}
 
-	// MARK: - NullTorrentActionImplementation Tests
+	// MARK: - NullTorrentClient Tests
 
-	@Test("NullTorrentActionImplementation throws errors for all methods")
-	func nullTorrentActionImplementationThrowsErrorsForAllMethods() async {
-		let nullImplementation = NullTorrentActionImplementation()
+	@Test("NullTorrentClient throws errors for all methods")
+	func nullTorrentClientThrowsErrorsForAllMethods() async {
+		let nullClient = NullTorrentClient()
 		let testTorrent = TestDataFactory.createStandardTorrent()
 		let testLabel = TestDataFactory.createStandardLabel()
 
-		// Test all methods throw NotReadyError
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.refresh()
+		func expectNullImplementation(_ operation: () async throws -> Void) async {
+			do {
+				try await operation()
+				Issue.record("Expected TorrentClientError.nullImplementation to be thrown")
+			} catch let error as TorrentClientError {
+				guard case .nullImplementation = error else {
+					Issue.record("Expected TorrentClientError.nullImplementation, got \(error)")
+					return
+				}
+			} catch {
+				Issue.record("Expected TorrentClientError.nullImplementation, got \(error)")
+			}
 		}
 
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.refreshFiles(testTorrent)
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.addLink("http://example.com")
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.paths(testTorrent)
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.pause([testTorrent])
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.resume([testTorrent])
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.remove([testTorrent], false)
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.verify([testTorrent])
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.setLabel(testLabel, [testTorrent])
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.updateTrackers([testTorrent])
-		}
-
-		await #expect(throws: TorrentClientError.nullImplementation.self) {
-			try await nullImplementation.moveDownloadFolder("/test/path", [testTorrent])
-		}
+		// Test all methods throw nullImplementation
+		await expectNullImplementation { _ = try await nullClient.refresh() }
+		await expectNullImplementation { _ = try await nullClient.refreshFiles(testTorrent) }
+		await expectNullImplementation { try await nullClient.addLink("http://example.com") }
+		await expectNullImplementation { _ = try await nullClient.paths(testTorrent) }
+		await expectNullImplementation { try await nullClient.pause([testTorrent]) }
+		await expectNullImplementation { try await nullClient.resume([testTorrent]) }
+		await expectNullImplementation { try await nullClient.remove([testTorrent], false) }
+		await expectNullImplementation { try await nullClient.verify([testTorrent]) }
+		await expectNullImplementation { try await nullClient.setLabel(testLabel, [testTorrent]) }
+		await expectNullImplementation { try await nullClient.updateTrackers([testTorrent]) }
+		await expectNullImplementation { try await nullClient.moveDownloadFolder("/test/path", [testTorrent]) }
 	}
 }
-

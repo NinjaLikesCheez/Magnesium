@@ -11,7 +11,27 @@ let package = Package(
 		.library(
 			name: "TorrentUI",
 			targets: ["TorrentUI"]
-		)
+		),
+		.library(
+			name: "TorrentCore",
+			targets: ["TorrentCore"]
+		),
+		.library(
+			name: "TorrentSession",
+			targets: ["TorrentSession"]
+		),
+		.library(
+			name: "TorrentManager",
+			targets: ["TorrentManager"]
+		),
+		.library(
+			name: "TorrentMapping",
+			targets: ["TorrentMapping"]
+		),
+		.library(
+			name: "TorrentPreferences",
+			targets: ["TorrentPreferences"]
+		),
 	],
 	dependencies: [
 		.package(path: "../Common"),
@@ -68,8 +88,15 @@ let package = Package(
 			dependencies: ["Common"]
 		),
 		.testTarget(
-			name: "TorrentUITests",
-			dependencies: ["TorrentUI"]
+			name: "TorrentTests",
+			dependencies: [
+				"TorrentCore",
+				"TorrentSession",
+				"TorrentManager",
+				"TorrentMapping",
+				"TorrentPreferences",
+				.product(name: "Deluge", package: "Deluge-Swift"),
+			]
 		),
 	]
 )

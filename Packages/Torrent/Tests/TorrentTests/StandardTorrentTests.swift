@@ -1,8 +1,10 @@
 import Foundation
 import Testing
-@testable import Magnesium
+
+@testable import TorrentCore
 
 @Suite("StandardTorrent Tests")
+@MainActor
 struct StandardTorrentTests {
 	// MARK: - Initialization Tests
 
@@ -10,24 +12,24 @@ struct StandardTorrentTests {
 	func standardTorrentInitialization() {
 		// Arrange
 		let dateAdded = Date()
-		let downloaded: Int64 = 1024 * 1024 * 500 // 500 MB
+		let downloaded: Int64 = 1024 * 1024 * 500  // 500 MB
 		let downloadPath = "/downloads/test"
-		let downloadRate: Int64 = 1024 * 100 // 100 KB/s
-		let eta: TimeInterval = 3600 // 1 hour
+		let downloadRate: Int64 = 1024 * 100  // 100 KB/s
+		let eta: TimeInterval = 3600  // 1 hour
 		let hash = "test-hash-123"
 		let label = "test-label"
 		let name = "Test Torrent"
 		let peers = 5
 		let progress: Float = 0.75
 		let seeds = 10
-		let seedingTime: TimeInterval = 7200 // 2 hours
-		let size: Int64 = 1024 * 1024 * 1024 // 1 GB
-		let state = TorrentState.downloading
+		let seedingTime: TimeInterval = 7200  // 2 hours
+		let size: Int64 = 1024 * 1024 * 1024  // 1 GB
+		let state = StandardTorrentState.downloading
 		let totalPeers = 20
 		let totalSeeds = 30
 		let trackers = ["http://tracker1.example.com", "http://tracker2.example.com"]
-		let uploaded: Int64 = 1024 * 1024 * 250 // 250 MB
-		let uploadRate: Int64 = 1024 * 50 // 50 KB/s
+		let uploaded: Int64 = 1024 * 1024 * 250  // 250 MB
+		let uploadRate: Int64 = 1024 * 50  // 50 KB/s
 
 		// Act
 		let torrent = StandardTorrent(
@@ -80,15 +82,18 @@ struct StandardTorrentTests {
 	@Test("StandardTorrent update method correctly updates all mutable properties")
 	func standardTorrentUpdateMethod() {
 		// Arrange
+		// `update` only mutates a torrent in place when the hash matches (it's a no-op guarded on
+		// identity otherwise), so both torrents must share the same hash for this to exercise the
+		// update path rather than the "different hash" guard clause.
 		let originalTorrent = TestDataFactory.createStandardTorrent(
-			hash: "original-hash",
+			hash: "same-hash",
 			name: "Original Torrent",
 			state: .downloading,
 			progress: 0.5
 		)
 
 		let updatedTorrent = TestDataFactory.createStandardTorrent(
-			hash: "updated-hash",
+			hash: "same-hash",
 			name: "Updated Torrent",
 			state: .seeding,
 			progress: 1.0,
@@ -159,55 +164,52 @@ struct StandardTorrentTests {
 		#expect(torrent4.ratio == 1.0)
 	}
 
-	@Test("StandardTorrent isActive property", arguments: [
-		(TorrentState.downloading, true),
-		(TorrentState.seeding, true),
-		(TorrentState.paused, false),
-		(TorrentState.checking, false),
-		(TorrentState.queued, false),
-		(TorrentState.error, false)
-	])
-	func standardTorrentIsActiveProperty(state: TorrentState, expectedActive: Bool) {
-		let torrent = TestDataFactory.createStandardTorrent(state: state)
-		#expect(torrent.isActive == expectedActive)
+	@Test("StandardTorrent isActive property")
+	func standardTorrentIsActiveProperty() {
+		let expectations: [(StandardTorrentState, Bool)] = [
+			(.downloading, true),
+			(.seeding, true),
+			(.paused, false),
+			(.checking, false),
+			(.queued, false),
+			(.error, false),
+		]
+
+		for (state, expectedActive) in expectations {
+			let torrent = TestDataFactory.createStandardTorrent(state: state)
+			#expect(torrent.isActive == expectedActive)
+		}
 	}
 
 	@Test("StandardTorrent localizedSpeed for downloading state")
 	func standardTorrentLocalizedSpeedDownloading() {
 		let torrent = TestDataFactory.createStandardTorrent(
 			state: .downloading,
-			downloadRate: 1024 * 100, // 100 KB/s
-			uploadRate: 1024 * 50      // 50 KB/s
+			downloadRate: 1024 * 100,  // 100 KB/s
+			uploadRate: 1024 * 50  // 50 KB/s
 		)
 
-		// TODO: when this is localizable update it
 		let localizedSpeed = torrent.localizedSpeed
 		#expect(!localizedSpeed.isEmpty)
-		// The exact format depends on L10n.Torrent.downloadUploadSpeed implementation
-		// We just verify it's not empty for downloading state
 	}
 
 	@Test("StandardTorrent localizedSpeed for seeding state")
 	func standardTorrentLocalizedSpeedSeeding() {
 		let torrent = TestDataFactory.createStandardTorrent(
 			state: .seeding,
-			uploadRate: 1024 * 50 // 50 KB/s
+			uploadRate: 1024 * 50  // 50 KB/s
 		)
 
-		// TODO: when this is localizable update it
 		let localizedSpeed = torrent.localizedSpeed
 		#expect(!localizedSpeed.isEmpty)
-		// The exact format depends on L10n.Torrent.uploadSpeed implementation
-		// We just verify it's not empty for seeding state
 	}
 
 	@Test("StandardTorrent localizedSpeed for non-active states")
 	func standardTorrentLocalizedSpeedNonActive() {
-		let states: [TorrentState] = [.paused, .checking, .queued, .error]
+		let states: [StandardTorrentState] = [.paused, .checking, .queued, .error]
 
 		for state in states {
 			let torrent = TestDataFactory.createStandardTorrent(state: state)
-			// TODO: when this is localizable update it
 			#expect(torrent.localizedSpeed.isEmpty)
 		}
 	}
@@ -216,24 +218,19 @@ struct StandardTorrentTests {
 	func standardTorrentLocalizedProgress() {
 		let torrent = TestDataFactory.createStandardTorrent(
 			progress: 0.75,
-			downloaded: 1024 * 1024 * 750, // 750 MB
-			size: 1024 * 1024 * 1024       // 1 GB
+			downloaded: 1024 * 1024 * 750,  // 750 MB
+			size: 1024 * 1024 * 1024  // 1 GB
 		)
 
-		// TODO: when this is localizable update it
 		let localizedProgress = torrent.localizedProgress
 		#expect(!localizedProgress.isEmpty)
-		// The exact format depends on L10n.Torrent.progress implementation
-		// We just verify it's not empty
 	}
 
 	@Test("StandardTorrent formattedETA with positive value")
 	func standardTorrentFormattedETAPositive() {
-		let torrent = TestDataFactory.createStandardTorrent(eta: 3600) // 1 hour
+		let torrent = TestDataFactory.createStandardTorrent(eta: 3600)  // 1 hour
 		let formattedETA = torrent.formattedETA
-		// TODO: when this is localizable update it
 		#expect(!formattedETA.isEmpty)
-		// The exact format depends on Formatters.eta implementation
 	}
 
 	@Test("StandardTorrent formattedETA with zero or negative value")
@@ -241,8 +238,6 @@ struct StandardTorrentTests {
 		let torrent1 = TestDataFactory.createStandardTorrent(eta: 0)
 		let torrent2 = TestDataFactory.createStandardTorrent(eta: -1)
 
-		// TODO: when this is localizable update it
-		// Both should return infinity string (depends on L10n.Common.infinity)
 		#expect(!torrent1.formattedETA.isEmpty)
 		#expect(!torrent2.formattedETA.isEmpty)
 	}
@@ -264,13 +259,11 @@ struct StandardTorrentTests {
 	@Test("StandardTorrent formattedRatio with infinite ratio")
 	func standardTorrentFormattedRatioInfinite() {
 		let torrent = TestDataFactory.createStandardTorrent(
-			downloaded: 0, uploaded: 1000 // This creates infinite ratio
+			downloaded: 0, uploaded: 1000  // This creates infinite ratio
 		)
 
-		// TODO: when this is localizable update it
 		let formattedRatio = torrent.formattedRatio()
 		#expect(!formattedRatio.isEmpty)
-		// Should return infinity string (depends on L10n.Common.infinity)
 	}
 
 	@Test("StandardTorrent localizedRatioOrETA for downloading state")
@@ -280,10 +273,8 @@ struct StandardTorrentTests {
 			eta: 3600
 		)
 
-		// TODO: when this is localizable update it
 		let result = torrent.localizedRatioOrETA
 		#expect(!result.isEmpty)
-		// For downloading state, should return formatted ETA
 	}
 
 	@Test("StandardTorrent localizedRatioOrETA for non-downloading state")
@@ -293,10 +284,8 @@ struct StandardTorrentTests {
 			downloaded: 1000, uploaded: 1500
 		)
 
-		// TODO: when this is localizable update it
 		let result = torrent.localizedRatioOrETA
 		#expect(!result.isEmpty)
-		// For non-downloading state, should return formatted ratio
 	}
 
 	// MARK: - Equality and Hashing Tests
@@ -311,8 +300,8 @@ struct StandardTorrentTests {
 
 		let torrent2 = TestDataFactory.createStandardTorrent(
 			hash: "same-hash",
-			name: "Torrent 2", // Different name
-			progress: 0.8     // Different progress
+			name: "Torrent 2",  // Different name
+			progress: 0.8  // Different progress
 		)
 
 		let torrent3 = TestDataFactory.createStandardTorrent(
@@ -337,7 +326,7 @@ struct StandardTorrentTests {
 
 		let torrent2 = TestDataFactory.createStandardTorrent(
 			hash: "test-hash",
-			name: "Torrent 2" // Different name but same hash
+			name: "Torrent 2"  // Different name but same hash
 		)
 
 		// Objects that are equal should have the same hash value
@@ -346,7 +335,7 @@ struct StandardTorrentTests {
 
 		// Test with Set to ensure hashing works correctly
 		let torrentSet: Set<StandardTorrent> = [torrent1, torrent2]
-		#expect(torrentSet.count == 1) // Should only contain one element due to same hash
+		#expect(torrentSet.count == 1)  // Should only contain one element due to same hash
 	}
 
 	// MARK: - Edge Cases Tests
@@ -400,7 +389,7 @@ struct StandardTorrentTests {
 		#expect(torrent.downloaded == Int64.max)
 		#expect(torrent.uploaded == Int64.max)
 		#expect(torrent.size == Int64.max)
-		#expect(torrent.ratio == 1.0) // max/max = 1
+		#expect(torrent.ratio == 1.0)  // max/max = 1
 	}
 
 	@Test("StandardTorrent with Unicode characters")

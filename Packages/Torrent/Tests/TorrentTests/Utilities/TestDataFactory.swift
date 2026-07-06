@@ -1,22 +1,23 @@
 import Foundation
-@testable import Magnesium
+import TorrentCore
 
 /// Factory for creating test data objects with configurable properties
 struct TestDataFactory {
 
 	// MARK: - StandardTorrent Factory Methods
 
+	@MainActor
 	static func createStandardTorrent(
 		hash: String = "test-torrent-hash",
 		name: String = "Test Torrent",
-		state: TorrentState = .downloading,
+		state: StandardTorrentState = .downloading,
 		progress: Float = 0.5,
-		downloaded: Int64 = 1024 * 1024 * 500, // 500 MB
-		uploaded: Int64 = 1024 * 1024 * 250,   // 250 MB
-		size: Int64 = 1024 * 1024 * 1024,      // 1 GB
-		downloadRate: Int64 = 1024 * 100,      // 100 KB/s
-		uploadRate: Int64 = 1024 * 50,         // 50 KB/s
-		eta: TimeInterval = 3600,              // 1 hour
+		downloaded: Int64 = 1024 * 1024 * 500,  // 500 MB
+		uploaded: Int64 = 1024 * 1024 * 250,  // 250 MB
+		size: Int64 = 1024 * 1024 * 1024,  // 1 GB
+		downloadRate: Int64 = 1024 * 100,  // 100 KB/s
+		uploadRate: Int64 = 1024 * 50,  // 50 KB/s
+		eta: TimeInterval = 3600,  // 1 hour
 		dateAdded: Date = Date(),
 		label: String = "test-label",
 		downloadPath: String = "/downloads",
@@ -50,31 +51,32 @@ struct TestDataFactory {
 		)
 	}
 
+	@MainActor
 	static func createMultipleTorrents(count: Int) -> [StandardTorrent] {
 		return (0..<count).map { index in
 			createStandardTorrent(
 				hash: "torrent-hash-\(UUID().uuidString)",
 				name: "Test Torrent \(index)",
-				state: TorrentState.allCases.randomElement() ?? .downloading,
+				state: StandardTorrentState.allCases.randomElement() ?? .downloading,
 				progress: Float.random(in: 0...1),
-				downloaded: Int64.random(in: 0...1024*1024*1024),
-				uploaded: Int64.random(in: 0...1024*1024*500)
+				downloaded: Int64.random(in: 0...1024 * 1024 * 1024),
+				uploaded: Int64.random(in: 0...1024 * 1024 * 500)
 			)
 		}
 	}
 
-	// MARK: - Server Factory Methods
+	// MARK: - TorrentServer Factory Methods
 
 	static func createServer(
 		name: String = "Test Server",
-		type: ServerType = .deluge,
+		type: TorrentServerType = .deluge,
 		data: Data = .init(#"{ "url": "http://localhost:8112" }"#.data(using: .utf8)!),
 		keychainData: Data? = .init(#"{ "password": "test" }"#.data(using: .utf8)!)
-	) -> Server {
-		return Server(name: name, type: type, data: data, keychainData: keychainData)
+	) -> TorrentServer {
+		return TorrentServer(name: name, type: type, data: data, keychainData: keychainData)
 	}
 
-	static func createMultipleServers(count: Int) -> [Server] {
+	static func createMultipleServers(count: Int) -> [TorrentServer] {
 		return (0..<count).map { index in
 			createServer(
 				name: "Test Server \(index)",
@@ -108,9 +110,9 @@ struct TestDataFactory {
 	static func createStandardTorrentFile(
 		index: Int = 0,
 		name: String = "test-file.txt",
-		size: Int64 = 1024 * 1024, // 1 MB
+		size: Int64 = 1024 * 1024,  // 1 MB
 		progress: Float = 0.5,
-		priority: TorrentPriority = .normal
+		priority: StandardTorrentPriority = .normal
 	) -> StandardTorrentFile {
 		return StandardTorrentFile(
 			index: index,
@@ -126,9 +128,9 @@ struct TestDataFactory {
 			createStandardTorrentFile(
 				index: index,
 				name: "file-\(index).txt",
-				size: Int64.random(in: 1024...1024*1024*100), // 1KB to 100MB
+				size: Int64.random(in: 1024...1024 * 1024 * 100),  // 1KB to 100MB
 				progress: Float.random(in: 0...1),
-				priority: TorrentPriority.allCases.randomElement() ?? .normal
+				priority: StandardTorrentPriority.allCases.randomElement() ?? .normal
 			)
 		}
 	}
@@ -139,7 +141,8 @@ struct TestDataFactory {
 extension TestDataFactory {
 
 	/// Creates torrents with specific states for testing filtering
-	static func createTorrentsWithStates(_ states: [TorrentState]) -> [StandardTorrent] {
+	@MainActor
+	static func createTorrentsWithStates(_ states: [StandardTorrentState]) -> [StandardTorrent] {
 		return states.enumerated().map { index, state in
 			createStandardTorrent(
 				hash: "torrent-hash-\(index)",
@@ -150,6 +153,7 @@ extension TestDataFactory {
 	}
 
 	/// Creates torrents with specific labels for testing filtering
+	@MainActor
 	static func createTorrentsWithLabels(_ labels: [String]) -> [StandardTorrent] {
 		return labels.enumerated().map { index, label in
 			createStandardTorrent(
@@ -161,6 +165,7 @@ extension TestDataFactory {
 	}
 
 	/// Creates torrents with edge case values for testing
+	@MainActor
 	static func createEdgeCaseTorrents() -> [StandardTorrent] {
 		return [
 			// Zero values
@@ -193,7 +198,7 @@ extension TestDataFactory {
 				hash: "unicode-torrent-hash",
 				name: "🎬 Test Movie [2024] 4K 🎥",
 				label: "🏷️ movies"
-			)
+			),
 		]
 	}
 }

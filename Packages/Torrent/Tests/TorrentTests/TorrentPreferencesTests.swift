@@ -1,9 +1,13 @@
-import Testing
+import Common
 import Foundation
-@testable import Magnesium
+import Testing
+
+@testable import TorrentCore
+@testable import TorrentPreferences
 
 @Suite("TorrentPreferences Tests")
-class AppPreferencesTests {
+@MainActor
+class TorrentPreferencesTests {
 	// MARK: - Test Setup
 	private let suiteName = "test-\(UUID().uuidString)"
 	private let testDefaults: UserDefaults
@@ -11,18 +15,18 @@ class AppPreferencesTests {
 
 	init() {
 		testDefaults = UserDefaults(suiteName: suiteName)!
-		preferences = TorrentPreferences(userDefaults: testDefaults)
+		preferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 	}
 
 	deinit {
-		testDefaults.removePersistentDomain(forName: suiteName)
+		UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
 	}
 
 	// MARK: - Sort and Filter Options Tests
 	@Test("Sort option storage and retrieval works correctly")
 	func sortOptionStorageAndRetrievalWorksCorrectly() {
 		// Arrange
-		let sortOption = SortOption(property: .name, direction: .ascending)
+		let sortOption = TorrentSortOption(property: .name, direction: .ascending)
 
 		// Act
 		preferences.sortOption = sortOption
@@ -35,7 +39,7 @@ class AppPreferencesTests {
 	@Test("Filter options storage and retrieval works correctly")
 	func filterOptionsStorageAndRetrievalWorksCorrectly() {
 		// Arrange
-		var filterOptions = FilterOptions()
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.states = [.downloading, .seeding]
 		filterOptions.labels = ["linux-iso", "data"]
 
@@ -74,8 +78,8 @@ class AppPreferencesTests {
 		// Arrange - Set up preferences with data
 		preferences.autoRefreshInterval = 10.0
 		preferences.automaticallyLookForMagnetLinks = true
-		preferences.sortOption = SortOption(property: .name, direction: .ascending)
-		var filterOptions = FilterOptions()
+		preferences.sortOption = TorrentSortOption(property: .name, direction: .ascending)
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.states = [.downloading]
 		preferences.filterOptions = filterOptions
 
@@ -83,10 +87,10 @@ class AppPreferencesTests {
 		preferences.reset()
 
 		// Assert - Create new preferences instance to verify persistence was cleared
-		let newPreferences = TorrentPreferences(userDefaults: testDefaults)
-		#expect(newPreferences.autoRefreshInterval == 2.0) // Default value
+		let newPreferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
+		#expect(newPreferences.autoRefreshInterval == 2.0)  // Default value
 		#expect(newPreferences.automaticallyLookForMagnetLinks == false)
-		#expect(newPreferences.sortOption.property == .dateAdded) // Default value
+		#expect(newPreferences.sortOption.property == .dateAdded)  // Default value
 		#expect(newPreferences.filterOptions.states.isEmpty)
 		#expect(newPreferences.filterOptions.labels.isEmpty)
 	}
@@ -100,7 +104,7 @@ class AppPreferencesTests {
 		let keychain = #"{ "password": "test" }"#.data(using: .utf8)!
 		let servers = [
 			TestDataFactory.createServer(name: "Server 1", type: .deluge, data: data, keychainData: keychain),
-			TestDataFactory.createServer(name: "Server 2", type: .qbittorrent, data: data, keychainData: keychain)
+			TestDataFactory.createServer(name: "Server 2", type: .qbittorrent, data: data, keychainData: keychain),
 		]
 
 		// Act
@@ -136,18 +140,18 @@ class AppPreferencesTests {
 	@Test("Preferences persist across instances")
 	func preferencesPersistAcrossInstances() {
 		// Arrange - Set preferences in first instance
-		let preferences1 = TorrentPreferences(userDefaults: testDefaults)
+		let preferences1 = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 		preferences1.autoRefreshInterval = 7.5
 		preferences1.automaticallyLookForMagnetLinks = true
-		preferences1.sortOption = SortOption(property: .uploadSpeed, direction: .descending)
-		var filterOptions = FilterOptions()
+		preferences1.sortOption = TorrentSortOption(property: .uploadSpeed, direction: .descending)
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.states = [.seeding, .paused]
 		filterOptions.labels = ["test-label"]
 		preferences1.filterOptions = filterOptions
 		preferences1.selectedServerID = "persistent-server"
 
 		// Act - Create new instance with same UserDefaults
-		let preferences2 = TorrentPreferences(userDefaults: testDefaults)
+		let preferences2 = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 
 		// Assert - Values should persist
 		#expect(preferences2.autoRefreshInterval == 7.5)
@@ -168,7 +172,7 @@ class AppPreferencesTests {
 		#expect(preferences.servers.isEmpty)
 		#expect(preferences.selectedServerID == nil)
 		#expect(preferences.sortOption.property == .dateAdded)
-		#expect(preferences.sortOption.direction == .descending) // dateAdded prefers descending
+		#expect(preferences.sortOption.direction == .descending)  // dateAdded prefers descending
 		#expect(preferences.filterOptions.states.isEmpty)
 		#expect(preferences.filterOptions.labels.isEmpty)
 		#expect(preferences.automaticallyLookForMagnetLinks == false)
@@ -179,7 +183,7 @@ class AppPreferencesTests {
 	@Test("Filter options with multiple states and labels")
 	func filterOptionsWithMultipleStatesAndLabels() {
 		// Arrange
-		var filterOptions = FilterOptions()
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.states = [.downloading, .seeding, .paused, .error]
 		filterOptions.labels = ["linux-iso", "data", "software", "books"]
 
@@ -203,13 +207,13 @@ class AppPreferencesTests {
 	@Test("Filter options can be cleared")
 	func filterOptionsCanBeCleared() {
 		// Arrange - Set some filter options
-		var filterOptions = FilterOptions()
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.states = [.downloading, .seeding]
 		filterOptions.labels = ["test-label"]
 		preferences.filterOptions = filterOptions
 
 		// Act - Clear filter options
-		preferences.filterOptions = FilterOptions()
+		preferences.filterOptions = TorrentFilterOptions()
 
 		// Assert
 		#expect(preferences.filterOptions.states.isEmpty)
@@ -220,13 +224,13 @@ class AppPreferencesTests {
 
 	@Test("Sort option with all properties and directions")
 	func sortOptionWithAllPropertiesAndDirections() {
-		let properties: [SortOption.Property] = [.dateAdded, .name, .downloadSpeed, .uploadSpeed, .progress]
-		let directions: [SortOption.Direction] = [.ascending, .descending]
+		let properties: [TorrentSortOption.Property] = [.dateAdded, .name, .downloadSpeed, .uploadSpeed, .progress]
+		let directions: [TorrentSortOption.Direction] = [.ascending, .descending]
 
 		for property in properties {
 			for direction in directions {
 				// Act
-				preferences.sortOption = SortOption(property: property, direction: direction)
+				preferences.sortOption = TorrentSortOption(property: property, direction: direction)
 
 				// Assert
 				#expect(preferences.sortOption.property == property)
@@ -238,7 +242,7 @@ class AppPreferencesTests {
 	@Test("Sort option with opposite direction")
 	func sortOptionWithOppositeDirection() {
 		// Arrange
-		let originalSortOption = SortOption(property: .name, direction: .ascending)
+		let originalSortOption = TorrentSortOption(property: .name, direction: .ascending)
 		preferences.sortOption = originalSortOption
 
 		// Act
@@ -253,7 +257,7 @@ class AppPreferencesTests {
 	@Test("Filter options with empty strings in labels")
 	func filterOptionsWithEmptyStringsInLabels() {
 		// Arrange
-		var filterOptions = FilterOptions()
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.labels = ["", "valid-label", ""]
 
 		// Act
@@ -268,7 +272,7 @@ class AppPreferencesTests {
 	@Test("Filter options with special characters in labels")
 	func filterOptionsWithSpecialCharactersInLabels() {
 		// Arrange
-		var filterOptions = FilterOptions()
+		var filterOptions = TorrentFilterOptions()
 		filterOptions.labels = ["🎬 movies", "tv-shows & series", "music/audio", "software.apps"]
 
 		// Act
