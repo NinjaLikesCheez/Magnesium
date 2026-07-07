@@ -5,9 +5,9 @@ import Testing
 
 @testable import TorrentCore
 @testable import TorrentManager
-@testable import TorrentMapping
 @testable import TorrentPreferences
 @testable import TorrentSession
+@testable import TorrentTestSupport
 
 // TODO: I think most of these are terrible.... but once we move over to the new error handling system these can probably get updated to something reasonable
 @MainActor

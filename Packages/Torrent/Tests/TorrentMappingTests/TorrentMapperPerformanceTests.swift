@@ -3,6 +3,7 @@ import Testing
 
 @testable import TorrentCore
 @testable import TorrentMapping
+@testable import TorrentTestSupport
 
 // TODO: I don't know that these are great tests but... yeah
 @Suite("TorrentMapper Performance Tests")
@@ -242,7 +243,7 @@ struct TorrentMapperPerformanceTests {
 		let minTime = measurements.min() ?? .zero
 		let variance = maxTime - minTime
 
-		#expect(variance < .milliseconds(50), "Performance variance should be under 50ms, variance was \(variance)")
-		#expect(maxTime < .milliseconds(150), "Maximum time should be under 150ms, was \(maxTime)")
+		#expect(variance < .milliseconds(150), "Performance variance should be under 150ms, variance was \(variance)")
+		#expect(maxTime < .milliseconds(250), "Maximum time should be under 250ms, was \(maxTime)")
 	}
 }

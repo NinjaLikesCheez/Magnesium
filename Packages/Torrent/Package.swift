@@ -87,15 +87,58 @@ let package = Package(
 			name: "TorrentCore",
 			dependencies: ["Common"]
 		),
-		.testTarget(
-			name: "TorrentTests",
+		.target(
+			name: "TorrentTestSupport",
 			dependencies: [
+				"TorrentCore",
+				"TorrentSession",
+				"TorrentPreferences",
+			]
+		),
+		.testTarget(
+			name: "TorrentCoreTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+			]
+		),
+		.testTarget(
+			name: "TorrentMappingTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentMapping",
+			]
+		),
+		.testTarget(
+			name: "TorrentPreferencesTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentPreferences",
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "TorrentSessionTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentPreferences",
+				"TorrentSession",
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "TorrentManagerTests",
+			dependencies: [
+				"TorrentTestSupport",
 				"TorrentCore",
 				"TorrentSession",
 				"TorrentManager",
 				"TorrentMapping",
 				"TorrentPreferences",
-				.product(name: "Deluge", package: "Deluge-Swift"),
+				"Common",
 			]
 		),
 	]

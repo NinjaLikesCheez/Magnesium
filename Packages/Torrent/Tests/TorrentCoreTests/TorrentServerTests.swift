@@ -2,6 +2,7 @@ import Foundation
 import Testing
 
 @testable import TorrentCore
+@testable import TorrentTestSupport
 
 @Suite("TorrentServer Tests")
 struct TorrentServerTests {

@@ -1,10 +1,11 @@
 import Common
 import Foundation
 import Testing
+import TorrentCore
+import TorrentPreferences
 
-@testable import TorrentCore
-@testable import TorrentPreferences
 @testable import TorrentSession
+@testable import TorrentTestSupport
 
 @Suite("TorrentSession Tests")
 @MainActor

@@ -3,6 +3,7 @@ import Testing
 
 @testable import TorrentCore
 @testable import TorrentMapping
+@testable import TorrentTestSupport
 
 @Suite("TorrentMapper Tests")
 @MainActor

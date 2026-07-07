@@ -4,6 +4,7 @@ import Testing
 
 @testable import TorrentCore
 @testable import TorrentPreferences
+@testable import TorrentTestSupport
 
 @Suite("TorrentPreferences Tests")
 @MainActor

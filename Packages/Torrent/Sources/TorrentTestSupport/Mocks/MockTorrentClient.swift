@@ -1,7 +1,6 @@
 import Foundation
 import TorrentCore
-
-@testable import TorrentSession
+import TorrentSession
 
 /// Mock implementation of TorrentClient for testing
 final class MockTorrentClient: TorrentClient {

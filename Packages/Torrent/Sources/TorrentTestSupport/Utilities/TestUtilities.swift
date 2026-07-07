@@ -1,7 +1,6 @@
 import Foundation
 import Testing
-
-@testable import TorrentCore
+import TorrentCore
 
 /// Utility functions and helpers for testing
 struct TestUtilities {
