@@ -1,5 +1,5 @@
 import Common
-import Sentry
+import SentrySwift
 
 import Logging
 import SwiftUI
@@ -57,7 +57,7 @@ struct MagnesiumApp: App {
 		WindowGroup {
 			AppView()
 				.environment(appModules)
-				.sentryTrace("AppView")
+				.sentryTrace()
 		}
 	}
 }

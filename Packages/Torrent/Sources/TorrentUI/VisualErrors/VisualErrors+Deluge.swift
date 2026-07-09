@@ -23,6 +23,8 @@ extension Deluge.ResponseError: @retroactive Hashable {
 		case let .unknown(error):
 			hasher.combine(4)
 			hasher.combine(error.localizedDescription)
+		case .unknownMethod:
+			hasher.combine(5)
 		}
 	}
 }
@@ -55,6 +57,8 @@ extension Deluge.ResponseError: @retroactive VisualError {
 			"Torrent Already Exists"
 		case .unknown:
 			"Unknown Error"
+		case .unknownMethod:
+			"Unknown Method"
 		}
 	}
 
@@ -70,6 +74,8 @@ extension Deluge.ResponseError: @retroactive VisualError {
 			"plus.square.on.square"
 		case .unknown:
 			"questionmark"
+		case .unknownMethod:
+			"questionmark.circle.dashed"
 		}
 	}
 
@@ -85,6 +91,8 @@ extension Deluge.ResponseError: @retroactive VisualError {
 			"Torrent already exists"
 		case let .unknown(error):
 			error.localizedDescription
+		case .unknownMethod:
+			"Please file feedback by shaking the device"
 		}
 	}
 }
