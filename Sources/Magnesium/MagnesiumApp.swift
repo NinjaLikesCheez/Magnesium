@@ -35,6 +35,13 @@ struct MagnesiumApp: App {
 			options.enableLogs = true
 
 			options.enableAutoPerformanceTracing = true
+
+#if os(iOS)
+			// Let users report feedback by shaking the device.
+			options.configureUserFeedback = { config in
+				config.useShakeGesture = true
+			}
+#endif
 		}
 
 		LoggingSystem.bootstrap { label in
