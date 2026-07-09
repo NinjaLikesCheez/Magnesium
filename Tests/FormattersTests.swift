@@ -1,5 +1,7 @@
-import Testing
+import Common
 import Foundation
+import Testing
+
 @testable import Magnesium
 
 @Suite("Formatters Tests")
@@ -11,27 +13,40 @@ struct FormattersTests {
 
 		@Test("Format bytes with various sizes")
 		func formatBytesWithVariousSizes() {
+			let locale = Locale(identifier: "en_US")
+
 			// Test small values
 			// TODO: https://developer.apple.com/documentation/foundation/formatstyle/bytecount(style:allowedunits:spellsoutzero:includesactualbytecount:)-59ep0
-			#expect(0.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "Zero kB")
-			#expect(512.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "0 kB")
-			#expect(1024.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "1 kB")
+			let zero: Int64 = 0
+			let fiveTwelve: Int64 = 512
+			let oneKB: Int64 = 1024
+			#expect(zero.formatted(Formatters.bytes.locale(locale)) == "0 kB")
+			#expect(fiveTwelve.formatted(Formatters.bytes.locale(locale)) == "0 kB")
+			#expect(oneKB.formatted(Formatters.bytes.locale(locale)) == "1 kB")
 
 			// Test KB range
-			#expect(2048.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "2 kB")
-			#expect(1536.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "2 kB")
+			let twoKB: Int64 = 2048
+			let oneAndHalfKB: Int64 = 1536
+			#expect(twoKB.formatted(Formatters.bytes.locale(locale)) == "2 kB")
+			#expect(oneAndHalfKB.formatted(Formatters.bytes.locale(locale)) == "2 kB")
 
 			// Test MB range
-			#expect((1024 * 1024).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "1 MB")
-			#expect((1024 * 1024 * 2).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "2 MB")
-			#expect((1024 * 1024 + 512 * 1024).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "1.5 MB")
+			let oneMB: Int64 = 1024 * 1024
+			let twoMB: Int64 = 1024 * 1024 * 2
+			let oneAndHalfMB: Int64 = 1024 * 1024 + 512 * 1024
+			#expect(oneMB.formatted(Formatters.bytes.locale(locale)) == "1 MB")
+			#expect(twoMB.formatted(Formatters.bytes.locale(locale)) == "2 MB")
+			#expect(oneAndHalfMB.formatted(Formatters.bytes.locale(locale)) == "1.5 MB")
 
 			// Test GB range
-			#expect((1024 * 1024 * 1024).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "1 GB")
-			#expect((Int64(1024) * 1024 * 1024 * 5).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "5 GB")
+			let oneGB: Int64 = 1024 * 1024 * 1024
+			let fiveGB: Int64 = Int64(1024) * 1024 * 1024 * 5
+			#expect(oneGB.formatted(Formatters.bytes.locale(locale)) == "1 GB")
+			#expect(fiveGB.formatted(Formatters.bytes.locale(locale)) == "5 GB")
 
 			// Test TB range
-			#expect((Int64(1024) * 1024 * 1024 * 1024).formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "1 TB")
+			let oneTB: Int64 = Int64(1024) * 1024 * 1024 * 1024
+			#expect(oneTB.formatted(Formatters.bytes.locale(locale)) == "1 TB")
 		}
 
 		@Test("Format bytes with binary units")
@@ -44,7 +59,7 @@ struct FormattersTests {
 			// Test that decimal (1000-based) would be different
 			let oneDecimalMB = 1000 * 1000
 			let decimalResult = Int64(oneDecimalMB).formatted(Formatters.bytes.locale(.init(identifier: "en_US")))
-			#expect(decimalResult != "1 MB") // Should be less than 1.0 MB in binary
+			#expect(decimalResult != "1 MB")  // Should be less than 1.0 MB in binary
 		}
 
 		@Test("Format bytes excludes byte unit")
@@ -52,7 +67,7 @@ struct FormattersTests {
 			// Verify that bytes unit is not used (minimum is KB)
 			let result = 100.formatted(Formatters.bytes.locale(.init(identifier: "en_US")))
 			#expect(!result.contains("bytes"))
-			#expect(!result.contains("B ")) // Space after B would indicate bytes unit
+			#expect(!result.contains("B "))  // Space after B would indicate bytes unit
 		}
 
 		@Test("Format large byte values")
@@ -60,7 +75,7 @@ struct FormattersTests {
 			// Test very large values
 			let petabyte = Int64(1024) * 1024 * 1024 * 1024 * 1024
 			let result = petabyte.formatted(Formatters.bytes.locale(.init(identifier: "en_US")))
-			#expect(result.contains("PB") || result.contains("TB")) // Should handle large values
+			#expect(result.contains("PB") || result.contains("TB"))  // Should handle large values
 		}
 	}
 
@@ -184,27 +199,27 @@ struct FormattersTests {
 		func formatETAWithZeroAndNegativeValues() {
 			// Test zero
 			let zeroResult = Duration.seconds(0).formatted(Formatters.eta.locale(.init(identifier: "en_US")))
-			#expect(zeroResult == "0s") // Should handle zero gracefully
+			#expect(zeroResult == "0s")  // Should handle zero gracefully
 
 			// Test negative (should handle gracefully)
 			let negativeResult = Duration.seconds(-100).formatted(Formatters.eta.locale(.init(identifier: "en_US")))
-			#expect(negativeResult == "-1m 40s") // Should not crash
+			#expect(negativeResult == "-1m 40s")  // Should not crash
 		}
 
 		@Test("Format ETA with large time intervals")
 		func formatETAWithLargeTimeIntervals() {
 			// Test weeks (7 days)
 			let result = Duration.seconds(7 * 24 * 3600).formatted(Formatters.eta.locale(.init(identifier: "en_US")))
-			#expect(result == "7d") // Should show in days
+			#expect(result == "7d")  // Should show in days
 
 			// Test months (33 days)
 			let monthResult = Duration.seconds(33 * 24 * 3600).formatted(Formatters.eta.locale(.init(identifier: "en_US")))
-			#expect(monthResult == "33d") // Should show in days
+			#expect(monthResult == "33d")  // Should show in days
 		}
 
 		@Test("ETA formatter uses abbreviated units")
 		func etaFormatterUsesAbbreviatedUnits() {
-			let result = Duration.seconds(3661).formatted(Formatters.eta.locale(.init(identifier: "en_US"))) // 1 hour, 1 minute, 1 second
+			let result = Duration.seconds(3661).formatted(Formatters.eta.locale(.init(identifier: "en_US")))  // 1 hour, 1 minute, 1 second
 			#expect(result == "1h 1m 1s")
 		}
 	}
@@ -214,6 +229,7 @@ struct FormattersTests {
 	@Suite("Locale-Specific Formatting Tests")
 	struct LocaleSpecificFormattingTests {
 		@Test("Byte formatter handles different locales")
+		@MainActor
 		func byteFormatterHandlesDifferentLocales() {
 			Current.locale = Locale(identifier: "fr_FR")
 			// Test that byte formatter works regardless of locale
@@ -252,8 +268,7 @@ struct FormattersTests {
 		@Test("Handle negative byte counts")
 		func handleNegativeByteCount() {
 			let result = (-1024).formatted(Formatters.bytes)
-			#expect(result == "-1 kB") // Should handle gracefully
+			#expect(result == "-1 kB")  // Should handle gracefully
 		}
 	}
 }
-

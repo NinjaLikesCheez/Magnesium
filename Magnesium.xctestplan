@@ -24,6 +24,55 @@
         "identifier" : "30B191621C02E0CBB93088F4",
         "name" : "MagnesiumTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Common",
+        "identifier" : "CommonTests",
+        "name" : "CommonTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/MagnesiumModule",
+        "identifier" : "MagnesiumModuleTests",
+        "name" : "MagnesiumModuleTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Torrent",
+        "identifier" : "TorrentCoreTests",
+        "name" : "TorrentCoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Torrent",
+        "identifier" : "TorrentMappingTests",
+        "name" : "TorrentMappingTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Torrent",
+        "identifier" : "TorrentPreferencesTests",
+        "name" : "TorrentPreferencesTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Torrent",
+        "identifier" : "TorrentSessionTests",
+        "name" : "TorrentSessionTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/Torrent",
+        "identifier" : "TorrentManagerTests",
+        "name" : "TorrentManagerTests"
+      }
     }
   ],
   "version" : 1

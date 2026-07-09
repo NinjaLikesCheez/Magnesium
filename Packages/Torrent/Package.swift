@@ -11,7 +11,27 @@ let package = Package(
 		.library(
 			name: "TorrentUI",
 			targets: ["TorrentUI"]
-		)
+		),
+		.library(
+			name: "TorrentCore",
+			targets: ["TorrentCore"]
+		),
+		.library(
+			name: "TorrentSession",
+			targets: ["TorrentSession"]
+		),
+		.library(
+			name: "TorrentManager",
+			targets: ["TorrentManager"]
+		),
+		.library(
+			name: "TorrentMapping",
+			targets: ["TorrentMapping"]
+		),
+		.library(
+			name: "TorrentPreferences",
+			targets: ["TorrentPreferences"]
+		),
 	],
 	dependencies: [
 		.package(path: "../Common"),
@@ -67,9 +87,59 @@ let package = Package(
 			name: "TorrentCore",
 			dependencies: ["Common"]
 		),
+		.target(
+			name: "TorrentTestSupport",
+			dependencies: [
+				"TorrentCore",
+				"TorrentSession",
+				"TorrentPreferences",
+			]
+		),
 		.testTarget(
-			name: "TorrentUITests",
-			dependencies: ["TorrentUI"]
+			name: "TorrentCoreTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+			]
+		),
+		.testTarget(
+			name: "TorrentMappingTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentMapping",
+			]
+		),
+		.testTarget(
+			name: "TorrentPreferencesTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentPreferences",
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "TorrentSessionTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentPreferences",
+				"TorrentSession",
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "TorrentManagerTests",
+			dependencies: [
+				"TorrentTestSupport",
+				"TorrentCore",
+				"TorrentSession",
+				"TorrentManager",
+				"TorrentMapping",
+				"TorrentPreferences",
+				"Common",
+			]
 		),
 	]
 )

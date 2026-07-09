@@ -1,9 +1,9 @@
 import Foundation
-import Combine
-@testable import Magnesium
+import TorrentCore
+import TorrentSession
 
-/// Mock implementation of TorrentClientActing for testing
-class MockTorrentClientActing: TorrentClientActing {
+/// Mock implementation of TorrentClient for testing
+final class MockTorrentClient: TorrentClient {
 	// MARK: - Mock Configuration
 
 	var refreshResult: ([StandardTorrent], [StandardLabel]) = ([], [])
@@ -52,7 +52,7 @@ class MockTorrentClientActing: TorrentClientActing {
 	var addLinkCallCount = 0
 	var addedLinks: [String] = []
 
-	// MARK: - TorrentClientActing Implementation
+	// MARK: - TorrentClient Implementation
 
 	func refresh() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel]) {
 		refreshCallCount += 1
@@ -236,7 +236,7 @@ class MockTorrentClientActing: TorrentClientActing {
 	}
 
 	func simulateNetworkError() {
-		let error = NSError(domain: NSURLErrorDomain, code: 1) as! URLError
+		let error = URLError(.notConnectedToInternet)
 		refreshError = TorrentClientError.deluge(.request(.urlError(error)))
 		refreshFilesError = TorrentClientError.deluge(.request(.urlError(error)))
 		pathsError = TorrentClientError.deluge(.request(.urlError(error)))

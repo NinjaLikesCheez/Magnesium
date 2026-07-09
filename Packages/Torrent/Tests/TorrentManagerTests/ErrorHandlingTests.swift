@@ -1,7 +1,13 @@
-import Testing
+import Common
 import Foundation
 import Security
-@testable import Magnesium
+import Testing
+
+@testable import TorrentCore
+@testable import TorrentManager
+@testable import TorrentPreferences
+@testable import TorrentSession
+@testable import TorrentTestSupport
 
 // TODO: I think most of these are terrible.... but once we move over to the new error handling system these can probably get updated to something reasonable
 @MainActor
@@ -36,7 +42,6 @@ struct ErrorHandlingTests {
 	@Test("TorrentSession.Error provides detailed error information")
 	func sessionErrorProvidesDetailedErrorInformation() throws {
 		let server = TestDataFactory.createServer(name: "Test Server", type: .deluge)
-		let underlyingError = NSError(domain: "TestDomain", code: 123, userInfo: [NSLocalizedDescriptionKey: "Test error"])
 
 		// Test missingKeychainData error
 		let missingKeychainError = TorrentSession.Error.missingKeychainData(server: server)
@@ -50,13 +55,11 @@ struct ErrorHandlingTests {
 		}
 
 		// Test decodingFailed error
-		let decodingError = TorrentSession.Error.decodingFailed(underlyingError)
+		let decodingError = TorrentSession.Error.decodingFailed("Test error")
 
 		switch decodingError {
-		case .decodingFailed(let error):
-			let nsError = error as NSError
-			#expect(nsError.domain == "TestDomain")
-			#expect(nsError.code == 123)
+		case .decodingFailed(let description):
+			#expect(description == "Test error")
 		default:
 			Issue.record("Expected decodingFailed error")
 		}
@@ -73,36 +76,11 @@ struct ErrorHandlingTests {
 		}
 	}
 
-	@Test("TorrentSession error handling preserves original error context")
-	func sessionErrorHandlingPreservesOriginalErrorContext() throws {
-		// Create a complex underlying error with userInfo
-		let userInfo: [String: Any] = [
-			NSLocalizedDescriptionKey: "JSON decoding failed",
-			NSLocalizedFailureReasonErrorKey: "Invalid JSON format",
-			"customKey": "customValue"
-		]
-		let underlyingError = NSError(domain: "DecodingDomain", code: 4865, userInfo: userInfo)
-
-		let sessionError = TorrentSession.Error.decodingFailed(underlyingError)
-
-		switch sessionError {
-		case .decodingFailed(let error):
-			let nsError = error as NSError
-			#expect(nsError.domain == "DecodingDomain")
-			#expect(nsError.code == 4865)
-			#expect(nsError.localizedDescription == "JSON decoding failed")
-			#expect(nsError.localizedFailureReason == "Invalid JSON format")
-			#expect(nsError.userInfo["customKey"] as? String == "customValue")
-		default:
-			Issue.record("Expected decodingFailed error")
-		}
-	}
-
 	// MARK: - Network Operation Error Handling Tests
 
-	@Test("MockTorrentClientActing error simulation")
-	func mockTorrentClientActingErrorSimulation() async throws {
-		let mockClient = MockTorrentClientActing()
+	@Test("MockTorrentClient error simulation")
+	func mockTorrentClientErrorSimulation() async throws {
+		let mockClient = MockTorrentClient()
 
 		// Test refresh error
 		mockClient.refreshError = TorrentClientError.deluge(.response(.unconnected))
@@ -191,11 +169,11 @@ struct ErrorHandlingTests {
 		testDefaults.set("invalid-data", forKey: "servers")
 		testDefaults.set(["invalid": "data"], forKey: "selectedServerID")
 
-		let preferences = TorrentPreferences(userDefaults: testDefaults)
+		let preferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 
 		// Verify preferences can be created and provide defaults
-		#expect(preferences.servers.isEmpty) // Should fall back to empty array
-		#expect(preferences.selectedServerID == nil) // Should fall back to nil
+		#expect(preferences.servers.isEmpty)  // Should fall back to empty array
+		#expect(preferences.selectedServerID == nil)  // Should fall back to nil
 
 		// Cleanup
 		testDefaults.removePersistentDomain(forName: suiteName)
@@ -205,12 +183,13 @@ struct ErrorHandlingTests {
 
 	@Test("TorrentManager handles concurrent refresh calls")
 	func torrentManagerHandlesConcurrentRefreshCalls() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
-		mockPreferences.autoRefreshInterval = 10.0 // Long interval to avoid timer interference
+		mockSession.setMockClient(mockClient)
+		mockPreferences.autoRefreshInterval = 10.0  // Long interval to avoid timer interference
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
 
@@ -238,11 +217,12 @@ struct ErrorHandlingTests {
 
 	@Test("Large torrent list memory handling")
 	func largeTorrentListMemoryHandling() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -270,12 +250,19 @@ struct ErrorHandlingTests {
 	@Test("TorrentSession handles invalid server type gracefully")
 	func sessionHandlesInvalidServerTypeGracefully() throws {
 		// This test verifies that adding new server types doesn't break existing code
+		let suiteName = "test-invalid-server-\(UUID().uuidString)"
+		let testDefaults = UserDefaults(suiteName: suiteName)!
+		let preferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
+		let session = TorrentSession(preferences)
+
 		let server = TestDataFactory.createServer(name: "Future Server", type: .qbittorrent)
 
 		// Should throw notImplemented error for unimplemented server types
 		#expect(throws: TorrentSession.Error.self) {
-			try TorrentSession.actionImplementation(server: server)
+			try session.setServer(server)
 		}
+
+		testDefaults.removePersistentDomain(forName: suiteName)
 	}
 
 	// MARK: - Resource Cleanup Error Handling Tests
@@ -283,24 +270,25 @@ struct ErrorHandlingTests {
 	@Test("TorrentManager timer cleanup on deallocation")
 	func torrentManagerTimerCleanupOnDeallocation() async throws {
 		var torrentManager: TorrentManager? = {
-			let mockPreferences = MockAppPreferences()
-			let mockSession = MockSession(mockPreferences)
-			let mockClient = MockTorrentClientActing()
+			let mockPreferences = TorrentPreferences(
+				userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+			let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+			let mockClient = MockTorrentClient()
 
-			mockSession.setMockActionImplementation(mockClient)
-			mockPreferences.autoRefreshInterval = 0.1 // Very short interval
+			mockSession.setMockClient(mockClient)
+			mockPreferences.autoRefreshInterval = 0.1  // Very short interval
 
 			return TorrentManager(session: mockSession, preferences: mockPreferences)
 		}()
 
 		// Let the timer run briefly
-		try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+		try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
 
 		// Deallocate the manager
 		torrentManager = nil
 
 		// Wait a bit more to ensure timer would have fired if not cleaned up
-		try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+		try await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
 
 		// If we get here without crashes, timer cleanup worked
 		#expect(torrentManager == nil)
@@ -312,7 +300,7 @@ struct ErrorHandlingTests {
 	func sessionRecoversFromTemporaryErrors() throws {
 		let suiteName = "test-recovery-\(UUID().uuidString)"
 		let testDefaults = UserDefaults(suiteName: suiteName)!
-		let preferences = TorrentPreferences(userDefaults: testDefaults)
+		let preferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 		let session = TorrentSession(preferences)
 
 		// First, set a valid server
@@ -363,11 +351,12 @@ struct ErrorHandlingTests {
 
 	@Test("Empty torrent list handling")
 	func emptyTorrentListHandling() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -404,12 +393,9 @@ struct ErrorHandlingTests {
 		#expect(torrent.eta == 0)
 
 		// Verify computed properties handle zero values
-		#expect(torrent.ratio.isNaN) // 0/0 should be NaN
-		#expect(torrent.downloadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "Zero kB")
-		#expect(torrent.uploadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "Zero kB")
-		// TODO: we need to make localizedProgress accept a locale that's not the system locale
-//		Current.locale = .init(identifier: "en_US")
-//		#expect(torrent.localizedProgress == "Zero kB / 1 GB (0%)")
+		#expect(torrent.ratio.isNaN)  // 0/0 should be NaN
+		#expect(torrent.downloadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "0 kB")
+		#expect(torrent.uploadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "0 kB")
 	}
 
 	@Test("Maximum values in torrent data")
@@ -432,11 +418,9 @@ struct ErrorHandlingTests {
 		#expect(torrent.eta == TimeInterval(Int64.max))
 
 		// Verify computed properties handle maximum values
-		#expect(torrent.ratio == 1.0) // max/max should be 1.0
+		#expect(torrent.ratio == 1.0)  // max/max should be 1.0
 		#expect(torrent.downloadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "8,192 PB")
 		#expect(torrent.uploadRate.formatted(Formatters.bytes.locale(.init(identifier: "en_US"))) == "8,192 PB")
-		// TODO: we need to make localizedProgress accept a locale that's not the system locale
-//		#expect(torrent.localizedProgress == "8,192 PB / 1GB (100%)")
 	}
 
 	@Test("Unicode and special characters in torrent names")
@@ -451,14 +435,15 @@ struct ErrorHandlingTests {
 			"Path/with/slashes\\and\\backslashes",
 			"Name with\ttabs\nand\nnewlines",
 			"Very.Long.Name.With.Many.Dots.And.Extensions.mkv.part1.rar",
-			""  // Empty name
+			"",  // Empty name
 		]
 
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -501,11 +486,12 @@ struct ErrorHandlingTests {
 		#expect(torrent.name.count > 1000)
 
 		// Test with TorrentManager
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockClient.refreshResult = ([torrent], [])
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -523,28 +509,22 @@ struct ErrorHandlingTests {
 	@Test("Boundary values for progress and ratios")
 	func boundaryValuesForProgressAndRatios() {
 		// Test progress boundaries
-		let progressTests = [
-			(0.0, "0%"),
-			(0.5, "50%"),
-			(1.0, "100%"),
-			(1.5, "150%"), // Over 100% (edge case)
-			(-0.1, "-10%") // Negative progress (edge case)
-		]
+		let progressValues: [Float] = [0.0, 0.5, 1.0, 1.5, -0.1]
 
-		for (progress, _) in progressTests {
-			let torrent = TestDataFactory.createStandardTorrent(progress: Float(progress))
-			#expect(torrent.progress == Float(progress))
+		for progress in progressValues {
+			let torrent = TestDataFactory.createStandardTorrent(progress: progress)
+			#expect(torrent.progress == progress)
 			#expect(torrent.localizedProgress != "")
 		}
 
 		// Test ratio boundaries
 		let ratioTests: [(Int64, Int64, Double)] = [
-			(0, 1, 0.0),      // No upload
-			(1, 0, .infinity), // No download (infinite ratio)
-			(0, 0, .nan),     // No data (NaN ratio)
-			(1, 1, 1.0),      // Equal upload/download
-			(2, 1, 2.0),      // 2:1 ratio
-			(Int64.max, 1, Double(Int64.max)) // Maximum upload
+			(0, 1, 0.0),  // No upload
+			(1, 0, .infinity),  // No download (infinite ratio)
+			(0, 0, .nan),  // No data (NaN ratio)
+			(1, 1, 1.0),  // Equal upload/download
+			(2, 1, 2.0),  // 2:1 ratio
+			(Int64.max, 1, Double(Int64.max)),  // Maximum upload
 		]
 
 		for (uploaded, downloaded, expectedRatio) in ratioTests {
@@ -566,11 +546,12 @@ struct ErrorHandlingTests {
 
 	@Test("Concurrent torrent operations")
 	func concurrentTorrentOperations() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -596,11 +577,12 @@ struct ErrorHandlingTests {
 
 	@Test("Rapid filter and search changes")
 	func rapidFilterAndSearchChanges() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
 
@@ -610,7 +592,7 @@ struct ErrorHandlingTests {
 			TestDataFactory.createStandardTorrent(hash: "2", name: "Music Album", state: .seeding, label: "music"),
 			TestDataFactory.createStandardTorrent(hash: "3", name: "Software Package", state: .paused, label: "software"),
 			TestDataFactory.createStandardTorrent(hash: "4", name: "Movie Seeding", state: .seeding, label: "movies"),
-			TestDataFactory.createStandardTorrent(hash: "5", name: "Music Download", state: .downloading, label: "music")
+			TestDataFactory.createStandardTorrent(hash: "5", name: "Music Download", state: .downloading, label: "music"),
 		]
 
 		mockClient.refreshResult = (testTorrents, [])
@@ -622,35 +604,36 @@ struct ErrorHandlingTests {
 		for query in searchQueries {
 			torrentManager.searchQuery = query
 			let results = torrentManager.filteredTorrents
-			#expect(results.count >= 0) // Should not crash
+			#expect(results.count >= 0)  // Should not crash
 		}
 
 		// Rapidly change filter options
 		let filterOptions = [
-			FilterOptions(states: [.downloading]),
-			FilterOptions(states: [.seeding]),
-			FilterOptions(states: [.paused]),
-			FilterOptions(states: [.downloading, .seeding]),
-			FilterOptions(labels: ["movies"]),
-			FilterOptions(labels: ["music"]),
-			FilterOptions(labels: ["software"]),
-			FilterOptions(states: [.downloading], labels: ["movies"])
+			TorrentFilterOptions(states: [.downloading]),
+			TorrentFilterOptions(states: [.seeding]),
+			TorrentFilterOptions(states: [.paused]),
+			TorrentFilterOptions(states: [.downloading, .seeding]),
+			TorrentFilterOptions(labels: ["movies"]),
+			TorrentFilterOptions(labels: ["music"]),
+			TorrentFilterOptions(labels: ["software"]),
+			TorrentFilterOptions(states: [.downloading], labels: ["movies"]),
 		]
 
 		for filter in filterOptions {
 			mockPreferences.filterOptions = filter
 			let results = torrentManager.filteredTorrents
-			#expect(results.count >= 0) // Should not crash
+			#expect(results.count >= 0)  // Should not crash
 		}
 	}
 
 	@Test("Memory pressure with large datasets")
 	func memoryPressureWithLargeDatasets() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -684,9 +667,9 @@ struct ErrorHandlingTests {
 		let extremeDates = [
 			Date.distantPast,
 			Date.distantFuture,
-			Date(timeIntervalSince1970: 0), // Unix epoch
-			Date(timeIntervalSince1970: -1), // Before epoch
-			Date(timeIntervalSince1970: Double.greatestFiniteMagnitude)
+			Date(timeIntervalSince1970: 0),  // Unix epoch
+			Date(timeIntervalSince1970: -1),  // Before epoch
+			Date(timeIntervalSince1970: Double.greatestFiniteMagnitude),
 		]
 
 		for date in extremeDates {
@@ -700,12 +683,12 @@ struct ErrorHandlingTests {
 
 		// Test with extreme ETA values
 		let extremeETAs: [TimeInterval: String] = [
-			-1: "∞",           // Invalid ETA
-			 0: "∞",            // No ETA
-			 1: "1s",            // 1 second
-			 3600: "1h",         // 1 hour
-			 86400: "1d",        // 1 day
-			 86400 * (365) * 2: "730d",    // 2 years
+			-1: "∞",  // Invalid ETA
+			0: "∞",  // No ETA
+			1: "1s",  // 1 second
+			3600: "1h",  // 1 hour
+			86400: "1d",  // 1 day
+			86400 * (365) * 2: "730d",  // 2 years
 		]
 
 		for (eta, localizedRatioOrETA) in extremeETAs {
@@ -719,10 +702,10 @@ struct ErrorHandlingTests {
 
 	@Test("Network timeout and retry scenarios")
 	func networkTimeoutAndRetryScenarios() async throws {
-		let mockClient = MockTorrentClientActing()
+		let mockClient = MockTorrentClient()
 
 		// Test timeout simulation
-		mockClient.refreshDelay = 0.1 // Small delay to simulate network latency
+		mockClient.refreshDelay = 0.1  // Small delay to simulate network latency
 		mockClient.refreshResult = (TestDataFactory.createMultipleTorrents(count: 3), [])
 
 		let startTime = Date()
@@ -730,7 +713,7 @@ struct ErrorHandlingTests {
 		let endTime = Date()
 
 		let elapsed = endTime.timeIntervalSince(startTime)
-		#expect(elapsed >= 0.1) // Should take at least the delay time
+		#expect(elapsed >= 0.1)  // Should take at least the delay time
 
 		// Test error followed by success (retry scenario)
 		mockClient.reset()
@@ -752,11 +735,12 @@ struct ErrorHandlingTests {
 
 	@Test("Thread safety with concurrent access")
 	func threadSafetyWithConcurrentAccess() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 		mockPreferences.autoRefreshInterval = 10.0
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
@@ -789,8 +773,8 @@ struct ErrorHandlingTests {
 
 		// Verify final state is consistent
 		await MainActor.run {
-			#expect(torrentManager.torrents.count <= 100) // Should not exceed expected count
-			#expect(mockClient.refreshCallCount >= 1) // At least one refresh should have completed
+			#expect(torrentManager.torrents.count <= 100)  // Should not exceed expected count
+			#expect(mockClient.refreshCallCount >= 1)  // At least one refresh should have completed
 		}
 	}
 
@@ -806,7 +790,7 @@ struct ErrorHandlingTests {
 			"\"string\"",
 			"123",
 			"",
-			"{ \"key\": \"value\" extra text"
+			"{ \"key\": \"value\" extra text",
 		]
 
 		for jsonString in malformedJSONData {
@@ -829,11 +813,12 @@ struct ErrorHandlingTests {
 
 	@Test("Resource exhaustion scenarios")
 	func resourceExhaustionScenarios() async throws {
-		let mockPreferences = MockAppPreferences()
-		let mockSession = MockSession(mockPreferences)
-		let mockClient = MockTorrentClientActing()
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		let mockClient = MockTorrentClient()
 
-		mockSession.setMockActionImplementation(mockClient)
+		mockSession.setMockClient(mockClient)
 
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
 

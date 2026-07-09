@@ -1,0 +1,53 @@
+{
+  "configurations" : [
+    {
+      "id" : "6C4F5316-B511-4EE2-8975-D8F7A1B4113E",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentCoreTests",
+        "name" : "TorrentCoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentMappingTests",
+        "name" : "TorrentMappingTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentPreferencesTests",
+        "name" : "TorrentPreferencesTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentSessionTests",
+        "name" : "TorrentSessionTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentManagerTests",
+        "name" : "TorrentManagerTests"
+      }
+    }
+  ],
+  "version" : 1
+}
