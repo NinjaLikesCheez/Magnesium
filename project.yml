@@ -74,8 +74,9 @@ targets:
       - package: Router
       - package: Sentry
     scheme:
-      testTargets:
-        - MagnesiumTests
+      testPlans:
+        - path: Magnesium.xctestplan
+          defaultPlan: true
       gatherCoverageData: true
       coverageTargets:
         - Magnesium
