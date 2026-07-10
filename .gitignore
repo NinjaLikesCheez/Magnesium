@@ -69,3 +69,7 @@ Magnesium.xcodeproj
 .build/workspace-state.json
 
 .sentryclirc
+
+### Code signing ###
+# Local, machine-specific signing config — see config/Signing.xcconfig.template
+config/Signing.xcconfig

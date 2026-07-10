@@ -1,0 +1,4 @@
+// Settings shared by both Debug and Release — included by config/Magnesium-Debug.xcconfig
+// and config/Magnesium-Release.xcconfig via #include. Config-specific overrides go in those files instead.
+
+INFOPLIST_KEY_CFBundleDisplayName = Magnesium

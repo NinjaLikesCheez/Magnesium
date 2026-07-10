@@ -46,13 +46,11 @@ targets:
       visionOS: 26
     sources:
       - Sources/Magnesium
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: bykim.cracks.Magnesium
+    # Build settings (bundle ID, signing, display name, ...) live in the xcconfig files below —
+    # add new settings there, not here.
     info:
       path: Sources/Magnesium/Resources/Info.plist
       properties:
-        CFBundleDisplayName: Magnesium
-        CFBundleIdentifier: bykim.cracks.Magnesium
         UILaunchScreen:
           UIColorName: White
         NSAppTransportSecurity:
@@ -73,6 +71,8 @@ targets:
       - package: ObservableDefaults
       - package: Router
       - package: Sentry
+        products:
+          - SentrySPM
     scheme:
       testPlans:
         - path: Magnesium.xctestplan
