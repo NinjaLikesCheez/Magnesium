@@ -1,0 +1,2 @@
+#include "Magnesium.xcconfig"
+#include? "Signing.xcconfig"

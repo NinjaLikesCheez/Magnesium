@@ -1,0 +1,13 @@
+// Copy this file to config/Signing.xcconfig (gitignored) and fill in your own values.
+// config/Signing.xcconfig is included by config/Magnesium-Debug.xcconfig and
+// config/Magnesium-Release.xcconfig via `#include?`, so it's optional — if it's
+// missing, Xcode falls back to whatever CODE_SIGN_* / PRODUCT_BUNDLE_IDENTIFIER
+// defaults are already set.
+
+PRODUCT_BUNDLE_IDENTIFIER = bykim.cracks.Magnesium
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY = iPhone Developer
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+// Only needed for CODE_SIGN_STYLE = Manual:
+// PROVISIONING_PROFILE_SPECIFIER = your-profile-name
