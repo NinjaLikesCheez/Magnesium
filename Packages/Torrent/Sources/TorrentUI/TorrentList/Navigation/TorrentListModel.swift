@@ -1,43 +1,46 @@
-import Router
-import SwiftUI
 import CommonUI
+import Observation
+import SwiftUINavigation
 
-public enum TorrentListError: RoutableError {
-	public var id: Self { self }
+/// Navigation + presentation state for the TorrentList feature, driven by swift-navigation
+/// case-path bindings instead of the Router package.
+///
+/// `path` and `destination` are separate optionals (rather than one shared enum) because a
+/// pushed detail screen and a presented error can be on-screen at the same time — e.g.
+/// `TorrentDetailHeaderView` presents an error without popping. Sharing one optional would make
+/// presenting an error silently dismiss the pushed detail view.
+@Observable
+public final class TorrentListModel {
+	public var error: Error?
+	public var destination: Destination?
 
-	case clientError(TorrentClientError)
-	case fileImportError(String) // fileImport API throws any Error... so manually build it
-}
+	public init() {}
 
-struct TorrentListErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: TorrentListRouter
+	/// Stack-navigation targets for the TorrentList feature.
+	@CasePathable
+	public enum Destination: Hashable {
+		/// Navigate to the detailed view of a specific torrent
+		case detail(StandardTorrent)
+	}
 
-	func body(content: Content) -> some View {
-		content
-			.panel(item: $router.presentedError) { error in
-				switch error {
-				case let .clientError(error):
-					ErrorPanelCard(
-						error: error,
-						primaryButtonAction: router.dismissError
-					)
-				case let .fileImportError(message):
-					PanelCard(
-						title: "File Import Error",
-						systemName: "square.and.arrow.down.badge.xmark",
-						subtitle: message,
-						primaryButtonAction: router.dismissError
-					)
-				}
-			}
+	/// Modal error presentations for the TorrentList feature.
+	@CasePathable
+	public enum Error: Hashable {
+		case clientError(TorrentClientError)
+		case fileImportError(FileImportError) // fileImport API throws any Error... so manually build it
+	}
+
+	/// A file-import failure message. `id` is the message itself since these carry no other identity.
+	public struct FileImportError: Hashable, Identifiable {
+		public var id: String { message }
+		public let message: String
+
+		public init(_ message: String) {
+			self.message = message
+		}
 	}
 }
 
-extension View {
-	func withTorrentListErrors(router: Binding<TorrentListRouter>) -> some View {
-		modifier(TorrentListErrorModifier(router: router))
-	}
-}
 
 extension TorrentClientError: VisualError {
 	public var title: String {
@@ -52,7 +55,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.title
 		}
 	}
-	
+
 	public var systemName: String {
 		switch self {
 		case .nullImplementation:
@@ -65,7 +68,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.systemName
 		}
 	}
-	
+
 	public var subtitle: String {
 		switch self {
 		case .nullImplementation:
@@ -78,7 +81,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.subtitle
 		}
 	}
-	
+
 	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case .nullImplementation:
@@ -116,4 +119,8 @@ extension TorrentClientError: Equatable {
 			false
 		}
 	}
+}
+
+extension TorrentClientError: Identifiable {
+	public var id: Self { self }
 }

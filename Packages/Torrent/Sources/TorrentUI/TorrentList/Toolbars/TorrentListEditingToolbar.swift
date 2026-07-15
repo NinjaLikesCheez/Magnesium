@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
-	@Environment(TorrentListRouter.self) var router
+	@Environment(TorrentListModel.self) var model
 
 	@State private var isConfirmingDelete = false
 	@Binding var editMode: EditMode
@@ -134,7 +134,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 				print("TODO")
 			}
 		} catch {
-			router.presentError(.clientError(error))
+			model.error = .clientError(error)
 		}
 	}
 }

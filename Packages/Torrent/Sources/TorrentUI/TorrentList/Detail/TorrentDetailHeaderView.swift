@@ -2,7 +2,8 @@ import SwiftUI
 
 struct TorrentDetailHeaderView: View {
 	@Environment(TorrentManager.self) var torrentManager
-	@Environment(TorrentListRouter.self) private var router
+	@Environment(TorrentDetailModel.self) private var model
+	@Environment(\.dismiss) var dismiss
 
 	var torrent: StandardTorrent
 
@@ -50,7 +51,7 @@ struct TorrentDetailHeaderView: View {
 					torrent.isActive
 						? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 				} catch {
-					router.presentError(.clientError(error))
+					model.error = .clientError(error)
 				}
 			}
 		} label: {
@@ -78,9 +79,9 @@ struct TorrentDetailHeaderView: View {
 				Task {
 					do throws(TorrentClientError) {
 						try await torrentManager.delete([torrent], removeData: false)
-						router.pop()
+						dismiss()
 					} catch {
-						router.presentError(.clientError(error))
+						model.error = .clientError(error)
 					}
 				}
 			}
@@ -89,9 +90,9 @@ struct TorrentDetailHeaderView: View {
 				Task {
 					do throws(TorrentClientError) {
 						try await torrentManager.delete([torrent], removeData: true)
-						router.pop()
+						dismiss()
 					} catch {
-						router.presentError(.clientError(error))
+						model.error = .clientError(error)
 					}
 				}
 			}
@@ -108,7 +109,7 @@ struct TorrentDetailHeaderView: View {
 					let paths = try await torrentManager.paths(for: torrent)
 					UIPasteboard.general.string = torrent.downloadPath + "/" + paths[0]
 				} catch {
-					router.presentError(.clientError(error))
+					model.error = .clientError(error)
 				}
 			}
 		} label: {

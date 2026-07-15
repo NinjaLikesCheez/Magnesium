@@ -10,7 +10,7 @@ import Common
 
 struct TorrentFilesSection: View {
 	@Environment(TorrentManager.self) var manager
-	@Environment(TorrentListRouter.self) private var router
+	@Environment(TorrentDetailModel.self) private var model
 
 	var torrent: StandardTorrent
 	@State private var files: [StandardTorrentFile] = []
@@ -37,7 +37,7 @@ struct TorrentFilesSection: View {
 				do throws(TorrentClientError) {
 					files = try await manager.refreshFiles(for: torrent)
 				} catch {
-					router.presentError(.clientError(error))
+					model.error = .clientError(error)
 				}
 			}
 		}
