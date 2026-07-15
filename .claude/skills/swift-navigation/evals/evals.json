@@ -1,0 +1,23 @@
+{
+  "skill_name": "swift-navigation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a SwiftUI screen with swift-navigation for a task-list app. It needs to push to a task detail view when a row is tapped, AND show an error panel (sheet) if loading tasks fails. The detail view has its own delete/edit actions that can also fail and need to show an error WHILE the detail view stays on screen. Set up the @Observable model and enums for this — don't wire up the actual UI, just the navigation/state model and a short explanation of the shape.",
+      "expected_output": "Two separate optional properties (or equivalent), not one shared Destination enum for push+error, with reasoning that push and error need to coexist. Should NOT produce a single enum with a fatalError/dead-branch default case.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My SwiftUI screen has a NavigationStack with a .toolbar { ToolbarItemGroup(placement: .bottomBar) { ... } }. I'm using a custom Panel ViewModifier (like a bottom sheet) driven by swift-navigation's case-path bindings to show error messages, applied as an overlay via a ZStack inside the modifier. When the panel shows, I can see my toolbar buttons rendering on top of/through the panel, and sometimes taps land on the toolbar instead of the panel. What's going on and how do I fix it?",
+      "expected_output": "Correctly diagnoses the toolbar-chrome compositing layer issue (not a z-order/nesting issue fixable by moving the modifier around) and recommends switching to a native presentation primitive (.sheet/.fullScreenCover with presentationBackground(.clear)) rather than an in-place ZStack overlay.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "should my ScreenModel have one Destination enum with all the cases (detail push, add-item sheet, delete confirmation, network error) or should I split them up? want to use swift-navigation the 'right' way for a settings screen with a push destination and a couple of alerts",
+      "expected_output": "Gives a clear rule of thumb (split by presentation surface / whether cases can be simultaneously on screen) rather than a blanket 'always one enum' or 'always split' answer, and explains why with concrete reasoning about exhaustive switches or simultaneous state.",
+      "files": []
+    }
+  ]
+}
