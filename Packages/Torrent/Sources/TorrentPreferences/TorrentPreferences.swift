@@ -47,8 +47,10 @@ public final class TorrentPreferences: Preferences {
 }
 
 public extension TorrentPreferences {
-	enum Error: VisualError {
+	enum Error: VisualError, Identifiable {
 		case keychain(KeychainError)
+
+		public var id: Self { self }
 
 		public var title: String {
 			switch self {

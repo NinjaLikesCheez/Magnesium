@@ -28,9 +28,9 @@ struct TorrentOnboardingSheetModifier: RoutableSheetViewModifier {
 					NavigationStack {
 						switch server {
 						case .deluge:
-							AddDelugeServerView<TorrentOnboardingRouter>()
+							OnboardingAddDelugeServerView()
 						case .qbittorrent:
-							AddQBittorrentServerView<TorrentOnboardingRouter>()
+							OnboardingAddQBittorrentServerView()
 						}
 					}
 				}

@@ -17,14 +17,9 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	let selectedTorrents: Set<StandardTorrent>
 
 	var body: some ToolbarContent {
-		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
-			glassToolbar
-		} else {
-			oldGrandpaToolbar
-		}
+		glassToolbar
 	}
 
-	@available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *)
 	@ToolbarContentBuilder
 	var glassToolbar: some ToolbarContent {
 		ToolbarSpacer(.flexible, placement: .bottomBar)

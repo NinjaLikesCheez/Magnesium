@@ -24,9 +24,9 @@ struct TorrentOnboardingDestinationModifier: RoutableDestinationViewModifier {
 				case let .addNewServer(type):
 					switch type {
 					case .deluge:
-						AddDelugeServerView<TorrentOnboardingRouter>()
+						OnboardingAddDelugeServerView()
 					case .qbittorrent:
-						AddQBittorrentServerView<TorrentOnboardingRouter>()
+						OnboardingAddQBittorrentServerView()
 					}
 				}
 			}

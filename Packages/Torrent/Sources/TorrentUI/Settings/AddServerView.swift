@@ -1,6 +1,8 @@
 import Deluge
 import Observation
 import SwiftUI
+import SwiftNavigation
+import CommonUI
 
 @Observable
 class ServerBasicAuthentication {
@@ -28,13 +30,14 @@ extension BasicAuthentication {
 }
 
 struct AddServerView: View {
-	@Environment(TorrentSettingsRouter.self) var router
+	@Environment(TorrentPreferences.self) private var preferences
+
+	@State private var model: Model = .init()
 
 	var body: some View {
 		List(TorrentServerType.allCases) { server in
-			NavigationLink(value: TorrentSettingsDestination.addNewServer(server)) {
-				Text(server.localizedString)
-					.fixedSize()
+			NavigationButton(server.localizedString) {
+				model.destination = .addNewServer(server)
 			}
 		}
 		.navigationTitle("Add Server")
@@ -44,5 +47,28 @@ struct AddServerView: View {
 		#else
 			.listStyle(.bordered)
 		#endif
+			.navigationDestination(item: $model.destination) { destination in
+				switch destination {
+				case let .addNewServer(type):
+					switch type {
+					case .deluge:
+						AddDelugeServerView()
+							.environment(preferences)
+					case .qbittorrent:
+						AddQBittorrentServerView()
+							.environment(preferences)
+					}
+				}
+			}
+	}
+
+	@Observable
+	final class Model {
+		var destination: Destination?
+
+		@CasePathable
+		enum Destination {
+			case addNewServer(TorrentServerType)
+		}
 	}
 }

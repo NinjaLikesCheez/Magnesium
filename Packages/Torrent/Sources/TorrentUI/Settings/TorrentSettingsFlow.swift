@@ -6,25 +6,47 @@
 //
 
 import SwiftUI
-import Router
+import SwiftUINavigation
+import CommonUI
+import Observation
 
-public struct TorrentSettingsFlow: Flow {
-	public typealias Router = TorrentSettingsRouter
+public struct TorrentSettingsFlow: View {
+	@State private var model = TorrentSettingsModel()
 
 	let preferences: TorrentPreferences
 	let session: TorrentSession
 
-// TODO: Fix plz
-	@State public  var router: TorrentSettingsRouter
+	public init(preferences: TorrentPreferences, session: TorrentSession) {
+		self.preferences = preferences
+		self.session = session
+	}
 
 	public var body: some View {
-//		NavigationStack(path: $router.path) {
-		Group {
-			TorrentSettingsListView()
-				.withTorrentSettingsDestinations(router: router, session: session, preferences: preferences)
+		@Bindable var model = model
+
+		TorrentSettingsListView()
+			.environment(model)
+			.environment(preferences)
+			.environment(session)
+	}
+}
+
+extension TorrentSettingsFlow {
+	@Observable
+	final class TorrentSettingsModel {
+		var destination: Destination?
+
+		init() {}
+
+		/// Stack-navigation targets for the Settings feature. Genuinely multi-level: the list can
+		/// push `addAServer`, and `addAServer` itself pushes `addNewServer`.
+		@CasePathable
+		enum Destination: Hashable {
+			/// Navigate to edit an existing server's configuration
+			case editServer(TorrentServer)
+
+			/// Navigate to the server selection screen where users can choose which type of server to add
+			case addAServer
 		}
-		.environment(router)
-		.environment(preferences)
-		.environment(session)
 	}
 }

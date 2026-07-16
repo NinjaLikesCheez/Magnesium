@@ -33,7 +33,7 @@ public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
 	}
 
 	public var settings: TorrentSettingsFlow {
-		.init(preferences: preferences, session: session, router: .init(parentRouter))
+		.init(preferences: preferences, session: session)
 	}
 
 	public var onboarding: TorrentOnboardingFlow {

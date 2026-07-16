@@ -6,7 +6,7 @@ import Router
 @MainActor
 public protocol MagnesiumFeatureModule<EntryPoint, SettingsFlow, OnboardingFlow>: Identifiable {
 	associatedtype EntryPoint: View
-	associatedtype SettingsFlow: Flow
+	associatedtype SettingsFlow: View
 	associatedtype OnboardingFlow: Flow
 
 	var name: String { get }

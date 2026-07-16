@@ -5,14 +5,15 @@
 //  Created by ninji on 16/04/2025.
 //
 
-import Router
 import SwiftUI
+import SwiftNavigation
 
 struct EditDelugeServerView: View {
-	@Environment(TorrentSettingsRouter.self) private var router
+	@Environment(\.dismiss) private var dismiss
 	@Environment(TorrentSession.self) private var session
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(\.isPresented) private var isPresented
+
+	@State private var error: Error?
 
 	@State private var settings: DelugeSettings
 
@@ -54,9 +55,9 @@ struct EditDelugeServerView: View {
 				Button("Delete", role: .destructive) {
 					do throws(TorrentPreferences.Error) {
 						try preferences.remove(server: server)
-						router.pop()
+						dismiss()
 					} catch {
-						router.presentError(.preferences(error))
+						self.error = .preferences(error)
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -71,19 +72,24 @@ struct EditDelugeServerView: View {
 			try preferences.addOrUpdate(server: server)
 			try session.setServer(server)
 
-			if isPresented {
-				router.dismissSheet(withParent: true)
-			} else {
-				router.popToRoot()
-			}
+			dismiss()
 		} catch let error as ServerSettingsError {
-			router.presentError(.serverSettings(error))
+			self.error = .serverSettings(error)
 		} catch let error as TorrentPreferences.Error {
-			router.presentError(.preferences(error))
+			self.error = .preferences(error)
 		} catch let error as TorrentSession.Error {
-			router.presentError(.session(error))
+			self.error = .session(error)
 		} catch {
 			fatalError("Unhandled error: \(error)")
 		}
+	}
+}
+
+extension EditDelugeServerView {
+	@CasePathable
+	enum Error {
+		case preferences(TorrentPreferences.Error)
+		case serverSettings(ServerSettingsError)
+		case session(TorrentSession.Error)
 	}
 }

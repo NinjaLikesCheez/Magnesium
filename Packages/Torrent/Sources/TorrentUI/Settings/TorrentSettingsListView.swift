@@ -1,13 +1,13 @@
 import SwiftUI
-import Common
+import CommonUI
+import SwiftUINavigation
 
 public struct TorrentSettingsListView: View {
 	@Environment(TorrentSession.self) private var session: TorrentSession
 	@Environment(TorrentPreferences.self) private var preferences: TorrentPreferences
-	@Environment(TorrentSettingsRouter.self) var router
 
+	@State private var model: Model = .init()
 	@State private var servers: [TorrentServer] = []
-
 	@State private var selectedRefreshInterval: TimeInterval = 0
 
 	private var automaticallyLookForMagnetLinks: Binding<Bool> {
@@ -26,28 +26,30 @@ public struct TorrentSettingsListView: View {
 
 			resetSection
 		}
+		.navigationDestination(item: $model.destination) { destination in
+			switch destination {
+			case .addAServer:
+				AddServerView()
+					.environment(preferences)
+			case let .editServer(server):
+				switch server.type {
+				case .deluge:
+					EditDelugeServerView(server)
+						.environment(model)
+						.environment(preferences)
+						.environment(session)
+				case .qbittorrent:
+					fatalError("Not yet implemented")
+				}
+			}
+		}
 		.navigationTitle("Torrent Settings")
-//		.toolbar {
-//			#if os(macOS)
-//				ToolbarItem(placement: .primaryAction) {
-//					Button("Done") {
-//						router.dismissSheet(withParent: true)
-//					}
-//				}
-//			#else
-//				ToolbarItem(placement: .topBarTrailing) {
-//					Button("Done") {
-//						router.dismissSheet(withParent: true)
-//					}
-//				}
-//			#endif
-//		}
 		.onAppear {
 			do throws(TorrentPreferences.Error) {
 				servers = try preferences.getServers()
 				selectedRefreshInterval = preferences.autoRefreshInterval
 			} catch {
-				router.presentError(.preferences(error))
+				model.error = .preferences(error)
 			}
 		}
 	}
@@ -55,12 +57,14 @@ public struct TorrentSettingsListView: View {
 	var serverSection: some View {
 		Section("Servers") {
 			ForEach(servers) { server in
-				NavigationLink(value: TorrentSettingsDestination.editServer(server)) {
-					Text(server.name)
+				NavigationButton(server.name) {
+					model.destination = .editServer(server)
 				}
 			}
 
-			NavigationLink(value: TorrentSettingsDestination.addAServer) {
+			Button {
+				model.destination = .addAServer
+			} label: {
 				Text("Add Server")
 			}
 		}
@@ -107,12 +111,43 @@ public struct TorrentSettingsListView: View {
 	var resetSection: some View {
 		Section("Reset") {
 			Button(role: .destructive) {
-				router.reset(withParent: true)
+				model.destination = nil
 				preferences.reset()
 				session.reset()
 			} label: {
 				Text("Reset - This is for easy debugging")
 			}
+		}
+	}
+}
+
+extension TorrentSettingsListView {
+	@Observable
+	final class Model {
+		var destination: Destination?
+		var error: Error?
+
+		init() {}
+
+		/// Stack-navigation targets for the Settings feature. Genuinely multi-level: the list can
+		/// push `addAServer`, and `addAServer` itself pushes `addNewServer`.
+		@CasePathable
+		enum Destination: Hashable {
+			/// Navigate to edit an existing server's configuration
+			case editServer(TorrentServer)
+
+			/// Navigate to the server selection screen where users can choose which type of server to add
+			case addAServer
+		}
+
+		/// Modal error presentations for the Settings feature.
+		@CasePathable
+		enum Error: Hashable, Identifiable {
+			case preferences(TorrentPreferences.Error)
+			//			case serverSettings(ServerSettingsError)
+			//			case session(TorrentSession.Error)
+
+			public var id: Self { self }
 		}
 	}
 }

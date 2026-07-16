@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct TorrentNavigationView: View {
-	@Environment(TorrentListModel.self) var model
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
 

@@ -90,7 +90,15 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 				if let newItem {
 					self.content = AnyView(contentBuilder(newItem))
 					if self.presentedItem == nil {
-						self.presentedItem = newItem
+						// Suppress animation on the `fullScreenCover` presentation itself so
+						// UIKit's system slide-up transition doesn't play; the cover appears
+						// instantly (fully transparent) and `presentPanel` then drives the
+						// dim/slide entrance purely via SwiftUI state in `onAppear`.
+						var transaction = Transaction()
+						transaction.disablesAnimations = true
+						withTransaction(transaction) {
+							self.presentedItem = newItem
+						}
 					}
 				} else {
 					closePanel()
@@ -128,17 +136,12 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	// MARK: UI
 
 	private func background() -> some View {
-		Group {
-			if isPresented {
-				Color.black.opacity(0.8)
-					.ignoresSafeArea()
-					.transition(
-						.opacity.animation(
-							.easeInOut(duration: backgroundAnimationDuration)
-						)
-					)
-			}
-		}
+		// Always present (rather than conditionally inserted via `if isPresented`) so the
+		// dim only ever animates via `.opacity`, with nothing for `fullScreenCover`'s own
+		// slide-up presentation transition to carry along.
+		Color.black.opacity(isPresented ? 0.8 : 0.0)
+			.ignoresSafeArea()
+			.animation(.easeInOut(duration: backgroundAnimationDuration), value: isPresented)
 	}
 
 	private func panelContent() -> some View {
