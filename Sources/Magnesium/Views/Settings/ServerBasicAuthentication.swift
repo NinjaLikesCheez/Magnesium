@@ -1,7 +1,5 @@
 import Deluge
 import Observation
-import SwiftUI
-import TorrentUI
 
 @Observable
 class ServerBasicAuthentication {
@@ -25,27 +23,5 @@ class ServerBasicAuthentication {
 extension BasicAuthentication {
 	func toServerBasicAuthentication() -> ServerBasicAuthentication {
 		ServerBasicAuthentication(username: username, password: password)
-	}
-}
-
-struct AddServerView: View {
-	@Environment(SettingsRouter.self) var router
-
-	var body: some View {
-		List(TorrentServerType.allCases) { server in
-			// TODO: this
-//			NavigationLink(value: SettingsDestination.addNewServer(server)) {
-				Text(server.localizedString)
-					.fixedSize()
-					.foregroundStyle(.primary)
-//			}
-		}
-		.navigationTitle("Add Server")
-		.navigationBarTitleDisplayMode(.inline)
-		#if !os(macOS)
-			.listStyle(.insetGrouped)
-		#else
-			.listStyle(.bordered)
-		#endif
 	}
 }

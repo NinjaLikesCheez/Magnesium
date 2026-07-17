@@ -23,7 +23,7 @@ struct AppSheetModifier: RoutableSheetViewModifier {
 			.sheet(item: $router.presentedSheet) { sheet in
 				switch sheet {
 				case .settings:
-					SettingsFlow(router: SettingsRouter(router))
+					SettingsFlow()
 						.environment(modules)
 				}
 			}
