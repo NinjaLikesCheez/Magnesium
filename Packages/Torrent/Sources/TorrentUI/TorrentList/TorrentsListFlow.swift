@@ -11,7 +11,7 @@ import Common
 import CommonUI
 
 public struct TorrentsListFlow: View {
-	@State public var model: TorrentListModel = .init()
+	@State public var model: TorrentListView.Model = .init()
 
 	let session: TorrentSession
 	let preferences: TorrentPreferences

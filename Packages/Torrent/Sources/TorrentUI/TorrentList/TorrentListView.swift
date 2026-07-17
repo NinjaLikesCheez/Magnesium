@@ -1,8 +1,9 @@
 import SwiftUI
+import SwiftUINavigation
 
 public struct TorrentListView: View {
 	@Environment(TorrentSession.self) private var session: TorrentSession
-	@Environment(TorrentListModel.self) private var model
+	@Environment(Model.self) private var model
 	@Environment(TorrentManager.self) var manager
 	@Environment(\.userInterfaceIdiom) var userInterfaceIdiom
 
@@ -90,4 +91,38 @@ public struct TorrentListView: View {
 	@State var editMode: EditMode = .inactive
 
 	TorrentListView(selections: $selections, editMode: $editMode)
+}
+
+extension TorrentListView {
+	@Observable
+	public final class Model {
+		public var error: Error?
+		public var destination: Destination?
+
+		public init() {}
+
+		/// Stack-navigation targets for the TorrentList feature.
+		@CasePathable
+		public enum Destination: Hashable {
+			/// Navigate to the detailed view of a specific torrent
+			case detail(StandardTorrent)
+		}
+
+		/// Modal error presentations for the TorrentList feature.
+		@CasePathable
+		public enum Error: Hashable {
+			case clientError(TorrentClientError)
+			case fileImportError(FileImportError) // fileImport API throws any Error... so manually build it
+		}
+
+		/// A file-import failure message. `id` is the message itself since these carry no other identity.
+		public struct FileImportError: Hashable, Identifiable {
+			public var id: String { message }
+			public let message: String
+
+			public init(_ message: String) {
+				self.message = message
+			}
+		}
+	}
 }

@@ -2,46 +2,6 @@ import CommonUI
 import Observation
 import SwiftUINavigation
 
-/// Navigation + presentation state for the TorrentList feature, driven by swift-navigation
-/// case-path bindings instead of the Router package.
-///
-/// `path` and `destination` are separate optionals (rather than one shared enum) because a
-/// pushed detail screen and a presented error can be on-screen at the same time — e.g.
-/// `TorrentDetailHeaderView` presents an error without popping. Sharing one optional would make
-/// presenting an error silently dismiss the pushed detail view.
-@Observable
-public final class TorrentListModel {
-	public var error: Error?
-	public var destination: Destination?
-
-	public init() {}
-
-	/// Stack-navigation targets for the TorrentList feature.
-	@CasePathable
-	public enum Destination: Hashable {
-		/// Navigate to the detailed view of a specific torrent
-		case detail(StandardTorrent)
-	}
-
-	/// Modal error presentations for the TorrentList feature.
-	@CasePathable
-	public enum Error: Hashable {
-		case clientError(TorrentClientError)
-		case fileImportError(FileImportError) // fileImport API throws any Error... so manually build it
-	}
-
-	/// A file-import failure message. `id` is the message itself since these carry no other identity.
-	public struct FileImportError: Hashable, Identifiable {
-		public var id: String { message }
-		public let message: String
-
-		public init(_ message: String) {
-			self.message = message
-		}
-	}
-}
-
-
 extension TorrentClientError: VisualError {
 	public var title: String {
 		switch self {

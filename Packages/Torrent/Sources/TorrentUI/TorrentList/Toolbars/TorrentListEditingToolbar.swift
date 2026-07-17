@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
-	@Environment(TorrentListModel.self) var model
+	@Environment(TorrentListView.Model.self) var model
 
 	@State private var isConfirmingDelete = false
 	@Binding var editMode: EditMode

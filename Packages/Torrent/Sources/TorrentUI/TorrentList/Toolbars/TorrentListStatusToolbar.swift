@@ -10,7 +10,7 @@ import SwiftUI
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(TorrentListModel.self) private var model
+	@Environment(TorrentListView.Model.self) private var model
 
 	@State var showAddTorrentConfirmation = false
 	@State var showingLinkInput = false

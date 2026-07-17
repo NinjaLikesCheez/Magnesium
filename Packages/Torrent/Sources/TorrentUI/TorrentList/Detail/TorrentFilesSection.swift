@@ -10,7 +10,7 @@ import Common
 
 struct TorrentFilesSection: View {
 	@Environment(TorrentManager.self) var manager
-	@Environment(TorrentDetailModel.self) private var model
+	@Environment(TorrentDetailView.Model.self) private var model
 
 	var torrent: StandardTorrent
 	@State private var files: [StandardTorrentFile] = []
