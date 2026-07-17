@@ -25,6 +25,9 @@ packages:
     # path: ../Router
     url: https://github.com/NinjaLikesCheez/Router
     branch: main
+  swift-navigation:
+    url: https://github.com/pointfreeco/swift-navigation
+    from: 2.4.1
   ObservableDefaults:
     # path: ../../fatbobman/ObservableDefaults
     url: https://github.com/fatbobman/ObservableDefaults
@@ -70,6 +73,10 @@ targets:
       - package: Logging
       - package: ObservableDefaults
       - package: Router
+      - package: swift-navigation
+        products:
+          - SwiftNavigation
+          - SwiftUINavigation
       - package: Sentry
         products:
           - SentrySPM

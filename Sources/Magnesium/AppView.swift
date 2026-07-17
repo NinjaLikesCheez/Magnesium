@@ -5,12 +5,10 @@
 //  Created by ninji on 03/11/2025.
 //
 
-import SwiftUI
-import Router
-
 import Common
 import Logging
 import SwiftUI
+import SwiftUINavigation
 import TorrentUI
 
 struct AppView: View {
@@ -18,13 +16,14 @@ struct AppView: View {
 
 	@State private var appState = AppState.resuming
 	@State private var appPreferences = AppPreferences()
-	@State private var router = AppRouter()
+	@State private var model = Model()
 
 	var body: some View {
+		@Bindable var model = model
+
 		Group {
 			switch appState {
 			case .unboarded:
-//				OnboardingFlow(router: .init())
 				NavigationStack {
 					modules
 						.torrent
@@ -36,25 +35,31 @@ struct AppView: View {
 						.torrent
 						.entry
 						.toolbar {
-#if os(macOS)
-							ToolbarItem(placement: .primaryAction) {
-								Button {
-									router.presentSheet(.settings)
-								} label: {
-									Image(systemName: "gear")
+							#if os(macOS)
+								ToolbarItem(placement: .primaryAction) {
+									Button {
+										model.sheet = .settings
+									} label: {
+										Image(systemName: "gear")
+									}
 								}
-							}
-#else
-							ToolbarItem(placement: .topBarLeading) {
-								Button {
-									router.presentSheet(.settings)
-								} label: {
-									Image(systemName: "gear")
+							#else
+								ToolbarItem(placement: .topBarLeading) {
+									Button {
+										model.sheet = .settings
+									} label: {
+										Image(systemName: "gear")
+									}
 								}
-							}
-#endif
+							#endif
 						}
-						.withAppSheets(router: router, modules: modules)
+						.sheet(item: $model.sheet) { sheet in
+							switch sheet {
+							case .settings:
+								SettingsFlow()
+									.environment(modules)
+							}
+						}
 				}
 			case .resuming:
 				ProgressView()
@@ -68,10 +73,26 @@ struct AppView: View {
 		}
 		.task {
 			appState = modules.torrent.isEnabled ? .onboarded : .unboarded
-//			appState = appPreferences.onboarded ? .onboarded : .unboarded
+			//			appState = appPreferences.onboarded ? .onboarded : .unboarded
 		}
 		.onChange(of: modules.torrent.isEnabled) { _, newValue in
 			appState = newValue ? .onboarded : .unboarded
+		}
+	}
+}
+
+extension AppView {
+	@Observable
+	final class Model {
+		var sheet: Sheet?
+
+		init() {}
+
+		@CasePathable
+		enum Sheet: Hashable, Identifiable {
+			case settings
+
+			var id: Self { self }
 		}
 	}
 }
