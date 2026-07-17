@@ -9,7 +9,7 @@ enum NetworkError: Swift.Error {
 	case noNetworkAccess
 }
 
-extension Error: VisualError {
+extension NetworkError: VisualError {
 	var title: String {
 		switch self {
 		case .noNetworkAccess:
@@ -19,44 +19,53 @@ extension Error: VisualError {
 
 	var systemName: String {
 		switch self {
-		case .system, .unknown:
+		case .noNetworkAccess:
 			"network.slash"
 		}
 	}
 
 	var subtitle: String {
 		switch self {
-		case let .noNetworkAccess:
+		case .noNetworkAccess:
 			"It looks like you're offline, please reconnect and try again"
 		}
 	}
 }
 ```
 
-This can then be used as the associated type of a `RoutableError` (which should be the base of all your possible UI errors - see [navigation.md](./navigation.md) for more):
+This is then used as a case's payload in a feature's `Error` enum (see [navigation.md](./navigation.md) for the full navigation model). The `Error` enum lives nested on the feature's own `Model`, is `Identifiable` via `var id: Self { self }`, and is presented with `.panel(item:)`:
 
 ```swift
-enum SomeRoutableError: RoutableError {
-	var id: Self { self }
+extension SomeFeatureView {
+	@Observable
+	final class Model {
+		var error: Error?
 
-	case network(NetworkError)
+		@CasePathable
+		enum Error: Hashable, Identifiable {
+			case network(NetworkError)
+
+			var id: Self { self }
+		}
+	}
 }
 
-struct SomeRoutableErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: SomeRouter
+struct SomeFeatureFlow: View {
+	@State var model: SomeFeatureView.Model = .init()
 
-	func body(content: Content) -> some View {
-		content
-			.panel(item: $router.presentedError) { error in
-				switch error {
-				case let .network(error):
-					ErrorPanelCard(
-						error: error,
-						primaryButtonAction: router.dismissError)
-				}
+	var body: some View {
+		@Bindable var model = model
+
+		SomeFeatureView()
+			.panel(item: $model.error.network) { error in
+				ErrorPanelCard(
+					error: error,
+					primaryButtonAction: { model.error = nil }
+				)
 			}
+			.environment(model)
 	}
 }
 ```
 
-The compiler should, in theory, enforce the type safety of the associated type provided you use the `ErrorPanelCard` for all presented errors (which you should).
+Always route user-facing errors through `ErrorPanelCard`/`panel(item:)` this way rather than presenting an ad hoc alert — it's what keeps `VisualError` conformance meaningful across the whole app.
