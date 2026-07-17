@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TorrentOnboardingView: View {
-	@Environment(TorrentOnboardingRouter.self) var router
+	@Environment(TorrentOnboardingFlow.Model.self) var model
 	@Environment(\.horizontalSizeClass) var horizontalSizeClass
 
 	var body: some View {
@@ -42,10 +42,10 @@ struct TorrentOnboardingView: View {
 				ForEach(TorrentServerType.allCases) { type in
 					Button {
 						if horizontalSizeClass == .compact {
-							router.push(.addNewServer(type))
+							model.destination = .addNewServer(type)
 						} else {
 							// On larger screens, a sheet looks better
-							router.presentSheet(.addNewServer(type))
+							model.sheet = .addNewServer(type)
 						}
 					} label: {
 						Text(type.rawValue)

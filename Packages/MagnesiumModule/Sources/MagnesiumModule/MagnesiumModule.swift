@@ -1,13 +1,12 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 import SwiftUI
-import Router
 
 @MainActor
 public protocol MagnesiumFeatureModule<EntryPoint, SettingsFlow, OnboardingFlow>: Identifiable {
 	associatedtype EntryPoint: View
 	associatedtype SettingsFlow: View
-	associatedtype OnboardingFlow: Flow
+	associatedtype OnboardingFlow: View
 
 	var name: String { get }
 	var icon: Image { get }

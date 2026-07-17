@@ -25,9 +25,11 @@ struct AppView: View {
 			switch appState {
 			case .unboarded:
 //				OnboardingFlow(router: .init())
-				modules
-					.torrent
-					.onboarding
+				NavigationStack {
+					modules
+						.torrent
+						.onboarding
+				}
 			case .onboarded:
 				NavigationStack {
 					modules
