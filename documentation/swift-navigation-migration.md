@@ -14,15 +14,17 @@ this doc doesn't repeat.
 ## Remaining Router-based features (as of this writing)
 
 - `Packages/Torrent/Sources/TorrentUI/Onboarding/Navigation` (`TorrentOnboardingRouter`)
-- `Sources/Magnesium/Features/Settings/Navigation` (`SettingsRouter`)
 - `Sources/Magnesium/Features/Onboarding/Navigation` (`OnboardingRouter`)
 - `Sources/Magnesium/Navigation` (`AppRouter`) — the app-level root router
 
 Already migrated (reference these for the real pattern, not just this doc):
-`Packages/Torrent/Sources/TorrentUI/TorrentList` and
-`Packages/Torrent/Sources/TorrentUI/Settings` (the package-level copy — note
-the app-target copy under `Sources/Magnesium/Features/Settings/Navigation` is
-still Router-based and is a separate migration).
+`Packages/Torrent/Sources/TorrentUI/TorrentList`,
+`Packages/Torrent/Sources/TorrentUI/Settings` (the package-level copy), and
+`Sources/Magnesium/Features/Settings` (the app-target shell — see
+`SettingsListView.swift`; it had a non-nil parent, `AppRouter`, and its
+`dismissSheet(withParent: true)`/`reset(withParent: true)` call sites became
+plain `@Environment(\.dismiss)` calls since the feature is only ever
+presented as a `.sheet`).
 
 Migrate leaf features first (Onboarding next). Save `AppRouter` for last —
 see "Routers with a parent" below, since it's the one other routers currently

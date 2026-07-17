@@ -7,18 +7,11 @@
 
 import SwiftUI
 import TorrentUI
-import Router
 
-struct SettingsFlow: Flow {
-	typealias Router = SettingsRouter
-
-	@State var router: SettingsRouter
-
+struct SettingsFlow: View {
 	var body: some View {
-		NavigationStack(path: $router.path) {
+		NavigationStack {
 			SettingsListView()
-				.withSettingsDestinations()
 		}
-		.environment(router)
 	}
 }
