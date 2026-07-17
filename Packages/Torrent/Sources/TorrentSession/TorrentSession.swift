@@ -89,7 +89,9 @@ extension TorrentSession {
 	}
 }
 
-extension TorrentSession.Error: VisualError {
+extension TorrentSession.Error: VisualError, Identifiable {
+	public var id: Self { self }
+
 	public var title: String {
 		switch self {
 		case .missingKeychainData:

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
-	@Environment(TorrentListRouter.self) var router
+	@Environment(TorrentListView.Model.self) var model
 
 	@State private var isConfirmingDelete = false
 	@Binding var editMode: EditMode
@@ -17,14 +17,9 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	let selectedTorrents: Set<StandardTorrent>
 
 	var body: some ToolbarContent {
-		if #available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *) {
-			glassToolbar
-		} else {
-			oldGrandpaToolbar
-		}
+		glassToolbar
 	}
 
-	@available(iOS 26.0, macOS 26.0, tvOS 26.0, visionOS 26.0, *)
 	@ToolbarContentBuilder
 	var glassToolbar: some ToolbarContent {
 		ToolbarSpacer(.flexible, placement: .bottomBar)
@@ -134,7 +129,7 @@ struct TorrentListEditingToolbar: ToolbarContent {
 				print("TODO")
 			}
 		} catch {
-			router.presentError(.clientError(error))
+			model.error = .clientError(error)
 		}
 	}
 }

@@ -4,17 +4,15 @@
 //
 //  Created by ninji on 11/04/2025.
 //
+import Router
 import SwiftUI
-import Observation
-import SwiftUINavigation
-import CommonUI
 
-struct AddDelugeServerView: View {
+struct OnboardingAddDelugeServerView: View {
+	@Environment(TorrentOnboardingRouter.self) var router
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(\.dismiss) var dismiss
+	@Environment(\.isPresented) private var isPresented
 
-	@State private var model = Model()
-	@State private var settings = DelugeSettings()
+	@State private var settings: DelugeSettings = .init()
 
 	var body: some View {
 		ServerSettingsView(
@@ -39,15 +37,6 @@ struct AddDelugeServerView: View {
 			},
 			additionalSections: {}
 		)
-		.panel(item: $model.error) { error in
-			switch error {
-			case let .serverSettings(error):
-				ErrorPanelCard(error: error) {
-					model.error = nil
-				}
-			}
-
-		}
 		.navigationTitle("Deluge Settings")
 	}
 
@@ -70,25 +59,13 @@ struct AddDelugeServerView: View {
 				}
 			}
 
-			dismiss()
+			if isPresented {
+				router.dismissSheet(withParent: true)
+			} else {
+				router.pop()
+			}
 		} catch {
-			model.error = .serverSettings(error)
-		}
-	}
-}
-
-extension AddDelugeServerView {
-	@Observable
-	final class Model {
-		init() {}
-
-		var error: Error?
-
-		@CasePathable
-		enum Error: Hashable, Identifiable {
-			case serverSettings(ServerSettingsError)
-
-			var id: Self { self }
+			router.presentError(.addServerError(error))
 		}
 	}
 }

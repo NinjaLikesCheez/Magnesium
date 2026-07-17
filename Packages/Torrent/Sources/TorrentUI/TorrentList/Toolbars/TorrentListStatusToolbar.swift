@@ -10,7 +10,7 @@ import SwiftUI
 struct TorrentListStatusToolbar: ToolbarContent {
 	@Environment(TorrentManager.self) private var torrentManager
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(TorrentListRouter.self) private var router
+	@Environment(TorrentListView.Model.self) private var model
 
 	@State var showAddTorrentConfirmation = false
 	@State var showingLinkInput = false
@@ -138,7 +138,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 				do throws(TorrentClientError) {
 					try await torrentManager.addLink(linkInput)
 				} catch {
-					router.presentError(.clientError(error))
+					model.error = .clientError(error)
 				}
 			}
 		}
@@ -159,7 +159,7 @@ struct TorrentListStatusToolbar: ToolbarContent {
 			do throws(TorrentClientError) {
 				try await torrentManager.addLink(string)
 			} catch {
-				router.presentError(.clientError(error))
+				model.error = .clientError(error)
 			}
 		}
 	}
@@ -174,13 +174,13 @@ struct TorrentListStatusToolbar: ToolbarContent {
 						do throws(TorrentClientError) {
 							try await torrentManager.addLink(url.path())
 						} catch {
-							router.presentError(.clientError(error))
+							model.error = .clientError(error)
 						}
 						url.stopAccessingSecurityScopedResource()
 					}
 				}
 		case .failure(let error):
-			router.presentError(.fileImportError(error.localizedDescription))
+			model.error = .fileImportError(.init(error.localizedDescription))
 		}
 	}
 }

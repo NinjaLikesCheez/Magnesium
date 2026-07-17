@@ -7,6 +7,9 @@
 import Deluge
 import Foundation
 import Observation
+import TorrentSession
+
+// TODO: this could probably live elsewhere
 
 @MainActor
 @Observable

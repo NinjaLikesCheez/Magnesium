@@ -77,7 +77,9 @@ public enum ServerSettingsError {
 	case unknown(message: String)
 }
 
-extension ServerSettingsError: VisualError {
+extension ServerSettingsError: VisualError, Identifiable {
+	public var id: Self { self }
+
 	public var title: String {
 		switch self {
 		case .invalidState:

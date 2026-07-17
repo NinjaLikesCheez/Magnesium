@@ -37,6 +37,7 @@ struct AddServerView: View {
 //			NavigationLink(value: SettingsDestination.addNewServer(server)) {
 				Text(server.localizedString)
 					.fixedSize()
+					.foregroundStyle(.primary)
 //			}
 		}
 		.navigationTitle("Add Server")

@@ -1,43 +1,6 @@
-import Router
-import SwiftUI
 import CommonUI
-
-public enum TorrentListError: RoutableError {
-	public var id: Self { self }
-
-	case clientError(TorrentClientError)
-	case fileImportError(String) // fileImport API throws any Error... so manually build it
-}
-
-struct TorrentListErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: TorrentListRouter
-
-	func body(content: Content) -> some View {
-		content
-			.panel(item: $router.presentedError) { error in
-				switch error {
-				case let .clientError(error):
-					ErrorPanelCard(
-						error: error,
-						primaryButtonAction: router.dismissError
-					)
-				case let .fileImportError(message):
-					PanelCard(
-						title: "File Import Error",
-						systemName: "square.and.arrow.down.badge.xmark",
-						subtitle: message,
-						primaryButtonAction: router.dismissError
-					)
-				}
-			}
-	}
-}
-
-extension View {
-	func withTorrentListErrors(router: Binding<TorrentListRouter>) -> some View {
-		modifier(TorrentListErrorModifier(router: router))
-	}
-}
+import Observation
+import SwiftUINavigation
 
 extension TorrentClientError: VisualError {
 	public var title: String {
@@ -52,7 +15,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.title
 		}
 	}
-	
+
 	public var systemName: String {
 		switch self {
 		case .nullImplementation:
@@ -65,7 +28,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.systemName
 		}
 	}
-	
+
 	public var subtitle: String {
 		switch self {
 		case .nullImplementation:
@@ -78,7 +41,7 @@ extension TorrentClientError: VisualError {
 			return qbitError.subtitle
 		}
 	}
-	
+
 	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case .nullImplementation:
@@ -116,4 +79,8 @@ extension TorrentClientError: Equatable {
 			false
 		}
 	}
+}
+
+extension TorrentClientError: Identifiable {
+	public var id: Self { self }
 }

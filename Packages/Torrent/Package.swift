@@ -40,6 +40,7 @@ let package = Package(
 		.package(url: "https://github.com/NinjaLikesCheez/qBittorrent-Swift", from: "0.0.2"),
 		.package(url: "https://github.com/NinjaLikesCheez/Router", branch: "main"),
 		.package(url: "https://github.com/fatbobman/ObservableDefaults", from: "1.7.0"),
+		.package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.4.1"),
 	],
 	targets: [
 		// Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -52,6 +53,8 @@ let package = Package(
 				.product(name: "Router", package: "Router"),
 				.product(name: "CommonUI", package: "Common"),
 				.product(name: "MagnesiumModule", package: "MagnesiumModule"),
+				.product(name: "SwiftNavigation", package: "swift-navigation"),
+				.product(name: "SwiftUINavigation", package: "swift-navigation"),
 			]
 		),
 		.target(

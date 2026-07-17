@@ -33,6 +33,10 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	@State private var isPresented = false
 	@State private var panelOpenAnimationProgress = 0.0
 	@State private var offset = CGSize.zero
+	/// Drives `fullScreenCover` directly. Kept separate from `item` so an external `item = nil`
+	/// (e.g. a "Done" button's action) plays the close animation first instead of instantly
+	/// tearing down the cover.
+	@State private var presentedItem: Item?
 
 	private var panelSpringResponse: Double {
 		isPresented ? 0.25 : 0.15
@@ -57,6 +61,7 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	) {
 		self._item = item
 		self._isPresented = State(initialValue: item.wrappedValue != nil)
+		self._presentedItem = State(initialValue: item.wrappedValue)
 		self.contentBuilder = contentBuilder
 		self.onCancel = onCancel
 	}
@@ -64,36 +69,41 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 	// MARK: Body
 
 	public func body(content: Content) -> some View {
-		ZStack {
-			content
-
-			ZStack(alignment: .bottom) {
-				background()
-				panelContent()
-					// Inset it to look more like the system panel
-					.padding([.leading, .trailing, .bottom], 15)
+		content
+			// `.fullScreenCover` presents in the system presentation layer, which sits above
+			// things like toolbars
+			.fullScreenCover(item: $presentedItem) { item in
+				ZStack(alignment: .bottom) {
+					background()
+					panelContent()
+						// Inset it to look more like the system panel
+						.padding([.leading, .trailing, .bottom], 15)
+				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.ignoresSafeArea()
+				.presentationBackground(.clear)
+				.onAppear {
+					presentPanel(for: item)
+				}
 			}
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.ignoresSafeArea()
-			.onChange(of: self.item) { _, item in
-				if let item {
-					// If currently presented, recompute the content
-					if self.isPresented {
-						self.content = AnyView(contentBuilder(item))
-					} else {
-						presentPanel(for: item)
+			.onChange(of: self.item) { _, newItem in
+				if let newItem {
+					self.content = AnyView(contentBuilder(newItem))
+					if self.presentedItem == nil {
+						// Suppress animation on the `fullScreenCover` presentation itself so
+						// UIKit's system slide-up transition doesn't play; the cover appears
+						// instantly (fully transparent) and `presentPanel` then drives the
+						// dim/slide entrance purely via SwiftUI state in `onAppear`.
+						var transaction = Transaction()
+						transaction.disablesAnimations = true
+						withTransaction(transaction) {
+							self.presentedItem = newItem
+						}
 					}
 				} else {
 					closePanel()
 				}
 			}
-		}
-		.onAnimationCompletion(with: self.panelOpenAnimationProgress) {
-			guard let item = self.item,
-				!self.isPresented
-			else { return }
-			self.presentPanel(for: item)
-		}
 	}
 
 	// MARK: Panel management
@@ -109,27 +119,29 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 		}
 	}
 
+	/// Plays the slide-down/fade-out animation, then dismisses the underlying `fullScreenCover`
+	/// once it finishes so the close animation is visible instead of being cut off.
 	private func closePanel() {
 		withAnimation {
 			self.isPresented = false
 			self.panelOpenAnimationProgress = 0.0
+		}
+
+		Task {
+			try? await Task.sleep(for: .seconds(panelSpringResponse))
+			self.presentedItem = nil
 		}
 	}
 
 	// MARK: UI
 
 	private func background() -> some View {
-		Group {
-			if isPresented {
-				Color.black.opacity(0.8)
-					.ignoresSafeArea()
-					.transition(
-						.opacity.animation(
-							.easeInOut(duration: backgroundAnimationDuration)
-						)
-					)
-			}
-		}
+		// Always present (rather than conditionally inserted via `if isPresented`) so the
+		// dim only ever animates via `.opacity`, with nothing for `fullScreenCover`'s own
+		// slide-up presentation transition to carry along.
+		Color.black.opacity(isPresented ? 0.8 : 0.0)
+			.ignoresSafeArea()
+			.animation(.easeInOut(duration: backgroundAnimationDuration), value: isPresented)
 	}
 
 	private func panelContent() -> some View {
@@ -219,7 +231,7 @@ public extension View {
 	///   - onCancel: A closure called when the panel is cancelled. When this is not nil a cancel
 	///   button will be added to the panel.
 	///   - content: A closure returning the content of the panel.
-	func panel<Item: Identifiable, Content: View>(
+	func  panel<Item: Identifiable, Content: View>(
 		item: Binding<Item?>,
 		onCancel: (() -> Void)? = nil,
 		@ViewBuilder content: @escaping (_ item: Item) -> Content

@@ -45,9 +45,12 @@ struct MagnesiumApp: App {
 		}
 
 		LoggingSystem.bootstrap { label in
-			var logger = StreamLogHandler.standardOutput(label: label)
+
 #if DEBUG
-			//			logger.logLevel = .debug
+			var logger = StreamLogHandler.standardOutput(label: label)
+			logger.logLevel = .debug
+#else
+			let logger = StreamLogHandler.standardOutput(label: label)
 #endif
 			return logger
 		}
