@@ -2,376 +2,163 @@
 
 ## Overview
 
-The app uses a router-based navigation system (inspired by [Ice Cubes App](https://github.com/Dimillian/IceCubesApp) with some tweaks) built on top of SwiftUI's `NavigationStack`. This system provides a clean, testable, and maintainable way to handle navigation throughout the app.
+The app uses [pointfreeco/swift-navigation](https://github.com/pointfreeco/swift-navigation) (`SwiftNavigation`/`SwiftUINavigation`) for navigation: a `@CasePathable` enum describes everywhere a screen can go, and each case gets its own `Binding<Payload?>` via dynamic member lookup (`$model.destination.detail`). That binding drives a native SwiftUI presentation primitive — `.navigationDestination(item:)`, `.sheet(item:)`, `.panel(item:)` (this app's error/modal card, see [error_handling.md](error_handling.md)) — so each presentation site gets an exhaustive switch over only its own cases.
 
-The architecture consists of:
+Some older features still use a custom `Router` package; that pattern is being phased out feature-by-feature, see [swift-navigation-migration.md](swift-navigation-migration.md) for the current migration status and checklist for converting a feature. **This document describes the target pattern — use it for all new navigation code.**
 
-- **Router Protocol**: Defines the navigation interface
-- **Destinations**: Enum cases representing push navigation targets
-- **Sheets**: Enum cases representing modal presentations
-- **Errors**: Enum cases representing error modals
-- **View Modifiers**: Extensions that handle navigation destination and sheet presentation
+For general swift-navigation anti-patterns (the two-enum split, `Identifiable` payloads, why not to hand-roll modal overlays, item- vs. array-based navigation), read the **swift-navigation** skill (`.claude/skills/swift-navigation/SKILL.md`) — it covers the library in general; this document covers how the library is actually used in this codebase.
 
 ## Architecture
 
-### Router Protocol (`Router.swift`)
+### The model
 
-The `RouterProtocol` is the core of the navigation system. It defines the interface for all navigation routers:
-
-```swift
-@MainActor
-public protocol RouterProtocol: AnyObject, Observation.Observable {
-	associatedtype Destination: RoutableDestination
-	associatedtype Sheet: RoutableSheet
-	associatedtype Error: RoutableError
-
-	var path: [Destination] { get set }
-	var presentedSheet: Sheet? { get set }
-	var presentedError: Error? { get set }
-	var parent: (any RouterProtocol)? { get }
-
-	init(_ parent: (any RouterProtocol)?)
-
-	func push(_ destination: Destination)
-	@discardableResult func pop() -> Destination?
-	func popToRoot()
-	func presentSheet(_ sheet: Sheet)
-	func presentError(_ error: Error)
-	func dismissSheet(withParent: Bool)
-	func dismissError()
-	func reset(withParent: Bool)
-}
-```
-
-### Key Components
-
-1. **Destinations**: Conform to `RoutableDestination` protocol, used for stack navigation
-2. **Sheets**: Conform to `RoutableSheet` protocol, used for modal presentations
-3. **Errors**: Conform to `RoutableError` protocol, used for modal presentations
-4. **Parent Router**: Enables hierarchical navigation where child routers can affect parent navigation
-
-### Default Implementation
-
-The protocol provides default implementations for all navigation methods:
-
-- `push(_:)`: Adds a destination to the navigation path
-- `pop()`: Removes the last destination from the path
-- `popToRoot()`: Clears the entire navigation path
-- `presentSheet(_:)`: Sets the presented sheet
-- `presentError(_:)`: Sets the presented error
-- `dismissSheet(withParent:)`: Dismisses the sheet, optionally affecting parent router
-- `dismissError()`: Dismisses the error
-- `reset(withParent:)`: Resets both path and sheet, optionally affecting parent router
-
-## Creating a New Router
-
-### Step 1: Define Destinations
-
-Create an enum conforming to `RoutableDestination`:
+Each view that owns navigation state defines its own `@Observable final class Model`, nested as an `extension` on the owning view or `Flow`. **There is no single shared `<Feature>Model.swift` file or naming convention** — the model lives wherever the view that presents things actually is:
 
 ```swift
-import Router
+// TorrentListView.swift
+extension TorrentListView {
+	@Observable
+	public final class Model {
+		public var error: Error?
+		public var destination: Destination?
 
-enum YourFeatureDestinations: RoutableDestination {
-	var id: Self { self }
-
-	case detailView(SomeModel)
-	case settingsView
-	case listView(parameters: SomeParameters)
-}
-```
-
-### Step 2: Define Sheets
-
-Create an enum conforming to `RoutableSheet`:
-
-```swift
-import Router
-
-enum YourFeatureSheets: RoutableSheet {
-	var id: Self { self }
-
-	case addItemSheet
-	case editItemSheet(SomeModel)
-	case confirmationSheet(message: String)
-}
-```
-
-### Step 3: Define Errors
-
-Create an enum conforming to `RoutableError`:
-
-```swift
-import Router
-
-enum YourFeatureErrors: RoutableError {
-	var id: Self { self }
-
-	case someError
-}
-```
-
-### Step 4: Create the Router
-
-Implement the `RouterProtocol`:
-
-```swift
-import Observation
-import Router
-
-@Observable
-final class YourFeatureRouter: RouterProtocol {
-	typealias Destination = YourFeatureDestinations
-	typealias Sheet = YourFeatureSheets
-
-	var path: [YourFeatureDestinations] = []
-	var presentedSheet: YourFeatureSheets? = nil
-	let parent: (any RouterProtocol)?
-
-	required init(_ parent: (any RouterProtocol)? = nil) {
-		self.parent = parent
-	}
-}
-```
-
-### Step 5: Create Destination Modifier
-
-Create a view modifier to handle navigation destinations:
-
-```swift
-import Router
-
-struct YourFeatureDestinationsModifier: RoutableDestinationViewModifier {
-	func body(content: Content) -> some View {
-		content
-			.navigationDestination(for: YourFeatureDestinations.self) { destination in
-				switch destination {
-				case .detailView(let model):
-					DetailView(model: model)
-				case .settingsView:
-					SettingsView()
-				case .listView(let parameters):
-					ListView(parameters: parameters)
-				}
-			}
-	}
-}
-
-extension View {
-	func withYourFeatureDestinations() -> some View {
-		modifier(YourFeatureDestinationsModifier())
-	}
-}
-```
-
-### Step 6: Create Sheet Modifier
-
-Create a view modifier to handle sheet presentations:
-
-```swift
-import Router
-
-struct YourFeatureSheetsModifier: RoutableSheetViewModifier {
-	@Binding var router: YourFeatureRouter
-
-	func body(content: Content) -> some View {
-		content
-			.sheet(item: $router.presentedSheet) { sheet in
-				switch sheet {
-				case .addItemSheet:
-					AddItemView()
-				case .editItemSheet(let model):
-						EditItemView(model: model)
-				case .confirmationSheet(let message):
-					ConfirmationView(message: message)
-				}
-			}
-	}
-}
-
-extension View {
-	func withYourFeatureSheets(router: Binding<YourFeatureRouter>) -> some View {
-			modifier(YourFeatureSheetsModifier(router: router))
-	}
-}
-```
-
-### Step 7: Create Error Modifier
-
-Create a view modifier to handle sheet presentations:
-
-```swift
-import Router
-
-struct YourFeatureErrorModifier: RoutableErrorViewModifier {
-	@Binding var router: YourFeatureRouter
-
-	func body(content: Content) -> some View {
-		content
-			.sheet(item: $router.presentedError) { error in
-				switch sheet {
-				case .someError:
-					SomeErrorView()
-				}
-			}
-	}
-}
-
-extension View {
-	func withYourFeatureError(router: Binding<YourFeatureRouter>) -> some View {
-			modifier(YourFeatureErrorModifier(router: router))
-	}
-}
-```
-
-### Step 8: Create the Flow View
-
-Create a flow view that sets up the navigation:
-
-```swift
-import Router
-
-struct YourFeatureFlow: View {
-	@State var router: YourFeatureRouter
-
-	var body: some View {
-		NavigationStack(path: $router.path) {
-			YourFeatureRootView()
-				.withYourFeatureDestinations()
-				.withYourFeatureSheets(router: $router)
+		@CasePathable
+		public enum Destination: Hashable {
+			case detail(StandardTorrent)
 		}
-		.environment(router)
+
+		@CasePathable
+		public enum Error: Hashable {
+			case clientError(TorrentClientError)
+			case fileImportError(FileImportError)
+		}
 	}
 }
 ```
 
-## Using Routers in Views
+Real examples in the codebase:
+- `TorrentListView.Model` — nested in [`TorrentListView.swift`](../Packages/Torrent/Sources/TorrentUI/TorrentList/TorrentListView.swift). One model for the whole feature, since TorrentList only has one navigable level (list → detail).
+- `TorrentSettingsFlow.TorrentSettingsModel`, `TorrentSettingsListView.Model`, `AddServerView.Model` — three separate, view-local models, one per screen in a multi-level push stack (list → add-a-server → add-new-server). See "Multi-level stacks" below.
 
-### Accessing the Router
-
-In any view within the navigation hierarchy, access the router via environment:
+There are no `push`/`pop`/`presentError`/`dismissError` wrapper methods — call sites assign the property directly:
 
 ```swift
-import Router
+model.destination = .detail(torrent)   // push
+model.destination = nil                // pop
+model.error = .clientError(error)      // present error
+model.error = nil                      // dismiss error
+```
 
-struct SomeView: View {
-	@Environment(YourFeatureRouter.self) private var router
+### One enum per presentation surface, not per feature
 
-	var body: some View {
-			// View content
+Every model splits presentation state **by surface, not by feature**: a `destination` property for push targets (`.navigationDestination(item:)`), and a separate `error` property for modal/error state (`.panel(item:)` or `.sheet(item:)`) — never one enum covering both. This is the two-enum split from the swift-navigation skill: it keeps each modifier's switch exhaustive over only its own cases, and it means presenting an error can't silently pop whatever's currently pushed, since the two are independent optionals.
+
+`Error` enum cases get `Identifiable` via `var id: Self { self }` on the enum itself (the cases are already `Hashable`), not a wrapper type:
+
+```swift
+@CasePathable
+enum Error: Hashable, Identifiable {
+	case preferences(TorrentPreferences.Error)
+
+	var id: Self { self }
+}
+```
+
+### Multi-level stacks: chain per-view models, not a shared path
+
+For a screen that only pushes one level deep, one model with `.navigationDestination(item:)` is enough (see TorrentList above). For a genuinely multi-level stack, **chain a separate one-level model per screen** rather than a single array-based `NavigationPath`/`[Destination]`:
+
+```swift
+// TorrentSettingsListView.Model.Destination
+case editServer(TorrentServer)
+case addAServer
+
+// AddServerView.Model.Destination
+case addNewServer(TorrentServerType)
+```
+
+`TorrentSettingsListView` pushes `AddServerView` via its own `.navigationDestination(item: $model.destination)`; once on screen, `AddServerView` has its *own* `model.destination` and its *own* `.navigationDestination(item:)` for the next level. There's no shared path array — the `NavigationStack` itself lives once, at the root the `Flow` composes into, but each screen along the way independently owns "what does *this* screen push next."
+
+Reach for this over an array-based `NavigationStack(path:)` + `.navigationDestination(for:)` whenever the real shape is "each screen pushes one fixed next screen" (a linear or tree-shaped flow). Save the array/path form for when the same screen type can recur at arbitrary, dynamic depth (e.g. folder browsing, recursive comment threads) — that case doesn't currently exist in this codebase.
+
+## Wiring it into the Flow
+
+Neither `TorrentsListFlow` nor `TorrentSettingsFlow` puts its own `NavigationStack` inside the Flow — both compose into a `NavigationStack` that already exists higher up the view hierarchy. Don't add a `NavigationStack(path:)` to a Flow unless the feature genuinely needs to own its own stack root.
+
+**One level** — model on the root view, modifiers applied directly to it in the Flow's `body` (see [`TorrentsListFlow.swift`](../Packages/Torrent/Sources/TorrentUI/TorrentList/TorrentsListFlow.swift)):
+
+```swift
+public struct TorrentsListFlow: View {
+	@State public var model: TorrentListView.Model = .init()
+	let session: TorrentSession
+	let preferences: TorrentPreferences
+	let manager: TorrentManager
+
+	public var body: some View {
+		@Bindable var model = model
+
+		TorrentNavigationView()
+			.navigationDestination(item: $model.destination.detail) { $torrent in
+				TorrentDetailView(torrent: torrent)
+					.environment(manager)
+			}
+			.panel(item: $model.error.clientError) { error in
+				ErrorPanelCard(error: error, primaryButtonAction: { model.error = nil })
+			}
+			.panel(item: $model.error.fileImportError) { error in
+				PanelCard(
+					title: "File Import Error",
+					systemName: "square.and.arrow.down.badge.xmark",
+					subtitle: error.message,
+					primaryButtonAction: { model.error = nil }
+				)
+			}
+			.environment(manager)
+			.environment(model)
+			.environment(preferences)
+			.environment(session)
 	}
 }
 ```
 
-### Navigation Actions
+**Multiple levels** — the `Flow` holds its own top-level model for whatever it directly presents, and each pushed screen chains its own model (see [`TorrentSettingsFlow.swift`](../Packages/Torrent/Sources/TorrentUI/Settings/TorrentSettingsFlow.swift), [`TorrentSettingsListView.swift`](../Packages/Torrent/Sources/TorrentUI/Settings/TorrentSettingsListView.swift), [`AddServerView.swift`](../Packages/Torrent/Sources/TorrentUI/Settings/AddServerView.swift) for the full three-screen chain).
 
-#### Push Navigation
+Notes:
+- `@Bindable var model = model` shadows the `@State` property so `$model` works inside `body` — existing codebase style for `@Bindable` locals, not swift-navigation-specific.
+- Use `$model.destination.someCase` (dynamic member lookup via `@CasePathable`) to get a `Binding<Payload?>` scoped to one case when the modifier should only react to that case (see `.detail` / `.clientError` above). Bind to the enum itself, `$model.destination`, only when the modifier's own switch is meant to be exhaustive over every case (see `TorrentSettingsListView`'s single `.navigationDestination(item: $model.destination)` with an internal `switch`).
+- Every view inside the feature accesses its model via `@Environment(SomeModel.self)` — there's no `RouterProtocol`-style abstraction; the environment key is just the concrete model type.
 
-```swift
-// Navigate to a detail view
-router.push(.detailView(someModel))
+## Package dependencies
 
-// Navigate to settings
-router.push(.settingsView)
-```
-
-#### Modal Presentation
+Depend on `swift-navigation` in the target's `Package.swift`:
 
 ```swift
-// Present a sheet
-router.presentSheet(.addItemSheet)
-
-// Present sheet with data
-router.presentSheet(.editItemSheet(someModel))
+.package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.4.1"),
 ```
-
-#### Going Back
 
 ```swift
-// Pop one level
-router.pop()
-
-// Pop to root
-router.popToRoot()
-
-// Dismiss sheet
-router.dismissSheet()
-
-// Dismiss sheet and affect parent router
-router.dismissSheet(withParent: true)
+.product(name: "SwiftNavigation", package: "swift-navigation"),
+.product(name: "SwiftUINavigation", package: "swift-navigation"),
 ```
 
-#### Reset Navigation
-
-```swift
-// Reset current router
-router.reset()
-
-// Reset current router and parent
-router.reset(withParent: true)
-```
-
-## Best Practices
-
-### 1. Router Naming
-
-- Router: `{Feature}Router` (e.g., `SettingsRouter`)
-- Destinations: `{Feature}Destinations` (e.g., `SettingsDestinations`)
-- Sheets: `{Feature}Sheets` (e.g., `SettingsSheets`)
-
-### 2. Environment Setup
-
-Always provide the router via environment in your flow view:
-
-```swift
-NavigationStack(path: $router.path) {
-	RootView()
-}
-.environment(router)
-```
-
-### 3. Hierarchical Navigation
-
-When creating child routers, pass the parent router:
-
-```swift
-let childRouter = ChildRouter(parentRouter)
-```
-
-### 4. Generic Views
-
-When creating views that work with multiple router types, use generics:
-
-```swift
-import Router
-
-struct AddServerView<Router: RouterProtocol>: View {
-	@Environment(Router.self) private var router
-
-	var body: some View {
-		// Implementation
-	}
-}
-```
+New macro dependencies (`SwiftNavigationMacros`, `CasePathsMacros`, and transitively `PerceptionMacros`) require a one-time interactive "Trust & Enable" approval in Xcode.app the first time they're built in a given DerivedData — this can't be done from the CLI. If a build fails with `Macro "..." must be enabled before it can be used`, open the project in Xcode and approve it there.
 
 ## Testing
 
-The router system is designed to be testable:
+Test the model directly — no router protocol or mocking required:
 
 ```swift
+@Test
 func testNavigation() {
-	let router = YourFeatureRouter()
+	let model = TorrentListView.Model()
 
-	// Test push navigation
-	router.push(.detailView(testModel))
-	XCTAssertEqual(router.path.count, 1)
+	model.destination = .detail(testTorrent)
+	#expect(model.destination == .detail(testTorrent))
 
-	// Test sheet presentation
-	router.presentSheet(.addItemSheet)
-	XCTAssertNotNil(router.presentedSheet)
+	model.destination = nil
+	#expect(model.destination == nil)
 
-	// Test pop
-	router.pop()
-	XCTAssertEqual(router.path.count, 0)
+	model.error = .clientError(testError)
+	#expect(model.error != nil)
 }
 ```
