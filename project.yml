@@ -20,7 +20,7 @@ packages:
   QBittorrent:
     # path: ../QBittorrent-Swift
     url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
-    branch: main
+    from: 0.0.2
   swift-navigation:
     url: https://github.com/pointfreeco/swift-navigation
     from: 2.4.1

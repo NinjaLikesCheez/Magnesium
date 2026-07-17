@@ -1,15 +1,7 @@
 {
-  "originHash" : "81e3d55a301ccb02a0ae181cbf76299f706c6ec4d8891e228c2eaec3e9ddd494",
   "pins" : [
-    {
-      "identity" : "router",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/NinjaLikesCheez/Router.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "936c1a57067d5a62931d6f1477c519f3c17dd7a4"
-      }
-    }
+
   ],
   "version" : 3
 }
+
