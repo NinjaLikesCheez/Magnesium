@@ -21,10 +21,6 @@ packages:
     # path: ../QBittorrent-Swift
     url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
     branch: main
-  Router:
-    # path: ../Router
-    url: https://github.com/NinjaLikesCheez/Router
-    branch: main
   swift-navigation:
     url: https://github.com/pointfreeco/swift-navigation
     from: 2.4.1
@@ -72,7 +68,6 @@ targets:
       - package: QBittorrent
       - package: Logging
       - package: ObservableDefaults
-      - package: Router
       - package: swift-navigation
         products:
           - SwiftNavigation

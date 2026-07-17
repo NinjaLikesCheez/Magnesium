@@ -38,7 +38,6 @@ let package = Package(
 		.package(path: "../MagnesiumModule"),
 		.package(url: "https://github.com/NinjaLikesCheez/Deluge-Swift", from: "2.0.0"),
 		.package(url: "https://github.com/NinjaLikesCheez/qBittorrent-Swift", from: "0.0.2"),
-		.package(url: "https://github.com/NinjaLikesCheez/Router", branch: "main"),
 		.package(url: "https://github.com/fatbobman/ObservableDefaults", from: "1.7.0"),
 		.package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.4.1"),
 	],
@@ -50,7 +49,6 @@ let package = Package(
 			dependencies: [
 				"TorrentManager",
 				"TorrentSession",
-				.product(name: "Router", package: "Router"),
 				.product(name: "CommonUI", package: "Common"),
 				.product(name: "MagnesiumModule", package: "MagnesiumModule"),
 				.product(name: "SwiftNavigation", package: "swift-navigation"),

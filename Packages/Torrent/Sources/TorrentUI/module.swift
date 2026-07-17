@@ -1,9 +1,8 @@
-@_exported import TorrentManager
-import Router
+import Common
+import MagnesiumModule
 import Observation
 import SwiftUI
-import MagnesiumModule
-import Common
+@_exported import TorrentManager
 
 @MainActor
 public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
@@ -15,16 +14,13 @@ public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
 	let preferences: TorrentPreferences
 	let manager: TorrentManager
 
-	let parentRouter: (any Routable)?
-
-	public init(_ parentRouter: (any Routable)? = nil) {
+	public init() {
 		preferences = .init(userDefaults: .standard, keychain: SystemKeychain())
 		session = .init(preferences)
 		manager = .init(session: session, preferences: preferences)
-		self.parentRouter = parentRouter
 	}
 
-	public let name: String  = "Torrent"
+	public let name: String = "Torrent"
 
 	public var icon: Image { Image(systemName: "square.and.arrow.down") }
 
@@ -58,4 +54,3 @@ public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
 		hasher.combine(name)
 	}
 }
-

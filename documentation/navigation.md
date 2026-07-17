@@ -4,7 +4,7 @@
 
 The app uses [pointfreeco/swift-navigation](https://github.com/pointfreeco/swift-navigation) (`SwiftNavigation`/`SwiftUINavigation`) for navigation: a `@CasePathable` enum describes everywhere a screen can go, and each case gets its own `Binding<Payload?>` via dynamic member lookup (`$model.destination.detail`). That binding drives a native SwiftUI presentation primitive — `.navigationDestination(item:)`, `.sheet(item:)`, `.panel(item:)` (this app's error/modal card, see [error_handling.md](error_handling.md)) — so each presentation site gets an exhaustive switch over only its own cases.
 
-Some older features still use a custom `Router` package; that pattern is being phased out feature-by-feature, see [swift-navigation-migration.md](swift-navigation-migration.md) for the current migration status and checklist for converting a feature. **This document describes the target pattern — use it for all new navigation code.**
+The app previously used a custom `Router` package for navigation; that migration is now complete and the `Router` dependency has been removed entirely. **This document describes the pattern used for all navigation code.**
 
 For general swift-navigation anti-patterns (the two-enum split, `Identifiable` payloads, why not to hand-roll modal overlays, item- vs. array-based navigation), read the **swift-navigation** skill (`.claude/skills/swift-navigation/SKILL.md`) — it covers the library in general; this document covers how the library is actually used in this codebase.
 
