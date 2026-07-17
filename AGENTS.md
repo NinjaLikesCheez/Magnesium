@@ -71,7 +71,7 @@ The app target (`Sources/Magnesium`) depends on three local SwiftPM packages und
 - **`Packages/MagnesiumModule`** — currently a near-empty scaffold module; other packages depend on it but it holds little logic yet.
 - **`Packages/Torrent`** — the bulk of torrent domain logic and UI, split into fine-grained targets (see below). Exposes a single product, `TorrentUI`.
 
-Remote dependencies (`project.yml` / `Packages/Torrent/Package.swift`): `Deluge-Swift`, `QBittorrent-Swift`, `swift-navigation` (`SwiftNavigation`/`SwiftUINavigation`, navigation — see Navigation System below), `ObservableDefaults`, `swift-log`, `sentry-cocoa`. `Deluge` and `QBittorrent` client packages are the same author's sibling repos. A handful of features not yet migrated off an older custom `Router` package still declare it as a dependency too — see Navigation System below.
+Remote dependencies (`project.yml` / `Packages/Torrent/Package.swift`): `Deluge-Swift`, `QBittorrent-Swift`, `swift-navigation` (`SwiftNavigation`/`SwiftUINavigation`, navigation — see Navigation System below), `ObservableDefaults`, `swift-log`, `sentry-cocoa`. `Deluge` and `QBittorrent` client packages are the same author's sibling repos. The older custom `Router` package that navigation used to run on has been fully removed — see Navigation System below.
 
 ### `Packages/Torrent` internal targets
 
@@ -89,7 +89,7 @@ TorrentUI
 - **TorrentSession**: `TorrentSessionProtocol`/`TorrentClient` — abstracts an active connection to a specific daemon; `TorrentClientActing`-style protocol lets `Deluge`/`QBittorrent` implementations be swapped behind one interface.
 - **TorrentPreferences**: persisted torrent-related settings (uses `ObservableDefaults`).
 - **TorrentManager**: owns the live torrent collection, refresh timer, and torrent actions (pause/resume/delete), doing in-place updates so SwiftUI bindings survive refresh cycles.
-- **TorrentUI**: all SwiftUI views/flows for onboarding, settings, and the torrent list/detail screens, using the swift-navigation pattern below. A few features haven't been migrated to it yet (see "Known in-progress state").
+- **TorrentUI**: all SwiftUI views/flows for onboarding, settings, and the torrent list/detail screens, using the swift-navigation pattern below.
 
 ### Navigation system (swift-navigation)
 
@@ -101,7 +101,7 @@ Navigation uses [pointfreeco/swift-navigation](https://github.com/pointfreeco/sw
 - Every model splits presentation state **by surface, not by feature**: a `destination` property (`@CasePathable enum Destination`) for push targets driving `.navigationDestination(item:)`, and a separate `error` property (`@CasePathable enum Error`) for modal/panel error state driving `.panel(item:)` (see Error handling below) — never one enum covering both. This keeps each presentation modifier's switch exhaustive over only its own cases, and means an error can appear without silently popping whatever's pushed, since the two are independent optionals.
 - `Error` enum cases get `Identifiable` via `var id: Self { self }` on the enum itself rather than a wrapper type, since the cases are already `Hashable`.
 - There are no `push`/`pop`/`presentError`/`dismissError` wrapper methods — call sites assign the model's property directly (`model.destination = .foo`, `model.destination = nil`).
-- A small number of features haven't been migrated to this pattern yet and still use an older custom `Router` package — see "Known in-progress state" below and [documentation/swift-navigation-migration.md](documentation/swift-navigation-migration.md) for the migration checklist if you're converting one.
+- The migration off the older custom `Router` package is complete; all navigation now follows this pattern.
 
 ### Error handling
 
@@ -113,9 +113,9 @@ Documented in [documentation/error_handling.md](documentation/error_handling.md)
 
 ### Known in-progress state
 
-- `Sources/Magnesium/QBittorrent/` and `Sources/Magnesium/Views/` contain app-target copies of views that also exist under `Packages/Torrent/Sources/TorrentUI/Settings/QBittorrent/` and `.../Settings/`. Both are currently compiled into the `Magnesium` target (check `Magnesium.xcodeproj/project.pbxproj` / regenerate via `xcodegen` before assuming either copy is unused) — this is leftover duplication from the ongoing modularization, not two independent features.
+- `Sources/Magnesium/Views/` contains app-target copies of views that also exist under `Packages/Torrent/Sources/TorrentUI/Settings/`. Both are currently compiled into the `Magnesium` target (check `Magnesium.xcodeproj/project.pbxproj` / regenerate via `xcodegen` before assuming either copy is unused) — this is leftover duplication from the ongoing modularization, not two independent features.
 - `AppFlow.swift` / `AppRouter` / `AppState` represent a newer app-startup rework (see git log "Start reworking the App startup flow"); prefer following these over older patterns if they conflict.
-- The navigation migration to swift-navigation (see Navigation System above) is partway through: `Packages/Torrent/Sources/TorrentUI/TorrentList` and `Packages/Torrent/Sources/TorrentUI/Settings` (the package-level copy) are done. `Packages/Torrent/Sources/TorrentUI/Onboarding`, `Sources/Magnesium/Features/Settings`, `Sources/Magnesium/Features/Onboarding`, and `Sources/Magnesium/Navigation` (`AppRouter`, the app-level root — migrate last) still use the older `Router` package. A feature with a `Navigation/` subdirectory is still on `Router`; one with a nested `Model` on its view/Flow has been migrated. Don't assume every feature follows the same navigation pattern — check first, and see [documentation/swift-navigation-migration.md](documentation/swift-navigation-migration.md) if converting one.
+- The navigation migration to swift-navigation (see Navigation System above) is now complete across the whole codebase, and the `Router` package dependency has been removed entirely. If you see a reference to it, it's likely stale — check first rather than assuming any feature still uses it.
 
 ## Code Style
 

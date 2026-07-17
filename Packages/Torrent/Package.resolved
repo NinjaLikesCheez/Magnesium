@@ -1,5 +1,5 @@
 {
-  "originHash" : "dc2f4d044253faf782ce16a628150f2e45ea707a1e2a6712e1e821fb12ab9447",
+  "originHash" : "c7ae51e4b8bfe6c74d29233d3defa912b26e69cadc812ed20e44bf732a2757ac",
   "pins" : [
     {
       "identity" : "deluge-swift",
@@ -29,39 +29,12 @@
       }
     },
     {
-      "identity" : "router",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/NinjaLikesCheez/Router",
-      "state" : {
-        "branch" : "main",
-        "revision" : "936c1a57067d5a62931d6f1477c519f3c17dd7a4"
-      }
-    },
-    {
       "identity" : "swift-api-client",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/NinjaLikesCheez/swift-api-client",
       "state" : {
         "revision" : "c6ca809a7884c46f4ad6bcc9164ca7ecc8408114",
         "version" : "0.0.1"
-      }
-    },
-    {
-      "identity" : "swift-case-paths",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-case-paths",
-      "state" : {
-        "revision" : "1197e80bc7e4b177051b6869ef93d8ac3ad677da",
-        "version" : "1.8.0"
-      }
-    },
-    {
-      "identity" : "swift-custom-dump",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-custom-dump",
-      "state" : {
-        "revision" : "a8cd6c976f335ed361dcecddb0dc39ebda51bc3e",
-        "version" : "1.6.1"
       }
     },
     {
@@ -80,15 +53,6 @@
       "state" : {
         "revision" : "fad75807c596fecd724b0fc81cd61c94008faad4",
         "version" : "2.10.3"
-      }
-    },
-    {
-      "identity" : "swift-perception",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-perception",
-      "state" : {
-        "revision" : "25ac73741c3436605d61eceb5207e896973918e7",
-        "version" : "2.0.10"
       }
     },
     {
