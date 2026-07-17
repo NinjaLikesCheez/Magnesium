@@ -8,6 +8,13 @@ import CommonUI
 import SwiftUI
 import SwiftUINavigation
 
+/// The Onboarding feature's entry point view.
+///
+/// - Important: This view does not provide its own `NavigationStack` — it relies on
+///   `.navigationDestination(item:)`, which requires an enclosing stack to push into.
+///   Callers must wrap this view in a `NavigationStack` (see `AppView`'s `.unboarded` case for
+///   the app-level example, or `TorrentsListFlow`'s caller for the same convention applied to
+///   the `entry` flow).
 public struct TorrentOnboardingFlow: View {
 	@State public var model: Model = .init()
 
@@ -22,36 +29,47 @@ public struct TorrentOnboardingFlow: View {
 	public var body: some View {
 		@Bindable var model = model
 
-		NavigationStack {
-			TorrentOnboardingView()
-				.navigationDestination(item: $model.destination.addNewServer) { $type in
-					switch type {
-					case .deluge:
-						OnboardingAddDelugeServerView()
-					case .qbittorrent:
-						OnboardingAddQBittorrentServerView()
-					}
+		TorrentOnboardingView()
+			.navigationDestination(item: $model.destination.addNewServer) { $type in
+				destinationContent(for: type)
+			}
+			.sheet(item: $model.sheet.addNewServer) { $type in
+				NavigationStack {
+					destinationContent(for: type)
 				}
-				.sheet(item: $model.sheet.addNewServer) { $type in
-					NavigationStack {
-						switch type {
-						case .deluge:
-							OnboardingAddDelugeServerView()
-						case .qbittorrent:
-							OnboardingAddQBittorrentServerView()
-						}
-					}
-				}
+			}
+			.panel(item: $model.error.addServerError) { error in
+				ErrorPanelCard(
+					error: error,
+					primaryButtonAction: { model.error = nil }
+				)
+			}
+			.environment(model)
+			.environment(preferences)
+			.environment(session)
+	}
+
+	/// Pushed/sheeted destination content for a given server type.
+	///
+	/// - Important: Environment values must be injected here, on the destination content itself,
+	///   rather than relying on inheritance from `body`'s outer `.environment(...)` calls.
+	///   `.navigationDestination`/`.sheet` splice their pushed content in at the enclosing
+	///   `NavigationStack`, not at the tree position where the modifier was applied, so ancestor
+	///   environment values set below that stack are not guaranteed to reach the pushed content.
+	@ViewBuilder
+	private func destinationContent(for type: TorrentServerType) -> some View {
+		switch type {
+		case .deluge:
+			OnboardingAddDelugeServerView()
+				.environment(model)
+				.environment(preferences)
+				.environment(session)
+		case .qbittorrent:
+			OnboardingAddQBittorrentServerView()
+				.environment(model)
+				.environment(preferences)
+				.environment(session)
 		}
-		.panel(item: $model.error.addServerError) { error in
-			ErrorPanelCard(
-				error: error,
-				primaryButtonAction: { model.error = nil }
-			)
-		}
-		.environment(model)
-		.environment(preferences)
-		.environment(session)
 	}
 }
 
