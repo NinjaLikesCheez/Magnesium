@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Deployment target is OS 26 across platforms (see project.yml), so this needs an Xcode
+  # new enough to ship the matching SDKs. "latest-stable" tracks whatever the runner image
+  # offers; pin to a specific version here if a future toolchain change needs to be pinned.
+  XCODE_VERSION: latest-stable
+
+jobs:
+  lint:
+    name: Lint (swift-format, SwiftLint)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Install linters
+        run: |
+          command -v swift-format >/dev/null || brew install swift-format
+          command -v swiftlint >/dev/null || brew install swiftlint
+
+      - name: swift-format lint
+        run: swift-format lint --recursive Sources Tests Packages/*/Sources Packages/*/Tests
+
+      - name: SwiftLint
+        run: swiftlint lint --strict
+
+  package-tests:
+    name: swift test (${{ matrix.package }})
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [Common, MagnesiumModule, Torrent]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Cache SwiftPM build
+        uses: actions/cache@v4
+        with:
+          path: Packages/${{ matrix.package }}/.build
+          key: spm-${{ matrix.package }}-${{ runner.os }}-${{ hashFiles(format('Packages/{0}/Package.resolved', matrix.package)) }}
+          restore-keys: |
+            spm-${{ matrix.package }}-${{ runner.os }}-
+
+      - name: swift test
+        working-directory: Packages/${{ matrix.package }}
+        run: swift test
+
+  build:
+    name: Build (${{ matrix.platform }})
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: iOS Simulator
+            destination: "platform=iOS Simulator,name=iPhone 16"
+          - platform: macOS
+            destination: "platform=macOS"
+          - platform: tvOS Simulator
+            destination: "platform=tvOS Simulator,name=Apple TV"
+          - platform: visionOS Simulator
+            destination: "platform=visionOS Simulator,name=Apple Vision Pro"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Install XcodeGen
+        run: |
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen version
+
+      # Magnesium.xcodeproj is generated, not checked in (see .gitignore) — regenerate it
+      # from project.yml before every build, same as local development.
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: deriveddata-${{ matrix.platform }}-${{ runner.os }}-${{ hashFiles('**/Package.resolved', 'project.yml') }}
+          restore-keys: |
+            deriveddata-${{ matrix.platform }}-${{ runner.os }}-
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project Magnesium.xcodeproj \
+            -scheme Magnesium \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+  test:
+    name: App test suite (MagnesiumTests)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Install XcodeGen
+        run: |
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen version
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: deriveddata-test-${{ runner.os }}-${{ hashFiles('**/Package.resolved', 'project.yml') }}
+          restore-keys: |
+            deriveddata-test-${{ runner.os }}-
+
+      - name: Run app-level tests
+        run: |
+          xcodebuild test \
+            -project Magnesium.xcodeproj \
+            -scheme MagnesiumTests \
+            -destination "platform=iOS Simulator,name=iPhone 16" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
