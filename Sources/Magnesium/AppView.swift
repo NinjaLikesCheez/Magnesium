@@ -24,7 +24,6 @@ struct AppView: View {
 		Group {
 			switch appState {
 			case .unboarded:
-//				OnboardingFlow(router: .init())
 				NavigationStack {
 					modules
 						.torrent
