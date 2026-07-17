@@ -5,14 +5,12 @@
 //  Created by ninji on 11/04/2025.
 //
 
-import Router
 import SwiftUI
 
 struct OnboardingAddQBittorrentServerView: View {
 	@Environment(TorrentSession.self) private var session
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(TorrentOnboardingRouter.self) private var router
-	@Environment(\.isPresented) private var isPresented
+	@Environment(\.dismiss) private var dismiss
 
 	@State private var settings: QBittorrentSettings = .init()
 	@State private var showBasicAuthentication = false
@@ -54,11 +52,7 @@ struct OnboardingAddQBittorrentServerView: View {
 					let server = try await settings.makeServer()
 					try preferences.addOrUpdate(server: server)
 					try session.setServer(server)
-					if isPresented {
-						router.dismissSheet(withParent: true)
-					} else {
-						router.pop()
-					}
+					dismiss()
 				} catch let error as ServerSettingsError {
 					switch error {
 					case .invalidState(let message):

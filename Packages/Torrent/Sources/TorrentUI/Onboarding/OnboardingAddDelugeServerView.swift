@@ -4,13 +4,12 @@
 //
 //  Created by ninji on 11/04/2025.
 //
-import Router
 import SwiftUI
 
 struct OnboardingAddDelugeServerView: View {
-	@Environment(TorrentOnboardingRouter.self) var router
+	@Environment(TorrentOnboardingFlow.Model.self) var model
 	@Environment(TorrentPreferences.self) private var preferences
-	@Environment(\.isPresented) private var isPresented
+	@Environment(\.dismiss) private var dismiss
 
 	@State private var settings: DelugeSettings = .init()
 
@@ -59,13 +58,9 @@ struct OnboardingAddDelugeServerView: View {
 				}
 			}
 
-			if isPresented {
-				router.dismissSheet(withParent: true)
-			} else {
-				router.pop()
-			}
+			dismiss()
 		} catch {
-			router.presentError(.addServerError(error))
+			model.error = .addServerError(error)
 		}
 	}
 }
