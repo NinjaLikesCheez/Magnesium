@@ -24,35 +24,35 @@ public final class TorrentManager {
 	@ObservationIgnored
 	private let preferences: TorrentPreferences
 
-	private var updateTimer: Timer
+	@ObservationIgnored
+	private let scheduling: TorrentScheduling
 
-	public init(session: TorrentSessionProtocol, preferences: TorrentPreferences) {
+	private var updateTimer: Cancellable?
+
+	public init(
+		session: TorrentSessionProtocol,
+		preferences: TorrentPreferences,
+		scheduling: TorrentScheduling = LiveTorrentScheduler()
+	) {
 		self.session = session
 		self.preferences = preferences
+		self.scheduling = scheduling
 
-		self.updateTimer = Timer()  // Needs to be initialized before the block is used..
-		if preferences.autoRefreshInterval != 0 {
-			self.updateTimer = Timer.scheduledTimer(
-				withTimeInterval: preferences.autoRefreshInterval, repeats: true,
-				block: { _ in
-					Task { try await self.refresh() }
-				})
-		}
-
+		// `Observations` yields the current value immediately on first await, then again on each
+		// subsequent change, so the loop below handles both the initial schedule and rescheduling.
 		let timerValue = Observations {
 			preferences.autoRefreshInterval
 		}
 
 		Task {
 			for await value in timerValue {
-				self.updateTimer.invalidate()
+				self.updateTimer?.invalidate()
+				self.updateTimer = nil
 
 				if value != 0 {
-					self.updateTimer = Timer.scheduledTimer(
-						withTimeInterval: value, repeats: true,
-						block: { _ in
-							Task { try await self.refresh() }
-						})
+					self.updateTimer = scheduling.schedule(interval: value) { [weak self] in
+						Task { try await self?.refresh() }
+					}
 				}
 			}
 		}

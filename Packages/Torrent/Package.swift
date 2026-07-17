@@ -94,6 +94,7 @@ let package = Package(
 				"TorrentCore",
 				"TorrentSession",
 				"TorrentPreferences",
+				"TorrentManager",
 			]
 		),
 		.testTarget(
