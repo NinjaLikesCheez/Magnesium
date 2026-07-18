@@ -18,13 +18,13 @@ struct AnimatedMeshGradientView: View {
 
 		Color(red: 0.29, green: 0.00, blue: 0.51),
 		Color(red: 0.00, green: 0.00, blue: 0.55),
-		Color(red: 0.10, green: 0.10, blue: 0.44)
+		Color(red: 0.10, green: 0.10, blue: 0.44),
 	]
 
 	private let points: [SIMD2<Float>] = [
 		SIMD2<Float>(0.0, 0.0), SIMD2<Float>(0.5, 0.0), SIMD2<Float>(1.0, 0.0),
 		SIMD2<Float>(0.0, 0.5), SIMD2<Float>(0.5, 0.5), SIMD2<Float>(1.0, 0.5),
-		SIMD2<Float>(0.0, 1.0), SIMD2<Float>(0.5, 1.0), SIMD2<Float>(1.0, 1.0)
+		SIMD2<Float>(0.0, 1.0), SIMD2<Float>(0.5, 1.0), SIMD2<Float>(1.0, 1.0),
 	]
 
 	var body: some View {
@@ -65,7 +65,12 @@ struct AnimatedMeshGradientView: View {
 			hue += 1
 		}
 
-		return Color(hue: Double(hue), saturation: Double(saturation), brightness: Double(brightness), opacity: Double(alpha))
+		return Color(
+			hue: Double(hue),
+			saturation: Double(saturation),
+			brightness: Double(brightness),
+			opacity: Double(alpha)
+		)
 	}
 }
 

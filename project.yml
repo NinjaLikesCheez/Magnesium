@@ -37,12 +37,9 @@ packages:
 targets:
   Magnesium:
     type: application
-    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    supportedDestinations: [iOS]
     deploymentTarget:
       iOS: 26
-      tvOS: 26
-      macOS: 26
-      visionOS: 26
     sources:
       - Sources/Magnesium
     # Build settings (bundle ID, signing, display name, ...) live in the xcconfig files below —
@@ -84,7 +81,7 @@ targets:
         - Magnesium
   MagnesiumTests:
     type: bundle.unit-test
-    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    supportedDestinations: [iOS]
     sources:
       - Tests
     dependencies:

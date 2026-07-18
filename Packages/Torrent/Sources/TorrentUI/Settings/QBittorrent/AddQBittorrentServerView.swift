@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-// TODO: this needs to be migrated to new navigation or ripped out 
+// TODO: this needs to be migrated to new navigation or ripped out
 
 struct AddQBittorrentServerView: View {
 	@Environment(TorrentSession.self) private var session

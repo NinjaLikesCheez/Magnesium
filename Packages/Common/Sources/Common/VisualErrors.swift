@@ -3,4 +3,3 @@ public protocol VisualError: Error, Equatable, Hashable {
 	var systemName: String { get }
 	var subtitle: String { get }
 }
-

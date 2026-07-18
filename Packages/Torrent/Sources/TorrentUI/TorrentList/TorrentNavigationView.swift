@@ -72,25 +72,25 @@ struct TorrentNavigationView: View {
 	@ToolbarContentBuilder
 	var selectToolbarItem: some ToolbarContent {
 		#if os(macOS)
-		ToolbarItem(placement: .primaryAction) {
-			// EditButton()
-			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
-			Button(editMode.isEditing ? "Done" : "Select") {
-				withAnimation {
-					editMode = editMode.isEditing ? .inactive : .active
+			ToolbarItem(placement: .primaryAction) {
+				// EditButton()
+				// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
+				Button(editMode.isEditing ? "Done" : "Select") {
+					withAnimation {
+						editMode = editMode.isEditing ? .inactive : .active
+					}
 				}
 			}
-		}
 		#else
-		ToolbarItem(placement: .topBarTrailing) {
-			// EditButton()
-			// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
-			Button(editMode.isEditing ? "Done" : "Select") {
-				withAnimation {
-					editMode = editMode.isEditing ? .inactive : .active
+			ToolbarItem(placement: .topBarTrailing) {
+				// EditButton()
+				// ^ This doesn't work... because Apple are a small scale start up that can't possibly be expected to make working software
+				Button(editMode.isEditing ? "Done" : "Select") {
+					withAnimation {
+						editMode = editMode.isEditing ? .inactive : .active
+					}
 				}
 			}
-		}
 		#endif
 	}
 }

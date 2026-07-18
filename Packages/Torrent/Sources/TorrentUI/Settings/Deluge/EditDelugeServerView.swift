@@ -5,8 +5,8 @@
 //  Created by ninji on 16/04/2025.
 //
 
-import SwiftUI
 import SwiftNavigation
+import SwiftUI
 
 struct EditDelugeServerView: View {
 	@Environment(\.dismiss) private var dismiss
@@ -21,8 +21,12 @@ struct EditDelugeServerView: View {
 
 	init(_ server: TorrentServer) {
 		self.server = server
+		// swiftlint:disable force_try
+		// See https://github.com/NinjaLikesCheez/Magnesium/issues/30 — this should decode
+		// failably and surface errors through the Error/panel mechanism instead of crashing.
 		let serverSettings = try! JSONDecoder().decode(DelugeServerSettings.self, from: server.data)
 		let keychain = try! JSONDecoder().decode(DelugeKeychainData.self, from: server.keychainData!)
+		// swiftlint:enable force_try
 
 		settings = .init(
 			name: server.name,

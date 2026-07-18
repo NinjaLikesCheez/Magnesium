@@ -139,7 +139,7 @@ struct ErrorHandlingTests {
 
 	@Test("Server model handles invalid JSON data")
 	func serverModelHandlesInvalidJSONData() throws {
-		let invalidData = "not valid json".data(using: .utf8)!
+		let invalidData = Data("not valid json".utf8)
 
 		let server = TestDataFactory.createServer(
 			name: "Test Server",
@@ -321,7 +321,7 @@ struct ErrorHandlingTests {
 		let invalidServer = TestDataFactory.createServer(
 			name: "Invalid Server",
 			type: .deluge,
-			data: "invalid".data(using: .utf8)!,
+			data: Data("invalid".utf8),
 			keychainData: validKeychainData
 		)
 
@@ -652,8 +652,8 @@ struct ErrorHandlingTests {
 		#expect(filtered.count >= 0)
 
 		// Test multiple rapid operations
-		for i in 0..<10 {
-			torrentManager.searchQuery = "Test \(i)"
+		for index in 0..<10 {
+			torrentManager.searchQuery = "Test \(index)"
 			_ = torrentManager.filteredTorrents
 		}
 
@@ -758,10 +758,10 @@ struct ErrorHandlingTests {
 			}
 
 			// Concurrent filter changes
-			for i in 0..<10 {
+			for index in 0..<10 {
 				group.addTask {
 					await MainActor.run {
-						torrentManager.searchQuery = "Test \(i)"
+						torrentManager.searchQuery = "Test \(index)"
 						_ = torrentManager.filteredTorrents
 					}
 				}
@@ -823,8 +823,8 @@ struct ErrorHandlingTests {
 		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
 
 		// Test with many small operations
-		for i in 0..<1000 {
-			let singleTorrent = [TestDataFactory.createStandardTorrent(hash: "hash\(i)", name: "Torrent \(i)")]
+		for index in 0..<1000 {
+			let singleTorrent = [TestDataFactory.createStandardTorrent(hash: "hash\(index)", name: "Torrent \(index)")]
 			mockClient.refreshResult = (singleTorrent, [])
 
 			try await torrentManager.refresh()
@@ -834,8 +834,8 @@ struct ErrorHandlingTests {
 		}
 
 		// Test rapid-fire filter changes
-		for i in 0..<100 {
-			torrentManager.searchQuery = "Query \(i)"
+		for index in 0..<100 {
+			torrentManager.searchQuery = "Query \(index)"
 			_ = torrentManager.filteredTorrents
 		}
 

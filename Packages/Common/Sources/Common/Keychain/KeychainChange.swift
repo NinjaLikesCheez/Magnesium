@@ -6,7 +6,7 @@ public enum KeychainChange {
 	case updated(KeychainQuery, Data)
 	/// Keychain items matching the query were deleted.
 	case deleted(KeychainQuery)
-	
+
 	/// Returns whether the given query matches the changed query.
 	/// - Parameter query: The keychain query to check for matches.
 	public func matches(query: KeychainQuery) -> Bool {

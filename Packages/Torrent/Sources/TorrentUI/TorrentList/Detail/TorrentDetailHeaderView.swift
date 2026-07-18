@@ -50,7 +50,7 @@ extension TorrentDetailView {
 				Task {
 					do throws(TorrentClientError) {
 						torrent.isActive
-						? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
+							? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 					} catch {
 						model.error = .clientError(error)
 					}

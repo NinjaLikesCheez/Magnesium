@@ -1,7 +1,7 @@
 import Common
-import SentrySwift
-
 import Logging
+
+import SentrySwift
 import SwiftUI
 import TorrentUI
 
@@ -23,35 +23,35 @@ struct MagnesiumApp: App {
 
 			// Configure profiling. Visit https://docs.sentry.io/platforms/apple/profiling/ to learn more.
 			options.configureProfiling = {
-				$0.sessionSampleRate = 1.0 // We recommend adjusting this value in production.
+				$0.sessionSampleRate = 1.0  // We recommend adjusting this value in production.
 				$0.lifecycle = .trace
 			}
 
 			// Uncomment the following lines to add more data to your events
-			 options.attachScreenshot = true // This adds a screenshot to the error events
-			 options.attachViewHierarchy = true // This adds the view hierarchy to the error events
+			options.attachScreenshot = true  // This adds a screenshot to the error events
+			options.attachViewHierarchy = true  // This adds the view hierarchy to the error events
 
 			// Enable experimental logging features
 			options.enableLogs = true
 
 			options.enableAutoPerformanceTracing = true
 
-#if os(iOS)
-			// Let users report feedback by shaking the device.
-			options.configureUserFeedback = { config in
-				config.useShakeGesture = true
-			}
-#endif
+			#if os(iOS)
+				// Let users report feedback by shaking the device.
+				options.configureUserFeedback = { config in
+					config.useShakeGesture = true
+				}
+			#endif
 		}
 
 		LoggingSystem.bootstrap { label in
 
-#if DEBUG
-			var logger = StreamLogHandler.standardOutput(label: label)
-			logger.logLevel = .debug
-#else
-			let logger = StreamLogHandler.standardOutput(label: label)
-#endif
+			#if DEBUG
+				var logger = StreamLogHandler.standardOutput(label: label)
+				logger.logLevel = .debug
+			#else
+				let logger = StreamLogHandler.standardOutput(label: label)
+			#endif
 			return logger
 		}
 	}

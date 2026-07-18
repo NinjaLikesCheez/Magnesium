@@ -12,7 +12,7 @@ public struct KeychainQuery: Equatable, Hashable {
 	public let accessibility: String?
 	/// The access control settings for the keychain item. This refers to the key `kSecAttrAccessControl`.
 	public let accessControl: AccessControl?
-	
+
 	/// Initializes a keychain item query.
 	public init(
 		class: String,
@@ -32,34 +32,34 @@ public struct KeychainQuery: Equatable, Hashable {
 extension KeychainQuery {
 	func rawQuery(with query: [String: Any] = [:]) -> [String: Any] {
 		var rawQuery: [String: Any] = [
-			kSecClass as String: `class`,
+			kSecClass as String: `class`
 		]
-		
+
 		if let service = service {
 			rawQuery[kSecAttrService as String] = service
 		}
-		
+
 		if let account = account {
 			rawQuery[kSecAttrAccount as String] = account
 		}
-		
+
 		if let accessibility = accessibility {
 			rawQuery[kSecAttrAccessible as String] = accessibility
 		}
-		
+
 		if let accessControl = accessControl {
 			rawQuery[kSecAttrAccessControl as String] = accessControl.systemAccessControl
 		}
-		
+
 		return rawQuery.merging(query, uniquingKeysWith: { old, _ in old })
 	}
-	
+
 	func matches(query: KeychainQuery) -> Bool {
 		`class` == query.class
-		&& (service == nil || service == query.service)
-		&& (account == nil || account == query.account)
-		&& (accessibility == nil || accessibility == query.accessibility)
-		&& (accessControl == nil || accessControl == query.accessControl)
+			&& (service == nil || service == query.service)
+			&& (account == nil || account == query.account)
+			&& (accessibility == nil || accessibility == query.accessibility)
+			&& (accessControl == nil || accessControl == query.accessControl)
 	}
 }
 
@@ -71,7 +71,7 @@ public extension KeychainQuery {
 		public let protection: CFString
 		/// The flags specifying how the keychain item may be used.
 		public let flags: SecAccessControlCreateFlags
-		
+
 		/// Initializes access control information.
 		public init(protection: CFString, flags: SecAccessControlCreateFlags) {
 			self.protection = protection

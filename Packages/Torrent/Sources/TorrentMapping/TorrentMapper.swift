@@ -15,8 +15,7 @@ public struct TorrentMapper {
 	}
 
 	private static func filter(_ values: [StandardTorrent], using filter: TorrentFilterOptions, query: String)
-		-> [StandardTorrent]
-	{
+		-> [StandardTorrent] {
 		var filtered = values
 
 		if !filter.states.isEmpty {
@@ -54,7 +53,6 @@ public struct TorrentMapper {
 
 	}
 
-	// swiftlint:disable:next cyclomatic_complexity
 	private static func sort(
 		_ torrents: [StandardTorrent],
 		using sortOption: TorrentSortOption

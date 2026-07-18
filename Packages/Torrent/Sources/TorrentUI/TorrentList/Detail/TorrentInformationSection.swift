@@ -1,5 +1,5 @@
-import SwiftUI
 import Common
+import SwiftUI
 
 struct TorrentInformationItem: Identifiable {
 	var id: String { label }
@@ -23,7 +23,7 @@ struct TorrentInformationSection: View {
 			.init(label: "Peers", value: "\(torrent.peers)"),
 			.init(label: "Seeds", value: "\(torrent.seeds)"),
 			.init(label: "Seeding Time", value: torrent.formattedSeedingTime),
-			.init(label: "Download Folder", value: torrent.downloadPath)
+			.init(label: "Download Folder", value: torrent.downloadPath),
 		]
 	}
 

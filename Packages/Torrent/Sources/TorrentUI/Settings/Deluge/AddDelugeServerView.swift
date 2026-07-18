@@ -4,10 +4,10 @@
 //
 //  Created by ninji on 11/04/2025.
 //
-import SwiftUI
-import Observation
-import SwiftUINavigation
 import CommonUI
+import Observation
+import SwiftUI
+import SwiftUINavigation
 
 struct AddDelugeServerView: View {
 	@Environment(TorrentPreferences.self) private var preferences

@@ -18,7 +18,9 @@ public struct NavigationButton: View {
 	}
 
 	public var body: some View {
-		Button(action: { action() }) {
+		Button {
+			action()
+		} label: {
 			NavigationLink(title, destination: EmptyView())
 		}
 		.foregroundStyle(.primary)

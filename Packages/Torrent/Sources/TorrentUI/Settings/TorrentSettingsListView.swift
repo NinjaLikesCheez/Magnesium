@@ -1,5 +1,5 @@
-import SwiftUI
 import CommonUI
+import SwiftUI
 import SwiftUINavigation
 
 public struct TorrentSettingsListView: View {
@@ -84,7 +84,7 @@ public struct TorrentSettingsListView: View {
 				Text("1 minute").tag(60.0)
 				Text("5 minutes").tag(300.0)
 			}
-			.onChange(of: selectedRefreshInterval) { oldValue, newValue in
+			.onChange(of: selectedRefreshInterval) { _, newValue in
 				preferences.autoRefreshInterval = newValue
 			}
 

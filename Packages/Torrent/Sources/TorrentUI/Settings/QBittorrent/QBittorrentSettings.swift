@@ -5,9 +5,9 @@
 //  Created by ninji on 11/04/2025.
 //
 
-import QBittorrent
 import Foundation
 import Observation
+import QBittorrent
 
 @MainActor
 @Observable
@@ -18,7 +18,13 @@ class QBittorrentSettings {
 	var password: String
 	var basicAuthentication: ServerBasicAuthentication
 
-	init(name: String, address: String, username: String, password: String, basicAuthentication: ServerBasicAuthentication) {
+	init(
+		name: String,
+		address: String,
+		username: String,
+		password: String,
+		basicAuthentication: ServerBasicAuthentication
+	) {
 		self.name = name
 		self.address = address
 		self.username = username

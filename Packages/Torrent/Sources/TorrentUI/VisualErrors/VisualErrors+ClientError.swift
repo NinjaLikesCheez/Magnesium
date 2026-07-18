@@ -4,16 +4,16 @@
 //
 //  Created by ninji on 29/09/2025.
 //
-import Common
 import APIClient
+import Common
 import Foundation
 
 extension ClientError: @retroactive VisualError where ResponseError: VisualError {
 	public var title: String {
 		switch self {
-		case .encoding(_):
+		case .encoding:
 			"Failed to Encode"
-		case .decoding(_):
+		case .decoding:
 			"Failed to Decode"
 		case let .request(error):
 			error.title
@@ -26,11 +26,11 @@ extension ClientError: @retroactive VisualError where ResponseError: VisualError
 		switch self {
 		case .encoding:
 			"gear.badge.xmark"
-		case .decoding(_):
+		case .decoding:
 			"gear.badge.xmark"
-		case .request(_):
+		case .request:
 			"network.slash"
-		case .response(_):
+		case .response:
 			"network.slash"
 		}
 	}
@@ -50,7 +50,7 @@ extension ClientError: @retroactive VisualError where ResponseError: VisualError
 }
 
 extension ClientError: @retroactive Hashable where ResponseError: Hashable {
-		public func hash(into hasher: inout Hasher) {
+	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .encoding(error):
 			hasher.combine(0)
@@ -84,4 +84,3 @@ extension ClientError: @retroactive Equatable where ResponseError: Equatable {
 		}
 	}
 }
-

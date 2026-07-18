@@ -5,8 +5,8 @@
 //  Created by ninji on 10/04/2025.
 //
 
-import SwiftUI
 import Common
+import SwiftUI
 
 struct TorrentFilesSection: View {
 	@Environment(TorrentManager.self) var manager
