@@ -78,6 +78,16 @@ public final class TorrentManager {
 		try await refresh()
 	}
 
+	public func verify(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+		try await session.client.verify(torrents)
+		try await refresh()
+	}
+
+	public func updateTrackers(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {
+		try await session.client.updateTrackers(torrents)
+		try await refresh()
+	}
+
 	public func paths(for torrent: StandardTorrent) async throws(TorrentClientError) -> [String] {
 		try await session.client.paths(torrent)
 	}
