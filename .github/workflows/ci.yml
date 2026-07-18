@@ -3,8 +3,19 @@ name: CI
 on:
   push:
     branches: [main]
+    paths: &ci-paths
+      - "Sources/**"
+      - "Tests/**"
+      - "Packages/**"
+      - "config/**"
+      - "project.yml"
+      - "Magnesium.xctestplan"
+      - ".swift-format"
+      - ".swiftlint.yml"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
+    paths: *ci-paths
   workflow_dispatch:
 
 concurrency:
