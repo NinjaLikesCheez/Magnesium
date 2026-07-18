@@ -85,11 +85,14 @@ jobs:
       # Package code is iOS/visionOS-only (SwiftUI APIs like fullScreenCover aren't
       # available on macOS), so this builds against a simulator destination rather than
       # `swift test`, which would otherwise build and run natively as a macOS process.
+      # The per-product scheme SwiftPM autogenerates (matching the package name) isn't
+      # configured for the test action — "<Package>-Package" is the umbrella scheme that
+      # bundles every target, including tests.
       - name: xcodebuild test
         working-directory: Packages/${{ matrix.package }}
         run: |
           xcodebuild test \
-            -scheme ${{ matrix.package }} \
+            -scheme ${{ matrix.package }}-Package \
             -destination "platform=iOS Simulator,name=iPhone 16" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
