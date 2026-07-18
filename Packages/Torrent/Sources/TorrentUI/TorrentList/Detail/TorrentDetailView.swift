@@ -35,6 +35,16 @@ struct TorrentDetailView: View {
 				primaryButtonAction: { model.error = nil }
 			)
 		}
+		.islandToast(item: $model.toast) { toast in
+			switch toast {
+			case .updateTrackers:
+				IslandToastCard(
+					title: "Trackers updated",
+					subtitle: "Placeholder subtitle",
+					role: .success
+				)
+			}
+		}
 		.environment(model)
 	}
 
@@ -88,6 +98,7 @@ struct TorrentDetailView: View {
 					try await torrentManager.verify([torrent])
 				case .updateTrackers:
 					try await torrentManager.updateTrackers([torrent])
+					model.toast = .updateTrackers
 				}
 			} catch {
 				model.error = .clientError(error)
@@ -102,6 +113,7 @@ extension TorrentDetailView {
 	public final class Model {
 		public var destination: Destination?
 		public var error: Error?
+		public var toast: Toast?
 
 		public init() {}
 
@@ -114,6 +126,11 @@ extension TorrentDetailView {
 		@CasePathable
 		public enum Error: Hashable {
 			case clientError(TorrentClientError)
+		}
+
+		@CasePathable
+		public enum Toast: Hashable {
+			case updateTrackers
 		}
 	}
 }
