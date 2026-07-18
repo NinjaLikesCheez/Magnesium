@@ -150,7 +150,13 @@ jobs:
             deriveddata-${{ matrix.platform }}-${{ runner.os }}-
 
       # config/Signing.xcconfig (gitignored, machine-specific) is what normally supplies
-      # PRODUCT_BUNDLE_IDENTIFIER — absent here, so set a throwaway one on the command line.
+      # PRODUCT_BUNDLE_IDENTIFIER for the Magnesium/MagnesiumTests targets — write a
+      # throwaway one here rather than passing it as an xcodebuild CLI override, which
+      # would apply project-wide and collide with the embedded SPM package frameworks'
+      # own bundle IDs (they'd all get forced to the same identifier as the app).
+      - name: Write throwaway signing config
+        run: echo "PRODUCT_BUNDLE_IDENTIFIER = dev.magnesium.ci" > config/Signing.xcconfig
+
       - name: Build
         run: |
           xcodebuild build \
@@ -158,8 +164,7 @@ jobs:
             -scheme Magnesium \
             -destination "${{ matrix.destination }}" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            PRODUCT_BUNDLE_IDENTIFIER=dev.magnesium.ci
+            CODE_SIGNING_REQUIRED=NO
 
   test:
     name: App test suite (MagnesiumTests)
@@ -193,11 +198,18 @@ jobs:
           restore-keys: |
             deriveddata-test-${{ runner.os }}-
 
+      # config/Signing.xcconfig (gitignored, machine-specific) is what normally supplies
+      # PRODUCT_BUNDLE_IDENTIFIER for the Magnesium/MagnesiumTests targets — write a
+      # throwaway one here rather than passing it as an xcodebuild CLI override, which
+      # would apply project-wide and collide with the embedded SPM package frameworks'
+      # own bundle IDs (they'd all get forced to the same identifier as the app, and
+      # installing the built .app then fails: "parent bundle has the same identifier
+      # as sub-bundle").
+      - name: Write throwaway signing config
+        run: echo "PRODUCT_BUNDLE_IDENTIFIER = dev.magnesium.ci" > config/Signing.xcconfig
+
       # There's no standalone "MagnesiumTests" scheme — it's a hosted test bundle that
       # only runs as part of the "Magnesium" scheme's test action (see Magnesium.xctestplan).
-      # config/Signing.xcconfig (gitignored, machine-specific) is what normally supplies
-      # PRODUCT_BUNDLE_IDENTIFIER — absent here, so set a throwaway one on the command line
-      # (without it, the built .app has no bundle ID and the simulator refuses to install it).
       - name: Run app-level tests
         run: |
           xcodebuild test \
@@ -206,5 +218,4 @@ jobs:
             -only-testing:MagnesiumTests \
             -destination "platform=iOS Simulator,name=iPhone 16" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            PRODUCT_BUNDLE_IDENTIFIER=dev.magnesium.ci
+            CODE_SIGNING_REQUIRED=NO
