@@ -3,6 +3,7 @@ import SwiftUI
 import SwiftUINavigation
 
 struct TorrentDetailView: View {
+	@Environment(TorrentManager.self) private var torrentManager
 	@State private var model = Model()
 
 	var torrent: StandardTorrent
@@ -24,6 +25,9 @@ struct TorrentDetailView: View {
 		.buttonStyle(BorderlessButtonStyle())
 		.navigationTitle("Info")
 		.navigationBarTitleDisplayMode(.inline)
+		.toolbar {
+			overflowMenu
+		}
 		.panel(item: $model.error.clientError) { error in
 			ErrorPanelCard(
 				error: error,
@@ -31,6 +35,47 @@ struct TorrentDetailView: View {
 			)
 		}
 		.environment(model)
+	}
+
+	@ToolbarContentBuilder
+	var overflowMenu: some ToolbarContent {
+		ToolbarItem(placement: .primaryAction) {
+			Menu {
+				Button {
+					perform(.verify)
+				} label: {
+					Label("Force Recheck", systemImage: "checkmark.shield")
+				}
+
+				Button {
+					perform(.updateTrackers)
+				} label: {
+					Label("Update Tracker", systemImage: "antenna.radiowaves.left.and.right")
+				}
+			} label: {
+				Image(systemName: "ellipsis")
+			}
+		}
+	}
+
+	enum OverflowAction {
+		case verify
+		case updateTrackers
+	}
+
+	private func perform(_ action: OverflowAction) {
+		Task {
+			do throws(TorrentClientError) {
+				switch action {
+				case .verify:
+					try await torrentManager.verify([torrent])
+				case .updateTrackers:
+					try await torrentManager.updateTrackers([torrent])
+				}
+			} catch {
+				model.error = .clientError(error)
+			}
+		}
 	}
 }
 

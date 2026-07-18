@@ -219,6 +219,35 @@ class TorrentManagerTests {
 		#expect(mockClient.refreshCallCount == 1)  // Called after delete
 	}
 
+	@Test("Verify torrents calls session and refreshes")
+	func verifyTorrentsCallsSessionAndRefreshes() async throws {
+		// Arrange
+		let testTorrents = TestDataFactory.createMultipleTorrents(count: 2)
+		mockClient.refreshResult = (testTorrents, [])
+
+		// Act
+		try await torrentManager.verify(testTorrents)
+
+		// Assert
+		#expect(mockClient.verifyCallCount == 1)
+		#expect(mockClient.refreshCallCount == 1)  // Called after verify
+	}
+
+	@Test("Update trackers calls session and refreshes")
+	func updateTrackersCallsSessionAndRefreshes() async throws {
+		// Arrange
+		let testTorrents = TestDataFactory.createMultipleTorrents(count: 2)
+		mockClient.refreshResult = (testTorrents, [])
+
+		// Act
+		try await torrentManager.updateTrackers(testTorrents)
+
+		// Assert
+		#expect(mockClient.updateTrackersCallCount == 1)
+		#expect(mockClient.updateTrackersTorrents.count == 2)
+		#expect(mockClient.refreshCallCount == 1)  // Called after update trackers
+	}
+
 	@Test("Add link calls session and refreshes")
 	func addLinkCallsSessionAndRefreshes() async throws {
 		// Arrange
@@ -439,6 +468,36 @@ class TorrentManagerTests {
 		}
 
 		#expect(mockClient.resumeCallCount == 1)
+		#expect(mockClient.refreshCallCount == 0)  // Refresh not called due to error
+	}
+
+	@Test("Verify handles client errors gracefully")
+	func verifyHandlesClientErrorsGracefully() async throws {
+		// Arrange
+		let testTorrents = TestDataFactory.createMultipleTorrents(count: 1)
+		mockClient.verifyResult = .failure(TorrentClientError.deluge(.response(.unauthenticated)))
+
+		// Act & Assert
+		await #expect(throws: TorrentClientError.self) {
+			try await torrentManager.verify(testTorrents)
+		}
+
+		#expect(mockClient.verifyCallCount == 1)
+		#expect(mockClient.refreshCallCount == 0)  // Refresh not called due to error
+	}
+
+	@Test("Update trackers handles client errors gracefully")
+	func updateTrackersHandlesClientErrorsGracefully() async throws {
+		// Arrange
+		let testTorrents = TestDataFactory.createMultipleTorrents(count: 1)
+		mockClient.updateTrackersResult = .failure(TorrentClientError.deluge(.response(.unauthenticated)))
+
+		// Act & Assert
+		await #expect(throws: TorrentClientError.self) {
+			try await torrentManager.updateTrackers(testTorrents)
+		}
+
+		#expect(mockClient.updateTrackersCallCount == 1)
 		#expect(mockClient.refreshCallCount == 0)  // Refresh not called due to error
 	}
 
