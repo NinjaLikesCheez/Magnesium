@@ -149,6 +149,8 @@ jobs:
           restore-keys: |
             deriveddata-${{ matrix.platform }}-${{ runner.os }}-
 
+      # config/Signing.xcconfig (gitignored, machine-specific) is what normally supplies
+      # PRODUCT_BUNDLE_IDENTIFIER — absent here, so set a throwaway one on the command line.
       - name: Build
         run: |
           xcodebuild build \
@@ -156,7 +158,8 @@ jobs:
             -scheme Magnesium \
             -destination "${{ matrix.destination }}" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            PRODUCT_BUNDLE_IDENTIFIER=dev.magnesium.ci
 
   test:
     name: App test suite (MagnesiumTests)
@@ -192,6 +195,9 @@ jobs:
 
       # There's no standalone "MagnesiumTests" scheme — it's a hosted test bundle that
       # only runs as part of the "Magnesium" scheme's test action (see Magnesium.xctestplan).
+      # config/Signing.xcconfig (gitignored, machine-specific) is what normally supplies
+      # PRODUCT_BUNDLE_IDENTIFIER — absent here, so set a throwaway one on the command line
+      # (without it, the built .app has no bundle ID and the simulator refuses to install it).
       - name: Run app-level tests
         run: |
           xcodebuild test \
@@ -200,4 +206,5 @@ jobs:
             -only-testing:MagnesiumTests \
             -destination "platform=iOS Simulator,name=iPhone 16" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            PRODUCT_BUNDLE_IDENTIFIER=dev.magnesium.ci
