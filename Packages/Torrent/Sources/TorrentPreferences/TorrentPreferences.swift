@@ -17,7 +17,7 @@ public final class TorrentPreferences: Preferences {
 	// TODO: Create a fork of observable defaults that allows you to transform before storing or something - servers can have keychainData which should be stored in the keychain and not in defaults
 	public var servers: [TorrentServer] = []
 
-	public var selectedServerID: String? = nil
+	public var selectedServerID: String?
 
 	public var sortOption: TorrentSortOption = .init(property: .dateAdded)
 

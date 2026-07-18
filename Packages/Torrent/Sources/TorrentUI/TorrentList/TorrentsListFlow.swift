@@ -5,10 +5,10 @@
 //  Created by ninji on 25/06/2025.
 //
 
-import SwiftUI
-import SwiftUINavigation
 import Common
 import CommonUI
+import SwiftUI
+import SwiftUINavigation
 
 public struct TorrentsListFlow: View {
 	@State public var model: TorrentListView.Model = .init()
@@ -31,23 +31,23 @@ public struct TorrentsListFlow: View {
 				TorrentDetailView(torrent: torrent)
 					.environment(manager)
 			}
-		.panel(item: $model.error.clientError) { error in
-			ErrorPanelCard(
-				error: error,
-				primaryButtonAction: { model.error = nil }
-			)
-		}
-		.panel(item: $model.error.fileImportError) { error in
-			PanelCard(
-				title: "File Import Error",
-				systemName: "square.and.arrow.down.badge.xmark",
-				subtitle: error.message,
-				primaryButtonAction: { model.error = nil }
-			)
-		}
-		.environment(manager)
-		.environment(model)
-		.environment(preferences)
-		.environment(session)
+			.panel(item: $model.error.clientError) { error in
+				ErrorPanelCard(
+					error: error,
+					primaryButtonAction: { model.error = nil }
+				)
+			}
+			.panel(item: $model.error.fileImportError) { error in
+				PanelCard(
+					title: "File Import Error",
+					systemName: "square.and.arrow.down.badge.xmark",
+					subtitle: error.message,
+					primaryButtonAction: { model.error = nil }
+				)
+			}
+			.environment(manager)
+			.environment(model)
+			.environment(preferences)
+			.environment(session)
 	}
 }

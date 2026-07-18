@@ -4,9 +4,9 @@
 //
 //  Created by ninji on 12/06/2025.
 //
-import TorrentUI
-import Observation
 import MagnesiumModule
+import Observation
+import TorrentUI
 
 enum AppState: Sendable {
 	case unboarded

@@ -4,8 +4,8 @@
 //
 //  Created by ninji on 22/09/2025.
 //
-import Deluge
 import Common
+import Deluge
 
 // MARK: - Deluge errors
 extension Deluge.ResponseError: @retroactive Hashable {
@@ -161,4 +161,3 @@ extension RequestError: @retroactive Hashable {
 		}
 	}
 }
-

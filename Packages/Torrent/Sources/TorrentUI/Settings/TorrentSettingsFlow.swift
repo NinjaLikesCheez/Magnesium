@@ -5,10 +5,10 @@
 //  Created by ninji on 06/10/2025.
 //
 
-import SwiftUI
-import SwiftUINavigation
 import CommonUI
 import Observation
+import SwiftUI
+import SwiftUINavigation
 
 public struct TorrentSettingsFlow: View {
 	@State private var model = TorrentSettingsModel()

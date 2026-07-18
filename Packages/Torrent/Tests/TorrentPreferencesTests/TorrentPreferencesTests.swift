@@ -101,8 +101,8 @@ class TorrentPreferencesTests {
 	@Test("Servers array storage and retrieval works correctly")
 	func serversArrayStorageAndRetrievalWorksCorrectly() {
 		// Arrange
-		let data = #"{ "url": "http://localhost:8112" }"#.data(using: .utf8)!
-		let keychain = #"{ "password": "test" }"#.data(using: .utf8)!
+		let data = Data(#"{ "url": "http://localhost:8112" }"#.utf8)
+		let keychain = Data(#"{ "password": "test" }"#.utf8)
 		let servers = [
 			TestDataFactory.createServer(name: "Server 1", type: .deluge, data: data, keychainData: keychain),
 			TestDataFactory.createServer(name: "Server 2", type: .qbittorrent, data: data, keychainData: keychain),

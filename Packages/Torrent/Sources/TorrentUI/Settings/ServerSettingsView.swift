@@ -5,16 +5,16 @@
 //  Created by ninji on 16/04/2025.
 //
 
-import SwiftUI
 import APIClient
 import Common
+import SwiftUI
 
 struct ServerSettingsView<FormContent: View, SectionContent: View>: View {
 	let formContent: () -> FormContent
 	let sectionContent: () -> SectionContent
 
 	@State private var isSaving = false
-	@State private var error: String? = nil
+	@State private var error: String?
 
 	@Binding var name: String
 	@Binding var address: String
@@ -124,4 +124,3 @@ extension ServerSettingsError: VisualError, Identifiable {
 		}
 	}
 }
-

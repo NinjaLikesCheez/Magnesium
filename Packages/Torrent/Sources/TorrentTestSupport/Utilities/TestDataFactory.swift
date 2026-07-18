@@ -70,8 +70,8 @@ struct TestDataFactory {
 	static func createServer(
 		name: String = "Test Server",
 		type: TorrentServerType = .deluge,
-		data: Data = .init(#"{ "url": "http://localhost:8112" }"#.data(using: .utf8)!),
-		keychainData: Data? = .init(#"{ "password": "test" }"#.data(using: .utf8)!)
+		data: Data = Data(#"{ "url": "http://localhost:8112" }"#.utf8),
+		keychainData: Data? = Data(#"{ "password": "test" }"#.utf8)
 	) -> TorrentServer {
 		return TorrentServer(name: name, type: type, data: data, keychainData: keychainData)
 	}
@@ -81,8 +81,8 @@ struct TestDataFactory {
 			createServer(
 				name: "Test Server \(index)",
 				type: .deluge,
-				data: .init(#"{ "url": "http://localhost:8112" }"#.data(using: .utf8)!),
-				keychainData: .init(#"{ "password": "test" }"#.data(using: .utf8)!)
+				data: Data(#"{ "url": "http://localhost:8112" }"#.utf8),
+				keychainData: Data(#"{ "password": "test" }"#.utf8)
 			)
 		}
 	}

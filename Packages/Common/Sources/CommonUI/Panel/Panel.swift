@@ -214,7 +214,7 @@ public struct Panel<Item: PanelItem, PanelContent: View>: ViewModifier {
 }
 
 // MARK: ViewHeightKey
-fileprivate struct ViewHeightKey: PreferenceKey {
+private struct ViewHeightKey: PreferenceKey {
 	typealias Value = Double
 	static let defaultValue = 0.0
 
@@ -231,7 +231,7 @@ public extension View {
 	///   - onCancel: A closure called when the panel is cancelled. When this is not nil a cancel
 	///   button will be added to the panel.
 	///   - content: A closure returning the content of the panel.
-	func  panel<Item: Identifiable, Content: View>(
+	func panel<Item: Identifiable, Content: View>(
 		item: Binding<Item?>,
 		onCancel: (() -> Void)? = nil,
 		@ViewBuilder content: @escaping (_ item: Item) -> Content

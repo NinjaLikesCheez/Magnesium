@@ -1,8 +1,8 @@
+import CommonUI
 import Deluge
 import Observation
-import SwiftUI
 import SwiftNavigation
-import CommonUI
+import SwiftUI
 
 @Observable
 class ServerBasicAuthentication {
@@ -47,19 +47,19 @@ struct AddServerView: View {
 		#else
 			.listStyle(.bordered)
 		#endif
-			.navigationDestination(item: $model.destination) { destination in
-				switch destination {
-				case let .addNewServer(type):
-					switch type {
-					case .deluge:
-						AddDelugeServerView()
-							.environment(preferences)
-					case .qbittorrent:
-						AddQBittorrentServerView()
-							.environment(preferences)
-					}
+		.navigationDestination(item: $model.destination) { destination in
+			switch destination {
+			case let .addNewServer(type):
+				switch type {
+				case .deluge:
+					AddDelugeServerView()
+						.environment(preferences)
+				case .qbittorrent:
+					AddQBittorrentServerView()
+						.environment(preferences)
 				}
 			}
+		}
 	}
 
 	@Observable

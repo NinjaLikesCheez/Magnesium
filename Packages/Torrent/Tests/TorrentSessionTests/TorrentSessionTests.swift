@@ -55,8 +55,8 @@ class TorrentSessionTests {
 
 	// MARK: - Server Setting Tests
 
-	private let serverSettingsData = #"{ "url": "http://localhost:8112" }"#.data(using: .utf8)!
-	private let keychainData = #"{ "password": "test" }"#.data(using: .utf8)!
+	private let serverSettingsData = Data(#"{ "url": "http://localhost:8112" }"#.utf8)
+	private let keychainData = Data(#"{ "password": "test" }"#.utf8)
 
 	@Test("Set server updates server property")
 	func setServerUpdatesServerProperty() throws {
@@ -157,7 +157,7 @@ class TorrentSessionTests {
 	@Test("Client creation throws error for invalid server data")
 	func clientCreationThrowsErrorForInvalidServerData() throws {
 		// Arrange
-		let invalidServerData = "invalid json".data(using: .utf8)!
+		let invalidServerData = Data("invalid json".utf8)
 		let keychainData = DelugeKeychainData(password: "test-password", basicAuthentication: nil)
 
 		let encoder = JSONEncoder()
@@ -188,7 +188,7 @@ class TorrentSessionTests {
 		let serverSettings = DelugeServerSettings(url: URL(string: "http://localhost:58846")!)
 		let encoder = JSONEncoder()
 		let serverData = try encoder.encode(serverSettings)
-		let invalidKeychainData = "invalid json".data(using: .utf8)!
+		let invalidKeychainData = Data("invalid json".utf8)
 
 		let server = TestDataFactory.createServer(
 			name: "Deluge Server",
@@ -327,7 +327,7 @@ class TorrentSessionTests {
 	@Test("Set server handles decoding failures gracefully")
 	func setServerHandlesDecodingFailuresGracefully() throws {
 		// Arrange
-		let invalidServerData = #"invalid json"#.data(using: .utf8)!
+		let invalidServerData = Data(#"invalid json"#.utf8)
 
 		let server = TestDataFactory.createServer(
 			name: "Deluge Server",

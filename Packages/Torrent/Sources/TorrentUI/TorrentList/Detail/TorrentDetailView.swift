@@ -1,6 +1,6 @@
+import CommonUI
 import SwiftUI
 import SwiftUINavigation
-import CommonUI
 
 struct TorrentDetailView: View {
 	@State private var model = Model()

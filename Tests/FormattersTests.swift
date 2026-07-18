@@ -219,7 +219,8 @@ struct FormattersTests {
 
 		@Test("ETA formatter uses abbreviated units")
 		func etaFormatterUsesAbbreviatedUnits() {
-			let result = Duration.seconds(3661).formatted(Formatters.eta.locale(.init(identifier: "en_US")))  // 1 hour, 1 minute, 1 second
+			// 1 hour, 1 minute, 1 second
+			let result = Duration.seconds(3661).formatted(Formatters.eta.locale(.init(identifier: "en_US")))
 			#expect(result == "1h 1m 1s")
 		}
 	}

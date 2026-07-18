@@ -14,8 +14,8 @@ struct TorrentServerTests {
 		// Arrange
 		let name = "Test Server"
 		let type = TorrentServerType.deluge
-		let data = "test data".data(using: .utf8)!
-		let keychainData = "keychain data".data(using: .utf8)!
+		let data = Data("test data".utf8)
+		let keychainData = Data("keychain data".utf8)
 
 		// Act
 		let server = TorrentServer(
@@ -38,7 +38,7 @@ struct TorrentServerTests {
 		// Arrange
 		let name = "Test Server"
 		let type = TorrentServerType.qbittorrent
-		let data = "test data".data(using: .utf8)!
+		let data = Data("test data".utf8)
 
 		// Act
 		let server = TorrentServer(
@@ -81,8 +81,8 @@ struct TorrentServerTests {
 		let server = TestDataFactory.createServer(
 			name: "Test Server",
 			type: .deluge,
-			data: "test data".data(using: .utf8)!,
-			keychainData: "keychain data".data(using: .utf8)!
+			data: Data("test data".utf8),
+			keychainData: Data("keychain data".utf8)
 		)
 
 		let encoder = JSONEncoder()
@@ -107,7 +107,7 @@ struct TorrentServerTests {
 		let originalServer = TestDataFactory.createServer(
 			name: "Decode Test Server",
 			type: .qbittorrent,
-			data: "decode test data".data(using: .utf8)!
+			data: Data("decode test data".utf8)
 		)
 
 		let encoder = JSONEncoder()
@@ -134,7 +134,7 @@ struct TorrentServerTests {
 			let originalServer = TestDataFactory.createServer(
 				name: "Round Trip \(serverType.rawValue)",
 				type: serverType,
-				data: "round trip data".data(using: .utf8)!
+				data: Data("round trip data".utf8)
 			)
 
 			// Act
@@ -155,7 +155,7 @@ struct TorrentServerTests {
 			{
 					"name": "Minimal Server",
 					"type": "Deluge",
-					"data": "\("minimal data".data(using: .utf8)!.base64EncodedString())"
+					"data": "\(Data("minimal data".utf8).base64EncodedString())"
 			}
 			"""
 		let jsonData = jsonString.data(using: .utf8)!
@@ -177,7 +177,7 @@ struct TorrentServerTests {
 			{
 					"name": "Invalid Server",
 					"type": "InvalidType",
-					"data": "\("test data".data(using: .utf8)!.base64EncodedString())"
+					"data": "\(Data("test data".utf8).base64EncodedString())"
 			}
 			"""
 		let jsonData = jsonString.data(using: .utf8)!
@@ -214,8 +214,8 @@ struct TorrentServerTests {
 
 	@Test("Server equality with all properties")
 	func serverEqualityWithAllProperties() {
-		let data = "test data".data(using: .utf8)!
-		let keychainData = "keychain data".data(using: .utf8)!
+		let data = Data("test data".utf8)
+		let keychainData = Data("keychain data".utf8)
 
 		let server1 = TorrentServer(
 			name: "Test Server",
@@ -239,7 +239,7 @@ struct TorrentServerTests {
 		let baseServer = TestDataFactory.createServer(
 			name: "Base Server",
 			type: .deluge,
-			data: "base data".data(using: .utf8)!
+			data: Data("base data".utf8)
 		)
 
 		// Different name
@@ -264,7 +264,7 @@ struct TorrentServerTests {
 		let differentDataServer = TorrentServer(
 			name: baseServer.name,
 			type: baseServer.type,
-			data: "different data".data(using: .utf8)!,
+			data: Data("different data".utf8),
 			keychainData: baseServer.keychainData
 		)
 		#expect(baseServer != differentDataServer)
@@ -274,14 +274,14 @@ struct TorrentServerTests {
 			name: baseServer.name,
 			type: baseServer.type,
 			data: baseServer.data,
-			keychainData: "different keychain".data(using: .utf8)!
+			keychainData: Data("different keychain".utf8)
 		)
 		#expect(baseServer != differentKeychainServer)
 	}
 
 	@Test("Server equality with nil keychainData")
 	func serverEqualityWithNilKeychainData() {
-		let data = "test data".data(using: .utf8)!
+		let data = Data("test data".utf8)
 
 		let server1 = TorrentServer(
 			name: "Test Server",
@@ -305,13 +305,13 @@ struct TorrentServerTests {
 		let server1 = TestDataFactory.createServer(
 			name: "Hash Test Server",
 			type: .deluge,
-			data: "hash test data".data(using: .utf8)!
+			data: Data("hash test data".utf8)
 		)
 
 		let server2 = TestDataFactory.createServer(
 			name: "Hash Test Server",
 			type: .deluge,
-			data: "hash test data".data(using: .utf8)!
+			data: Data("hash test data".utf8)
 		)
 
 		// Equal servers should have equal hash values
@@ -378,7 +378,7 @@ struct TorrentServerTests {
 	@Test("Server with Unicode characters")
 	func serverWithUnicodeCharacters() {
 		let unicodeName = "🖥️ Test Server 测试服务器"
-		let unicodeData = "Unicode data: 🔐 测试数据".data(using: .utf8)!
+		let unicodeData = Data("Unicode data: 🔐 测试数据".utf8)
 
 		let server = TestDataFactory.createServer(
 			name: unicodeName,

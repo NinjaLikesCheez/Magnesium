@@ -28,23 +28,22 @@ class DelugeSettings {
 
 	init() {
 		#if DEBUG
-		self.name = "Deluge"
-		self.address = "http://proxyman.debug:8112"
-		self.password = "deluge"
-		self.basicAuthentication = .init()
+			self.name = "Deluge"
+			self.address = "http://proxyman.debug:8112"
+			self.password = "deluge"
+			self.basicAuthentication = .init()
 		#else
-		self.name = ""
-		self.address = ""
-		self.password = ""
-		self.basicAuthentication = .init()
+			self.name = ""
+			self.address = ""
+			self.password = ""
+			self.basicAuthentication = .init()
 		#endif
 	}
 
 	var isValid: Bool {
 		!name.isEmpty && !address.isEmpty && !password.isEmpty
-		&&
-			(basicAuthentication.username.isEmpty || !basicAuthentication.password.isEmpty) ||
-			(!basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
+			&& (basicAuthentication.username.isEmpty || !basicAuthentication.password.isEmpty)
+			|| (!basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
 	}
 
 	func makeServer() async throws(ServerSettingsError) -> TorrentServer {

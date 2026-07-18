@@ -17,7 +17,7 @@ public struct TorrentListView: View {
 	}
 
 	public var body: some View {
-//		let _ = Self._printChanges()
+		//		let _ = Self._printChanges()
 		@Bindable var manager = manager
 
 		torrentList
@@ -112,7 +112,7 @@ extension TorrentListView {
 		@CasePathable
 		public enum Error: Hashable {
 			case clientError(TorrentClientError)
-			case fileImportError(FileImportError) // fileImport API throws any Error... so manually build it
+			case fileImportError(FileImportError)  // fileImport API throws any Error... so manually build it
 		}
 
 		/// A file-import failure message. `id` is the message itself since these carry no other identity.

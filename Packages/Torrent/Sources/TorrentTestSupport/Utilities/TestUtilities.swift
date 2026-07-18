@@ -46,10 +46,10 @@ struct TestUtilities {
 		file: StaticString = #file,
 		line: UInt = #line
 	) {
-		for i in 0..<(collection.count - 1) {
+		for index in 0..<(collection.count - 1) {
 			#expect(
-				predicate(collection[i], collection[i + 1]),
-				"Collection is not sorted at index \(i)",
+				predicate(collection[index], collection[index + 1]),
+				"Collection is not sorted at index \(index)",
 				sourceLocation: SourceLocation(fileID: file.description, filePath: file.description, line: Int(line), column: 0)
 			)
 		}
