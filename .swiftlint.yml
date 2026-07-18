@@ -1,11 +1,6 @@
 disabled_rules:
   - trailing_comma
   - todo
-  # The two force-tries in EditDelugeServerView's init decode a server's own previously-saved
-  # settings; fixing this properly means reworking that init to surface failures through the
-  # view's Error/panel mechanism (see documentation/error_handling.md) rather than a mechanical
-  # lint fix — left as a follow-up rather than silently patched here.
-  - force_try
 
 line_length:
   ignores_comments: true
