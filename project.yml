@@ -37,11 +37,9 @@ packages:
 targets:
   Magnesium:
     type: application
-    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    supportedDestinations: [iOS, visionOS]
     deploymentTarget:
       iOS: 26
-      tvOS: 26
-      macOS: 26
       visionOS: 26
     sources:
       - Sources/Magnesium
@@ -84,7 +82,7 @@ targets:
         - Magnesium
   MagnesiumTests:
     type: bundle.unit-test
-    supportedDestinations: [iOS, tvOS, macOS, visionOS]
+    supportedDestinations: [iOS, visionOS]
     sources:
       - Tests
     dependencies:

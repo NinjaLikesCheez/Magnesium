@@ -79,10 +79,6 @@ jobs:
         include:
           - platform: iOS Simulator
             destination: "platform=iOS Simulator,name=iPhone 16"
-          - platform: macOS
-            destination: "platform=macOS"
-          - platform: tvOS Simulator
-            destination: "platform=tvOS Simulator,name=Apple TV"
           - platform: visionOS Simulator
             destination: "platform=visionOS Simulator,name=Apple Vision Pro"
     steps:
