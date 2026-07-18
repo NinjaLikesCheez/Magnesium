@@ -5,6 +5,7 @@ import SwiftUINavigation
 struct TorrentDetailView: View {
 	@Environment(TorrentManager.self) private var torrentManager
 	@State private var model = Model()
+	@State private var isPerformingOverflowAction = false
 
 	var torrent: StandardTorrent
 
@@ -39,23 +40,34 @@ struct TorrentDetailView: View {
 
 	@ToolbarContentBuilder
 	var overflowMenu: some ToolbarContent {
-		ToolbarItem(placement: .primaryAction) {
-			Menu {
-				Button {
-					perform(.verify)
-				} label: {
-					Label("Force Recheck", systemImage: "checkmark.shield")
-				}
-
-				Button {
-					perform(.updateTrackers)
-				} label: {
-					Label("Update Tracker", systemImage: "antenna.radiowaves.left.and.right")
-				}
-			} label: {
-				Image(systemName: "ellipsis")
+		#if os(macOS)
+			ToolbarItem(placement: .primaryAction) {
+				overflowMenuContent
 			}
+		#else
+			ToolbarItem(placement: .topBarTrailing) {
+				overflowMenuContent
+			}
+		#endif
+	}
+
+	var overflowMenuContent: some View {
+		Menu {
+			Button {
+				perform(.verify)
+			} label: {
+				Label("Force Recheck", systemImage: "checkmark.shield")
+			}
+
+			Button {
+				perform(.updateTrackers)
+			} label: {
+				Label("Update Tracker", systemImage: "antenna.radiowaves.left.and.right")
+			}
+		} label: {
+			Image(systemName: "ellipsis")
 		}
+		.disabled(isPerformingOverflowAction)
 	}
 
 	enum OverflowAction {
@@ -64,7 +76,12 @@ struct TorrentDetailView: View {
 	}
 
 	private func perform(_ action: OverflowAction) {
+		guard !isPerformingOverflowAction else { return }
+		isPerformingOverflowAction = true
+
 		Task {
+			defer { isPerformingOverflowAction = false }
+
 			do throws(TorrentClientError) {
 				switch action {
 				case .verify:

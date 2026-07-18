@@ -230,6 +230,7 @@ class TorrentManagerTests {
 
 		// Assert
 		#expect(mockClient.verifyCallCount == 1)
+		#expect(mockClient.verifiedTorrents.count == 2)
 		#expect(mockClient.refreshCallCount == 1)  // Called after verify
 	}
 
