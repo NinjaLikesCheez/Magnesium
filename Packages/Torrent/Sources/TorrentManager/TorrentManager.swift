@@ -27,6 +27,9 @@ public final class TorrentManager {
 	@ObservationIgnored
 	private let scheduling: TorrentScheduling
 
+	@ObservationIgnored
+	private var observationTask: Task<Void, Never>?
+
 	private var updateTimer: Cancellable?
 
 	public init(
@@ -38,14 +41,17 @@ public final class TorrentManager {
 		self.preferences = preferences
 		self.scheduling = scheduling
 
-		// `Observations` yields the current value immediately on first await, then again on each
-		// subsequent change, so the loop below handles both the initial schedule and rescheduling.
+		// `Observations` yields the current value immediately on first await (after the current
+		// synchronous call stack completes), then again on each subsequent change. This means the
+		// initial schedule happens asynchronously, not during init — tests must await to observe it.
 		let timerValue = Observations {
 			preferences.autoRefreshInterval
 		}
 
-		Task {
+		observationTask = Task { [weak self] in
 			for await value in timerValue {
+				guard let self else { return }
+
 				self.updateTimer?.invalidate()
 				self.updateTimer = nil
 
@@ -56,6 +62,11 @@ public final class TorrentManager {
 				}
 			}
 		}
+	}
+
+	isolated deinit {
+		observationTask?.cancel()
+		updateTimer?.invalidate()
 	}
 
 	public func resume(_ torrents: [StandardTorrent]) async throws(TorrentClientError) {

@@ -5,7 +5,7 @@ import TorrentManager
 /// Tests call `fire()` to simulate an interval elapsing.
 @MainActor
 public final class FakeTorrentScheduler: TorrentScheduling {
-	public final class Handle: Cancellable {
+	public final class ScheduleHandle: Cancellable {
 		public private(set) var isCancelled = false
 
 		public func invalidate() {
@@ -16,7 +16,7 @@ public final class FakeTorrentScheduler: TorrentScheduling {
 	private struct Schedule {
 		let interval: TimeInterval
 		let action: @Sendable () -> Void
-		let handle: Handle
+		let handle: ScheduleHandle
 	}
 
 	public private(set) var scheduledIntervals: [TimeInterval] = []
@@ -25,7 +25,7 @@ public final class FakeTorrentScheduler: TorrentScheduling {
 	public init() {}
 
 	public func schedule(interval: TimeInterval, action: @escaping @Sendable () -> Void) -> Cancellable {
-		let handle = Handle()
+		let handle = ScheduleHandle()
 		scheduledIntervals.append(interval)
 		scheduled.append(Schedule(interval: interval, action: action, handle: handle))
 		return handle

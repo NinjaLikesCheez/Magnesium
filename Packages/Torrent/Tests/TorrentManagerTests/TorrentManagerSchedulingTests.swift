@@ -9,6 +9,11 @@ import Testing
 @Suite("TorrentManager Scheduling Tests")
 @MainActor
 class TorrentManagerSchedulingTests {
+	/// Allows the async `Observations` loop in `TorrentManager.init` to emit its first value and (re)schedule.
+	private static let observationLoopDelay: Duration = .milliseconds(50)
+	/// Allows the detached `Task` inside a fired schedule's action to run `refresh()` to completion.
+	private static let refreshTaskDelay: Duration = .milliseconds(10)
+
 	private let suiteName = "test-\(UUID().uuidString)"
 	private let testDefaults: UserDefaults
 	private let mockPreferences: TorrentPreferences
@@ -36,10 +41,26 @@ class TorrentManagerSchedulingTests {
 	@Test("TorrentManager initializes with timer based on preferences")
 	func torrentManagerInitializesWithTimerBasedOnPreferences() async throws {
 		// The initial schedule happens on the first iteration of an async observation loop, not synchronously in init
-		try await Task.sleep(for: .milliseconds(50))
+		try await Task.sleep(for: Self.observationLoopDelay)
 
 		// Verify that the manager scheduled a refresh at the preferences' configured interval
 		#expect(fakeScheduler.scheduledIntervals == [mockPreferences.autoRefreshInterval])
+	}
+
+	@Test("TorrentManager does not schedule when initialized with a zero interval")
+	func torrentManagerDoesNotScheduleWithZeroInterval() async throws {
+		// Arrange
+		let zeroIntervalPreferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
+		zeroIntervalPreferences.autoRefreshInterval = 0
+		let zeroScheduler = FakeTorrentScheduler()
+
+		// Act
+		_ = TorrentManager(session: mockSession, preferences: zeroIntervalPreferences, scheduling: zeroScheduler)
+		try await Task.sleep(for: Self.observationLoopDelay)
+
+		// Assert
+		#expect(zeroScheduler.scheduledIntervals.isEmpty)
+		#expect(zeroScheduler.activeScheduleCount == 0)
 	}
 
 	@Test("Firing the scheduled interval triggers a refresh")
@@ -48,11 +69,11 @@ class TorrentManagerSchedulingTests {
 		let testTorrents = TestDataFactory.createMultipleTorrents(count: 2)
 		mockClient.refreshResult = (testTorrents, [])
 		// The initial schedule happens on the first iteration of an async observation loop, not synchronously in init
-		try await Task.sleep(for: .milliseconds(50))
+		try await Task.sleep(for: Self.observationLoopDelay)
 
 		// Act
 		fakeScheduler.fire()
-		try await Task.sleep(for: .milliseconds(10))
+		try await Task.sleep(for: Self.refreshTaskDelay)
 
 		// Assert
 		#expect(mockClient.refreshCallCount == 1)
@@ -62,11 +83,11 @@ class TorrentManagerSchedulingTests {
 	func firingScheduledIntervalMultipleTimesRefreshesEachTime() async throws {
 		// Arrange
 		mockClient.refreshResult = ([], [])
-		try await Task.sleep(for: .milliseconds(50))
+		try await Task.sleep(for: Self.observationLoopDelay)
 
 		// Act
 		fakeScheduler.fire(times: 3)
-		try await Task.sleep(for: .milliseconds(10))
+		try await Task.sleep(for: Self.refreshTaskDelay)
 
 		// Assert
 		#expect(mockClient.refreshCallCount == 3)
@@ -77,7 +98,7 @@ class TorrentManagerSchedulingTests {
 		// Act
 		mockPreferences.autoRefreshInterval = 5.0
 		// Allow the Observations loop (a detached Task) to observe the change and reschedule
-		try await Task.sleep(for: .milliseconds(50))
+		try await Task.sleep(for: Self.observationLoopDelay)
 
 		// Assert
 		#expect(fakeScheduler.scheduledIntervals.last == 5.0)
@@ -88,7 +109,7 @@ class TorrentManagerSchedulingTests {
 	func settingAutoRefreshIntervalToZeroCancelsScheduling() async throws {
 		// Act
 		mockPreferences.autoRefreshInterval = 0
-		try await Task.sleep(for: .milliseconds(50))
+		try await Task.sleep(for: Self.observationLoopDelay)
 
 		// Assert
 		#expect(fakeScheduler.activeScheduleCount == 0)
