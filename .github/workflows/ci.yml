@@ -60,7 +60,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [Common, MagnesiumModule, Torrent]
+        include:
+          # Scheme names SwiftPM autogenerates aren't uniform: a single-product package
+          # (MagnesiumModule) gets one scheme matching the package name, already configured
+          # for the test action. A package with more than one product (Common) or none
+          # matching its own name (Torrent) instead gets a "<Package>-Package" umbrella
+          # scheme that bundles every target, tests included — the per-product schemes in
+          # that case are build-only.
+          - package: Common
+            scheme: Common-Package
+          - package: MagnesiumModule
+            scheme: MagnesiumModule
+          - package: Torrent
+            scheme: Torrent-Package
     steps:
       - uses: actions/checkout@v4
 
@@ -85,14 +97,11 @@ jobs:
       # Package code is iOS/visionOS-only (SwiftUI APIs like fullScreenCover aren't
       # available on macOS), so this builds against a simulator destination rather than
       # `swift test`, which would otherwise build and run natively as a macOS process.
-      # The per-product scheme SwiftPM autogenerates (matching the package name) isn't
-      # configured for the test action — "<Package>-Package" is the umbrella scheme that
-      # bundles every target, including tests.
       - name: xcodebuild test
         working-directory: Packages/${{ matrix.package }}
         run: |
           xcodebuild test \
-            -scheme ${{ matrix.package }}-Package \
+            -scheme ${{ matrix.scheme }} \
             -destination "platform=iOS Simulator,name=iPhone 16" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
