@@ -17,11 +17,6 @@ struct TorrentListEditingToolbar: ToolbarContent {
 	let selectedTorrents: Set<StandardTorrent>
 
 	var body: some ToolbarContent {
-		glassToolbar
-	}
-
-	@ToolbarContentBuilder
-	var glassToolbar: some ToolbarContent {
 		ToolbarSpacer(.flexible, placement: .bottomBar)
 
 		ToolbarItemGroup(placement: .bottomBar) {
@@ -38,20 +33,6 @@ struct TorrentListEditingToolbar: ToolbarContent {
 
 		ToolbarItemGroup(placement: .bottomBar) {
 			moreButton
-		}
-	}
-
-	var oldGrandpaToolbar: some ToolbarContent {
-		ToolbarItemGroup(placement: .bottomBar) {
-			HStack {
-				playButton
-				Spacer()
-				pauseButton
-				Spacer()
-				deleteButton
-				Spacer()
-				moreButton
-			}
 		}
 	}
 

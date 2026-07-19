@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct AddTorrentButton: View {
 	@Environment(TorrentManager.self) private var torrentManager
@@ -39,7 +40,7 @@ struct AddTorrentButton: View {
 		}
 		.fileImporter(
 			isPresented: $showingFileImporter,
-			allowedContentTypes: [.init(filenameExtension: "torrent")!],
+			allowedContentTypes: UTType(filenameExtension: "torrent").map { [$0] } ?? [.data],
 			allowsMultipleSelection: true
 		) { result in
 			handleFileImporterResult(result)
@@ -97,18 +98,21 @@ struct AddTorrentButton: View {
 	private func handleFileImporterResult(_ result: Result<[URL], any Error>) {
 		switch result {
 		case .success(let urls):
-			urls
-				.forEach { url in
-					Task {
-						_ = url.startAccessingSecurityScopedResource()
-						do throws(TorrentClientError) {
-							try await torrentManager.addLink(url.path())
-						} catch {
-							model.error = .clientError(error)
-						}
-						url.stopAccessingSecurityScopedResource()
+			Task {
+				for url in urls {
+					guard url.startAccessingSecurityScopedResource() else {
+						model.error = .fileImportError(.init("Couldn't access \(url.lastPathComponent)"))
+						continue
+					}
+					defer { url.stopAccessingSecurityScopedResource() }
+
+					do throws(TorrentClientError) {
+						try await torrentManager.addLink(url.path())
+					} catch {
+						model.error = .clientError(error)
 					}
 				}
+			}
 		case .failure(let error):
 			model.error = .fileImportError(.init(error.localizedDescription))
 		}

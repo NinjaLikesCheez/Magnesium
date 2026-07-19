@@ -15,7 +15,6 @@ struct TorrentNavigationView: View {
 	@State private var selections: Set<String> = []
 	@State private var columnVisibility: NavigationSplitViewVisibility = .all
 	@State private var editMode: EditMode = .inactive
-	@State private var isSearching: Bool = false
 
 	var selectedTorrents: Set<StandardTorrent> {
 		Set(torrentManager.filteredTorrents.filter { selections.contains($0.id) })
@@ -34,13 +33,10 @@ struct TorrentNavigationView: View {
 			.toolbar {
 				selectToolbarItem
 
-				#if os(iOS) || os(tvOS) || os(visionOS)
-					if #available(iOS 26.0, tvOS 26.0, visionOS 26.0, *) {
-						ToolbarSpacer(.fixed, placement: .topBarTrailing)
-					}
-				#endif
-
-				addTorrentToolbarItem
+				if !editMode.isEditing {
+					topBarTrailingSpacer
+					addTorrentToolbarItem
+				}
 
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
@@ -48,9 +44,8 @@ struct TorrentNavigationView: View {
 						selectedTorrents: selectedTorrents
 					)
 				} else {
-					TorrentListStatusToolbar(
-						isSearching: $isSearching
-					)
+					searchToolbarItem
+					TorrentListStatusToolbar()
 				}
 			}
 	}
@@ -78,6 +73,16 @@ struct TorrentNavigationView: View {
 			}
 		}
 		.navigationSplitViewStyle(.balanced)
+	}
+
+	/// Keeps Select and Add rendering as two distinct glass controls instead of merging into one pill.
+	@ToolbarContentBuilder
+	var topBarTrailingSpacer: some ToolbarContent {
+		#if os(macOS)
+			ToolbarSpacer(.fixed, placement: .primaryAction)
+		#else
+			ToolbarSpacer(.fixed, placement: .topBarTrailing)
+		#endif
 	}
 
 	@ToolbarContentBuilder
@@ -115,6 +120,17 @@ struct TorrentNavigationView: View {
 					}
 				}
 			}
+		#endif
+	}
+
+	/// Relocates the system search field to the bottom bar so it no longer collapses `selectToolbarItem`
+	/// (the root cause of #69 was `.searchToolbarBehavior(.minimize)`, not `.searchable` itself).
+	/// Unavailable on tvOS, so `.searchable` falls back to its default placement there.
+	@ToolbarContentBuilder
+	var searchToolbarItem: some ToolbarContent {
+		#if !os(tvOS)
+			DefaultToolbarItem(kind: .search, placement: .bottomBar)
+			ToolbarSpacer(.flexible, placement: .bottomBar)
 		#endif
 	}
 }

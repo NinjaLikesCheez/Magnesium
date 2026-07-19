@@ -24,6 +24,7 @@ public struct TorrentListView: View {
 			.environment(\.editMode, $editMode)
 			.refreshable { refresh() }
 			.onAppear { refresh() }
+			.searchable(text: $manager.searchQuery)
 			.navigationTitle(session.server?.name ?? "Torrents")
 			.overlay {
 				if manager.filteredTorrents.isEmpty && !manager.searchQuery.isEmpty {
