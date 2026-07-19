@@ -53,6 +53,8 @@ model.error = nil                      // dismiss error
 
 Every model splits presentation state **by surface, not by feature**: a `destination` property for push targets (`.navigationDestination(item:)`), and a separate `error` property for modal/error state (`.panel(item:)` or `.sheet(item:)`) — never one enum covering both. This is the two-enum split from the swift-navigation skill: it keeps each modifier's switch exhaustive over only its own cases, and it means presenting an error can't silently pop whatever's currently pushed, since the two are independent optionals.
 
+A feature can add further independent optionals per surface as needed — a non-blocking transient confirmation, for example, has its own `toast` property driving `.islandToast(item:)` (see [`IslandToast`](../Packages/Common/Sources/CommonUI/IslandToast/IslandToast.swift)). Same rule: one independent optional per surface, never folded into `destination` or `error`, so a toast and an error can coexist on screen without one silently dismissing the other.
+
 `Error` enum cases get `Identifiable` via `var id: Self { self }` on the enum itself (the cases are already `Hashable`), not a wrapper type:
 
 ```swift
