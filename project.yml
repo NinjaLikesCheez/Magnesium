@@ -16,7 +16,7 @@ packages:
   Deluge:
     # path: ../Deluge-Swift
     url: https://github.com/NinjaLikesCheez/Deluge-Swift
-    from: 2.0.0
+    from: 2.0.1
   QBittorrent:
     # path: ../QBittorrent-Swift
     url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
