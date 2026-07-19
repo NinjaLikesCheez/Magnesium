@@ -1,13 +1,13 @@
 {
-  "originHash" : "c7ae51e4b8bfe6c74d29233d3defa912b26e69cadc812ed20e44bf732a2757ac",
+  "originHash" : "2e5c92c701f2f471fdc2cbe338ff50bba7c7426b2b58009463032f860234fab1",
   "pins" : [
     {
       "identity" : "deluge-swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/NinjaLikesCheez/Deluge-Swift",
       "state" : {
-        "revision" : "ca5f34f7cca76bc9379a36c643d5798e50553b18",
-        "version" : "2.0.0"
+        "revision" : "ca5b47cdc9b1c5f1e97724e034273a7d13edcf8c",
+        "version" : "2.0.1"
       }
     },
     {
