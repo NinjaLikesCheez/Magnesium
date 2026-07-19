@@ -33,6 +33,13 @@ struct TorrentNavigationView: View {
 			.toolbar {
 				selectToolbarItem
 
+				if !editMode.isEditing {
+					topBarTrailingSpacer
+					addTorrentToolbarItem
+				}
+
+				searchToolbarItem
+
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
 						editMode: $editMode,
@@ -69,6 +76,29 @@ struct TorrentNavigationView: View {
 		.navigationSplitViewStyle(.balanced)
 	}
 
+	/// Keeps Select and Add rendering as two distinct glass controls instead of merging into one pill.
+	@ToolbarContentBuilder
+	var topBarTrailingSpacer: some ToolbarContent {
+		#if os(macOS)
+			ToolbarSpacer(.fixed, placement: .primaryAction)
+		#else
+			ToolbarSpacer(.fixed, placement: .topBarTrailing)
+		#endif
+	}
+
+	@ToolbarContentBuilder
+	var addTorrentToolbarItem: some ToolbarContent {
+		#if os(macOS)
+			ToolbarItem(placement: .primaryAction) {
+				AddTorrentButton()
+			}
+		#else
+			ToolbarItem(placement: .topBarTrailing) {
+				AddTorrentButton()
+			}
+		#endif
+	}
+
 	@ToolbarContentBuilder
 	var selectToolbarItem: some ToolbarContent {
 		#if os(macOS)
@@ -91,6 +121,17 @@ struct TorrentNavigationView: View {
 					}
 				}
 			}
+		#endif
+	}
+
+	/// Relocates the system search field to the bottom bar so it no longer collapses `selectToolbarItem`
+	/// (the root cause of #69 was `.searchToolbarBehavior(.minimize)`, not `.searchable` itself).
+	/// Unavailable on tvOS, so `.searchable` falls back to its default placement there.
+	@ToolbarContentBuilder
+	var searchToolbarItem: some ToolbarContent {
+		#if !os(tvOS)
+			DefaultToolbarItem(kind: .search, placement: .bottomBar)
+			ToolbarSpacer(.flexible, placement: .bottomBar)
 		#endif
 	}
 }
