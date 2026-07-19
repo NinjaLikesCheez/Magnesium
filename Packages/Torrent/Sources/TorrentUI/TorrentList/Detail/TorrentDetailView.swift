@@ -38,11 +38,7 @@ struct TorrentDetailView: View {
 		.islandToast(item: $model.toast) { toast in
 			switch toast {
 			case .updateTrackers:
-				IslandToastCard(
-					title: "Trackers updated",
-					subtitle: "Placeholder subtitle",
-					role: .success
-				)
+				IslandToastCard(title: "Trackers updated", role: .success)
 			}
 		}
 		.environment(model)
