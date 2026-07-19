@@ -15,6 +15,7 @@ struct TorrentNavigationView: View {
 	@State private var selections: Set<String> = []
 	@State private var columnVisibility: NavigationSplitViewVisibility = .all
 	@State private var editMode: EditMode = .inactive
+	@State private var isSearching: Bool = false
 
 	var selectedTorrents: Set<StandardTorrent> {
 		Set(torrentManager.filteredTorrents.filter { selections.contains($0.id) })
@@ -33,13 +34,23 @@ struct TorrentNavigationView: View {
 			.toolbar {
 				selectToolbarItem
 
+				#if os(iOS) || os(tvOS) || os(visionOS)
+					if #available(iOS 26.0, tvOS 26.0, visionOS 26.0, *) {
+						ToolbarSpacer(.fixed, placement: .topBarTrailing)
+					}
+				#endif
+
+				addTorrentToolbarItem
+
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
 						editMode: $editMode,
 						selectedTorrents: selectedTorrents
 					)
 				} else {
-					TorrentListStatusToolbar()
+					TorrentListStatusToolbar(
+						isSearching: $isSearching
+					)
 				}
 			}
 	}
@@ -67,6 +78,19 @@ struct TorrentNavigationView: View {
 			}
 		}
 		.navigationSplitViewStyle(.balanced)
+	}
+
+	@ToolbarContentBuilder
+	var addTorrentToolbarItem: some ToolbarContent {
+		#if os(macOS)
+			ToolbarItem(placement: .primaryAction) {
+				AddTorrentButton()
+			}
+		#else
+			ToolbarItem(placement: .topBarTrailing) {
+				AddTorrentButton()
+			}
+		#endif
 	}
 
 	@ToolbarContentBuilder
