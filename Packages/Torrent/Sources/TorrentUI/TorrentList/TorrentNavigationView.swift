@@ -30,6 +30,11 @@ struct TorrentNavigationView: View {
 
 	var contentView: some View {
 		TorrentListView(selections: $selections, editMode: $editMode)
+			// Safe here because search sits in the bottom bar (see `searchToolbarItem`): minimize collapses
+			// search into a trailing button that expands on tap, without touching the top-bar items (#69).
+			#if !os(tvOS)
+				.searchToolbarBehavior(.minimize)
+			#endif
 			.toolbar {
 				selectToolbarItem
 
@@ -125,13 +130,15 @@ struct TorrentNavigationView: View {
 	}
 
 	/// Relocates the system search field to the bottom bar so it no longer collapses `selectToolbarItem`
-	/// (the root cause of #69 was `.searchToolbarBehavior(.minimize)`, not `.searchable` itself).
+	/// (the root cause of #69 was `.searchToolbarBehavior(.minimize)` while search lived in the top bar —
+	/// in the bottom bar, minimize only collapses search itself, see `contentView`).
+	/// The leading flexible spacer pushes the minimized search button to the trailing edge.
 	/// Unavailable on tvOS, so `.searchable` falls back to its default placement there.
 	@ToolbarContentBuilder
 	var searchToolbarItem: some ToolbarContent {
 		#if !os(tvOS)
-			DefaultToolbarItem(kind: .search, placement: .bottomBar)
 			ToolbarSpacer(.flexible, placement: .bottomBar)
+			DefaultToolbarItem(kind: .search, placement: .bottomBar)
 		#endif
 	}
 }
