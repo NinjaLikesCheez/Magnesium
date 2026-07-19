@@ -8,10 +8,6 @@
 import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
-	@Environment(TorrentManager.self) private var torrentManager
-	@Environment(TorrentListView.Model.self) var model
-
-	@State private var isConfirmingDelete = false
 	@Binding var editMode: EditMode
 
 	let selectedTorrents: Set<StandardTorrent>
@@ -20,20 +16,28 @@ struct TorrentListEditingToolbar: ToolbarContent {
 		ToolbarSpacer(.flexible, placement: .bottomBar)
 
 		ToolbarItemGroup(placement: .bottomBar) {
-			playButton
+			TorrentListEditingActions(editMode: $editMode, selectedTorrents: selectedTorrents)
 		}
+	}
+}
 
-		ToolbarItemGroup(placement: .bottomBar) {
-			pauseButton
-		}
+/// The multi-select actions, shared between `TorrentListEditingToolbar` and the floating bar
+/// `TorrentListView` shows while search is active (the expanded search field replaces the whole
+/// bottom bar, which would otherwise make these unreachable mid-search).
+struct TorrentListEditingActions: View {
+	@Environment(TorrentManager.self) private var torrentManager
+	@Environment(TorrentListView.Model.self) var model
 
-		ToolbarItemGroup(placement: .bottomBar) {
-			deleteButton
-		}
+	@State private var isConfirmingDelete = false
+	@Binding var editMode: EditMode
 
-		ToolbarItemGroup(placement: .bottomBar) {
-			moreButton
-		}
+	let selectedTorrents: Set<StandardTorrent>
+
+	var body: some View {
+		playButton
+		pauseButton
+		deleteButton
+		moreButton
 	}
 
 	var playButton: some View {

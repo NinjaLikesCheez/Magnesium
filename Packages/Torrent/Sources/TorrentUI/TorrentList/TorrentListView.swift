@@ -8,6 +8,7 @@ public struct TorrentListView: View {
 	@Environment(\.userInterfaceIdiom) var userInterfaceIdiom
 
 	@State private var editingSelections: Set<String> = []
+	@State private var isSearchActive = false
 
 	@Binding var selections: Set<String>
 	@Binding var editMode: EditMode
@@ -24,7 +25,10 @@ public struct TorrentListView: View {
 			.environment(\.editMode, $editMode)
 			.refreshable { refresh() }
 			.onAppear { refresh() }
+			// Must sit inside the searchable scope, so before .searchable in the chain.
+			.background { SearchActivityReader(isSearchActive: $isSearchActive) }
 			.searchable(text: $manager.searchQuery)
+			.safeAreaBar(edge: .bottom) { editingActionsBar }
 			.navigationTitle(session.server?.name ?? "Torrents")
 			.overlay {
 				if manager.filteredTorrents.isEmpty && !manager.searchQuery.isEmpty {
@@ -62,6 +66,23 @@ public struct TorrentListView: View {
 		}
 	}
 
+	/// Keeps the multi-select actions reachable while searching: the expanded search field takes over
+	/// the entire bottom bar, hiding TorrentListEditingToolbar, so float the same actions above it.
+	/// The searchQuery check covers the field staying expanded with committed text after focus is lost.
+	@ViewBuilder
+	var editingActionsBar: some View {
+		if editMode.isEditing && (isSearchActive || !manager.searchQuery.isEmpty) {
+			HStack(spacing: 28) {
+				TorrentListEditingActions(editMode: $editMode, selectedTorrents: selectedTorrents)
+			}
+			.padding(.horizontal, 24)
+			.padding(.vertical, 14)
+			.glassEffect()
+			// Match the monochrome icons of the bottom-bar toolbar these actions mirror.
+			.tint(.primary)
+		}
+	}
+
 	func refresh() {
 		Task {
 			do throws(TorrentClientError) {
@@ -70,6 +91,21 @@ public struct TorrentListView: View {
 				model.error = .clientError(error)
 			}
 		}
+	}
+}
+
+/// Mirrors the `isSearching` environment value (only readable inside a searchable scope) out to a
+/// binding, so the view that owns `.searchable` can react to search becoming active.
+private struct SearchActivityReader: View {
+	@Environment(\.isSearching) private var isSearching
+
+	@Binding var isSearchActive: Bool
+
+	var body: some View {
+		Color.clear
+			.onChange(of: isSearching, initial: true) { _, newValue in
+				isSearchActive = newValue
+			}
 	}
 }
 
