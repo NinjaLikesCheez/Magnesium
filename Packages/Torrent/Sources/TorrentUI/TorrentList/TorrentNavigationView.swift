@@ -43,8 +43,6 @@ struct TorrentNavigationView: View {
 					addTorrentToolbarItem
 				}
 
-				searchToolbarItem
-
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
 						editMode: $editMode,
@@ -53,6 +51,8 @@ struct TorrentNavigationView: View {
 				} else {
 					TorrentListStatusToolbar()
 				}
+
+				searchToolbarItem
 			}
 	}
 
@@ -132,12 +132,13 @@ struct TorrentNavigationView: View {
 	/// Relocates the system search field to the bottom bar so it no longer collapses `selectToolbarItem`
 	/// (the root cause of #69 was `.searchToolbarBehavior(.minimize)` while search lived in the top bar —
 	/// in the bottom bar, minimize only collapses search itself, see `contentView`).
-	/// The leading flexible spacer pushes the minimized search button to the trailing edge.
+	/// Declared last in the bottom bar so the minimized search button sits at the trailing edge; the fixed
+	/// spacer keeps it in its own glass container instead of merging with the preceding toolbar's pill.
 	/// Unavailable on tvOS, so `.searchable` falls back to its default placement there.
 	@ToolbarContentBuilder
 	var searchToolbarItem: some ToolbarContent {
 		#if !os(tvOS)
-			ToolbarSpacer(.flexible, placement: .bottomBar)
+			ToolbarSpacer(.fixed, placement: .bottomBar)
 			DefaultToolbarItem(kind: .search, placement: .bottomBar)
 		#endif
 	}
