@@ -99,9 +99,11 @@ struct AddTorrentButton: View {
 		switch result {
 		case .success(let urls):
 			Task {
+				var failureMessages: [String] = []
+
 				for url in urls {
 					guard url.startAccessingSecurityScopedResource() else {
-						model.error = .fileImportError(.init("Couldn't access \(url.lastPathComponent)"))
+						failureMessages.append("Couldn't access \(url.lastPathComponent)")
 						continue
 					}
 					defer { url.stopAccessingSecurityScopedResource() }
@@ -109,8 +111,12 @@ struct AddTorrentButton: View {
 					do throws(TorrentClientError) {
 						try await torrentManager.addLink(url.path())
 					} catch {
-						model.error = .clientError(error)
+						failureMessages.append("\(url.lastPathComponent): \(error.localizedDescription)")
 					}
+				}
+
+				if !failureMessages.isEmpty {
+					model.error = .fileImportError(.init(failureMessages.joined(separator: "\n")))
 				}
 			}
 		case .failure(let error):

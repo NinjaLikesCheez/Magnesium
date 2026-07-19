@@ -38,13 +38,14 @@ struct TorrentNavigationView: View {
 					addTorrentToolbarItem
 				}
 
+				searchToolbarItem
+
 				if editMode.isEditing {
 					TorrentListEditingToolbar(
 						editMode: $editMode,
 						selectedTorrents: selectedTorrents
 					)
 				} else {
-					searchToolbarItem
 					TorrentListStatusToolbar()
 				}
 			}
