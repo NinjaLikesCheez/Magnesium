@@ -19,6 +19,10 @@ struct TorrentListStatusToolbar: ToolbarContent {
 				.frame(minWidth: 100)
 		}
 
+		// Pins the status text to the leading edge and the filter menu (plus the search button declared
+		// after this toolbar, see TorrentNavigationView.searchToolbarItem) to the trailing edge.
+		ToolbarSpacer(.flexible, placement: .bottomBar)
+
 		ToolbarItemGroup(placement: .bottomBar) {
 			TorrentFilterMenu(labels: torrentManager.labels)
 				.environment(preferences)
