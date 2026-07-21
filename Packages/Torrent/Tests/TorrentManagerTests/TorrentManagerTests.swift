@@ -17,6 +17,7 @@ class TorrentManagerTests {
 	private let mockPreferences: TorrentPreferences
 	private let mockSession: MockTorrentSession
 	private let mockClient: MockTorrentClient
+	private let fakeScheduler: FakeTorrentScheduler
 	private let torrentManager: TorrentManager
 
 	init() {
@@ -24,14 +25,12 @@ class TorrentManagerTests {
 		mockPreferences = TorrentPreferences(userDefaults: testDefaults, keychain: InMemoryKeychain())
 		mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
 		mockClient = MockTorrentClient()
+		fakeScheduler = FakeTorrentScheduler()
 
 		// Set up mock session with mock client
 		mockSession.setMockClient(mockClient)
 
-		// Long interval to avoid the auto-refresh timer firing mid-test and skewing refreshCallCount assertions
-		mockPreferences.autoRefreshInterval = 10.0
-
-		torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
+		torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences, scheduling: fakeScheduler)
 	}
 
 	deinit {
@@ -46,12 +45,6 @@ class TorrentManagerTests {
 		#expect(torrentManager.torrents.isEmpty)
 		#expect(torrentManager.labels.isEmpty)
 		#expect(torrentManager.searchQuery.isEmpty)
-	}
-
-	@Test("TorrentManager initializes with timer based on preferences")
-	func torrentManagerInitializesWithTimerBasedOnPreferences() {
-		// Verify that preferences auto refresh interval is used
-		#expect(mockPreferences.autoRefreshInterval == 10.0)
 	}
 
 	// MARK: - Torrent Refresh Tests
