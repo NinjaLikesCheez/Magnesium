@@ -22,7 +22,7 @@ public class TorrentModule: MagnesiumFeatureModule, Equatable, Hashable {
 
 	public let name: String = "Torrent"
 
-	public var icon: Image { Image(systemName: "square.and.arrow.down") }
+	public var iconSystemName: String { "square.and.arrow.down" }
 
 	public var entry: TorrentsListFlow {
 		.init(session: session, preferences: preferences, manager: manager)

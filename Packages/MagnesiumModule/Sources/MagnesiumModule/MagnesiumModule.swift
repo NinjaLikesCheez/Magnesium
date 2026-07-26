@@ -9,7 +9,7 @@ public protocol MagnesiumFeatureModule<EntryPoint, SettingsFlow, OnboardingFlow>
 	associatedtype OnboardingFlow: View
 
 	var name: String { get }
-	var icon: Image { get }
+	var iconSystemName: String { get }
 
 	var isEnabled: Bool { get }
 

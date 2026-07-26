@@ -6,6 +6,7 @@
 //
 import MagnesiumModule
 import Observation
+import SonarrUI
 import TorrentUI
 
 enum AppState: Sendable {
@@ -21,10 +22,13 @@ class AppModules {
 	@MainActor
 	enum ModuleType: Hashable, Equatable, @MainActor Identifiable {
 		case torrent(TorrentModule)
+		case sonarr(SonarrModule)
 
 		var id: String {
 			switch self {
 			case let .torrent(module):
+				module.name
+			case let .sonarr(module):
 				module.name
 			}
 		}
@@ -32,6 +36,8 @@ class AppModules {
 		var rawValue: any MagnesiumFeatureModule {
 			switch self {
 			case let .torrent(module):
+				module
+			case let .sonarr(module):
 				module
 			}
 		}
@@ -42,9 +48,10 @@ class AppModules {
 	let modules: [ModuleType]
 
 	let torrent: TorrentModule = .init()
+	let sonarr: SonarrModule = .init()
 
 	private init() {
-		modules = [.torrent(torrent)]
+		modules = [.torrent(torrent), .sonarr(sonarr)]
 	}
 }
 

@@ -1,5 +1,6 @@
 import Common
 import CommonUI
+import SonarrUI
 import SwiftUI
 import SwiftUINavigation
 import TorrentUI
@@ -22,6 +23,8 @@ public struct SettingsListView: View {
 		.navigationDestination(item: $model.destination.moduleSettings) { moduleType in
 			switch moduleType {
 			case let .torrent(module):
+				module.settings
+			case let .sonarr(module):
 				module.settings
 			}
 		}

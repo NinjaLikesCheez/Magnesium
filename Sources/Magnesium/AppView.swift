@@ -7,6 +7,8 @@
 
 import Common
 import Logging
+import MagnesiumModule
+import SonarrUI
 import SwiftUI
 import SwiftUINavigation
 import TorrentUI
@@ -14,70 +16,76 @@ import TorrentUI
 struct AppView: View {
 	@Environment(AppModules.self) var modules
 
-	@State private var appState = AppState.resuming
-	@State private var appPreferences = AppPreferences()
 	@State private var model = Model()
 
 	var body: some View {
 		@Bindable var model = model
 
-		Group {
-			switch appState {
-			case .unboarded:
-				NavigationStack {
-					modules
-						.torrent
-						.onboarding
-				}
-			case .onboarded:
-				NavigationStack {
-					modules
-						.torrent
-						.entry
-						.toolbar {
-							#if os(macOS)
-								ToolbarItem(placement: .primaryAction) {
-									Button {
-										model.sheet = .settings
-									} label: {
-										Image(systemName: "gear")
+		TabView {
+			ForEach(modules.modules) { moduleType in
+				Tab(moduleType.rawValue.name, systemImage: moduleType.rawValue.iconSystemName) {
+					NavigationStack {
+						ModuleTabView(moduleType: moduleType)
+							.toolbar {
+								#if os(macOS)
+									ToolbarItem(placement: .primaryAction) {
+										Button {
+											model.sheet = .settings
+										} label: {
+											Image(systemName: "gear")
+										}
 									}
-								}
-							#else
-								ToolbarItem(placement: .topBarLeading) {
-									Button {
-										model.sheet = .settings
-									} label: {
-										Image(systemName: "gear")
+								#else
+									ToolbarItem(placement: .topBarLeading) {
+										Button {
+											model.sheet = .settings
+										} label: {
+											Image(systemName: "gear")
+										}
 									}
-								}
-							#endif
-						}
-						.sheet(item: $model.sheet) { sheet in
-							switch sheet {
-							case .settings:
-								SettingsFlow()
-									.environment(modules)
+								#endif
 							}
-						}
+							.sheet(item: $model.sheet) { sheet in
+								switch sheet {
+								case .settings:
+									SettingsFlow()
+										.environment(modules)
+								}
+							}
+					}
 				}
-			case .resuming:
-				ProgressView()
-					.containerRelativeFrame([.horizontal, .vertical])
-			case .error(let error):
-				ContentUnavailableView(
-					"Error: \(error.localizedDescription)",
-					image: "exclamationmark.triangle"
-				)
 			}
 		}
-		.task {
-			appState = modules.torrent.isEnabled ? .onboarded : .unboarded
-			//			appState = appPreferences.onboarded ? .onboarded : .unboarded
+	}
+}
+
+/// Shows a single feature module's onboarding flow or entry point, depending on whether it's
+/// currently configured (`isEnabled`). Each tab tracks this independently — unlike the old
+/// single-module app, one feature being unconfigured no longer blocks the others.
+private struct ModuleTabView: View {
+	let moduleType: AppModules.ModuleType
+
+	@State private var isEnabled = false
+
+	var body: some View {
+		Group {
+			switch moduleType {
+			case let .torrent(module):
+				if isEnabled {
+					module.entry
+				} else {
+					module.onboarding
+				}
+			case let .sonarr(module):
+				if isEnabled {
+					module.entry
+				} else {
+					module.onboarding
+				}
+			}
 		}
-		.onChange(of: modules.torrent.isEnabled) { _, newValue in
-			appState = newValue ? .onboarded : .unboarded
-		}
+		.task { isEnabled = moduleType.rawValue.isEnabled }
+		.onChange(of: moduleType.rawValue.isEnabled) { _, newValue in isEnabled = newValue }
 	}
 }
 

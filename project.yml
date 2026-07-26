@@ -8,6 +8,8 @@ packages:
   #### Local Packages ####
   TorrentUI:
     path: Packages/Torrent
+  SonarrUI:
+    path: Packages/Sonarr
   Common:
     path: Packages/Common
   MagnesiumModule:
@@ -20,6 +22,10 @@ packages:
   QBittorrent:
     # path: ../QBittorrent-Swift
     url: https://github.com/NinjaLikesCheez/QBittorrent-Swift
+    branch: main
+  Sonarr:
+    # path: ../sonarr-swift
+    url: https://github.com/NinjaLikesCheez/sonarr-swift
     branch: main
   swift-navigation:
     url: https://github.com/pointfreeco/swift-navigation
@@ -60,9 +66,11 @@ targets:
           - Common
           - CommonUI
       - package: TorrentUI
+      - package: SonarrUI
       - package: MagnesiumModule
       - package: Deluge
       - package: QBittorrent
+      - package: Sonarr
       - package: Logging
       - package: ObservableDefaults
       - package: swift-navigation
