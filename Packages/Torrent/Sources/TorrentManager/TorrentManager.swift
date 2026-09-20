@@ -97,6 +97,7 @@ public final class TorrentManager {
 	}
 
 	public func refresh() async throws(TorrentClientError) {
+		guard session.server != nil else { return }
 		let (torrents, labels) = try await session.client.refresh()
 
 		// We have to do 'delta' style updates so the view bindings work properly.
