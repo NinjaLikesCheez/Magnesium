@@ -842,4 +842,26 @@ struct ErrorHandlingTests {
 		// Should complete without resource exhaustion
 		#expect(torrentManager.torrents.count == 1)
 	}
+
+	// MARK: - Null Client Guard Tests
+
+	@Test("TorrentManager.refresh does not throw when no server is configured")
+	func refreshWithNoServerConfiguredDoesNotThrow() async throws {
+		// Arrange: session with no server set (uses NullTorrentClient by default)
+		let mockPreferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-null-client-\(UUID().uuidString)")!,
+			keychain: InMemoryKeychain())
+		let mockSession = MockTorrentSession(TorrentPreferences(keychain: InMemoryKeychain()))
+		// MockTorrentSession starts with no server and a NullTorrentClient
+		mockPreferences.autoRefreshInterval = 0  // Disable timer; test refresh() directly
+
+		let torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
+
+		// Act & Assert: calling refresh() must not throw even though client is NullTorrentClient
+		try await torrentManager.refresh()
+
+		// State should remain empty — no client was ever contacted
+		#expect(torrentManager.torrents.isEmpty)
+		#expect(torrentManager.labels.isEmpty)
+	}
 }
