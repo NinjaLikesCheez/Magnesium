@@ -2,3 +2,9 @@
 // and config/Magnesium-Release.xcconfig via #include. Config-specific overrides go in those files instead.
 
 INFOPLIST_KEY_CFBundleDisplayName = Magnesium
+
+// Generate dSYMs for every configuration so the Sentry upload script can symbolicate Debug and Release.
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+
+// Required for the Sentry dSYM upload Run Script (network + reading dSYM outputs).
+ENABLE_USER_SCRIPT_SANDBOXING = NO

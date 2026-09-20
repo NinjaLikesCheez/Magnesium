@@ -1,0 +1,6 @@
+# Project defaults for sentry-cli (org/project are not secrets).
+# Auth: set SENTRY_AUTH_TOKEN in your environment, or add a token under
+# [auth] in ~/.sentryclirc (preferred) — never commit auth tokens.
+[defaults]
+org=ninjalikescheez
+project=magnesium

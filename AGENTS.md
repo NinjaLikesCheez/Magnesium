@@ -10,10 +10,21 @@ The codebase is mid-migration from a monolithic app target into standalone Swift
 
 ## Common Development Commands
 
+### Install tools
+```bash
+# One-shot bootstrap: installs `just` (if needed) then Brewfile deps
+# (xcodegen, swift-format, swiftlint, sentry-cli). See Brewfile / justfile.
+./bootstrap.sh
+
+# Or, once just is installed:
+just install-tools
+```
+
 ### Project Generation
 ```bash
 # Regenerate Magnesium.xcodeproj from project.yml — required after changing dependencies/targets
-xcodegen generate --spec project.yml
+just generate
+# (or: xcodegen generate --spec project.yml)
 ```
 
 ### Building
@@ -54,12 +65,22 @@ cd Packages/Common && swift test
 
 ### Code Quality
 ```bash
+just lint
+just format
+
+# Or invoke the tools directly:
 # Format (120-char lines, tab indentation — see .swift-format)
 swift-format format --in-place Sources/ Tests/ Packages/*/Sources Packages/*/Tests
 
 # Lint (trailing_comma rule disabled — see .swiftlint.yml)
 swiftlint
 ```
+
+### Sentry dSYMs
+Every Magnesium app build runs `scripts/upload-dsyms.sh` (Xcode post-build phase) to upload
+dSYMs for stack trace symbolication. Set `SENTRY_AUTH_TOKEN` (or `[auth] token=` in
+`~/.sentryclirc`) so uploads succeed; without auth the script skips with a warning.
+Org/project defaults are in `.sentryclirc`. Manual upload: `just upload-dsyms <path>`.
 
 ## Architecture
 
