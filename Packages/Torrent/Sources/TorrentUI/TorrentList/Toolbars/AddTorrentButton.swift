@@ -70,7 +70,7 @@ struct AddTorrentButton: View {
 				do throws(TorrentClientError) {
 					try await torrentManager.addLink(linkInput)
 				} catch {
-					model.present(error, operation: "add_link")
+					model.present(error, operation: .addLink)
 				}
 			}
 		}
@@ -91,7 +91,7 @@ struct AddTorrentButton: View {
 			do throws(TorrentClientError) {
 				try await torrentManager.addLink(string)
 			} catch {
-				model.present(error, operation: "add_magnet")
+				model.present(error, operation: .addMagnet)
 			}
 		}
 	}

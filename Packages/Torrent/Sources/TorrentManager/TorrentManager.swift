@@ -39,7 +39,7 @@ public final class TorrentManager {
 						do {
 							try await self.refresh()
 						} catch {
-							ErrorReporting.capture(error, feature: "client", operation: "auto_refresh")
+							ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
 						}
 					}
 				})
@@ -61,7 +61,7 @@ public final class TorrentManager {
 								do {
 									try await self.refresh()
 								} catch {
-									ErrorReporting.capture(error, feature: "client", operation: "auto_refresh")
+									ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
 								}
 							}
 						})

@@ -89,7 +89,7 @@ public struct TorrentListView: View {
 			do throws(TorrentClientError) {
 				try await manager.refresh()
 			} catch {
-				model.present(error, operation: "refresh")
+				model.present(error, operation: .refresh)
 			}
 		}
 	}
@@ -137,8 +137,8 @@ extension TorrentListView {
 		public init() {}
 
 		/// Records a client failure for Sentry, then presents it in the error panel.
-		public func present(_ error: TorrentClientError, operation: String) {
-			ErrorReporting.capture(error, feature: "client", operation: operation)
+		public func present(_ error: TorrentClientError, operation: ErrorReporting.Operation) {
+			ErrorReporting.capture(error, feature: .client, operation: operation)
 			self.error = .clientError(error)
 		}
 
@@ -151,8 +151,8 @@ extension TorrentListView {
 					code: 1,
 					userInfo: [NSLocalizedDescriptionKey: message]
 				),
-				feature: "file_import",
-				operation: "import"
+				feature: .fileImport,
+				operation: .`import`
 			)
 			self.error = .fileImportError(error)
 		}

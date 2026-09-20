@@ -66,7 +66,7 @@ extension TorrentSession {
 			let decoder = JSONDecoder()
 			guard let keychainData = server.keychainData else {
 				let error = Error.missingKeychainData(server: server)
-				ErrorReporting.capture(error, feature: "keychain", operation: "missing_data")
+				ErrorReporting.capture(error, feature: .keychain, operation: .missingData)
 				throw error
 			}
 
@@ -81,14 +81,14 @@ extension TorrentSession {
 
 				return DelugeClient(session: .init(client: client))
 			} catch let error as DecodingError {
-				ErrorReporting.capture(error, feature: "decoding", operation: "server_settings")
+				ErrorReporting.capture(error, feature: .decoding, operation: .serverSettings)
 				throw Error.decodingFailed(error.localizedDescription)
 			} catch {
 				fatalError("Unhandled Error: \(error)")
 			}
 		case .qbittorrent:
 			let error = Error.notImplemented
-			ErrorReporting.capture(error, feature: "session", operation: "qbittorrent_client")
+			ErrorReporting.capture(error, feature: .session, operation: .qbittorrentClient)
 			throw error
 		}
 	}

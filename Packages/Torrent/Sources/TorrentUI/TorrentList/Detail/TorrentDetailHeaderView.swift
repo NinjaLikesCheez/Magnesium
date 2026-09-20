@@ -53,7 +53,7 @@ extension TorrentDetailView {
 						torrent.isActive
 							? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 					} catch {
-						model.present(error, operation: torrent.isActive ? "pause" : "resume")
+						model.present(error, operation: torrent.isActive ? .pause : .resume)
 					}
 				}
 			} label: {
@@ -83,7 +83,7 @@ extension TorrentDetailView {
 							try await torrentManager.delete([torrent], removeData: false)
 							dismiss()
 						} catch {
-							model.present(error, operation: "delete")
+							model.present(error, operation: .delete)
 						}
 					}
 				}
@@ -94,7 +94,7 @@ extension TorrentDetailView {
 							try await torrentManager.delete([torrent], removeData: true)
 							dismiss()
 						} catch {
-							model.present(error, operation: "delete_with_data")
+							model.present(error, operation: .deleteWithData)
 						}
 					}
 				}
@@ -111,7 +111,7 @@ extension TorrentDetailView {
 						let paths = try await torrentManager.paths(for: torrent)
 						UIPasteboard.general.string = torrent.downloadPath + "/" + paths[0]
 					} catch {
-						model.present(error, operation: "copy_path")
+						model.present(error, operation: .copyPath)
 					}
 				}
 			} label: {

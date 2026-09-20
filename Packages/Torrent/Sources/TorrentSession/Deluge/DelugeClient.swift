@@ -22,7 +22,7 @@ final class DelugeClient: TorrentClient {
 				return (torrents, labels)
 			}
 		} catch {
-			throw reportDelugeFailure(error, operation: "refresh")
+			throw reportDelugeFailure(error, operation: .refresh)
 		}
 	}
 
@@ -40,7 +40,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			return torrentFiles(in: try await client.request(.torrentItems(hash: torrent.hash)))
 		} catch {
-			throw reportDelugeFailure(error, operation: "refresh_files")
+			throw reportDelugeFailure(error, operation: .refreshFiles)
 		}
 	}
 
@@ -56,7 +56,7 @@ final class DelugeClient: TorrentClient {
 				try await client.request(.add(fileURL: url))
 			}
 		} catch {
-			throw reportDelugeFailure(error, operation: "add_link")
+			throw reportDelugeFailure(error, operation: .addLink)
 		}
 	}
 
@@ -77,7 +77,7 @@ final class DelugeClient: TorrentClient {
 			let items = try await client.request(.torrentItems(hash: torrent.hash))
 			return torrentPaths(in: items)
 		} catch {
-			throw reportDelugeFailure(error, operation: "paths")
+			throw reportDelugeFailure(error, operation: .paths)
 		}
 	}
 
@@ -85,7 +85,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.pause(hashes: torrents.map(\.hash)))
 		} catch {
-			throw reportDelugeFailure(error, operation: "pause")
+			throw reportDelugeFailure(error, operation: .pause)
 		}
 	}
 
@@ -93,7 +93,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.resume(hashes: torrents.map(\.hash)))
 		} catch {
-			throw reportDelugeFailure(error, operation: "resume")
+			throw reportDelugeFailure(error, operation: .resume)
 		}
 	}
 
@@ -101,7 +101,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.remove(hashes: torrents.map(\.hash), removeData: removeData))
 		} catch {
-			throw reportDelugeFailure(error, operation: "remove")
+			throw reportDelugeFailure(error, operation: .remove)
 		}
 	}
 
@@ -109,7 +109,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.recheck(hashes: torrents.map(\.hash)))
 		} catch {
-			throw reportDelugeFailure(error, operation: "verify")
+			throw reportDelugeFailure(error, operation: .verify)
 		}
 	}
 
@@ -118,7 +118,7 @@ final class DelugeClient: TorrentClient {
 			do throws(Deluge.Error) {
 				try await self.client.request(.setLabel(hash: torrent.hash, label: label.name))
 			} catch {
-				throw reportDelugeFailure(error, operation: "set_label")
+				throw reportDelugeFailure(error, operation: .setLabel)
 			}
 		}
 	}
@@ -127,7 +127,7 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.reannounce(hashes: torrents.map(\.hash)))
 		} catch {
-			throw reportDelugeFailure(error, operation: "update_trackers")
+			throw reportDelugeFailure(error, operation: .updateTrackers)
 		}
 	}
 
@@ -135,19 +135,22 @@ final class DelugeClient: TorrentClient {
 		do {
 			try await client.request(.move(hashes: torrents.map(\.hash), path: path))
 		} catch {
-			throw reportDelugeFailure(error, operation: "move_download_folder")
+			throw reportDelugeFailure(error, operation: .moveDownloadFolder)
 		}
 	}
 
 	/// Captures structural Deluge failures (decode/encode/auth) before wrapping for the caller.
-	private func reportDelugeFailure(_ error: Deluge.Error, operation: String) -> TorrentClientError {
+	private func reportDelugeFailure(
+		_ error: Deluge.Error,
+		operation: ErrorReporting.Operation
+	) -> TorrentClientError {
 		switch error {
 		case .decoding:
-			ErrorReporting.capture(error, feature: "decoding", operation: operation)
+			ErrorReporting.capture(error, feature: .decoding, operation: operation)
 		case .encoding:
-			ErrorReporting.capture(error, feature: "encoding", operation: operation)
+			ErrorReporting.capture(error, feature: .encoding, operation: operation)
 		case .response(.unauthenticated):
-			ErrorReporting.capture(error, feature: "login", operation: operation)
+			ErrorReporting.capture(error, feature: .login, operation: operation)
 		default:
 			break
 		}

@@ -46,9 +46,9 @@ struct MagnesiumApp: App {
 
 		ErrorReporting.handler = { error, context in
 			SentrySDK.capture(error: error) { scope in
-				scope.setTag(value: context.feature, key: "feature")
+				scope.setTag(value: context.feature.rawValue, key: "feature")
 				if let operation = context.operation {
-					scope.setTag(value: operation, key: "operation")
+					scope.setTag(value: operation.rawValue, key: "operation")
 				}
 			}
 		}

@@ -115,16 +115,16 @@ struct TorrentListEditingActions: View {
 				print("TODO")
 			}
 		} catch {
-			let operation: String
+			let operation: ErrorReporting.Operation
 			switch action {
 			case .resume:
-				operation = "resume"
+				operation = .resume
 			case .pause:
-				operation = "pause"
+				operation = .pause
 			case .delete:
-				operation = "delete"
+				operation = .delete
 			case .more:
-				operation = "more"
+				operation = .more
 			}
 			model.present(error, operation: operation)
 		}

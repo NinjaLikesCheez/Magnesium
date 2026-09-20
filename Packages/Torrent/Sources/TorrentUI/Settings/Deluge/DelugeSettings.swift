@@ -67,7 +67,7 @@ class DelugeSettings {
 			}
 		} catch {
 			let settingsError = error.intoServerSettingsError()
-			ErrorReporting.capture(settingsError, feature: "login", operation: "authenticate")
+			ErrorReporting.capture(settingsError, feature: .login, operation: .authenticate)
 			throw settingsError
 		}
 
@@ -85,7 +85,7 @@ class DelugeSettings {
 			data = try encoder.encode(serverSettings)
 			keychainData = try encoder.encode(keychain)
 		} catch {
-			ErrorReporting.capture(error, feature: "encoding", operation: "server_settings")
+			ErrorReporting.capture(error, feature: .encoding, operation: .serverSettings)
 			throw .invalidState(message: error.localizedDescription)
 		}
 

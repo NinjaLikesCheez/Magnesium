@@ -37,7 +37,7 @@ struct TorrentFilesSection: View {
 				do throws(TorrentClientError) {
 					files = try await manager.refreshFiles(for: torrent)
 				} catch {
-					model.present(error, operation: "refresh_files")
+					model.present(error, operation: .refreshFiles)
 				}
 			}
 		}

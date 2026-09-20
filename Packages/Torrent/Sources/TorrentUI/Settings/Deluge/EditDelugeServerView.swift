@@ -85,7 +85,7 @@ struct EditDelugeServerView: View {
 		} catch let error as TorrentSession.Error {
 			self.error = .session(error)
 		} catch {
-			ErrorReporting.capture(error, feature: "client", operation: "edit_server")
+			ErrorReporting.capture(error, feature: .client, operation: .editServer)
 			fatalError("Unhandled error: \(error)")
 		}
 	}

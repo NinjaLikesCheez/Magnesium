@@ -50,7 +50,7 @@ public struct TorrentSettingsListView: View {
 				servers = try preferences.getServers()
 				selectedRefreshInterval = preferences.autoRefreshInterval
 			} catch {
-				ErrorReporting.capture(error, feature: "preferences", operation: "load_servers")
+				ErrorReporting.capture(error, feature: .preferences, operation: .loadServers)
 				model.error = .preferences(error)
 			}
 		}

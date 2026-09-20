@@ -56,7 +56,7 @@ struct AddQBittorrentServerView: View {
 					try session.setServer(server)
 					dismiss()
 				} catch let error as ServerSettingsError {
-					ErrorReporting.capture(error, feature: "login", operation: "add_qbittorrent_server")
+					ErrorReporting.capture(error, feature: .login, operation: .addQBittorrentServer)
 					switch error {
 					case .invalidState(let message):
 						errorMessage = message
@@ -74,7 +74,7 @@ struct AddQBittorrentServerView: View {
 						errorMessage = "Unknown error occurred: \(message)"
 					}
 				} catch let error as TorrentSession.Error {
-					ErrorReporting.capture(error, feature: "session", operation: "add_qbittorrent_server")
+					ErrorReporting.capture(error, feature: .session, operation: .addQBittorrentServer)
 					switch error {
 					case .missingKeychainData:
 						errorMessage = "Missing keychain data. Please try again."
@@ -86,7 +86,7 @@ struct AddQBittorrentServerView: View {
 					}
 					showingError = true
 				} catch {
-					ErrorReporting.capture(error, feature: "client", operation: "add_qbittorrent_server")
+					ErrorReporting.capture(error, feature: .client, operation: .addQBittorrentServer)
 					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
 					showingError = true
 				}
