@@ -1,7 +1,7 @@
 import Common
 import Logging
-
-import SentrySwift
+import Sentry
+import SentrySwiftUI
 import SwiftUI
 import TorrentUI
 
@@ -42,6 +42,15 @@ struct MagnesiumApp: App {
 					config.useShakeGesture = true
 				}
 			#endif
+		}
+
+		ErrorReporting.handler = { error, context in
+			SentrySDK.capture(error: error) { scope in
+				scope.setTag(value: context.feature, key: "feature")
+				if let operation = context.operation {
+					scope.setTag(value: operation, key: "operation")
+				}
+			}
 		}
 
 		LoggingSystem.bootstrap { label in

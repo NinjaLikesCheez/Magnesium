@@ -5,6 +5,7 @@
 //  Created by ninji on 09/04/2025.
 //
 
+import Common
 import SwiftUI
 
 struct TorrentListEditingToolbar: ToolbarContent {
@@ -114,7 +115,18 @@ struct TorrentListEditingActions: View {
 				print("TODO")
 			}
 		} catch {
-			model.error = .clientError(error)
+			let operation: String
+			switch action {
+			case .resume:
+				operation = "resume"
+			case .pause:
+				operation = "pause"
+			case .delete:
+				operation = "delete"
+			case .more:
+				operation = "more"
+			}
+			model.present(error, operation: operation)
 		}
 	}
 }

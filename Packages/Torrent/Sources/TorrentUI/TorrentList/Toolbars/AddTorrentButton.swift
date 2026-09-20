@@ -5,6 +5,7 @@
 //  Created by ninji on 09/04/2025.
 //
 
+import Common
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -69,7 +70,7 @@ struct AddTorrentButton: View {
 				do throws(TorrentClientError) {
 					try await torrentManager.addLink(linkInput)
 				} catch {
-					model.error = .clientError(error)
+					model.present(error, operation: "add_link")
 				}
 			}
 		}
@@ -90,7 +91,7 @@ struct AddTorrentButton: View {
 			do throws(TorrentClientError) {
 				try await torrentManager.addLink(string)
 			} catch {
-				model.error = .clientError(error)
+				model.present(error, operation: "add_magnet")
 			}
 		}
 	}
@@ -116,11 +117,11 @@ struct AddTorrentButton: View {
 				}
 
 				if !failureMessages.isEmpty {
-					model.error = .fileImportError(.init(failureMessages.joined(separator: "\n")))
+					model.presentFileImport(failureMessages.joined(separator: "\n"))
 				}
 			}
 		case .failure(let error):
-			model.error = .fileImportError(.init(error.localizedDescription))
+			model.presentFileImport(error.localizedDescription)
 		}
 	}
 }

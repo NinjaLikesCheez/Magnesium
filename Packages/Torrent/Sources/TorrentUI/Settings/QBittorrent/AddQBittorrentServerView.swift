@@ -5,6 +5,7 @@
 //  Created by ninji on 11/04/2025.
 //
 
+import Common
 import SwiftUI
 // TODO: this needs to be migrated to new navigation or ripped out
 
@@ -55,6 +56,7 @@ struct AddQBittorrentServerView: View {
 					try session.setServer(server)
 					dismiss()
 				} catch let error as ServerSettingsError {
+					ErrorReporting.capture(error, feature: "login", operation: "add_qbittorrent_server")
 					switch error {
 					case .invalidState(let message):
 						errorMessage = message
@@ -72,6 +74,7 @@ struct AddQBittorrentServerView: View {
 						errorMessage = "Unknown error occurred: \(message)"
 					}
 				} catch let error as TorrentSession.Error {
+					ErrorReporting.capture(error, feature: "session", operation: "add_qbittorrent_server")
 					switch error {
 					case .missingKeychainData:
 						errorMessage = "Missing keychain data. Please try again."
@@ -83,6 +86,7 @@ struct AddQBittorrentServerView: View {
 					}
 					showingError = true
 				} catch {
+					ErrorReporting.capture(error, feature: "client", operation: "add_qbittorrent_server")
 					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
 					showingError = true
 				}

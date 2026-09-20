@@ -1,3 +1,4 @@
+import Common
 import CommonUI
 import SwiftUI
 import SwiftUINavigation
@@ -97,7 +98,7 @@ struct TorrentDetailView: View {
 					model.toast = .updateTrackers
 				}
 			} catch {
-				model.error = .clientError(error)
+				model.present(error, operation: action == .verify ? "verify" : "update_trackers")
 			}
 		}
 	}
@@ -112,6 +113,12 @@ extension TorrentDetailView {
 		public var toast: Toast?
 
 		public init() {}
+
+		/// Records a client failure for Sentry, then presents it in the error panel.
+		public func present(_ error: TorrentClientError, operation: String) {
+			ErrorReporting.capture(error, feature: "client", operation: operation)
+			self.error = .clientError(error)
+		}
 
 		/// Stack-navigation targets for the TorrentDetail screen. Currently a leaf with nothing to
 		/// push, but kept alongside `Error` for consistency with `TorrentListModel`'s shape.

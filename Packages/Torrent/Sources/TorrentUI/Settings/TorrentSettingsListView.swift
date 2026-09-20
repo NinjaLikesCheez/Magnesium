@@ -1,3 +1,4 @@
+import Common
 import CommonUI
 import SwiftUI
 import SwiftUINavigation
@@ -49,6 +50,7 @@ public struct TorrentSettingsListView: View {
 				servers = try preferences.getServers()
 				selectedRefreshInterval = preferences.autoRefreshInterval
 			} catch {
+				ErrorReporting.capture(error, feature: "preferences", operation: "load_servers")
 				model.error = .preferences(error)
 			}
 		}

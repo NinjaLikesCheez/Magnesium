@@ -48,12 +48,16 @@ public final class SystemKeychain: Keychain {
 
 		if status != errSecSuccess {
 			os_log("%@: Failed to copy keychain item (%d). Query: %@", #function, status, String(describing: query))
-			throw KeychainError.system(status)
+			let error = KeychainError.system(status)
+			ErrorReporting.capture(error, feature: "keychain", operation: "get")
+			throw error
 		}
 
 		guard let data = result as? Data else {
 			os_log("%@: Failed to cast result to data (%d). Query: %@", #function, status, String(describing: query))
-			throw KeychainError.unknown
+			let error = KeychainError.unknown
+			ErrorReporting.capture(error, feature: "keychain", operation: "get")
+			throw error
 		}
 
 		return data
@@ -63,7 +67,9 @@ public final class SystemKeychain: Keychain {
 		let status = SecItemAdd(query as CFDictionary, nil)
 		guard status == errSecSuccess else {
 			os_log("%@: Failed to add keychain item (%d). Query: %@", #function, status, String(describing: query))
-			throw KeychainError.system(status)
+			let error = KeychainError.system(status)
+			ErrorReporting.capture(error, feature: "keychain", operation: "add")
+			throw error
 		}
 	}
 
@@ -71,7 +77,9 @@ public final class SystemKeychain: Keychain {
 		let status = SecItemDelete(query as CFDictionary)
 		guard status == errSecSuccess || status == errSecItemNotFound else {
 			os_log("%@: Failed to delete keychain item (%d). Query: %@", #function, status, String(describing: query))
-			throw KeychainError.system(status)
+			let error = KeychainError.system(status)
+			ErrorReporting.capture(error, feature: "keychain", operation: "delete")
+			throw error
 		}
 	}
 }

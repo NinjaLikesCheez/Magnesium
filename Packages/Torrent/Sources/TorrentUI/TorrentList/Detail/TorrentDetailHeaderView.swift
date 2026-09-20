@@ -1,3 +1,4 @@
+import Common
 import SwiftUI
 
 extension TorrentDetailView {
@@ -52,7 +53,7 @@ extension TorrentDetailView {
 						torrent.isActive
 							? try await torrentManager.pause([torrent]) : try await torrentManager.resume([torrent])
 					} catch {
-						model.error = .clientError(error)
+						model.present(error, operation: torrent.isActive ? "pause" : "resume")
 					}
 				}
 			} label: {
@@ -82,7 +83,7 @@ extension TorrentDetailView {
 							try await torrentManager.delete([torrent], removeData: false)
 							dismiss()
 						} catch {
-							model.error = .clientError(error)
+							model.present(error, operation: "delete")
 						}
 					}
 				}
@@ -93,7 +94,7 @@ extension TorrentDetailView {
 							try await torrentManager.delete([torrent], removeData: true)
 							dismiss()
 						} catch {
-							model.error = .clientError(error)
+							model.present(error, operation: "delete_with_data")
 						}
 					}
 				}
@@ -110,7 +111,7 @@ extension TorrentDetailView {
 						let paths = try await torrentManager.paths(for: torrent)
 						UIPasteboard.general.string = torrent.downloadPath + "/" + paths[0]
 					} catch {
-						model.error = .clientError(error)
+						model.present(error, operation: "copy_path")
 					}
 				}
 			} label: {
