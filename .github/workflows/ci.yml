@@ -8,11 +8,15 @@ on:
       - "Tests/**"
       - "Packages/**"
       - "config/**"
+      - "scripts/**"
       - "project.yml"
+      - "Brewfile"
+      - "justfile"
       - "Magnesium.xctestplan"
       - ".swift-format"
       - ".swiftlint.yml"
       - ".github/workflows/ci.yml"
+      - ".sentryclirc"
   pull_request:
     branches: [main]
     paths: *ci-paths
@@ -44,10 +48,8 @@ jobs:
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
 
-      - name: Install linters
-        run: |
-          command -v swift-format >/dev/null || brew install swift-format
-          command -v swiftlint >/dev/null || brew install swiftlint
+      - name: Install tools
+        run: brew bundle --file=Brewfile
 
       - name: swift-format lint
         run: swift-format lint --recursive Sources Tests Packages/*/Sources Packages/*/Tests
@@ -134,15 +136,13 @@ jobs:
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
-      - name: Install XcodeGen
-        run: |
-          command -v xcodegen >/dev/null || brew install xcodegen
-          xcodegen version
+      - name: Install tools
+        run: brew bundle --file=Brewfile
 
       # Magnesium.xcodeproj is generated, not checked in (see .gitignore) — regenerate it
       # from project.yml before every build, same as local development.
       - name: Generate Xcode project
-        run: xcodegen generate --spec project.yml
+        run: just generate
 
       - name: Cache DerivedData
         uses: actions/cache@v4
@@ -161,6 +161,9 @@ jobs:
         run: echo "PRODUCT_BUNDLE_IDENTIFIER = dev.magnesium.ci" > config/Signing.xcconfig
 
       - name: Build
+        env:
+          # Optional — when set, the Xcode post-build phase uploads dSYMs to Sentry.
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           xcodebuild build \
             -project Magnesium.xcodeproj \
@@ -186,13 +189,11 @@ jobs:
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
-      - name: Install XcodeGen
-        run: |
-          command -v xcodegen >/dev/null || brew install xcodegen
-          xcodegen version
+      - name: Install tools
+        run: brew bundle --file=Brewfile
 
       - name: Generate Xcode project
-        run: xcodegen generate --spec project.yml
+        run: just generate
 
       - name: Cache DerivedData
         uses: actions/cache@v4
@@ -215,6 +216,9 @@ jobs:
       # There's no standalone "MagnesiumTests" scheme — it's a hosted test bundle that
       # only runs as part of the "Magnesium" scheme's test action (see Magnesium.xctestplan).
       - name: Run app-level tests
+        env:
+          # Optional — when set, the Xcode post-build phase uploads dSYMs to Sentry.
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           xcodebuild test \
             -project Magnesium.xcodeproj \

@@ -72,6 +72,15 @@ targets:
       - package: Sentry
         products:
           - SentrySPM
+    # Upload dSYMs after the rest of the build so DWARF_DSYM_FOLDER_PATH is populated.
+    # Script soft-skips when sentry-cli or SENTRY_AUTH_TOKEN is missing.
+    postBuildScripts:
+      - name: Upload dSYMs to Sentry
+        path: scripts/upload-dsyms.sh
+        shell: /bin/bash
+        basedOnDependencyAnalysis: false
+        inputFiles:
+          - ${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${EXECUTABLE_NAME}
     scheme:
       testPlans:
         - path: Magnesium.xctestplan
