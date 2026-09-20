@@ -1,5 +1,5 @@
 # Magnesium command runner — https://just.systems/man/en/
-# Bootstrap once: `brew install just`, then `just install-tools`
+# First-time setup: ./bootstrap.sh  (installs just + Brewfile tools)
 
 set dotenv-load := false
 

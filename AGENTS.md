@@ -12,9 +12,11 @@ The codebase is mid-migration from a monolithic app target into standalone Swift
 
 ### Install tools
 ```bash
-# Bootstrap once if needed, then install Brewfile deps (just, xcodegen, swift-format,
-# swiftlint, sentry-cli). See Brewfile / justfile.
-brew install just
+# One-shot bootstrap: installs `just` (if needed) then Brewfile deps
+# (xcodegen, swift-format, swiftlint, sentry-cli). See Brewfile / justfile.
+./bootstrap.sh
+
+# Or, once just is installed:
 just install-tools
 ```
 

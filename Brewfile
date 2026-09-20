@@ -1,5 +1,6 @@
 # Development tools for Magnesium.
-# Install with: `just install-tools`  (or `brew bundle`)
+# First-time setup: ./bootstrap.sh
+# Later updates: `just install-tools` (or `brew bundle`)
 
 # Command runner — https://just.systems
 brew "just"
