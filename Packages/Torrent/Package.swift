@@ -131,6 +131,15 @@ let package = Package(
 			]
 		),
 		.testTarget(
+			name: "TorrentUITests",
+			dependencies: [
+				"TorrentUI",
+				"TorrentSession",
+				"TorrentCore",
+				.product(name: "Deluge", package: "Deluge-Swift"),
+			]
+		),
+		.testTarget(
 			name: "TorrentManagerTests",
 			dependencies: [
 				"TorrentTestSupport",

@@ -1,5 +1,5 @@
 {
-  "originHash" : "2e5c92c701f2f471fdc2cbe338ff50bba7c7426b2b58009463032f860234fab1",
+  "originHash" : "815bb05bfc392de51060070dce4d6f43e38ce2d4940f976ac25f665f225a7d4c",
   "pins" : [
     {
       "identity" : "deluge-swift",
@@ -38,6 +38,24 @@
       }
     },
     {
+      "identity" : "swift-case-paths",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-case-paths",
+      "state" : {
+        "revision" : "794f4b0a9cf32042592388d014f6a1ea987d323a",
+        "version" : "1.9.1"
+      }
+    },
+    {
+      "identity" : "swift-custom-dump",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-custom-dump",
+      "state" : {
+        "revision" : "a8cd6c976f335ed361dcecddb0dc39ebda51bc3e",
+        "version" : "1.6.1"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log",
@@ -53,6 +71,15 @@
       "state" : {
         "revision" : "fad75807c596fecd724b0fc81cd61c94008faad4",
         "version" : "2.10.3"
+      }
+    },
+    {
+      "identity" : "swift-perception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-perception",
+      "state" : {
+        "revision" : "de219a1cf34e958134e75a9ebb134cf09bf52fc6",
+        "version" : "2.0.11"
       }
     },
     {

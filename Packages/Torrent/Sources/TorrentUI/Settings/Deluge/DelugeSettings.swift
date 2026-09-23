@@ -41,12 +41,16 @@ class DelugeSettings {
 	}
 
 	var isValid: Bool {
+		// Basic auth is optional, but username/password must both be present or both be absent.
 		!name.isEmpty && !address.isEmpty && !password.isEmpty
-			&& (basicAuthentication.username.isEmpty || !basicAuthentication.password.isEmpty)
-			|| (!basicAuthentication.username.isEmpty && !basicAuthentication.password.isEmpty)
+			&& basicAuthentication.username.isEmpty == basicAuthentication.password.isEmpty
 	}
 
-	func makeServer() async throws(ServerSettingsError) -> TorrentServer {
+	func makeServer(
+		authenticate: (Deluge) async throws(Deluge.Error) -> Bool = { client in
+			try await client.request(.authenticate(client.password))
+		}
+	) async throws(ServerSettingsError) -> TorrentServer {
 		guard let url = URL(string: address) else {
 			throw .invalidState(message: "Invalid URL, ensure you add http(s)://")
 		}
@@ -60,7 +64,7 @@ class DelugeSettings {
 		let authenticated: Bool
 
 		do throws(Deluge.Error) {
-			authenticated = try await client.request(.authenticate(password))
+			authenticated = try await authenticate(client)
 			if !authenticated {
 				throw Deluge.Error.response(.unauthenticated)
 			}
