@@ -1,3 +1,4 @@
+import Common
 import SwiftUI
 import SwiftUINavigation
 
@@ -88,7 +89,7 @@ public struct TorrentListView: View {
 			do throws(TorrentClientError) {
 				try await manager.refresh()
 			} catch {
-				model.error = .clientError(error)
+				model.present(error, operation: .refresh)
 			}
 		}
 	}
@@ -134,6 +135,27 @@ extension TorrentListView {
 		public var destination: Destination?
 
 		public init() {}
+
+		/// Records a client failure for Sentry, then presents it in the error panel.
+		public func present(_ error: TorrentClientError, operation: ErrorReporting.Operation) {
+			ErrorReporting.capture(error, feature: .client, operation: operation)
+			self.error = .clientError(error)
+		}
+
+		/// Records a file-import failure for Sentry, then presents it in the error panel.
+		public func presentFileImport(_ message: String) {
+			let error = FileImportError(message)
+			ErrorReporting.capture(
+				NSError(
+					domain: "FileImportError",
+					code: 1,
+					userInfo: [NSLocalizedDescriptionKey: message]
+				),
+				feature: .fileImport,
+				operation: .`import`
+			)
+			self.error = .fileImportError(error)
+		}
 
 		/// Stack-navigation targets for the TorrentList feature.
 		@CasePathable

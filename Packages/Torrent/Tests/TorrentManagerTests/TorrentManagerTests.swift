@@ -28,8 +28,9 @@ class TorrentManagerTests {
 		// Set up mock session with mock client
 		mockSession.setMockClient(mockClient)
 
-		// Long interval to avoid the auto-refresh timer firing mid-test and skewing refreshCallCount assertions
-		mockPreferences.autoRefreshInterval = 10.0
+		// Disable auto-refresh so the timer cannot fire mid-test and skew refreshCallCount assertions.
+		// A "long" interval still flakes on slow CI where individual tests can exceed it.
+		mockPreferences.autoRefreshInterval = 0
 
 		torrentManager = TorrentManager(session: mockSession, preferences: mockPreferences)
 	}
@@ -50,8 +51,8 @@ class TorrentManagerTests {
 
 	@Test("TorrentManager initializes with timer based on preferences")
 	func torrentManagerInitializesWithTimerBasedOnPreferences() {
-		// Verify that preferences auto refresh interval is used
-		#expect(mockPreferences.autoRefreshInterval == 10.0)
+		// Verify auto-refresh is disabled for this suite's shared manager
+		#expect(mockPreferences.autoRefreshInterval == 0)
 	}
 
 	// MARK: - Torrent Refresh Tests

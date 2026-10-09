@@ -35,7 +35,13 @@ public final class TorrentManager {
 			self.updateTimer = Timer.scheduledTimer(
 				withTimeInterval: preferences.autoRefreshInterval, repeats: true,
 				block: { _ in
-					Task { try await self.refresh() }
+					Task {
+						do {
+							try await self.refresh()
+						} catch {
+							ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
+						}
+					}
 				})
 		}
 
@@ -51,7 +57,13 @@ public final class TorrentManager {
 					self.updateTimer = Timer.scheduledTimer(
 						withTimeInterval: value, repeats: true,
 						block: { _ in
-							Task { try await self.refresh() }
+							Task {
+								do {
+									try await self.refresh()
+								} catch {
+									ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
+								}
+							}
 						})
 				}
 			}

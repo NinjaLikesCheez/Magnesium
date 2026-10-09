@@ -4,6 +4,7 @@
 //
 //  Created by ninji on 11/04/2025.
 //
+import Common
 import Deluge
 import Foundation
 import Observation
@@ -65,7 +66,9 @@ class DelugeSettings {
 				throw Deluge.Error.response(.unauthenticated)
 			}
 		} catch {
-			throw error.intoServerSettingsError()
+			let settingsError = error.intoServerSettingsError()
+			ErrorReporting.capture(settingsError, feature: .login, operation: .authenticate)
+			throw settingsError
 		}
 
 		let serverSettings = DelugeServerSettings(url: url)
@@ -82,6 +85,7 @@ class DelugeSettings {
 			data = try encoder.encode(serverSettings)
 			keychainData = try encoder.encode(keychain)
 		} catch {
+			ErrorReporting.capture(error, feature: .encoding, operation: .serverSettings)
 			throw .invalidState(message: error.localizedDescription)
 		}
 

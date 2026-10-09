@@ -5,6 +5,7 @@
 //  Created by ninji on 11/04/2025.
 //
 
+import Common
 import SwiftUI
 
 struct OnboardingAddQBittorrentServerView: View {
@@ -54,6 +55,7 @@ struct OnboardingAddQBittorrentServerView: View {
 					try session.setServer(server)
 					dismiss()
 				} catch let error as ServerSettingsError {
+					ErrorReporting.capture(error, feature: .login, operation: .onboardingAddQBittorrent)
 					switch error {
 					case .invalidState(let message):
 						errorMessage = message
@@ -71,6 +73,7 @@ struct OnboardingAddQBittorrentServerView: View {
 						errorMessage = "Unknown error occurred: \(message)"
 					}
 				} catch let error as TorrentSession.Error {
+					ErrorReporting.capture(error, feature: .session, operation: .onboardingAddQBittorrent)
 					switch error {
 					case .missingKeychainData:
 						errorMessage = "Missing keychain data. Please try again."
@@ -82,6 +85,7 @@ struct OnboardingAddQBittorrentServerView: View {
 					}
 					showingError = true
 				} catch {
+					ErrorReporting.capture(error, feature: .client, operation: .onboardingAddQBittorrent)
 					errorMessage = "An unknown error occurred. Please try again. \(error.localizedDescription)"
 					showingError = true
 				}

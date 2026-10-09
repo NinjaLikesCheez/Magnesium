@@ -71,7 +71,8 @@ targets:
           - SwiftUINavigation
       - package: Sentry
         products:
-          - SentrySPM
+          - Sentry
+          - SentrySwiftUI
     scheme:
       testPlans:
         - path: Magnesium.xctestplan
