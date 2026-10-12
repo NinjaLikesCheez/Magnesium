@@ -47,6 +47,13 @@
         "identifier" : "TorrentManagerTests",
         "name" : "TorrentManagerTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Package.swift",
+        "identifier" : "TorrentUITests",
+        "name" : "TorrentUITests"
+      }
     }
   ],
   "version" : 1
