@@ -5,11 +5,13 @@
 //  Created by ninji on 10/05/2025.
 //
 
+import Common
 import SwiftUI
 
 struct TorrentNavigationView: View {
 	@Environment(TorrentManager.self) var torrentManager
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
+	@Environment(\.scenePhase) private var scenePhase
 
 	// BEWARE: this needs to be whatever the id of StandardTorrent is. Otherwise, SwiftUI will not show editing multiselect!
 	@State private var selections: Set<String> = []
@@ -21,10 +23,28 @@ struct TorrentNavigationView: View {
 	}
 
 	var body: some View {
-		if horizontalSizeClass == .compact {
-			contentView
-		} else {
-			splitView
+		Group {
+			if horizontalSizeClass == .compact {
+				contentView
+			} else {
+				splitView
+			}
+		}
+		// Stop auto-refresh while backgrounded: iOS tears down sockets on suspension, and requests fired then
+		// (or reusing those dead connections on resume) fail with "The network connection was lost".
+		.onChange(of: scenePhase, initial: true) { _, newPhase in
+			let isActive = newPhase == .active
+			let wasActive = torrentManager.isAutoRefreshActive
+			torrentManager.setActive(isActive)
+			if isActive && !wasActive {
+				Task {
+					do {
+						try await torrentManager.refresh()
+					} catch {
+						ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
+					}
+				}
+			}
 		}
 	}
 

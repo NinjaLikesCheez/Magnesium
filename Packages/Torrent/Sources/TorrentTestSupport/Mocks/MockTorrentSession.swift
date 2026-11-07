@@ -44,8 +44,15 @@ final class MockTorrentSession: TorrentSessionProtocol {
 
 	// MARK: - Test Helpers
 
-	func setMockClient(_ client: any TorrentClient) {
+	/// Injects a mock client. Also selects a server (a default test server unless one is passed or already
+	/// set), since `TorrentManager.refresh()` skips the client entirely when no server is configured.
+	func setMockClient(_ client: any TorrentClient, server: TorrentServer? = nil) {
 		self.client = client
+		if let server {
+			self.server = server
+		} else if self.server == nil {
+			self.server = TestDataFactory.createServer()
+		}
 	}
 
 	func simulateMissingKeychainData(for server: TorrentServer) {

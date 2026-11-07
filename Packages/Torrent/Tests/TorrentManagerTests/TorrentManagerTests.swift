@@ -441,6 +441,63 @@ class TorrentManagerTests {
 		#expect(!totalDownloadSpeed.isEmpty)  // Should return "0 bytes" or similar
 	}
 
+	// MARK: - Lifecycle & Transient Error Tests
+
+	@Test("Refresh retries once after a dropped connection")
+	func refreshRetriesOnceAfterConnectionLost() async throws {
+		torrentManager.transientRetryDelay = .zero
+		let torrent = TestDataFactory.createStandardTorrent(hash: "hash1", name: "Retry")
+		mockClient.refreshResult = ([torrent], [])
+		mockClient.refreshErrorQueue = [.deluge(.request(.urlError(URLError(.networkConnectionLost))))]
+
+		try await torrentManager.refresh()
+
+		#expect(mockClient.refreshCallCount == 2)
+		#expect(torrentManager.torrents.count == 1)
+	}
+
+	@Test("Refresh rethrows when the retry also loses the connection")
+	func refreshRethrowsWhenRetryFails() async throws {
+		torrentManager.transientRetryDelay = .zero
+		mockClient.refreshError = .deluge(.request(.urlError(URLError(.networkConnectionLost))))
+
+		await #expect(throws: TorrentClientError.self) {
+			try await torrentManager.refresh()
+		}
+		#expect(mockClient.refreshCallCount == 2)
+	}
+
+	@Test("Refresh does not retry non-transient errors")
+	func refreshDoesNotRetryNonTransientErrors() async throws {
+		mockClient.simulateNetworkError()
+
+		await #expect(throws: TorrentClientError.self) {
+			try await torrentManager.refresh()
+		}
+		#expect(mockClient.refreshCallCount == 1)
+	}
+
+	@Test("Auto-refresh pauses while inactive and resumes when active")
+	func autoRefreshFollowsActiveState() async throws {
+		let preferences = TorrentPreferences(
+			userDefaults: UserDefaults(suiteName: "test-\(UUID().uuidString)")!, keychain: InMemoryKeychain())
+		preferences.autoRefreshInterval = 0.05
+		let manager = TorrentManager(session: mockSession, preferences: preferences)
+
+		manager.setActive(false)
+		#expect(!manager.isAutoRefreshActive)
+		let pausedCount = mockClient.refreshCallCount
+		try await Task.sleep(for: .milliseconds(250))
+		#expect(mockClient.refreshCallCount == pausedCount)
+
+		manager.setActive(true)
+		#expect(manager.isAutoRefreshActive)
+		try await Task.sleep(for: .milliseconds(250))
+		#expect(mockClient.refreshCallCount > pausedCount)
+
+		manager.setActive(false)
+	}
+
 	// MARK: - Error Handling Tests
 
 	@Test("Refresh handles client errors gracefully")
