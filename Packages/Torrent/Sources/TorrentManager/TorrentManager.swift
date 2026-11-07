@@ -24,47 +24,67 @@ public final class TorrentManager {
 	@ObservationIgnored
 	private let preferences: TorrentPreferences
 
-	private var updateTimer: Timer
+	private var updateTimer: Timer?
+
+	/// Whether the app is in the foreground and allowed to auto-refresh.
+	///
+	/// When the app is backgrounded iOS suspends it and tears down open sockets. Firing refreshes while
+	/// suspended (or reusing those dead keep-alive connections on resume) fails with
+	/// `NSURLErrorNetworkConnectionLost`, so the timer only runs while active.
+	@ObservationIgnored
+	private var isActive = true
+
+	/// Whether the auto-refresh timer is currently allowed to run.
+	public var isAutoRefreshActive: Bool { isActive }
+
+	/// Delay before retrying a refresh that failed with a transient connection error.
+	@ObservationIgnored
+	var transientRetryDelay: Duration = .milliseconds(500)
 
 	public init(session: TorrentSessionProtocol, preferences: TorrentPreferences) {
 		self.session = session
 		self.preferences = preferences
 
-		self.updateTimer = Timer()  // Needs to be initialized before the block is used..
-		if preferences.autoRefreshInterval != 0 {
-			self.updateTimer = Timer.scheduledTimer(
-				withTimeInterval: preferences.autoRefreshInterval, repeats: true,
-				block: { _ in
-					Task {
-						do {
-							try await self.refresh()
-						} catch {
-							ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
-						}
-					}
-				})
-		}
+		scheduleTimer(interval: preferences.autoRefreshInterval)
 
 		let timerValue = Observations {
 			preferences.autoRefreshInterval
 		}
 
-		Task {
+		Task { [weak self] in
 			for await value in timerValue {
-				self.updateTimer.invalidate()
+				guard let self else { return }
+				self.scheduleTimer(interval: value)
+			}
+		}
+	}
 
-				if value != 0 {
-					self.updateTimer = Timer.scheduledTimer(
-						withTimeInterval: value, repeats: true,
-						block: { _ in
-							Task {
-								do {
-									try await self.refresh()
-								} catch {
-									ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
-								}
-							}
-						})
+	/// Pauses or resumes auto-refresh to follow the app's lifecycle (e.g. SwiftUI `scenePhase`).
+	public func setActive(_ active: Bool) {
+		guard active != isActive else { return }
+		isActive = active
+		scheduleTimer(interval: preferences.autoRefreshInterval)
+	}
+
+	/// (Re)creates the auto-refresh timer. The timer only runs while the app is active and the interval is non-zero.
+	private func scheduleTimer(interval: TimeInterval) {
+		updateTimer?.invalidate()
+		updateTimer = nil
+
+		guard isActive, interval != 0 else { return }
+
+		updateTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] timer in
+			guard self != nil else {
+				// The manager was deallocated; stop the run loop from firing forever.
+				timer.invalidate()
+				return
+			}
+			Task { @MainActor [weak self] in
+				guard let self, self.isActive else { return }
+				do {
+					try await self.refresh()
+				} catch {
+					ErrorReporting.capture(error, feature: .client, operation: .autoRefresh)
 				}
 			}
 		}
@@ -110,7 +130,7 @@ public final class TorrentManager {
 
 	public func refresh() async throws(TorrentClientError) {
 		guard session.server != nil else { return }
-		let (torrents, labels) = try await session.client.refresh()
+		let (torrents, labels) = try await fetchWithTransientRetry()
 
 		// We have to do 'delta' style updates so the view bindings work properly.
 		// First, calculate the changes in torrents
@@ -150,6 +170,30 @@ public final class TorrentManager {
 
 			self.torrents = torrentsCopy
 			self.labels = labels.sorted(by: { $0.name < $1.name })
+		}
+	}
+
+	/// Fetches torrents, retrying once if the connection was dropped (e.g. a keep-alive socket torn down while
+	/// the app was suspended). Any other error, or a second failure, is rethrown to the caller for reporting.
+	private func fetchWithTransientRetry() async throws(TorrentClientError) -> ([StandardTorrent], [StandardLabel]) {
+		do throws(TorrentClientError) {
+			return try await session.client.refresh()
+		} catch where error.isTransientConnectionError {
+			try? await Task.sleep(for: transientRetryDelay)
+			return try await session.client.refresh()
+		}
+	}
+}
+
+extension TorrentClientError {
+	/// Connection-level failures that are expected to succeed on an immediate retry.
+	var isTransientConnectionError: Bool {
+		guard case .deluge(.request(.urlError(let urlError))) = self else { return false }
+		switch urlError.code {
+		case .networkConnectionLost, .timedOut:
+			return true
+		default:
+			return false
 		}
 	}
 }

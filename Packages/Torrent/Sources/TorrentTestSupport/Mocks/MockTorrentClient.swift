@@ -8,6 +8,8 @@ final class MockTorrentClient: TorrentClient {
 
 	var refreshResult: ([StandardTorrent], [StandardLabel]) = ([], [])
 	var refreshError: TorrentClientError?
+	/// Errors thrown by successive refresh calls (one per call) before falling back to `refreshError`.
+	var refreshErrorQueue: [TorrentClientError] = []
 	var refreshCallCount = 0
 	var refreshDelay: TimeInterval = 0
 
@@ -59,6 +61,10 @@ final class MockTorrentClient: TorrentClient {
 
 		if refreshDelay > 0 {
 			try? await Task.sleep(nanoseconds: UInt64(refreshDelay * 1_000_000_000))
+		}
+
+		if !refreshErrorQueue.isEmpty {
+			throw refreshErrorQueue.removeFirst()
 		}
 
 		if let error = refreshError {
@@ -190,6 +196,7 @@ final class MockTorrentClient: TorrentClient {
 	func reset() {
 		refreshResult = ([], [])
 		refreshError = nil
+		refreshErrorQueue = []
 		refreshCallCount = 0
 		refreshDelay = 0
 
